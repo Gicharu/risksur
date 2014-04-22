@@ -1,0 +1,12 @@
+@CHARSET "UTF-8";
+/* CSS Document 
+.fg-toolbar {
+	display: none;
+}
+tbody {
+	border: solid 1px #0798a5;
+}
+*/
+.dataTables_wrapper {
+	min-height: 0px;
+}

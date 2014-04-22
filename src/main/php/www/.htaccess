@@ -1,0 +1,11 @@
+#Options +FollowSymLinks
+
+#<IfModule mod_rewrite.c>
+#IndexIgnore */*
+#RewriteEngine on
+#RewriteBase /tracii/
+#RewriteCond %{REQUEST_FILENAME} !-f
+#RewriteCond %{REQUEST_FILENAME} !-d
+#RewriteRule . index.php
+#RewriteRule ^(.*)\?*$ /tracii/index.php/$1 [L,QSA]
+#</IfModule>

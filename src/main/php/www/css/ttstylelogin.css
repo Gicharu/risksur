@@ -1,0 +1,197 @@
+@charset "utf-8";
+/* CSS Document */
+html{
+	background-color:#FFF;
+}
+body{
+	margin:0px;
+}
+body, .ui-widget{
+	font-family:Arial,Helvetica,sans-serif;
+	font-style:normal;}
+
+#doc3 {
+background-image: url(../images/login_page_risksur.png);
+background-repeat:no-repeat;
+height:475px;
+margin:0px;
+}
+/*#hd {
+margin-bottom:140px;
+}*/
+#bd {
+color:#294061;
+float:right;
+padding-right:60px;
+	position: relative;
+	bottom: -125px;
+	min-width:0px;
+}
+
+/*.errorSummary
+{
+	border: 2px solid #C00;
+	padding: 7px 7px 12px 7px;
+	margin: 0 0 20px 0;
+	background: #FEE;
+	font-size: 0.9em;
+}
+
+.errorSummary p
+{
+	margin: 0;
+	padding: 5px;
+} 
+
+.errorSummary ul
+{
+	margin: 0;
+	padding: 0 0 0 20px;
+}
+.errorMessage {
+    float: left;
+    position: relative;
+    color: red;
+	font-size: 0.9em;
+}
+span.required
+{
+	color: red;
+}
+
+div.error label,
+label.error,
+span.error
+{
+	color: #C00;
+}
+
+div.error input,
+div.error textarea,
+div.error select,
+input.error,
+textarea.error,
+select.error
+{
+	background: #FEE;
+	border-color: #C00;
+}
+
+div.success input,
+div.success textarea,
+div.success select,
+input.success,
+textarea.success,
+select.success
+{
+	background: #E6EFC2;
+	border-color: #C6D880;
+}
+*/
+/*#bd a {
+	color:#294061;}
+
+#bd tbody {
+text-align:right;
+}
+#bd tbody td {
+padding-bottom:10px;
+}
+#ft {
+color:#294061;
+text-align:right;
+padding-right:15px;
+}*/
+#loginft { text-align: left; padding-left: 10px; font-size: 10px; margin-left:20px; }
+#customer-logo{
+	float:right;
+	padding:12px 60px 0px 0px;}
+
+/** css from skining.ecss (old richfaces style) */
+
+a:hover { color: #294061; }
+a { color: #294061; }
+input, select, textarea, button, keygen, isindex, legend, a {
+	font-size: 11px;
+	font-family: Arial, Verdana, sans-serif;
+}
+#formLogin label {
+    margin-right: 10px;
+}
+#formLogin input {
+    background: #fff;
+	color:#000;
+}
+#formRemember input {
+    margin-left: 5px;
+    vertical-align: bottom;
+}
+div.flash-error{
+	background:#FEF1EC;
+	border:2px solid #ddd;
+	border-color:#CC0000;
+	color:#881212;
+	font-weight: bold;
+	margin-bottom:1em;
+	padding:.8em;
+
+}
+div.flash-success{
+	background:#E6EFC2;
+	color:#264409;
+	border:2px solid #ddd;	
+	border-color:#CC0000;
+	font-weight: bold;
+	margin-bottom:1em;
+	padding:.8em;
+
+}
+div.flash-notice{
+	background:#FFF6BF;
+	border:2px solid #ddd;
+	border-color:#CC0000;
+	color:#514721;
+	font-weight: bold;
+	margin-bottom:1em;
+	padding:.8em;
+
+}
+
+div.login-error{
+	background: #FFF6BF;
+	border:2px solid #ddd;
+	border-color:#CC0000;
+	font-weight: bold;
+	margin-bottom:1em;
+	padding:.8em;
+	right: 60px;
+	position: absolute;
+	color: #CC0000;
+	top: 80px;
+	width: 350px;
+
+}
+
+/* Remove borders on images for IE */
+a img{ border: 0px; }
+.ui-inputfield {
+    background: none;
+}
+#formRemember li, #formLogin li{
+	text-align:right;
+    margin-bottom: 10px;
+}
+.#formRemember input {
+    margin-left: 5px;
+    vertical-align: bottom;
+}
+#txtRequired{
+	text-align:right;
+}
+#loginft {
+    position: absolute;
+    bottom: 10px;
+}
+.ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default{
+	/*border-color:#4297D7;*/
+}

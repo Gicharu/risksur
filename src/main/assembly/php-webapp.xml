@@ -1,0 +1,51 @@
+<assembly>
+	<id>php-webapp</id>
+	<includeBaseDirectory>false</includeBaseDirectory>
+	<formats>
+		<format>zip</format>
+	</formats>
+	<dependencySets>
+		<dependencySet>
+			<outputDirectory>phpinc</outputDirectory>
+            <!--<unpack>true</unpack>-->
+		</dependencySet>
+	</dependencySets>
+	<fileSets>
+		<fileSet>
+			<!-- Include all the WWW files -->
+            <directory>src/main/php/www</directory>
+			<outputDirectory>/htdocs</outputDirectory>
+			<useDefaultExcludes>true</useDefaultExcludes>
+		</fileSet>
+		<fileSet>
+			<!-- Include all the framework files -->
+            <directory>src/main/php/framework</directory>
+			<outputDirectory>/framework</outputDirectory>
+			<useDefaultExcludes>true</useDefaultExcludes>
+		</fileSet>
+		<fileSet>
+			<!-- Include all the protected files -->
+            <directory>src/main/php/protected</directory>
+			<outputDirectory>/protected</outputDirectory>
+			<useDefaultExcludes>true</useDefaultExcludes>
+		</fileSet>
+		<fileSet>
+			<!-- Include PDF files, such as user guides -->
+			<directory>target/classes/htdocs</directory>
+			<outputDirectory>/htdocs/docs</outputDirectory>
+			<useDefaultExcludes>true</useDefaultExcludes>
+		</fileSet>
+		<fileSet>
+			<!-- Include resource files, such as ct.ini -->
+			<directory>target/classes/resources</directory>
+			<outputDirectory>/resources</outputDirectory>
+			<useDefaultExcludes>true</useDefaultExcludes>
+		</fileSet>
+		<fileSet>
+			<!-- Include masterdata folder -->
+			<directory>masterdata</directory>
+			<outputDirectory>/resources</outputDirectory>
+			<useDefaultExcludes>true</useDefaultExcludes>
+		</fileSet>
+	</fileSets>
+</assembly>

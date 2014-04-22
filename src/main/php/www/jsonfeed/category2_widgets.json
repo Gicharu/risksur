@@ -1,0 +1,31 @@
+{
+"result" :
+  {
+  "data" : [
+    {
+      "id" : "widget3",
+      "title" : "JqPlot Graph",
+      "description" : "JqPlot Graph",
+      "creator" : "Chirag",
+      "url" : "widgets/display/widget3",
+      "image": "../../images/items1.png"
+    },
+    {
+      "id" : "widget4",
+      "title" : "HighChart Pie",
+      "description" : "HighChart Pie",
+      "creator" : "Chirag",
+      "url" : "widgets/display/widget4",
+      "image": "../../images/items2.png"
+    },
+    {
+      "id" : "widget5",
+      "title" : "Client Shipments",
+      "description" : "Client Shipments",
+      "creator" : "James",
+      "url" : "widgets/display/widget5",
+      "image": "../../images/itemsBar.png"
+    }
+  ]
+  }
+}

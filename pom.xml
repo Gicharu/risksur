@@ -1,0 +1,352 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<parent>
+		<groupId>com.tracetracker</groupId>
+		<artifactId>tt-main</artifactId>
+		<version>6.0.20</version>
+	</parent>
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.tracetracker</groupId>
+	<artifactId>story</artifactId>
+	<version>1.0.59-SNAPSHOT</version>
+	<packaging>php</packaging>
+	<name>TraceTracker STORY</name>
+	<description>TraceTracker STORY</description>
+
+	<prerequisites>
+		<maven>3.0.3</maven>
+	</prerequisites>
+
+	<scm>
+		<connection>scm:git:ssh://git@bitbucket.org/tracetracker/story.git</connection>
+		<url>https://bitbucket.org/tracetracker/story</url>
+	</scm>
+	<build>
+		<extensions>
+			<extension>
+				<groupId>org.phpmaven</groupId>
+
+				<artifactId>maven-php-plugin</artifactId>
+				<version>${phpmaven.release.number}</version>
+			</extension>
+		</extensions>
+		<testSourceDirectory>${basedir}/src/main/php/protected/skippedTests"</testSourceDirectory> 
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<targetPath>resources</targetPath>
+				<filtering>true</filtering>
+				<includes>
+					<include>**/*.ini</include>
+					<include>**/*.xml</include>
+				</includes>
+			</resource>
+		</resources>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.phpmaven</groupId>
+					<artifactId>maven-php-plugin</artifactId>
+					<version>${phpmaven.release.number}</version>
+					<extensions>true</extensions>
+					<configuration>
+						<!--<arguments>-c src/test/resources/php.ini</arguments>-->
+						<!-- JN 120713 Temporarily skip unit tests till we upgrade phpunit -->
+						<!-- <skipTests>true</skipTests>
+						<maven.test.skip>true</maven.test.skip>
+						<maven.test.failure.ignore>true</maven.test.failure.ignore> -->
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+
+		<plugins>
+			<plugin>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<inherited>false</inherited>
+				<executions>
+					<!-- HB060812: Temporarily disable phar packaging -->
+					<execution>
+						<id>create-dummy-phar</id>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<phase>prepare-package</phase>
+						<configuration>
+							<target>
+								<copy file="pom.xml" tofile="${project.build.directory}/${project.artifactId}-${project.version}.phar" />
+							</target>
+						</configuration>
+					</execution>
+					<!-- Get and run phpcheckstyle, inherited from tt-main -->
+					<execution>
+						<id>get-and-run-phpcheckstyle</id>
+						<phase>process-resources</phase>
+					</execution>
+					<execution>
+						<id>run-phpunit</id>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<phase>test</phase>
+						<configuration>
+							<target unless="maven.test.skip">
+								<exec executable="php" failonerror="true">
+									<arg line="-c src/test/resources/php.ini" />
+									<arg line="/usr/bin/phpunit" />
+									<arg line="--include-path target/classes:target/php-deps:target/php-deps/pear:target/test-classes:target/php-test-deps:target/php-test-deps/pear" />
+									<arg line="--bootstrap src/main/php/protected/tests/bootstrap.php" />
+									<arg line="--log-junit target/phpunit-reports/resultsFromTest.xml" />
+									<arg line="--debug" />
+									<arg line="--verbose" />
+									<arg line="src/main/php/protected/tests/unit" />
+								</exec>
+							</target>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<dependencies>
+					<dependency>
+						<groupId>org.phpmaven</groupId>
+						<artifactId>maven-php-plugin</artifactId>
+						<version>${phpmaven.release.number}</version>
+					</dependency>
+				</dependencies>
+				<executions>
+					<execution>
+						<id>bundle-project-sources</id>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+						<inherited>false</inherited>
+						<configuration>
+							<descriptors>
+								<descriptor>
+									src/main/assembly/php-webapp.xml
+								</descriptor>
+							</descriptors>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+<!-- Invoking Selenium server to start before any tests begin -->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>selenium-maven-plugin</artifactId>
+				<version>2.3</version>
+				<executions>
+					<execution>
+						<id>xvfb</id>
+						<phase>pre-integration-test</phase>
+						<goals>
+							<goal>xvfb</goal>
+						</goals>
+					</execution>
+					<execution>
+						<phase>pre-integration-test</phase>
+						<goals>
+							<goal>start-server</goal>
+						</goals>
+						<configuration>
+							<background>true</background>
+							<port>11200</port>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin> 
+
+			<!-- ******************************************************* -->
+			<!-- Start selenium-server before the integration test start -->
+			<!-- ******************************************************* 
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>selenium-maven-plugin</artifactId>
+				<version>2.3</version>
+				<executions>
+					<execution>
+						<id>start-selenium-server</id>
+						<phase>pre-integration-test</phase>
+							<goals>
+								<goal>start-server</goal>
+								<goal>xvfb</goal>
+							</goals>
+							<configuration>
+								<background>true</background>
+								<logOutput>true</logOutput>
+								<multiWindow>true</multiWindow>
+							</configuration>
+					</execution>
+					<execution>
+						<id>stop-selenium-server</id>
+						<phase>post-integration-test</phase>
+						<goals>
+							<goal>stop-server</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin> -->
+			<!-- ******************************************************** -->
+			<!-- Force to run the testcases in the integration-test phase -->
+			<!-- ******************************************************** -->
+			<!--<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.9</version>
+				<configuration>
+					 Skip the normal tests, we'll run them in the integration-test phase 
+					<skip>true</skip>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>integration-test</phase>
+						<goals>
+							<goal>test</goal>
+						</goals>
+						<configuration>
+							<skip>false</skip>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin> -->
+
+			<plugin>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.9</version>
+				<configuration>
+					<skip>true</skip>
+				</configuration>
+				<executions>
+					<execution>
+						<id>unit-test</id>
+						<phase>test</phase>
+						<goals>
+							<goal>test</goal>
+						</goals>
+						<configuration>
+							<skip>false</skip>
+							<excludes>
+								<exclude>**/IT*.php</exclude>
+							</excludes>
+						</configuration>
+					</execution>
+ 
+					<execution>
+						<id>integration-test</id>
+						<phase>integration-test</phase>
+						<goals>
+							<goal>test</goal>
+						</goals>
+						<configuration>
+							<skip>false</skip>
+							<includes>
+								<include>**/IT*.php</include>
+							</includes>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+
+
+
+			<plugin>
+				<groupId>org.phpmaven</groupId>
+				<artifactId>maven-php-phpunit</artifactId>
+				<version>${phpmaven.release.number}</version>
+				<configuration>
+					<arguments>--bootstrap ${basedir}/src/main/php/protected/tests/bootstrap.php --coverage-clover ${project.build.directory}/clover.xml</arguments>
+					<executableConfig>
+						<additionalPhpParameters>-c ${basedir}/src/test/resources/php.ini</additionalPhpParameters>
+					</executableConfig>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-site-plugin</artifactId>
+				<version>3.1</version>
+				<configuration>
+					<reportPlugins>
+						<plugin>
+							<groupId>org.phpmaven</groupId>
+							<artifactId>maven-php-plugin</artifactId>
+							<version>${phpmaven.plugin.version}</version>
+							<reports>
+								<!-- HB060812: Temporarily disable phpdocumentor -->
+								<!-- report>phpdocumentor</report -->
+								<report>phpunit-coverage</report>
+								<report>phpunit</report>
+							</reports>
+						</plugin>
+					</reportPlugins>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+	<dependencies>
+		<dependency>
+			<groupId>de.phpunit</groupId>
+			<artifactId>PHPUnit_Selenium</artifactId>
+			<version>1.2.6</version>
+			<type>phar</type>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>de.phpunit</groupId>
+			<artifactId>PHPUnit</artifactId>
+			<version>${phpunit.version}</version>
+			<type>phar</type>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>com.tracetracker</groupId>
+			<artifactId>lib-internal-resources</artifactId>
+			<version>${tt.lib-internal.version}</version>
+			<scope>provided</scope>
+		</dependency>
+	</dependencies> 
+
+	<profiles>
+		<profile>
+			<id>nightly</id>
+			<properties>
+				<log.file.location>/tmp/</log.file.location>
+				<deploy.web.root>${user.home}/site/nightly</deploy.web.root>
+			</properties>
+		</profile>
+		<profile>
+			<id>alpha</id>
+			<properties>
+				<log.file.location>/tmp/</log.file.location>
+				<deploy.web.root>${user.home}/site/nightly</deploy.web.root>
+				<tt.jenkins.dependent.job>Nightly_Story_Trunk</tt.jenkins.dependent.job>
+				<tt.jenkins.dependent.job2>Nightly_Story_Trunk_Jmeter</tt.jenkins.dependent.job2>
+				<scp.host>alpha.tracetracker.com</scp.host>
+			</properties>
+		</profile>
+	</profiles>
+
+	<properties>
+		<application.name>${project.name}</application.name>
+		<application.version>${project.version}</application.version>
+		<application.year>2012</application.year>
+
+		<phpmaven.release.number>2.0.1</phpmaven.release.number>
+		<phpunit.version>3.6.10</phpunit.version>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<tt.phpcheckstyle.excludes>--exclude assets --exclude css --exclude framework --exclude images --exclude js --exclude protected/commands --exclude protected/data --exclude protected/extensions/EActiveResource --exclude protected/extensions/EStrongPassword --exclude protected/extensions/mbmenu --exclude protected/extensions/lightopenid --exclude protected/extensions/phpmailer --exclude protected/runtime --exclude protected/views/user/openid.php --exclude protected/components/Rbac.php --exclude protected/extensions/validators/EPasswordStrength.php --exclude protected/yiic.php --exclude protected/tests/phpunit.php --exclude protected/extensions/jqrelcopy --exclude protected/extensions/timeout-dialog --exclude protected/extensions/date-compare  --exclude www/libraries</tt.phpcheckstyle.excludes>
+		<tt.lib-internal.version>5.0.14</tt.lib-internal.version>
+
+		<deploy.web.root>/var/www/myapps</deploy.web.root>
+		<scp.user>bob</scp.user>
+		<scp.host>nightly.tracetracker.com</scp.host>
+
+		<pentaho.server>http://nightly.tracetracker.com:8888</pentaho.server>
+	</properties>
+
+</project>

@@ -1,0 +1,1 @@
+phpunit --include-path target/classes:target/php-deps:target/php-deps/pear:target/test-classes:target/php-test-deps:target/php-test-deps/pear --bootstrap src/main/php/protected/tests/bootstrap.php src/main/php/protected/tests/unit/TMdsResourceTest.php

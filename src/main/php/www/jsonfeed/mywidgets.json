@@ -1,0 +1,75 @@
+{
+"result" :
+  {
+  "layout": "layout5",
+  "data" : [
+    {
+      "title" : "Shipments Graph",
+      "column" : "first",
+      "id" : "widget5",
+      "url" : "widgets/display/widget5/id/widget5",
+      "editurl" : "widgets/edit/widget5",
+      "open" : true,
+      "metadata": {
+        "size": "10",
+        "dateFrom":"01-01-2012",
+        "dateTo":"31-01-2012"
+      }
+
+    },
+    {
+      "title" : "Events",
+      "id" : "widget1",
+      "column" : "first",
+      "editurl" : "widgets/editwidget1.html",
+      "open" : true,
+      "url" : "widgets/display/widget1/id/widget1",
+      "metadata": {
+        "size": "10",
+        "dateFrom":"01-01-2012",
+        "dateTo":"31-01-2012"
+      }
+    },
+    {
+      "title" : "Items Per Store",
+      "column" : "second",
+      "id" : "widget3",
+      "url" : "widgets/display/widget3/id/widget3",
+      "editurl" : "widgets/editwidget3.html",
+      "open" : true,
+      "metadata": {
+        "size": "10",
+        "dateFrom":"01-01-2012",
+        "dateTo":"31-01-2012"
+      }
+
+    },
+    {
+      "title" : "Shipments",
+      "id" : "widget2",
+      "column" : "second",
+      "url" : "widgets/display/widget2/id/widget2",
+      "editurl" : "widgets/editwidget2.html",
+      "open" : true,
+      "metadata": {
+        "size": "100",
+        "dateFrom":"01-08-2012",
+        "dateTo":"31-08-2012"
+      }
+    },
+    {
+      "title" : "Items Per Store 2",
+      "column" : "third",
+      "id" : "widget4",
+      "url" : "widgets/display/widget4/id/widget4",
+      "editurl" : "widgets/editwidget4.html",
+      "open" : true,
+      "metadata": {
+        "size": "10",
+        "dateFrom":"01-01-2012",
+        "dateTo":"31-01-2012"
+      }
+    }
+  ]
+  }
+}
