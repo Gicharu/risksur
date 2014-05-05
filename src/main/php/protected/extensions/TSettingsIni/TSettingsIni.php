@@ -47,9 +47,6 @@ class TSettingsIni extends CApplicationComponent {
 		$configParams['backgroundpath'] = "images/headerBackground.png";
 		$configParams['theme'] = "risksurTheme/jquery-ui-1.9.2.custom.css";
 		$configParams['helpdocumentpath'] = "http://docs.tracetracker.com/story";
-		$configParams['moreinfobuttonclass'] = "ui-icon-info";
-		$configParams['moreinfobuttontext'] = "More Information";
-		$configParams['moreinfobuttonurl'] = "";
 		$configParams['epcisNamespace'] = "http://www.globaltraceability.net/schema/epcis";
 		$configParams['gtnetNamespace'] = "http://www.tracetracker.com/data";
 		$configParams['legendbuttontext'] = "Legend";
@@ -112,16 +109,13 @@ class TSettingsIni extends CApplicationComponent {
 			$this->settings->name = $iniArray['application.name'];
 			$this->settings->version = $iniArray['application.version'];
 			$this->settings->year = $iniArray['application.year'];
-			$this->settings->pentahoUser = $iniArray['pentaho.reportUser'];
-			$this->settings->pentahoServer = $iniArray['pentaho.server'];
+			//$this->settings->pentahoUser = $iniArray['pentaho.reportUser'];
+			//$this->settings->pentahoServer = $iniArray['pentaho.server'];
 
 			$this->settings->logopath = $configParams['logopath'];
 			$this->settings->backgroundpath = $configParams['backgroundpath'];
 			$this->settings->theme = $configParams['theme'];
 			$this->settings->helpdocumentpath = $configParams['helpdocumentpath'];
-//			$this->settings->moreinfobuttonclass = $configParams['moreinfobuttonclass'];
-//			$this->settings->moreinfobuttontext = $configParams['moreinfobuttontext'];
-//			$this->settings->moreinfobuttonurl = $configParams['moreinfobuttonurl'];
 			$this->settings->epcisNamespace = $configParams['epcisNamespace'];
 			$this->settings->gtnetNamespace = $configParams['gtnetNamespace'];
 			$this->settings->legendbuttontext = $configParams['legendbuttontext'];
@@ -131,15 +125,12 @@ class TSettingsIni extends CApplicationComponent {
 			$this->settings->name = "(Unknown)";
 			$this->settings->version = "(Unknown)";
 			$this->settings->year = "(Unknown)";
-			$this->settings->pentahoUser = "(Unknown)";
-			$this->settings->pentahoServer = "(Unknown)";
+			//$this->settings->pentahoUser = "(Unknown)";
+			//$this->settings->pentahoServer = "(Unknown)";
 			$this->settings->logopath = $configParams['logopath'];
 			$this->settings->backgroundpath = $configParams['backgroundpath'];
 			$this->settings->theme = $configParams['theme'];
 			$this->settings->helpdocumentpath = $configParams['helpdocumentpath'];
-			$this->settings->moreinfobuttonclass = $configParams['moreinfobuttonclass'];
-			$this->settings->moreinfobuttontext = $configParams['moreinfobuttontext'];
-			$this->settings->moreinfobuttonurl = $configParams['moreinfobuttonurl'];
 			$this->settings->epcisNamespace = $configParams['epcisNamespace'];
 			$this->settings->gtnetNamespace = $configParams['gtnetNamespace'];
 			$this->settings->legendbuttontext = $configParams['legendbuttontext'];
@@ -353,15 +344,12 @@ class IniSettings {
 	public $appName;
 	public $appVersion;
 	public $appYear;
-	public $pentahoUser;
+	//public $pentahoUser;
 
 	public $logopath;
 	public $backgroundpath;
 	public $theme;
 	public $helpdocumentpath;
-	public $moreinfobuttonclass;
-	public $moreinfobuttontext;
-	public $moreinfobuttonurl;
 	public $epcisNamespace;
 	public $gtnetNamespace;
 	public $legendbuttontext;
