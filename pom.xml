@@ -344,40 +344,40 @@
 				<scp.host>alpha.tracetracker.com</scp.host>
 			</properties>
 		</profile>
+		<profile>
+			<id>init-db</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>com.carbonfive.db-support</groupId>
+						<artifactId>db-migration-maven-plugin</artifactId>
+						<dependencies>
+							<dependency>
+								<groupId>mysql</groupId>
+								<artifactId>mysql-connector-java</artifactId>
+								<version>${mysql.version}</version>
+							</dependency>
+						</dependencies>
+						<executions>
+							<execution>
+								<id>drop-existing-create-new-db-with-migrations</id>
+								<phase>package</phase>
+						<configuration>
+							<url>jdbc:${risksur.database.type}://${risksur.database.host}/${risksur.database.name}</url>
+							<username>${risksur.database.username}</username>
+							<password>${risksur.database.password}</password>
+							<migrationsPath>src/main/resources/MySQL</migrationsPath>
+						</configuration>
+								<goals>
+									<goal>reset</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
 	</profiles>
-	<profile>
-		<id>init-db</id>
-		<build>
-			<plugins>
-				<plugin>
-					<groupId>com.carbonfive.db-support</groupId>
-					<artifactId>db-migration-maven-plugin</artifactId>
-					<dependencies>
-						<dependency>
-							<groupId>mysql</groupId>
-							<artifactId>mysql-connector-java</artifactId>
-							<version>${mysql.version}</version>
-						</dependency>
-					</dependencies>
-					<executions>
-						<execution>
-							<id>drop-existing-create-new-db-with-migrations</id>
-							<phase>package</phase>
-					<configuration>
-						<url>jdbc:${risksur.database.type}://${risksur.database.host}/${risksur.database.name}</url>
-						<username>${risksur.database.username}</username>
-						<password>${risksur.database.password}</password>
-						<migrationsPath>src/main/resources/MySQL</migrationsPath>
-					</configuration>
-							<goals>
-								<goal>reset</goal>
-							</goals>
-						</execution>
-					</executions>
-				</plugin>
-			</plugins>
-		</build>
-	</profile>
 
 	<properties>
 		<application.name>${project.name}</application.name>
