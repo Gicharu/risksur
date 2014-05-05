@@ -7,19 +7,19 @@
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.tracetracker</groupId>
-	<artifactId>story</artifactId>
+	<artifactId>risksur</artifactId>
 	<version>1.0.59-SNAPSHOT</version>
 	<packaging>php</packaging>
-	<name>TraceTracker STORY</name>
-	<description>TraceTracker STORY</description>
+	<name>TraceTracker Risksur</name>
+	<description>TraceTracker Risksur</description>
 
 	<prerequisites>
 		<maven>3.0.3</maven>
 	</prerequisites>
 
 	<scm>
-		<connection>scm:git:ssh://git@bitbucket.org/tracetracker/story.git</connection>
-		<url>https://bitbucket.org/tracetracker/story</url>
+		<connection>scm:git:ssh://git@bitbucket.org/tracetracker/risksur.git</connection>
+		<url>https://bitbucket.org/tracetracker/risksur</url>
 	</scm>
 	<build>
 		<extensions>
@@ -39,6 +39,7 @@
 				<includes>
 					<include>**/*.ini</include>
 					<include>**/*.xml</include>
+					<include>**/*.sql</include>
 				</includes>
 			</resource>
 		</resources>
@@ -287,6 +288,17 @@
 		</plugins>
 	</build>
 
+	<dependencyManagement>
+		<dependencies>
+			<!-- EXTERNAL -->
+			<dependency>
+				<groupId>mysql</groupId>
+				<artifactId>mysql-connector-java</artifactId>
+				<version>${postgres.version}</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
 	<dependencies>
 		<dependency>
 			<groupId>de.phpunit</groupId>
@@ -317,6 +329,9 @@
 			<properties>
 				<log.file.location>/tmp/</log.file.location>
 				<deploy.web.root>${user.home}/site/nightly</deploy.web.root>
+				<risksur.database.host>nightly.tracetracker.com</risksur.database.host>
+				<risksur.database.username>bob_db</risksur.database.username>
+				<risksur.database.password>${tt.scm.password}</risksur.database.password>
 			</properties>
 		</profile>
 		<profile>
@@ -324,16 +339,50 @@
 			<properties>
 				<log.file.location>/tmp/</log.file.location>
 				<deploy.web.root>${user.home}/site/nightly</deploy.web.root>
-				<tt.jenkins.dependent.job>Nightly_Story_Trunk</tt.jenkins.dependent.job>
-				<tt.jenkins.dependent.job2>Nightly_Story_Trunk_Jmeter</tt.jenkins.dependent.job2>
+				<tt.jenkins.dependent.job>Nightly_Risksur_Trunk</tt.jenkins.dependent.job>
+				<tt.jenkins.dependent.job2>Nightly_Risksur_Trunk_Jmeter</tt.jenkins.dependent.job2>
 				<scp.host>alpha.tracetracker.com</scp.host>
 			</properties>
 		</profile>
 	</profiles>
+	<profile>
+		<id>init-db</id>
+		<build>
+			<plugins>
+				<plugin>
+					<groupId>com.carbonfive.db-support</groupId>
+					<artifactId>db-migration-maven-plugin</artifactId>
+					<dependencies>
+						<dependency>
+							<groupId>mysql</groupId>
+							<artifactId>mysql-connector-java</artifactId>
+							<version>${mysql.version}</version>
+						</dependency>
+					</dependencies>
+					<executions>
+						<execution>
+							<id>drop-existing-create-new-db-with-migrations</id>
+							<phase>package</phase>
+					<configuration>
+						<url>jdbc:${risksur.database.type}://${risksur.database.host}/${risksur.database.name}</url>
+						<username>${risksur.database.username}</username>
+						<password>${risksur.database.password}</password>
+						<migrationsPath>src/main/resources/MySQL</migrationsPath>
+					</configuration>
+							<goals>
+								<goal>reset</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
+			</plugins>
+		</build>
+	</profile>
 
 	<properties>
 		<application.name>${project.name}</application.name>
 		<application.version>${project.version}</application.version>
+		<mysql.version>5.1.6</mysql.version>
 		<application.year>2012</application.year>
 
 		<phpmaven.release.number>2.0.1</phpmaven.release.number>
@@ -341,6 +390,12 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<tt.phpcheckstyle.excludes>--exclude assets --exclude css --exclude framework --exclude images --exclude js --exclude protected/commands --exclude protected/data --exclude protected/extensions/EActiveResource --exclude protected/extensions/EStrongPassword --exclude protected/extensions/mbmenu --exclude protected/extensions/lightopenid --exclude protected/extensions/phpmailer --exclude protected/runtime --exclude protected/views/user/openid.php --exclude protected/components/Rbac.php --exclude protected/extensions/validators/EPasswordStrength.php --exclude protected/yiic.php --exclude protected/tests/phpunit.php --exclude protected/extensions/jqrelcopy --exclude protected/extensions/timeout-dialog --exclude protected/extensions/date-compare  --exclude www/libraries</tt.phpcheckstyle.excludes>
 		<tt.lib-internal.version>5.0.14</tt.lib-internal.version>
+
+		<risksur.database.host>localhost</risksur.database.host>
+		<risksur.database.type>mysql</risksur.database.type>
+		<!-- ct.database.name>ct_${user.name}</ct.database.name -->
+		<risksur.database.name>risksur</risksur.database.name>
+		<risksur.database.username>root</risksur.database.username>
 
 		<deploy.web.root>/var/www/myapps</deploy.web.root>
 		<scp.user>bob</scp.user>
