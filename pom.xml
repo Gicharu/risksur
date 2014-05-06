@@ -342,6 +342,9 @@
 				<tt.jenkins.dependent.job>Nightly_Risksur_Trunk</tt.jenkins.dependent.job>
 				<tt.jenkins.dependent.job2>Nightly_Risksur_Trunk</tt.jenkins.dependent.job2>
 				<scp.host>alpha.tracetracker.com</scp.host>
+				<risksur.database.host>alpha.tracetracker.com</risksur.database.host>
+				<risksur.database.username>bob_db</risksur.database.username>
+				<risksur.database.password>${tt.scm.password}</risksur.database.password>
 			</properties>
 		</profile>
 		<profile>
