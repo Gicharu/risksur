@@ -340,6 +340,7 @@
 				<log.file.location>/tmp/</log.file.location>
 				<deploy.web.root>${user.home}/site/nightly</deploy.web.root>
 				<tt.jenkins.dependent.job>Nightly_Risksur_Trunk</tt.jenkins.dependent.job>
+				<tt.jenkins.dependent.job2>Nightly_Risksur_Trunk</tt.jenkins.dependent.job2>
 				<scp.host>alpha.tracetracker.com</scp.host>
 			</properties>
 		</profile>
