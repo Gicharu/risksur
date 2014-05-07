@@ -104,14 +104,6 @@ class SiteController extends Controller {
 	}
 
 	public function actionIndex() {
-		$parentId = 0;
-		$programPages = Yii::app()->db->createCommand()
-			->select('pageId, pageName, path, parentId, menuOrder')
-			->from('programpages p')
-			//->join('tbl_profile p', 'u.id=p.user_id')
-			->where('parentId=:parentId', array(':parentId'=>$parentId))
-			->queryAll();
-			print_r($programPages);
 		$this->render('index', array(
 			//'model' => $model
 		));

@@ -249,42 +249,9 @@ if (!Yii::app()->user->isGuest) {?>
 </div>
 	</div><!-- header -->
 	<div id="mainmenu">
-	<?php
-		$this->widget('zii.widgets.CMenu',array(
-			'activeCssClass'=>'active',
-			'activateParents'=>true,
-			'id' => 'menu',
-			'items'=>array(
-				array(
-					'label'=>'Main',
-					'url'=>array('/company/index'),
-				),
-				array(
-					'label'=>'Surveillance design framework ',
-					'url'=>array('/blog/post/index'),
-					'linkOptions'=>array('id'=>'menuBlog')
-				),
-				array(
-					'label'=>'Evaluation tool',
-					'url'=>array('/change/index'),
-				),
-				array(
-					'label'=>'Economic assessment',
-					'url'=>array('/shop'),
-					'linkOptions'=>array('id'=>'menuBuy')
-				),
-				array(
-					'label'=>'Examples',
-					'url'=>array('/shop'),
-					'linkOptions'=>array('id'=>'menuBuy')
-				),
-				array(
-					'label'=>'Statistical tools',
-					'url'=>array('/shop'),
-					'linkOptions'=>array('id'=>'menuBuy')
-				),
-			),
-		)); 
+	<?php $this->widget('application.components.MainMenu', array(
+		'parentId' => 0
+	)); 
 	?>
 	</div>
 	<!-- mainmenu -->
