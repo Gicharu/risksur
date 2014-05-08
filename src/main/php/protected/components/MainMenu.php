@@ -19,7 +19,6 @@ class MainMenu extends CWidget {
 	 * @return void
 	 */
 	public function run() {
-
 		$parentId = 0;
 		$programPages = Yii::app()->db->createCommand()
 			->select('p.pageId, p.pageName, p.path, p.parentId, p.menuOrder, c.pageId as childId, c.pageName as childName, c.menuOrder as childOrder')
@@ -42,7 +41,6 @@ class MainMenu extends CWidget {
 						'url' => $menuPages['path']
 					);
 			} else {
-				echo "parent page: " . $menuPages['childId'] . "<br>"; 
 				$pathArray = $this->arrayKeyPath((int)$menuPages['childId'], $menuParams['menuArray']);
 				if($menuPages['childName'] != "noMenu" && $pathArray !== FALSE) {
 					$fullMenuPath =& $this->arrayPath($menuParams['menuArray'], $pathArray);
