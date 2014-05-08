@@ -30,16 +30,6 @@ CREATE TABLE `groupaccess` (
 
 
 --
--- Table structure for table `auctionintegration`
---
-
-CREATE TABLE `auctionintegration` (
-  `lastImportedSaleNo` varchar(20) DEFAULT NULL,
-  `lastImportedLotNo` decimal(11,0) DEFAULT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
--- --------------------------------------------------------
-
---
 -- Table structure for table `groups`
 --
 
