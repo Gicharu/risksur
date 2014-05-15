@@ -89,3 +89,69 @@ CREATE TABLE `users` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=38 ;
 
 -- --------------------------------------------------------
+
+/*Table structure for table `frameworkDetails` */
+
+
+CREATE TABLE `frameworkDetails` (
+  `frameworkDetailId` int(11) NOT NULL AUTO_INCREMENT,
+  `frameworkId` int(11) DEFAULT NULL,
+  `subFormId` int(11) DEFAULT NULL,
+  `value` varchar(254) DEFAULT NULL,
+  `comments` blob,
+  PRIMARY KEY (`frameworkDetailId`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+/*Table structure for table `frameworkHeader` */
+
+
+CREATE TABLE `frameworkHeader` (
+  `frameworkId` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `userId` int(11) DEFAULT NULL,
+  `formId` int(11) DEFAULT NULL,
+  `comments` blob,
+  PRIMARY KEY (`frameworkId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+/*Table structure for table `goalMenu` */
+
+
+CREATE TABLE `goalMenu` (
+  `pageId` int(11) NOT NULL AUTO_INCREMENT,
+  `pageName` varchar(50) DEFAULT NULL,
+  `path` varchar(254) DEFAULT NULL,
+  `parentId` int(11) DEFAULT NULL,
+  `menuOrder` int(11) DEFAULT NULL,
+  `target` varchar(20) DEFAULT NULL,
+  `active` tinyint(1) DEFAULT '1',
+  `comments` varchar(254) DEFAULT NULL,
+  PRIMARY KEY (`pageId`)
+) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=latin1;
+
+
+/*Table structure for table `surForm` */
+
+
+CREATE TABLE `surForm` (
+  `formId` int(11) NOT NULL AUTO_INCREMENT,
+  `formName` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (`formId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+/*Table structure for table `surFormDetails` */
+
+
+CREATE TABLE `surFormDetails` (
+  `subFormId` int(11) NOT NULL AUTO_INCREMENT,
+  `formId` int(11) DEFAULT NULL,
+  `inputName` varchar(50) DEFAULT NULL,
+  `label` varchar(50) DEFAULT NULL,
+  `inputType` varchar(50) DEFAULT NULL,
+  `description` blob,
+  PRIMARY KEY (`subFormId`),
+  KEY `formId` (`formId`),
+  CONSTRAINT `surFormDetails_ibfk_1` FOREIGN KEY (`formId`) REFERENCES `surForm` (`formId`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
