@@ -117,6 +117,14 @@ $(function(){
 	$('#btnAdminVerify').on('click', function() {
 		window.location.href = '<?php echo CController::createUrl("admin/verify"); ?>';
 	});
+
+	// opene the new design dialog form
+	$('#newDesign').on('click', function() {
+		$("#newDesignDialog").dialog("open");
+		$("form#newDesignForm")[0].reset();
+		$("#goalId").val($("#goalId option:first").val());
+		$("#goalId").trigger("change");
+	});
 	
 <?php
 	//print_r(Yii::app()->user->isGuest);
@@ -296,7 +304,7 @@ if ($flashMessages) {
 		<div id="designButtons">
 		<?php echo CHtml::htmlButton(Yii::t("translation", "New Surveillance Design"), array(
 			'id' => 'newDesign',
-			'onclick' => '$("#newDesignDialog").dialog("open");',
+			//'onclick' => '$("#newDesignDialog").dialog("open"); $("#goalId").val($("#goalId option:first").val()); $("#goalId").trigger("change");',
 			'type' => 'button'
 		)); ?>
 		<?php echo CHtml::htmlButton(Yii::t("translation", "List Existing Designs"), array(

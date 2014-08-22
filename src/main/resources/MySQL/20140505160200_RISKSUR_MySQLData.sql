@@ -37,7 +37,9 @@ INSERT INTO `programpages` (`pageId`, `pageName`, `path`, `parentId`, `menuOrder
 
 
 insert  into `permissions`(`id`,`name`,`description`,`controller`,`action`,`bizrule`) values 
-(1,'Design index','design index','design','index','');
+(1,'Design index','design index','design','index',''),
+(2,'Design fetchComponents','design fetchComponents','design','fetchComponents','')
+;
 
 
 /*Data for the table `roles` */
@@ -46,7 +48,7 @@ insert  into `roles`(`id`,`name`,`description`) values (1,'ROLE_ADMIN','administ
 
 /*Data for the table `roles_has_permissions` */
 
-insert  into `roles_has_permissions`(`permissions_id`,`roles_id`) values (1,1),(1,2);
+insert  into `roles_has_permissions`(`permissions_id`,`roles_id`) values (1,1),(1,2),(2,1),(2,2);
 
 /*Data for the table `users` */
 

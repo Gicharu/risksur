@@ -13,19 +13,44 @@ $(function(){
 			}
 		}
 	});
+
 });
+function addNewDesign() {
+	var data=$("#newDesignForm").serialize();
+	$.ajax({
+		type: 'POST',
+		url: '<?php echo Yii::app()->createAbsoluteUrl("design/index"); ?>',
+		data:data,
+		success:function(data){
+				// reset the form if success
+				var checkSuccess = /successfully/i;
+				if (checkSuccess.test(data)) {
+				// add process message
+				$("#msgsNewDesign").html(data).attr('class', 'flash-success');
+					$("form#newDesignForm")[0].reset();
+					$("#newDesignDialog").dialog("close");
+				}
+
+		},
+		error: function(data) { // if error occured
+		console.log("Error occured.please try again");
+		console.log(data);
+		},
+		dataType:'html'
+	});
+}
 	</script>
 
 <div id="newDesignDialog" style="display:none" >
 	<div id="manageDashProcess" class="loading" style="display:none;">
 			<p><?php echo Yii::t("translation", "Processing...")?></p>
 	</div>
-	<div id="msgManageWidgets"></div>
+	<div id="msgNewDesign"></div>
 <div class="form">
 
 <?php $form = $this->beginWidget('CActiveForm', array(
-	'id' => 'goadDesignForm',
-	//'enableAjaxValidation' => true,
+	'id' => 'newDesignForm',
+	'enableAjaxValidation' => true,
 	'enableClientValidation' => true,
 	'clientOptions' => array(
 		'validateOnSubmit' => true,
@@ -34,20 +59,19 @@ $(function(){
 			if(hasError) {
 				return false;
 				} else {
-					//'#configSubmit' - id for the submit button
-					processConfig('#objectDetailsWidget-form_es_');
+					addNewDesign();
 					return true;
 				}
 			}"
 		//'afterValidate'=>'js:processConfig(this)'
 		
-	)
-	//'htmlOptions' => array(
-		//// disable default submit method
-		//'onsubmit' => "return false;",
-		//// add class on the form for the scripts it must be 'configForm'
+	),
+	'htmlOptions' => array(
+		// disable default submit method
+		'onsubmit' => "return false;",
+		// add class on the form for the scripts it must be 'configForm'
 		//'class' => 'configForm',
-	//)
+	)
 ));
 ?>
 <?php 
@@ -71,9 +95,9 @@ $(function(){
 		<?php echo $form->error($model, 'description', array('inputID' => "description")); ?>
 	</div>	
 	<div class="row">
-		<?php echo $form->labelEx($model, 'goal'); ?>
-		<?php echo $form->dropDownList($model, 'goal', $dataArray['goalDropDown'], array(
-			'id' => 'goal',
+		<?php echo $form->labelEx($model, 'goalId'); ?>
+		<?php echo $form->dropDownList($model, 'goalId', $dataArray['goalDropDown'], array(
+			'id' => 'goalId',
 			//'empty' => "Choose one",
 			'ajax' => array(
 				'type'=>'POST', //request type
@@ -81,7 +105,7 @@ $(function(){
 				'update'=>'#component', //selector to update
 			)
 			)); ?>
-		<?php echo $form->error($model, 'goal', array('inputID' => "goal")); ?>
+		<?php echo $form->error($model, 'goalId', array('inputID' => "goalId")); ?>
 	</div>
 	<div class="row">
 		<?php echo $form->labelEx($model, 'component'); ?>
@@ -92,10 +116,10 @@ $(function(){
 		<?php echo $form->error($model, 'component', array('inputID' => "component")); ?>
 	</div>
 	<div class="row">
-	<?php echo CHtml::htmlButton(Yii::t("translation", "Create"), array(
+	<?php echo CHtml::Button(Yii::t("translation", "Create"), array(
 			'id' => 'load',
-			//'onclick' => "openAddWidget();",
-			'type' => 'button'
+			//'onclick' => "addNewDesign();",
+			'type' => 'submit'
 	)); ?>
 	</div>
 <?php

@@ -33,9 +33,28 @@ class DesignController extends Controller {
 	 */
 	public function actionIndex() {
 		Yii::log("actionIndex DesignController called", "trace", self::LOG_CAT);
-		$model = new NewDesignForm;
+		$model = new NewDesign;
 		$dataArray = array();
+		$this->performAjaxValidation($model);
 
+		if ( isset( $_POST['NewDesign'] ) ) {
+			$model->attributes = $_POST['NewDesign'];
+			$model->userId = Yii::app()->user->id;
+			//$model->tool = $model->tool == '' ? null : $model->tool;
+			//$model->path = $model->tool === null ? $model->path : "tools/index";
+			
+			//$model->setAttribute('menuOrder', $mnuResult->lastMenu + 1);
+			if ( $model->validate() ) {
+				$model->save();
+				//Yii::app()->user->setFlash('success', "Page created successfully");
+				echo "saved successfully";
+				//$this->redirect( array( 'index' ) );
+				return;
+			} else {
+				echo CActiveForm::validate($model);
+				Yii::app()->end();
+			}
+		}
 		// fetch the goal dropdown data
 		$goalDropDown = GoalData::model()->findAll(array(
 			'select' => 'pageId, pageName',
@@ -53,6 +72,20 @@ class DesignController extends Controller {
 			'model' => $model,
 			'dataArray' => $dataArray
 		));
+	}
+	/**
+	 * performAjaxValidation 
+	 * 
+	 * @param mixed $model 
+	 * @access protected
+	 * @return void
+	 */
+	protected function performAjaxValidation($model) {
+		if(isset($_POST['ajax']) && $_POST['ajax']==='newDesignForm')
+		{
+			echo CActiveForm::validate($model);
+			Yii::app()->end();
+		}
 	}
 	/**
 	 * actionGetComponentMenu 
@@ -82,7 +115,7 @@ class DesignController extends Controller {
 			'select' => 'pageId, pageName',
 			'condition' => 'parentId=:parentId',
 			'params' => array(
-				':parentId' => $postData['NewDesignForm']['goal'],
+				':parentId' => $postData['NewDesign']['goalId'],
 			),
 		));
 
@@ -92,10 +125,5 @@ class DesignController extends Controller {
 			echo CHtml::tag('option',
 			array('value'=>$value),CHtml::encode($name),true);
 		}
-	}
-
-	public function actionAddNewDesign() {
-		Yii::log("actionAddNewDesign DesignController called", "trace", self::LOG_CAT);
-		// code...
 	}
 }
