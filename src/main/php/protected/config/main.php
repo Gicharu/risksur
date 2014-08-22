@@ -10,7 +10,7 @@ $cachePath = substr($cachePath, 0, -17);
 $cachePath = str_replace("\\", "%", $cachePath);
 $cachePath = str_replace("/", "%", $cachePath);
 $cachePath = str_replace(":", "", $cachePath);
-$cachePath = "/tmp/cache/".$cachePath;
+$cachePath = "/tmp/cache/". $cachePath;
 
 	$iniArray =  array();
 	$filePath = dirname(__FILE__) . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR;
@@ -55,7 +55,7 @@ foreach ($iniArray as $key => $val) {
 $configArray['components']['log']['routes'][] = $logArray;
 return CMap::mergeArray($configArray, array(
 	'basePath' => dirname(__FILE__) . DIRECTORY_SEPARATOR . '..',
-	'name' => 'RISKSUR',
+	'name' => 'Risksur',
 	'defaultController' => 'site/login',
 	'sourceLanguage' => 'en',
 	// 'language' => 'bs',
@@ -70,7 +70,7 @@ return CMap::mergeArray($configArray, array(
 		'application.components.*',
 		'application.extensions.EActiveResource.*',
 		'application.extensions.TLogResource.*',
-		//'application.extensions.TLdapResource.*',
+		//'application.extensions.EpitoolsFunctions.*',
 		'application.extensions.TSettingsIni.*',
 		'application.extensions.TTMailer.*',
 		//'application.extensions.LightOpenIdYii.*',
@@ -80,41 +80,27 @@ return CMap::mergeArray($configArray, array(
 	),
 	'modules' => array(
 		// uncomment the following to enable the Gii tool
-		'gii' => array(
-			'class' => 'system.gii.GiiModule',
-			'password' => 'cdosh!',
-			// If removed, Gii defaults to localhost only. Edit carefully to taste.
-			'ipFilters' => array(
-				'127.0.0.1',
-				'::1'
-			),
-		),
+		// 'gii' => array(
+		// 	'class' => 'system.gii.GiiModule',
+		// 	'password' => 'cdosh!',
+		// 	// If removed, Gii defaults to localhost only. Edit carefully to taste.
+		// 	'ipFilters' => array(
+		// 		'127.0.0.1',
+		// 		'::1'
+		// 	),
+		// ),
 	),
-	
 	// application components
 	'components' => array(
-			//'MDSCache' => array(
-				//'class' => 'system.caching.CApcCache',
-			//),
-			//'TRDCache' => array(
-				//'class' => 'system.caching.CFileCache',
-				//'cachePath' => $cachePath.'/TRD',
-				//'hashKey' => 'false',
-			//),
-			//'EnvCache' => array(
-				//'class' => 'system.caching.CFileCache',
-				//'cachePath' => $cachePath.'/Env',
-				//'hashKey' => 'false',
-			//),
-			//'TradingPartnersCache' => array(
-				//'class' => 'system.caching.CFileCache',
-				//'cachePath' => $cachePath.'/TradingPartners',
-				//'hashKey' => 'false',
-			//),
-		// 'messages' => array(
-		// 	'class' => 'CPhpMessageSource',
-		// 	'basePath' => '../messages',
-		// ),
+		'errorHandler'=> array(
+			// use 'site/error' action to display errors
+			'errorAction' => 'site/error',
+		),
+		'EnvCache' => array(
+			'class' => 'system.caching.CFileCache',
+			'cachePath' => $cachePath . '/Env',
+			'hashKey' => 'false',
+		),
 		'session' => array(
 			'sessionName' => 'risksurSession',
 			'class' => 'CHttpSession',
@@ -152,12 +138,13 @@ return CMap::mergeArray($configArray, array(
 		//),
 		// uncomment the following to use a MySQL database
 		'db' => array(
-			'class'=>'CDbConnection',
 			'connectionString' => 'mysql:host=localhost;dbname=risksur',
 			'emulatePrepare' => true,
 			'username' => 'root',
 			'password' => '',
 			'charset' => 'utf8',
+			'enableParamLogging' => true,
+			// 'enableProfiling' => true,
 		),
 		'errorHandler' => array(
 			// use 'site/error' action to display errors
@@ -213,6 +200,7 @@ return CMap::mergeArray($configArray, array(
 				"<span class='ui-icon ui-icon-alert' style='float: left; margin-right: .3em;'></span>",
 			'footerErrorSummary' => "</p></div></div>",
 			'AdminUrl' => (isset($_SERVER['HTTP_HOST'])) ? $_SERVER['HTTP_HOST'] : exec("hostname"),
+			// 'wwwPath' => $wwwPath,
 		),
 		//'runtimePath' => sys_get_temp_dir(),
 	)

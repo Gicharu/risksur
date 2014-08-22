@@ -11,34 +11,6 @@ SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 -- Database: `risksur`
 --
 
-
--- --------------------------------------------------------
-
-
---
--- Table structure for table `groupaccess`
---
-
-CREATE TABLE `groupaccess` (
-  `groupAccessId` int(11) NOT NULL auto_increment,
-  `groupId` int(11) default NULL,
-  `pageId` int(11) default NULL,
-  PRIMARY KEY  (`groupAccessId`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=467 ;
-
--- --------------------------------------------------------
-
-
---
--- Table structure for table `groups`
---
-
-CREATE TABLE `groups` (
-  `groupId` int(11) NOT NULL auto_increment,
-  `groupName` varchar(20) default NULL,
-  PRIMARY KEY  (`groupId`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=8 ;
-
 -- --------------------------------------------------------
 -- Table structure for table `programpages`
 --
@@ -55,18 +27,6 @@ CREATE TABLE `programpages` (
   PRIMARY KEY  (`pageId`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=199 ;
 
--- --------------------------------------------------------
-
---
--- Table structure for table `usergroup`
---
-
-CREATE TABLE `usergroup` (
-  `userGroupId` int(11) NOT NULL auto_increment,
-  `userId` int(11) default NULL,
-  `groupId` int(11) default NULL,
-  PRIMARY KEY  (`userGroupId`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=45 ;
 
 -- --------------------------------------------------------
 
@@ -75,18 +35,18 @@ CREATE TABLE `usergroup` (
 --
 
 CREATE TABLE `users` (
-  `userId` int(11) NOT NULL auto_increment,
-  `userName` varchar(20) default NULL,
-  `password` varchar(40) default NULL,
-  `email` varchar(40) default NULL,
-  `active` tinyint(1) default NULL,
-  `passReset` tinyint(1) default 0,
-  `cookie` char(32) default NULL,
-  `session` char(32) default NULL,
-  `ip` varchar(15) default NULL,
-  PRIMARY KEY  (`userId`),
+  `userId` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `userName` varchar(20) CHARACTER SET latin1 DEFAULT NULL,
+  `password` varchar(40) CHARACTER SET latin1 DEFAULT NULL,
+  `email` varchar(40) CHARACTER SET latin1 DEFAULT NULL,
+  `active` tinyint(1) DEFAULT NULL,
+  `passReset` tinyint(1) DEFAULT '0',
+  `cookie` char(32) CHARACTER SET latin1 DEFAULT NULL,
+  `session` char(32) CHARACTER SET latin1 DEFAULT NULL,
+  `ip` varchar(15) CHARACTER SET latin1 DEFAULT NULL,
+  PRIMARY KEY (`userId`),
   UNIQUE KEY `userName` (`userName`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=38 ;
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -109,8 +69,8 @@ CREATE TABLE `frameworkHeader` (
   `frameworkId` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
   `userId` int(11) DEFAULT NULL,
-  `formId` int(11) DEFAULT NULL,
-  `comments` blob,
+  `goalId` int(11) DEFAULT NULL,
+  `description` blob,
   PRIMARY KEY (`frameworkId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
@@ -155,3 +115,44 @@ CREATE TABLE `surFormDetails` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
+CREATE TABLE `permissions` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(45) CHARACTER SET latin1 NOT NULL,
+  `description` varchar(45) CHARACTER SET latin1 DEFAULT NULL,
+  `controller` varchar(45) CHARACTER SET latin1 NOT NULL,
+  `action` varchar(45) CHARACTER SET latin1 NOT NULL,
+  `bizrule` varchar(255) CHARACTER SET latin1 NOT NULL DEFAULT '',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `unique_access_rule` (`controller`,`action`,`bizrule`)
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+
+
+CREATE TABLE `roles` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(45) CHARACTER SET latin1 NOT NULL,
+  `description` varchar(45) CHARACTER SET latin1 NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+
+CREATE TABLE `roles_has_permissions` (
+  `permissions_id` int(11) NOT NULL,
+  `roles_id` int(11) NOT NULL,
+  PRIMARY KEY (`permissions_id`,`roles_id`),
+  KEY `fk_permissions_has_roles_permissions` (`permissions_id`),
+  KEY `fk_permissions_has_roles_roles` (`roles_id`),
+  CONSTRAINT `fk_permissions_has_roles_permissions` FOREIGN KEY (`permissions_id`) REFERENCES `permissions` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_permissions_has_roles_roles` FOREIGN KEY (`roles_id`) REFERENCES `roles` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+
+CREATE TABLE `users_has_roles` (
+  `users_id` int(10) unsigned NOT NULL,
+  `roles_id` int(11) NOT NULL,
+  PRIMARY KEY (`users_id`,`roles_id`),
+  KEY `fk_users_has_roles_roles` (`roles_id`) USING BTREE,
+  KEY `fk_users_has_roles_users` (`users_id`),
+  CONSTRAINT `fk_users_has_roles_roles` FOREIGN KEY (`roles_id`) REFERENCES `roles` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_users_has_roles_users` FOREIGN KEY (`users_id`) REFERENCES `users` (`userId`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;

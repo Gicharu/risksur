@@ -37,8 +37,8 @@ class AdminController extends Controller {
 	 * @return void
 	 */
 	public function init() {
-		$this->dashboard = Yii::app()->dashboardresource;
-		$this->mds = Yii::app()->mdsresource;
+		//$this->dashboard = Yii::app()->dashboardresource;
+		//$this->mds = Yii::app()->mdsresource;
 		$this->configuration = Yii::app()->tsettings;
 
 	}

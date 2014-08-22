@@ -119,18 +119,22 @@ $(function(){
 	});
 	
 <?php
-//if (Yii::app()->components['user']->loginRequiredAjaxResponse) {
-	//Yii::app()->clientScript->registerScript('ajaxLoginRequired', '
-		//jQuery("body").ajaxComplete(
-			//function(event, request, options) {
-				//if (request.responseText == "'.Yii::app()->components['user']->loginRequiredAjaxResponse.'") {
-					////window.location.href = options.url;
-					//window.location.href = "'.Yii::app()->createUrl('/site/login?inactive=1').'"
-				//}
-			//}
-		//);
-	//');
-//}
+	//print_r(Yii::app()->user->isGuest);
+	//print_r(Yii::app()->components);
+	//print_r(Yii::app()->components['user']);
+	//logout when session expires in ajax call
+	if (Yii::app()->user->loginRequiredAjaxResponse) {
+		Yii::app()->clientScript->registerScript('ajaxLoginRequired', '
+		jQuery("body").ajaxComplete(
+			function(event, request, options) {
+				if (request.responseText == "'.Yii::app()->user->loginRequiredAjaxResponse.'") {
+					//window.location.href = options.url;
+					window.location.href = "'.Yii::app()->createUrl('/site/login?inactive=1').'"
+				}
+			}
+		);
+		');
+	}
 ?>
 	
 	
@@ -172,6 +176,9 @@ function MM_openBrWindow(theURL,winName,features) { //v2.0
 -->
 <div id="doc3">
 <!--<div class="container" id="page">-->
+<?php
+if (!Yii::app()->user->isGuest) {
+?>
 	<div id="top_header">
 		<ul id="login">
 			<li id="ttlogo"><a href='//www.tracetracker.com' target="_blank">
@@ -180,14 +187,12 @@ function MM_openBrWindow(theURL,winName,features) { //v2.0
 			</a></li>
 			<li>
 <?php
-if (!Yii::app()->user->isGuest) {
 	echo CHtml::htmlButton(Yii::t('translation', 'Logout'), array(
 		'submit' => array(
 			'site/logout'
 		),
 		'type' => 'submit'
 	));
-	//}
 ?>
 			</li>
 			<li>
@@ -200,44 +205,41 @@ echo CHtml::htmlButton(Yii::t('translation', 'User Preferences'), array(
 		'id' => 'btnUserPreferences'
 	)
 );
-}
 ?>				
 
 			</li>
 			<li>
 <?php
 $msg = 0;
-echo (Yii::app()->rbac->checkAccess("admin", "verify", Yii::app()->user->name, $msg)) ? CHtml::htmlButton(Yii::t('translation', 'Verify Modules'), array(
-		'type' => 'button',
-		'id' => 'btnAdminVerify'
-	)) : "";
+//echo (Yii::app()->rbac->checkAccess("admin", "verify", Yii::app()->user->name, $msg)) ? CHtml::htmlButton(Yii::t('translation', 'Verify Modules'), array(
+		//'type' => 'button',
+		//'id' => 'btnAdminVerify'
+	//)) : "";
 
 ?>
 			</li>
 			<li>
 <?php
 
-echo (Yii::app()->rbac->checkAccess("admin", "upgrade", Yii::app()->user->name, $msg)) ? 
-CHtml::htmlButton(Yii::t('translation', 'Upgrade Configuration'), array(
-		'submit' => array(
-			'admin/upgrade'
-		),
-		'type' => 'button',
-		'id' => 'btnUpgradeConfig'
-	)) : "";
+//echo (Yii::app()->rbac->checkAccess("admin", "upgrade", Yii::app()->user->name, $msg)) ? 
+//CHtml::htmlButton(Yii::t('translation', 'Upgrade Configuration'), array(
+		//'submit' => array(
+			//'admin/upgrade'
+		//),
+		//'type' => 'button',
+		//'id' => 'btnUpgradeConfig'
+	//)) : "";
 
 ?>
 			</li>
-
 			<li id="userName">
-<?php
-if (!Yii::app()->user->isGuest) {?>
-	<div title="<?php echo Yii::app()->user->name;?>"><?php echo Yii::app()->user->name;;?></div><?php
-} ?>
-			
+				<div title="<?php echo Yii::app()->user->name;?>"><?php echo Yii::app()->user->name;;?></div>
 			</li>
 		</ul>
 	</div>
+	<?php
+	}
+	?>
 
 	<div id="header" 
 	style="background-image:url(<?php echo $baseUrl;?>/<?php echo $storySettings->backgroundpath; ?>)">
@@ -248,12 +250,20 @@ if (!Yii::app()->user->isGuest) {?>
 	</a>
 </div>
 	</div><!-- header -->
+
+<?php
+if (!Yii::app()->user->isGuest) {
+?>
 	<div id="mainmenu">
-	<?php $this->widget('application.components.MainMenu', array(
+	<?php 
+		$this->widget('application.components.MainMenu', array(
 		'parentId' => 0
 	)); 
 	?>
 	</div>
+	<?php
+}
+	?>
 	<!-- mainmenu -->
 <!-- Flash Messeage Display Area -->
 <?php
@@ -279,6 +289,53 @@ if ($flashMessages) {
 </div>
 <!-- End Flash Message Area -->
 	<div id="bd">
+	<?php
+		// only show menu for Design controller actions
+		if (Yii::app()->controller->id == 'design') {
+	?>
+		<div id="designButtons">
+		<?php echo CHtml::htmlButton(Yii::t("translation", "New Surveillance Design"), array(
+			'id' => 'newDesign',
+			'onclick' => '$("#newDesignDialog").dialog("open");',
+			'type' => 'button'
+		)); ?>
+		<?php echo CHtml::htmlButton(Yii::t("translation", "List Existing Designs"), array(
+			'id' => 'showDesigns',
+			'type' => 'button'
+		)); ?>
+		<?php echo CHtml::htmlButton(Yii::t("translation", "Add Component"), array(
+			'id' => 'addComponent',
+			'type' => 'button'
+		)); ?>
+		<?php echo CHtml::htmlButton(Yii::t("translation", "List Components"), array(
+			'id' => 'showComponents',
+			'type' => 'button'
+		)); ?>
+		</div>
+	<?php
+		}
+	?>
+	<div id="componentMenuWrapper" style="float:right;">
+	</div>
+<!--<form>
+  <fieldset>
+    <legend>Favorite jQuery Project</legend>
+    <div id="radio">
+      <input type="radio" id="sizzle" name="project">
+      <label for="sizzle">Sizzle</label>
+ 
+      <input type="radio" id="qunit" name="project">
+      <label for="qunit">QUnit</label>
+ 
+      <input type="radio" id="color" name="project">
+      <label for="color">Color</label>
+    </div>
+  </fieldset>
+  </form> -->
+ 
+<script>
+$("#goalMenu").buttonset();
+</script>
 	<?php echo $content; ?>
 	</div>
 

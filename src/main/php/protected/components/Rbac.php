@@ -1,104 +1,169 @@
 <?php
-/**
- * Description of Rbac
- *
- * @author oleksiy
- */
-class Rbac {
-	const LOG_CAT = "comp.Rbac";
-	public function init() {
-	}
 	/**
-	 *
-	 * @param string $controller controller.id
-	 * @param string $action action.id
-	 * @param numeric $user user ID
-	 * @param array $fakeGET fake _GET array for evaluating businness rules
-	 * @return boolean true if user has access, false otherwise
+	 * Rbac 
+	 * 
+	 * @package  
+	 * @author oleksiy
+	 * @copyright Tracetracker
+	 * @version   $id$
+	 * @uses      Controller
+	 * @license   Tracetracker {@link http://www.tracetracker.com}
 	 */
-	public function checkAccess($controller, $action, $user = null, $msg = 1, array $fakeGET = null) {
-		$allow = false;
-		if (!$user) {
-			$user = Yii::app()->user->id;
+
+	class Rbac {
+
+		/**
+		 * init 
+		 * @return void
+		 */
+		public function init() {
+
 		}
-		$permissions = Yii::app()->session['roleManage'];
-		$userGroups = Yii::app()->session['userGroups'];
-		$controllerAction = $controller . ":" . $action;
-		if ($fakeGET) { // lets fake GET request params for evaluating business rule
+
+		/**
+		 *
+		 * checkAccess
+		 * @param string  $controller controller.id
+		 * @param string  $action     action.id
+		 * @param numeric $user       (optional) user ID
+		 * @param array   $fakeGET    (optional) fake _GET array for evaluating businness rules
+		 * @return boolean true if user has access, false otherwise
+		 */
+
+		public function checkAccess($controller, $action, $user = null, array $fakeGET = null) {
+			$allow = false;
+
+			if (!$user) {
+				$user = Yii::app()->user->id;
+			}
+
+			$sql = 'SELECT DISTINCT p.* FROM permissions p, users u, roles r, users_has_roles ur, roles_has_permissions rp
+			WHERE p.id=rp.permissions_id
+			AND r.id=rp.roles_id
+			AND ur.roles_id=r.id
+			AND ur.users_id=u.userId
+			AND u.userId=:uid
+			AND p.controller=:controller
+			AND p.action=:action
+			ORDER BY p.bizrule ASC';
+			$command = Yii::app()->db->createCommand($sql);
+			$command->bindParam(":uid", $user, PDO::PARAM_INT);
+			$command->bindParam(":controller", $controller, PDO::PARAM_STR);
+			$command->bindParam(":action", $action, PDO::PARAM_STR);
+			$permissions = $command->queryAll();
+
+
+			if ($fakeGET) { // lets fake GET request params for evaluating business rule
 			$save_GET = $_GET;
 			$_GET = $fakeGET;
-		}
-		//echo $controller . "/" . $action;
-		if (!empty($permissions)) {
-			if (isset($permissions[$controllerAction]) ) {
-				$rolesAllowed = explode(",", $permissions[$controllerAction]);
-				//print_r($userGroups);
-				//print_r($rolesAllowed); die();
-				foreach ($rolesAllowed as $allowed) {
-					//echo "here" . $allowed;
-					//die();
-					if(in_array($allowed, $userGroups)) {
-						//print_r($p);
-						//echo "found it" . "<br>";
+			}
+
+			if (!empty($permissions)) {
+				foreach ($permissions as $p) {
+					if (empty($p['bizrule']) || @eval($p['bizrule'])) {
 						$allow = true;
 						break;
 					}
 				}
-			} else {
-				Yii::log("No role access declaration found for:" . $controllerAction, "warning", 'rbac');
 			}
-		} else {
-			Yii::log("Roles management data is empty", "error", 'rbac');
-		}
-		if ($fakeGET) { // restore original _GET
+
+			if ($fakeGET) { // restore original _GET
 			$_GET = $save_GET;
-		}
-		if (!$allow) {
-			if(empty($userGroups)) {
-				if ($msg == 1 ){
-					Yii::app()->user->setFlash('error', "You do not have the rights to access this page, please contact your administrator.");
-				}
-				Yii::log("No user roles in the session for user " . $user . " therefore access is denied to " . $controllerAction , "warning", self::LOG_CAT);
-
-			} else {
-				if ($msg == 1 ){
-					Yii::app()->user->setFlash('error', "You do not have the rights to access this page, please contact your administrator.");
-				}
-				Yii::log("User roles-" . implode(",", $userGroups) . " for user " . $user . " is not allowed to see page " . $controllerAction , "warning", self::LOG_CAT);
 			}
-		}
-		return $allow;
-	}
 
-	public function checkRules($rules, $user = null) {
-		$allow = false;
-		if (!$user) {
-			$user = Yii::app()->user->id;
+			return $allow;
 		}
-		$permissions = Yii::app()->session['businessRules'];
-		$userGroups = Yii::app()->session['userGroups'];
-		if (!empty($permissions)) {
-			if (isset($permissions[$rules]) ) {
-				$rolesAllowed = explode(",", $permissions[$rules]);
-				//print_r($userGroups);
-				//print_r($rolesAllowed); die();
-				foreach ($rolesAllowed as $allowed) {
-					//echo "here" . $allowed;
-					//die();
-					if(in_array($allowed, $userGroups)) {
-						//print_r($p);
-						//echo "found it" . "<br>";
-						$allow = true;
-						break;
+
+
+		/**
+		 *
+		 * checkAccessEx
+		 * @param mixed   $searchCriteria can be a string or an array with RBAC search criterias
+		 * @param numeric $user           (optional) user.id
+		 * @return boolean true if user satisfies rbac criteria $searchCriteria
+		 */
+		public function checkAccessEx($searchCriteria, $user = null) {
+			$from = array();
+			$where = array();
+
+			if (!$user) {
+				$user = Yii::app()->user->id;
+			}
+
+			$from[] = 'users u';
+			$where[] = 'u.userId=' . intval($user);
+			$this->parseSearchCriteria($searchCriteria, $from, $where);
+
+			$sql = 'SELECT u.userId FROM '.join($from, ', ') . ' WHERE ' . join($where, ' AND ');
+			$access = Yii::app()->db->createCommand($sql)->queryScalar();
+			return !empty($access);
+		}
+
+
+		/**
+		 *
+		 * parseSearchCriteria
+		 * @param unknown $conditions
+		 * @param unknown $from       (reference)
+		 * @param unknown $where      (reference)
+		 */
+		private function parseSearchCriteria($conditions, &$from, &$where) {
+			if (!is_array($conditions)) {
+				$conditions = array($conditions);
+			}
+			foreach ($conditions as $c) {
+				$c .= ',';
+				if (preg_match('/(users|roles|permissions)=/', $c, $regs)) {
+					$talias = $regs[1]{0};
+					$from[] = $regs[1] . ' ' . $talias;
+				}
+				$or = array();
+				if (preg_match_all('/(\w+):(.*?),/', $c, $regs)) {
+					for ($i=0; $i<count($regs[0]); $i++) {
+						if (is_numeric($regs[2][$i])) {
+							$or[] = $talias . '.' . $regs[1][$i] . '=' . $regs[2][$i];
+						} else {
+							$value = preg_replace('[\'\"]', '', $regs[2][$i]);
+							$or[] = $talias . '.' . $regs[1][$i] . ' LIKE \'' . $value . '\'';
+						}
 					}
 				}
-			} else {
-				Yii::log("No business rule declaration found for:" . $rules, "warning", 'rbac');
+				if (count($or)) {
+					$where[] = '(' . join($or, ' OR ') . ')';
+				}
 			}
-		} else {
-			Yii::log("Business rules data is empty", "error", 'rbac');
+
+			$addUsersHasRoles = false;
+			$addRolesHasPermissions = false;
+			if (preg_match('/users/', join($from, ' ')) && preg_match('/permissions/', join($from, ' '))) {
+				$from[] = 'roles r';
+				$addUsersHasRoles = true;
+				$addRolesHasPermissions = true;
+			} else {
+				if (preg_match('/users/', join($from, ' ')) && preg_match('/roles/', join($from, ' '))) {
+					$addUsersHasRoles = true;
+				}
+				if (preg_match('/permissions/', join($from, ' ')) && preg_match('/roles/', join($from, ' '))) {
+					$addRolesHasPermissions = true;
+				}
+			}
+			if ($addRolesHasPermissions) {
+				$from[] = 'roles_has_permissions rp';
+				$where[] = 'r.id=rp.roles_id';
+				$where[] = 'p.id=rp.permissions_id';
+			}
+			if ($addUsersHasRoles) {
+				$from[] = 'users_has_roles ur';
+				$where[] = 'u.userId=ur.users_id';
+				$where[] = 'r.id=ur.roles_id';
+			}
+
+			$from = array_unique($from);
+			$where = array_unique($where);
 		}
-		return $allow;
+
+
 	}
-}
+
+
 ?>

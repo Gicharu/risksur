@@ -159,9 +159,9 @@ class SiteController extends Controller {
 			//echo "set"; die();
 			Yii::app()->user->setFlash('error', Yii::t("translation", "Failed to connect to server (1), please contact your administrator"));
 		}
-		if (!Yii::app()->user->isGuest && !isset($_GET['nodeId']) && !isset($_GET['widget'])) {
+		if (!Yii::app()->user->isGuest) {
 			$this->redirect(array(
-				'dashboard/index'
+				'site/index'
 			));
 		}
 		$model = new LoginForm;

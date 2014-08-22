@@ -1248,4 +1248,43 @@ div.buttonWrapLeft {
     float: left;
     display: block;
 }
+/* button list menu */
+.goalMenuComponent {
+	float:left;
+	width:200px;
+	margin: 0.5em;
+	padding: 5px;
+	/*margin-right:0.5em;*/
+	background-color: #ccc;
+}
+.goalMenuComponent h4 {
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
+	width: 185px;
+	text-align: center;
+}
+.goalMenuComponent span label {
+	width: 185px;
+	margin:3px;
+	padding: 3px;
+	margin-top: 0.1em;
+	font-size: 1.0em;
+
+}
+#designButtons {
+	float:left;
+	width:200px;
+	margin: 0.5em;
+	padding: 5px;
+	/*margin-right:0.5em;*/
+	background-color: #ccc;
+}
+#designButtons button {
+	width: 190px;
+	margin:3px;
+	padding: 3px;
+	margin-top: 0.1em;
+	font-size: 1.0em;
+}
+
 

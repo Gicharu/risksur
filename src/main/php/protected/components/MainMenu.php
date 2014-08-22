@@ -38,13 +38,13 @@ class MainMenu extends CWidget {
 				$menuParams['menuArray'][$menuPages['pageId']]['url'] = "";
 					$menuParams['menuArray'][$menuPages['pageId']] = array(
 						'label' => $menuPages['pageName'],
-						'url' => $menuPages['path']
+						'url' => Yii::app()->controller->createUrl($menuPages['path']),
 					);
 			} else {
 				$pathArray = $this->arrayKeyPath((int)$menuPages['childId'], $menuParams['menuArray']);
 				if($menuPages['childName'] != "noMenu" && $pathArray !== FALSE) {
 					$fullMenuPath =& $this->arrayPath($menuParams['menuArray'], $pathArray);
-				  $fullMenuPath['items'][$menuPages['pageId']] = array(
+					$fullMenuPath['items'][$menuPages['pageId']] = array(
 						'label' => $menuPages['pageName'],
 						'url' => $menuPages['path']
 					);

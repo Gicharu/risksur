@@ -20,59 +20,12 @@ SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 --
 
 --
--- Dumping data for table `groupaccess`
---
-
-INSERT INTO `groupaccess` (`groupAccessId`, `groupId`, `pageId`) VALUES
-(1,1,1),
-(2,1,2),
-(3,1,3),
-(4,1,4),
-(5,1,5),
-(6,1,6),
-(7,1,7),
-(8,1,8),
-(9,1,9),
-(10,1,10),
-(11,2,1),
-(12,2,2),
-(13,2,3),
-(14,2,4),
-(15,2,5),
-(16,2,6),
-(17,2,7),
-(18,2,8),
-(19,2,9),
-(20,2,10),
-(21,2,1),
-(22,2,2),
-(23,2,3),
-(24,2,4),
-(25,2,5),
-(26,2,6),
-(27,2,7),
-(29,2,9),
-(30,2,10);
-
-
-
-
---
--- Dumping data for table `groups`
---
-
-INSERT INTO `groups` (`groupId`, `groupName`) VALUES
-(1, 'Super Admin'),
-(2, 'Admin'),
-(3, 'User');
-
---
 -- Dumping data for table `programpages`
 --
 
 INSERT INTO `programpages` (`pageId`, `pageName`, `path`, `parentId`, `menuOrder`, `target`, `active`) VALUES
 (1,'Main','',0,1,'',1),
-(2,'Surveillance Design Framework','',0,2,'',1),
+(2,'Surveillance Design Framework','design/index',0,2,'',1),
 (3,'Evaluation Tool','',0,3,'',1),
 (4,'Economic Assessment','',0,4,'',1),
 (5,'Examples','',0,5,'',1),
@@ -82,26 +35,26 @@ INSERT INTO `programpages` (`pageId`, `pageName`, `path`, `parentId`, `menuOrder
 (9,'noMenu','',0,14,'',1),
 (10,'Change Password','changePassword.php',7,10,'',1);
 
---
--- Dumping data for table `usergroup`
---
 
-INSERT INTO `usergroup` (`userGroupId`, `userId`, `groupId`) VALUES
-(1,1,1),
-(2,1,2),
-(3,1,3),
-(5,2,2),
-(6,2,3),
-(7,3,3);
+insert  into `permissions`(`id`,`name`,`description`,`controller`,`action`,`bizrule`) values 
+(1,'Design index','design index','design','index','');
 
---
--- Dumping data for table `users`
---
 
-INSERT INTO `users` (`userId`, `userName`, `password`, `active`, `cookie`, `session`, `ip`) VALUES
-(1,'tracetracker','04a75036e9d520bb983c5ed03b8d0182',1,NULL,NULL,NULL),
-(2,'admin','21232f297a57a5a743894a0e4a801fc3',1,NULL,NULL,NULL),
-(3,'user','21232f297a57a5a743894a0e4a801fc3',1,NULL,NULL,NULL);
+/*Data for the table `roles` */
+
+insert  into `roles`(`id`,`name`,`description`) values (1,'ROLE_ADMIN','administrator role'),(2,'ROLE_SUPERADMIN','super administrator role');
+
+/*Data for the table `roles_has_permissions` */
+
+insert  into `roles_has_permissions`(`permissions_id`,`roles_id`) values (1,1),(1,2);
+
+/*Data for the table `users` */
+
+insert  into `users`(`userId`,`userName`,`password`,`email`,`active`,`passReset`,`cookie`,`session`,`ip`) values (7,'admin','f8892166ddb74acc4a3437e7a7e9f63b','admin@me.com',1,0,NULL,NULL,NULL),(8,'user','f8892166ddb74acc4a3437e7a7e9f63b','admin@me.com',1,0,NULL,NULL,NULL);
+
+/*Data for the table `users_has_roles` */
+
+insert  into `users_has_roles`(`users_id`,`roles_id`) values (8,1),(7,2);
 
 /*Data for the table `goalMenu` */
 
