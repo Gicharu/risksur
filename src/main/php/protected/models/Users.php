@@ -58,26 +58,6 @@ class Users extends CActiveRecord {
 		);
 	}
 
-	/**
-	 *
-	 *
-	 * @return array relational rules.
-	 */
-	public function relations() {
-		// NOTE: you may need to adjust the relation name and the related
-		// class name for the relations automatically generated below.
-		return array(
-			'branches' => array( self::HAS_MANY, 'Branches', 'modifiedby' ),
-			'branchtags' => array( self::HAS_MANY, 'Branchtags', 'modifiedby' ),
-			'categories' => array( self::HAS_MANY, 'Categories', 'modifiedby' ),
-			'fields' => array( self::HAS_MANY, 'Fields', 'modifiedby' ),
-			'fieldtypes' => array( self::HAS_MANY, 'Fieldtypes', 'modifiedby' ),
-			'nodes' => array( self::HAS_MANY, 'Nodes', 'modifiedby' ),
-			'tags' => array( self::HAS_MANY, 'Tags', 'modifiedby' ),
-			'tools' => array( self::HAS_MANY, 'Tools', 'modifiedby' ),
-			'tooltags' => array( self::HAS_MANY, 'Tooltags', 'modifiedby' ),
-		);
-	}
 
 	/**
 	 *
@@ -159,15 +139,6 @@ class Users extends CActiveRecord {
 		return $this->hashPassword( $password, $this->salt ) === $this->password;
 	}
 
-	// //generate salt
-	// public function generateSalt() {
-	// 	return uniqid( '', true );
-	// }
-
-	// public function beforeValidate() {
-	// 	$this->salt = $this->generateSalt();
-	// 	return parent::beforeValidate();
-	// }
 	/**
 	 * beforeSave
 	 * @return bool

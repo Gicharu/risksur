@@ -296,11 +296,11 @@ if ($flashMessages) {
 	<span id="ajaxFlashMsg"></span><input id = "closeButtonAjax" class="ui-icon ui-icon-closethick" type="button" value="close" />
 </div>
 <!-- End Flash Message Area -->
-	<div id="bd">
 	<?php
 		// only show menu for Design controller actions
 		if (Yii::app()->controller->id == 'design') {
 	?>
+	<div id="leftSide" style="width:20%; float:left">
 		<div id="designButtons">
 		<?php echo CHtml::htmlButton(Yii::t("translation", "New Surveillance Design"), array(
 			'id' => 'newDesign',
@@ -309,8 +309,14 @@ if ($flashMessages) {
 		)); ?>
 		<?php echo CHtml::htmlButton(Yii::t("translation", "List Existing Designs"), array(
 			'id' => 'showDesigns',
+			'submit' => array(
+				'design/index'
+			),
 			'type' => 'button'
 		)); ?>
+		<?php
+			if (!empty(Yii::app()->session['surDesign'])) {	
+		?>
 		<?php echo CHtml::htmlButton(Yii::t("translation", "Add Component"), array(
 			'id' => 'addComponent',
 			'type' => 'button'
@@ -319,10 +325,15 @@ if ($flashMessages) {
 			'id' => 'showComponents',
 			'type' => 'button'
 		)); ?>
+		<?php
+			}
+		?>
 		</div>
 	<?php
 		}
 	?>
+	</div>
+	<div id="bd" style="width:80%;float:right;">
 	<div id="componentMenuWrapper" style="float:right;">
 	</div>
 <!--<form>
@@ -354,7 +365,7 @@ $("#goalMenu").buttonset();
 </div>
 
 </div>
-	<div id="footer">
+	<div id="footer" style="width:100%; float:right;">
 		<?php echo $storySettings->name; ?>, <?php echo Yii::t('translation', 'version ') . $storySettings->version . ", " . date('Y'); ?>
 		<?php echo Yii::t('translation', 'All rights reserved by '); ?> <a href='//www.tracetracker.com' target="_blank">
 <img src="<?php echo $baseUrl; ?>/images/tt_ft_logo.png" width="109" 

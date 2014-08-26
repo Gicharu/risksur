@@ -35,6 +35,8 @@ class DesignController extends Controller {
 		Yii::log("actionIndex DesignController called", "trace", self::LOG_CAT);
 		$model = new NewDesign;
 		$dataArray = array();
+		$dataArray['dtHeader'] = "Surveillence design List";
+		$dataArray['surveillanceList'] =  json_encode(array());
 		$this->performAjaxValidation($model);
 
 		if ( isset( $_POST['NewDesign'] ) ) {
@@ -55,6 +57,37 @@ class DesignController extends Controller {
 				Yii::app()->end();
 			}
 		}
+
+		// get list of surveillance designs 
+		$surveillanceList = NewDesign::model()->with("goal")->findAll(array(
+			//'select' => 'pageId, pageName',
+			'condition' => 'userId=:userId',
+			'params' => array(
+				':userId' => Yii::app()->user->id,
+			),
+		));
+		$surveillanceListArray = array();
+		// format datatable data
+		foreach ($surveillanceList as $sur) {
+				$deleteButton = "";
+				//if (Yii::app()->user->name != $valu['userName']) {
+					$deleteButton = "<button id='deleteDesign" . $sur->frameworkId . 
+					"' type='button' class='bdelete' onclick=\"$('#deleteBox').dialog('open');" . 
+					"deleteConfirm('" . $sur->frameworkId . "', '" .
+					$sur->name . "')\">Remove</button>";
+						//}
+			$surveillanceListArray[] = array (
+				'frameworkId' =>   $sur->frameworkId,
+				'name' =>   $sur->name,
+				'userId' =>   $sur->userId,
+				'description' =>   $sur->description,
+				'goalId' =>   $sur->goalId,
+				'goalName' =>   $sur->goal->pageName,
+				'deleteButton' => $deleteButton
+			);
+		}
+		$dataArray['surveillanceList'] =  json_encode($surveillanceListArray);
+		//print_r($dataArray['surveillanceList']);
 		// fetch the goal dropdown data
 		$goalDropDown = GoalData::model()->findAll(array(
 			'select' => 'pageId, pageName',
@@ -69,6 +102,41 @@ class DesignController extends Controller {
 			$dataArray['goalDropDown'][$data->pageId] = $data->pageName;
 		}
 		$this->render('index', array(
+			'model' => $model,
+			'dataArray' => $dataArray
+		));
+	}
+	/**
+	 * actionShowDesign 
+	 * 
+	 * @access public
+	 * @return void
+	 */
+	public function actionShowDesign() {
+		Yii::log("actionShowDesign DesignController called", "trace", self::LOG_CAT);
+		$model = new NewDesign;
+		$dataArray = array();
+		if (isset($_GET['designId'])) {
+			$selectedDesign = NewDesign::model()->with("goal")->findAll(array(
+				//'select' => 'pageId, pageName',
+				'condition' => 'frameworkId=:frameworkId AND userId=:userId',
+				'params' => array(
+					':frameworkId' => $_GET['designId'],
+					':userId' => Yii::app()->user->id,
+				),
+			));
+			$dataArray['selectedDesign'] = $selectedDesign;
+			//add the surveilance design to the session
+			if (count($selectedDesign) == 1) {
+				Yii::app()->session->add('surDesign', array('id' => $_GET['designId'], 'name' => $selectedDesign[0]->name));
+			} else {
+				Yii::app()->session->remove('surDesign');
+			}
+			//print_r($selectedDesign);
+			//print_r($_SESSION);
+		}
+
+		$this->render('showDesign', array(
 			'model' => $model,
 			'dataArray' => $dataArray
 		));

@@ -64,6 +64,12 @@ class NewDesign extends CActiveRecord {
 			)
 		);
 	}
+
+	public function relations() {
+		return array(
+			'goal' => array( self::BELONGS_TO, 'GoalData', 'goalId' )
+		);
+	}
 	/**
 	 * attributeLabels 
 	 * 

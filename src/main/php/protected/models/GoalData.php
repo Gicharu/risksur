@@ -31,6 +31,11 @@ class GoalData extends CActiveRecord {
 		return 'goalMenu';
 	}
 
+	public function relations() {
+		return array(
+			'surveillance' => array( self::HAS_MANY, 'NewDesign', 'goalId' )
+		);
+	}
 	/**
 	 * primaryKey 
 	 * 

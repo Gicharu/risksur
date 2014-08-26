@@ -127,7 +127,7 @@ if ($flashMessages) {
 		}
 	}
 }
-if (isset($_GET['inactive']) && !isset(Yii::app()->user->name)) {
+if (isset($_GET['inactive']) && Yii::app()->user->isGuest) {
 	echo "<div class='flash-notice'>You have been logged out due to a period of inactivity</div>\n";
 	//
 }

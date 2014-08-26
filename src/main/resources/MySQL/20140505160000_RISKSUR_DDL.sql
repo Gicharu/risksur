@@ -86,7 +86,8 @@ CREATE TABLE `goalMenu` (
   `target` varchar(20) DEFAULT NULL,
   `active` tinyint(1) DEFAULT '1',
   `comments` varchar(254) DEFAULT NULL,
-  PRIMARY KEY (`pageId`)
+  PRIMARY KEY (`pageId`),
+  CONSTRAINT `goal` FOREIGN KEY (`goalId`) REFERENCES `goalMenu`(`pageId`) ON UPDATE CASCADE ON DELETE CASCADE; 
 ) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=latin1;
 
 
