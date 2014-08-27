@@ -38,7 +38,7 @@ INSERT INTO `programpages` (`pageId`, `pageName`, `path`, `parentId`, `menuOrder
 
 insert  into `permissions`(`id`,`name`,`description`,`controller`,`action`,`bizrule`) values 
 (1,'Design index','design index','design','index',''),
-(2,'Design fetchComponents','design fetchComponents','design','fetchComponents','')
+(2,'Design fetchComponents','design fetchComponents','design','fetchComponents',''),
 (3,'Design view','design view','design','showDesign','')
 ;
 

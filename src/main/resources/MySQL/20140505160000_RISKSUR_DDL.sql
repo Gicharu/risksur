@@ -62,18 +62,6 @@ CREATE TABLE `frameworkDetails` (
   PRIMARY KEY (`frameworkDetailId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-/*Table structure for table `frameworkHeader` */
-
-
-CREATE TABLE `frameworkHeader` (
-  `frameworkId` int(11) NOT NULL AUTO_INCREMENT,
-  `name` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `userId` int(11) DEFAULT NULL,
-  `goalId` int(11) DEFAULT NULL,
-  `description` blob,
-  PRIMARY KEY (`frameworkId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-
 /*Table structure for table `goalMenu` */
 
 
@@ -86,9 +74,21 @@ CREATE TABLE `goalMenu` (
   `target` varchar(20) DEFAULT NULL,
   `active` tinyint(1) DEFAULT '1',
   `comments` varchar(254) DEFAULT NULL,
-  PRIMARY KEY (`pageId`),
-  CONSTRAINT `goal` FOREIGN KEY (`goalId`) REFERENCES `goalMenu`(`pageId`) ON UPDATE CASCADE ON DELETE CASCADE; 
+  PRIMARY KEY (`pageId`)
 ) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=latin1;
+/*Table structure for table `frameworkHeader` */
+
+
+CREATE TABLE `frameworkHeader` (
+  `frameworkId` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `userId` int(11) DEFAULT NULL,
+  `goalId` int(11) DEFAULT NULL,
+  `description` blob,
+  PRIMARY KEY (`frameworkId`),
+  CONSTRAINT `goal foreign Key` FOREIGN KEY (`goalId`) REFERENCES `goalMenu`(`pageId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
 
 
 /*Table structure for table `surForm` */
