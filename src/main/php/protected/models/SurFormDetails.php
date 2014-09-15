@@ -1,6 +1,6 @@
 <?php
 /**
- * GoalData 
+ * SurFormDetails 
  * 
  * @uses CActiveRecord
  * @package 
@@ -9,7 +9,7 @@
  * @author Chirag Doshi <chirag@tracetracker.com> 
  * @license Tracetracker {@link http://www.tracetracker.com}
  */
-class GoalData extends CActiveRecord {
+class SurFormDetails extends CActiveRecord {
 	/**
 	 * model 
 	 * 
@@ -28,7 +28,7 @@ class GoalData extends CActiveRecord {
 	 * @return void
 	 */
 	public function tableName() {
-		return 'goalMenu';
+		return 'surFormDetails';
 	}
 
 	/**
@@ -39,7 +39,7 @@ class GoalData extends CActiveRecord {
 	 */
 	public function relations() {
 		return array(
-			'surveillance' => array( self::HAS_MANY, 'NewDesign', 'goalId' )
+			'surFormElements' => array( self::BELONGS_TO, 'SurFormHead', 'formId' )
 		);
 	}
 	/**
@@ -49,6 +49,6 @@ class GoalData extends CActiveRecord {
 	 * @return void
 	 */
 	public function primaryKey() {
-		return 'pageId';
+		return 'formSubId';
 	}
 }

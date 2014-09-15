@@ -141,6 +141,101 @@ class DesignController extends Controller {
 			'dataArray' => $dataArray
 		));
 	}
+
+	public function actionAddComponent() {
+		Yii::log("actionAddComponent DesignController called", "trace", self::LOG_CAT);
+		$modelDesign = new NewDesign;
+		$dataArray = array();
+		if (!empty(Yii::app()->session['surDesign'])) {
+			$getForm = SurForm::model()->with("surFormHead")->findAll(array(
+				//'select' => 'pageId, pageName',
+				'condition' => 't.formId=:formId',
+				'params' => array(
+					':formId' => Yii::app()->session['surDesign']['id'],
+				),
+			));
+			//$dataArray['getForm'] = $getForm;
+			$elements = array();
+			//$elements['title'] = "Components Form";
+			$elements['showErrorSummary'] = true;
+			$elements['activeForm']['id'] = "ComponentsForm";
+			$elements['activeForm']['enableClientValidation'] = true;
+			//$elements['activeForm']['enableAjaxValidation'] = false;
+			$elements['activeForm']['class'] = 'CActiveForm';
+			$components = $getForm[0]->surFormHead;
+			$dataArray['getForm'] = $components;
+			$dynamicDataAttributes = array();
+			$inputType = 'text';
+			foreach ($components as $valu) {
+				//set the model attribute array
+				$dynamicDataAttributes[$valu->inputName] = 1;
+				//update the element type
+				if ($valu->inputType == 'int') {
+					$inputType = 'text';
+				} else if ($valu->inputType == 'select') {
+					$inputType = 'dropdownlist';
+				} else {
+					$inputType = 'text';
+				}
+				// add the elements to the CForm array
+				$elements['elements'][$valu->inputName] = array(
+					'label' => $valu->label,
+					'required' => $valu->required,
+					'type' =>  $inputType,
+				);
+				//add the dropdown parameters
+				if ($inputType == 'dropdownlist') {
+					$data = Options::model()->findAll(array(
+						'condition' => 'elementId=:elementId',
+						'params' => array(
+							':elementId' => $valu->subFormId
+						),
+					));
+					$items = array();
+					// process the dropdown data into an array
+					foreach ($data as $params) {
+						$items[$params->optionId] = $params->label;
+					}
+					// add the dropdown items to the element
+					$elements['elements'][$valu->inputName]['items'] = $items; 
+				}
+			}
+			$elements['buttons'] = array(
+				'newComponent'=>array(
+					'type'=>'submit',
+					'label'=>'Create Component',
+				),
+			);
+			$model = new ComponentsForm;
+			$model->_dynamicFields = $dynamicDataAttributes;
+			$form = new CForm($elements, $model);
+			//print_r($form);die();
+			//if($form->submitted('ComponentsForm')) {
+				////$form->loadData();
+				//if($model->validate()) {
+					//echo "what da";
+				//}
+				////$this->redirect(...);
+				////print_r($form); die();
+			//}
+			if ($form->submitted('ComponentsForm') && $form->validate()) {
+				print_r($form); die();
+				$account = $form['Account']->model;
+				$email = $form['Email']->model;
+				if ($account->save(false)) {
+					$email->id = $account->id;
+					$email->save(false);
+					$this->redirect(array('thankyou'));
+				}
+			}
+		}
+
+		$this->render('component', array(
+			'model' => $model,
+			'dataArray' => $dataArray,
+			'form' => $form
+		));
+	}
 	/**
 	 * performAjaxValidation 
 	 * 

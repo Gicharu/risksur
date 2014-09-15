@@ -1,6 +1,6 @@
 <?php
 /**
- * GoalData 
+ * Options 
  * 
  * @uses CActiveRecord
  * @package 
@@ -9,7 +9,7 @@
  * @author Chirag Doshi <chirag@tracetracker.com> 
  * @license Tracetracker {@link http://www.tracetracker.com}
  */
-class GoalData extends CActiveRecord {
+class Options extends CActiveRecord {
 	/**
 	 * model 
 	 * 
@@ -28,20 +28,9 @@ class GoalData extends CActiveRecord {
 	 * @return void
 	 */
 	public function tableName() {
-		return 'goalMenu';
+		return 'options';
 	}
 
-	/**
-	 * relations 
-	 * 
-	 * @access public
-	 * @return void
-	 */
-	public function relations() {
-		return array(
-			'surveillance' => array( self::HAS_MANY, 'NewDesign', 'goalId' )
-		);
-	}
 	/**
 	 * primaryKey 
 	 * 
@@ -49,6 +38,6 @@ class GoalData extends CActiveRecord {
 	 * @return void
 	 */
 	public function primaryKey() {
-		return 'pageId';
+		return 'optionId';
 	}
 }

@@ -1,6 +1,6 @@
 <?php
 /**
- * NewDesign 
+ * FrameworkDetails 
  * 
  * @uses CActiveRecord
  * @package 
@@ -9,11 +9,11 @@
  * @author Chirag Doshi <chirag@tracetracker.com> 
  * @license Tracetracker {@link http://www.tracetracker.com}
  */
-class NewDesign extends CActiveRecord {
+class FrameworkDetails extends CActiveRecord {
 	//public $name;
 	//public $description;
 	//public $goal;
-	public $component;
+	//public $component;
 
 	/**
 	 * model 
@@ -34,7 +34,7 @@ class NewDesign extends CActiveRecord {
 	 * @return void
 	 */
 	public function tableName() {
-		return 'frameworkHeader';
+		return 'frameworkDetails';
 	}
 
 	/**
@@ -44,7 +44,7 @@ class NewDesign extends CActiveRecord {
 	 * @return void
 	 */
 	public function primaryKey() {
-		return 'frameworkId';
+		return 'frameworkDetailsId';
 	}
 	/**
 	 * rules 
@@ -52,18 +52,18 @@ class NewDesign extends CActiveRecord {
 	 * @access public
 	 * @return void
 	 */
-	public function rules() {
-		return array(
-			array(
-				'name, description, goalId, userId',
-				'required'
-			),
-			array(
-				'name',
-				'unique'
-			)
-		);
-	}
+	//public function rules() {
+		//return array(
+			//array(
+				//'name, description, goalId, userId',
+				//'required'
+			//),
+			//array(
+				//'name',
+				//'unique'
+			//)
+		//);
+	//}
 
 	/**
 	 * relations 
@@ -73,8 +73,7 @@ class NewDesign extends CActiveRecord {
 	 */
 	public function relations() {
 		return array(
-			'goal' => array( self::BELONGS_TO, 'GoalData', 'goalId' ),
-			'designHead' => array( self::HAS_MANY, 'FrameworkDetails', 'frameworkDetailsId' )
+			'frameDetails' => array( self::BELONGS_TO, 'NewDesign', 'frameworkId' )
 		);
 	}
 	/**

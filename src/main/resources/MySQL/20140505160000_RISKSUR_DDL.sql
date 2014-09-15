@@ -25,7 +25,7 @@ CREATE TABLE `programpages` (
   `active` tinyint(1) default '1',
 `comments` varchar(254) default NULL,
   PRIMARY KEY  (`pageId`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=199 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 ;
 
 
 -- --------------------------------------------------------
@@ -46,22 +46,31 @@ CREATE TABLE `users` (
   `ip` varchar(15) CHARACTER SET latin1 DEFAULT NULL,
   PRIMARY KEY (`userId`),
   UNIQUE KEY `userName` (`userName`)
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
 
-/*Table structure for table `frameworkDetails` */
+/*Table structure for table `componentDetails` */
 
 
-CREATE TABLE `frameworkDetails` (
-  `frameworkDetailId` int(11) NOT NULL AUTO_INCREMENT,
-  `frameworkId` int(11) DEFAULT NULL,
+CREATE TABLE `componentDetails` (
+  `componentDetailId` int(11) NOT NULL AUTO_INCREMENT,
+  `componentId` int(11) DEFAULT NULL,
   `subFormId` int(11) DEFAULT NULL,
   `value` varchar(254) DEFAULT NULL,
   `comments` blob,
-  PRIMARY KEY (`frameworkDetailId`)
+  PRIMARY KEY (`componentDetailId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
+
+/*Table structure for table `componentHead` */
+CREATE TABLE `componentHead` (
+  `componentId` int(11) NOT NULL AUTO_INCREMENT,
+  `frameworkId` int(11) DEFAULT NULL,
+  `componentName` varchar(254) DEFAULT NULL,
+  `comments` blob,
+  PRIMARY KEY (`componentId`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*Table structure for table `goalMenu` */
 
 
@@ -75,7 +84,7 @@ CREATE TABLE `goalMenu` (
   `active` tinyint(1) DEFAULT '1',
   `comments` varchar(254) DEFAULT NULL,
   PRIMARY KEY (`pageId`)
-) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*Table structure for table `frameworkHeader` */
 
 
@@ -109,12 +118,21 @@ CREATE TABLE `surFormDetails` (
   `inputName` varchar(50) DEFAULT NULL,
   `label` varchar(50) DEFAULT NULL,
   `inputType` varchar(50) DEFAULT NULL,
-  `description` blob,
+  `required` tinyint(1) DEFAULT '1',
   PRIMARY KEY (`subFormId`),
   KEY `formId` (`formId`),
   CONSTRAINT `surFormDetails_ibfk_1` FOREIGN KEY (`formId`) REFERENCES `surForm` (`formId`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
+/*Table structure for table `options` */
+
+CREATE TABLE `options` (
+  `optionId` INT(11) NOT NULL AUTO_INCREMENT,
+  `elementId` INT(11) DEFAULT NULL,
+  `val` VARCHAR(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `label` VARCHAR(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (`optionId`)
+) ENGINE=INNODB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE `permissions` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -125,7 +143,7 @@ CREATE TABLE `permissions` (
   `bizrule` varchar(255) CHARACTER SET latin1 NOT NULL DEFAULT '',
   PRIMARY KEY (`id`),
   UNIQUE KEY `unique_access_rule` (`controller`,`action`,`bizrule`)
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
 
@@ -134,7 +152,7 @@ CREATE TABLE `roles` (
   `name` varchar(45) CHARACTER SET latin1 NOT NULL,
   `description` varchar(45) CHARACTER SET latin1 NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
 CREATE TABLE `roles_has_permissions` (
@@ -157,3 +175,5 @@ CREATE TABLE `users_has_roles` (
   CONSTRAINT `fk_users_has_roles_roles` FOREIGN KEY (`roles_id`) REFERENCES `roles` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `fk_users_has_roles_users` FOREIGN KEY (`users_id`) REFERENCES `users` (`userId`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+
