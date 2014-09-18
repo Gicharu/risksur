@@ -251,12 +251,19 @@ $msg = 0;
 
 	<div id="header" 
 	style="background-image:url(<?php echo $baseUrl;?>/<?php echo $storySettings->backgroundpath; ?>)">
-<div id="storyLogo">
-	<a href='<?php echo $baseUrl; ?>/index.php/design/index'>
-		<img src="<?php echo $baseUrl; ?>/<?php echo $storySettings->logopath;?>" 
-			alt="link to landing page" />
-	</a>
-</div>
+	<div id="storyLogo">
+		<a href='<?php echo $baseUrl; ?>/index.php/design/index'>
+			<img src="<?php echo $baseUrl; ?>/<?php echo $storySettings->logopath;?>" 
+				alt="link to landing page" />
+		</a>
+	</div>
+	<div id="designName">
+	<?php
+		if (!empty(Yii::app()->session['surDesign'])) {
+			echo "Active Design: " . Yii::app()->session['surDesign']['name'];
+		}
+	?>
+	</div>
 	</div><!-- header -->
 
 <?php
@@ -297,11 +304,6 @@ if ($flashMessages) {
 </div>
 <!-- End Flash Message Area -->
 	<?php
-		if (!empty(Yii::app()->session['surDesign'])) {
-			echo "<h4>Active Design: " . Yii::app()->session['surDesign']['name'] . "</h4>";
-		}
-	?>
-	<?php
 		// only show menu for Design controller actions
 		if (Yii::app()->controller->id == 'design') {
 	?>
@@ -331,6 +333,9 @@ if ($flashMessages) {
 		)); ?>
 		<?php echo CHtml::htmlButton(Yii::t("translation", "List Components"), array(
 			'id' => 'showComponents',
+			'submit' => array(
+				'design/listComponents'
+			),
 			'type' => 'button'
 		)); ?>
 		<?php

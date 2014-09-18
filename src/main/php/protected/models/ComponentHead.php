@@ -1,6 +1,6 @@
 <?php
 /**
- * SurFormDetails 
+ * ComponentHead 
  * 
  * @uses CActiveRecord
  * @package 
@@ -9,7 +9,8 @@
  * @author Chirag Doshi <chirag@tracetracker.com> 
  * @license Tracetracker {@link http://www.tracetracker.com}
  */
-class SurFormDetails extends CActiveRecord {
+class ComponentHead extends CActiveRecord {
+
 	/**
 	 * model 
 	 * 
@@ -21,6 +22,7 @@ class SurFormDetails extends CActiveRecord {
 	public static function model($className = __CLASS__) {
 		return parent::model($className);
 	}
+
 	/**
 	 * tableName 
 	 * 
@@ -28,7 +30,17 @@ class SurFormDetails extends CActiveRecord {
 	 * @return void
 	 */
 	public function tableName() {
-		return 'surFormDetails';
+		return 'componentHead';
+	}
+
+	/**
+	 * primaryKey 
+	 * 
+	 * @access public
+	 * @return void
+	 */
+	public function primaryKey() {
+		return 'componentId';
 	}
 
 	/**
@@ -39,16 +51,7 @@ class SurFormDetails extends CActiveRecord {
 	 */
 	public function relations() {
 		return array(
-			'surFormElements' => array( self::BELONGS_TO, 'SurFormHead', 'formId' )
+			'compDetails' => array( self::HAS_MANY, 'ComponentDetails', 'componentDetailId' )
 		);
-	}
-	/**
-	 * primaryKey 
-	 * 
-	 * @access public
-	 * @return void
-	 */
-	public function primaryKey() {
-		return 'subFormId';
 	}
 }

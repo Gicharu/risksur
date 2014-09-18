@@ -870,11 +870,12 @@ div.login-error{
 
 }
 
-#dashboardName {
-	color: #448DAE;
-	font-size: 20px;
+#designName {
+	color: #666;
+	font-size: 18px;
 	font-weight: bold;
 	margin-right: 5px;
+	margin-top:25px;
 	padding-right: 5px;
 	float: right;
 }

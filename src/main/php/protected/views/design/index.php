@@ -225,7 +225,7 @@ function addNewDesign() {
 	<?php echo CHtml::Button(Yii::t("translation", "Create"), array(
 			'id' => 'load',
 			//'onclick' => "addNewDesign();",
-			'type' => 'submit'
+			'type' => 'button'
 	)); ?>
 	</div>
 <?php

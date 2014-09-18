@@ -1,6 +1,10 @@
 $(function() {
 
-    $( 'button').button();
+	// update the button to jquery button themes
+    $('button').button();
+    $('input:button').button();
+    $('input:submit').button();
+
     $('button.btoogler').button({
         icons: { primary: "ui-icon-arrowthickstop-1-n" }, text: false});
     $('button.breport').button({

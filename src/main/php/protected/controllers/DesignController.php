@@ -128,7 +128,11 @@ class DesignController extends Controller {
 			$dataArray['selectedDesign'] = $selectedDesign;
 			//add the surveilance design to the session
 			if (count($selectedDesign) == 1) {
-				Yii::app()->session->add('surDesign', array('id' => $_GET['designId'], 'name' => $selectedDesign[0]->name));
+				Yii::app()->session->add('surDesign', array(
+					'id' => $_GET['designId'],
+					'name' => $selectedDesign[0]->name,
+					'goalId' => $selectedDesign[0]->goalId
+				));
 			} else {
 				Yii::app()->session->remove('surDesign');
 			}
@@ -144,14 +148,16 @@ class DesignController extends Controller {
 
 	public function actionAddComponent() {
 		Yii::log("actionAddComponent DesignController called", "trace", self::LOG_CAT);
-		$modelDesign = new NewDesign;
+		$component = new ComponentHead;
+		$componentDetails = new ComponentDetails;
 		$dataArray = array();
+		//print_r(Yii::app()->session['surDesign']);
 		if (!empty(Yii::app()->session['surDesign'])) {
 			$getForm = SurForm::model()->with("surFormHead")->findAll(array(
 				//'select' => 'pageId, pageName',
 				'condition' => 't.formId=:formId',
 				'params' => array(
-					':formId' => Yii::app()->session['surDesign']['id'],
+					':formId' => Yii::app()->session['surDesign']['goalId'],
 				),
 			));
 			//$dataArray['getForm'] = $getForm;
@@ -162,13 +168,21 @@ class DesignController extends Controller {
 			$elements['activeForm']['enableClientValidation'] = true;
 			//$elements['activeForm']['enableAjaxValidation'] = false;
 			$elements['activeForm']['class'] = 'CActiveForm';
+			//print_r($getForm); die();
 			$components = $getForm[0]->surFormHead;
 			$dataArray['getForm'] = $components;
 			$dynamicDataAttributes = array();
 			$inputType = 'text';
+			// add componentName form element
+			$dynamicDataAttributes['componentName'] = 1;
+			$elements['elements']['componentName'] = array(
+				'label' => "Component Name",
+				'required' => true,
+				'type' =>  'text',
+			);
 			foreach ($components as $valu) {
 				//set the model attribute array
-				$dynamicDataAttributes[$valu->inputName] = 1;
+				$dynamicDataAttributes[$valu->inputName . "|" . $valu->subFormId] = 1;
 				//update the element type
 				if ($valu->inputType == 'int') {
 					$inputType = 'text';
@@ -178,7 +192,7 @@ class DesignController extends Controller {
 					$inputType = 'text';
 				}
 				// add the elements to the CForm array
-				$elements['elements'][$valu->inputName] = array(
+				$elements['elements'][$valu->inputName . "|" . $valu->subFormId] = array(
 					'label' => $valu->label,
 					'required' => $valu->required,
 					'type' =>  $inputType,
@@ -197,7 +211,7 @@ class DesignController extends Controller {
 						$items[$params->optionId] = $params->label;
 					}
 					// add the dropdown items to the element
-					$elements['elements'][$valu->inputName]['items'] = $items; 
+					$elements['elements'][$valu->inputName . "|" . $valu->subFormId]['items'] = $items; 
 				}
 			}
 			$elements['buttons'] = array(
@@ -208,25 +222,44 @@ class DesignController extends Controller {
 			);
 			$model = new ComponentsForm;
 			$model->_dynamicFields = $dynamicDataAttributes;
+			// generate the components form
 			$form = new CForm($elements, $model);
-			//print_r($form);die();
-			//if($form->submitted('ComponentsForm')) {
-				////$form->loadData();
-				//if($model->validate()) {
-					//echo "what da";
-				//}
-				////$this->redirect(...);
-				////print_r($form); die();
-			//}
+			//validate and save the component data
 			if ($form->submitted('ComponentsForm') && $form->validate()) {
-				print_r($form); die();
-				$account = $form['Account']->model;
-				$email = $form['Email']->model;
-				if ($account->save(false)) {
-					$email->id = $account->id;
-					$email->save(false);
-					$this->redirect(array('thankyou'));
+				//print_r($form->getModel()); die();
+				$component->componentName = $val = $form->model->componentName;
+				$component->frameworkId = Yii::app()->session['surDesign']['id'];
+				//save the componentHead values
+				$component->save();
+				$componentId = $component->componentId; 
+				// fetch the form data 
+				foreach ($form->model as $key => $val) {
+					//ignore the attribute arrays
+					if (!is_array($key) && !is_array($val)) {
+						if ($key != "componentName") {
+							$componentDetails->setIsNewRecord(true);
+							$componentDetails->componentDetailId = null;
+							$componentDetails->componentId = $componentId;
+							$params = explode("|", $key);
+							$componentDetails->subFormId = $params[1];
+							$componentDetails->value = $val;
+							$componentDetails->save();
+						}
+						//echo $key . "=>" . $val ."<br>";
+						//print_r($key);
+						//print_r($val);
+					}
 				}
+				Yii::app()->user->setFlash('success', Yii::t("translation", "Component successfully created"));
+				
+				//die();
+				//$account = $form['Account']->model;
+				//$email = $form['Email']->model;
+				//if ($account->save(false)) {
+					//$email->id = $account->id;
+					//$email->save(false);
+					//$this->redirect(array('thankyou'));
+				//}
 			}
 		}
 
@@ -234,6 +267,56 @@ class DesignController extends Controller {
 			'model' => $model,
 			'dataArray' => $dataArray,
 			'form' => $form
+		));
+	}
+	/**
+	 * actionListComponents 
+	 * 
+	 * @access public
+	 * @return void
+	 */
+	public function actionListComponents() {
+		Yii::log("actionListComponents DesignController called", "trace", self::LOG_CAT);
+		//$model = new ComponentHead;
+		$dataArray = array();
+		$dataArray['componentList'] =  json_encode(array());
+		$dataArray['dtHeader'] = "Components List";
+		if (!empty(Yii::app()->session['surDesign'])) {
+			// get list of surveillance designs 
+			$componentList = ComponentHead::model()->with("compDetails")->findAll(array(
+				//'select' => 'pageId, pageName',
+				'condition' => 'frameworkId=:frameworkId',
+				'params' => array(
+					':frameworkId' => Yii::app()->session['surDesign']['id'],
+				),
+			));
+			//print_r($componentList); die();
+			$componentListArray = array();
+			// format datatable data
+			foreach ($componentList as $com) {
+				$deleteButton = "";
+				$editButton = "";
+					$deleteButton = "<button id='deleteComponent" . $com->componentId . 
+					"' type='button' class='bdelete' onclick=\"$('#deleteBox').dialog('open');" . 
+					"deleteConfirm('" . $com->componentId . "', '" .
+					$com->componentName . "')\">Remove</button>";
+					$editButton = "<button id='editComponent" . $com->componentId . 
+					"' type='button' class='bedit' onclick=\"window.location.href ='" . CController::createUrl('design/editComponent') .
+					"'\">Edit</button>";
+					$componentListArray[] = array (
+						'componentId' =>   $com->componentId,
+						'frameworkId' =>   $com->frameworkId,
+						'name' => $com->componentName,
+						'description' =>   $com->comments,
+						'editButton' => $editButton,
+						'deleteButton' => $deleteButton
+					);
+			}
+		}
+		$dataArray['componentList'] =  json_encode($componentListArray);
+		$this->render('componentList', array(
+			//'model' => $model,
+			'dataArray' => $dataArray
 		));
 	}
 	/**
@@ -282,11 +365,11 @@ class DesignController extends Controller {
 			),
 		));
 
-		$data = CHtml::listData($data,'pageId','pageName');
+		$data = CHtml::listData($data, 'pageId', 'pageName');
 		//print_r($data);
-		foreach($data as $value => $name) {
+		foreach ($data as $value => $name) {
 			echo CHtml::tag('option',
-			array('value'=>$value),CHtml::encode($name),true);
+			array('value'=>$value), CHtml::encode($name), true);
 		}
 	}
 }
