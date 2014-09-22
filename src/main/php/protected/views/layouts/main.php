@@ -89,6 +89,31 @@ function disableConfirm(formName,confValue){
 			}
 	});
 }
+// new design function
+function addNewDesign() {
+	var data=$("#newDesignForm").serialize();
+	$.ajax({
+		type: 'POST',
+		url: '<?php echo Yii::app()->createAbsoluteUrl("design/index"); ?>',
+		data:data,
+		success:function(data){
+				// reset the form if success
+				var checkSuccess = /successfully/i;
+				if (checkSuccess.test(data)) {
+				// add process message
+				$("#msgsNewDesign").html(data).attr('class', 'flash-success');
+					$("form#newDesignForm")[0].reset();
+					$("#newDesignDialog").dialog("close");
+				}
+
+		},
+		error: function(data) { // if error occured
+		console.log("Error occured.please try again");
+		console.log(data);
+		},
+		dataType:'html'
+	});
+}
 var baseUrl = "<?php echo $baseUrl; ?>" + '/index.php/';
 $(function(){
 	$("#menu").menu({
@@ -118,14 +143,6 @@ $(function(){
 		window.location.href = '<?php echo CController::createUrl("admin/verify"); ?>';
 	});
 
-	// opene the new design dialog form
-	$('#newDesign').on('click', function() {
-		$("#newDesignDialog").dialog("open");
-		$("form#newDesignForm")[0].reset();
-		$("#goalId").val($("#goalId option:first").val());
-		$("#goalId").trigger("change");
-	});
-	
 <?php
 	//print_r(Yii::app()->user->isGuest);
 	//print_r(Yii::app()->components);
@@ -312,6 +329,9 @@ if ($flashMessages) {
 		<?php echo CHtml::htmlButton(Yii::t("translation", "New Surveillance Design"), array(
 			'id' => 'newDesign',
 			//'onclick' => '$("#newDesignDialog").dialog("open"); $("#goalId").val($("#goalId option:first").val()); $("#goalId").trigger("change");',
+			'submit' => array(
+				'design/createDesign'
+			),
 			'type' => 'button'
 		)); ?>
 		<?php echo CHtml::htmlButton(Yii::t("translation", "List Existing Designs"), array(

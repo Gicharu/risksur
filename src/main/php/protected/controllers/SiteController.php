@@ -161,7 +161,7 @@ class SiteController extends Controller {
 		}
 		if (!Yii::app()->user->isGuest) {
 			$this->redirect(array(
-				'site/index'
+				'design/index'
 			));
 		}
 		$model = new LoginForm;
@@ -206,7 +206,7 @@ class SiteController extends Controller {
 			if ($model->validate() && $model->login()) { // || Yii::app()->user->login($identity)) {
 				// if nodeId provided set the selectedTix session variable to skip the select node page
 				$this->redirect(array(
-					'site/index'
+					'design/index'
 				));
 				return;
 			}

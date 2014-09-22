@@ -29,7 +29,7 @@ INSERT INTO `programpages` (`pageId`, `pageName`, `path`, `parentId`, `menuOrder
 (3,'Evaluation Tool','',0,3,'',1),
 (4,'Economic Assessment','',0,4,'',1),
 (5,'Examples','',0,5,'',1),
-(6,'Statistical Tools','',0,6,'',1),
+(6,'Statistical Tools','nightly.tracetracker.com/epitools/htdocs/',0,6,'_blank',1),
 --(7,'Profile','',0,7,'',1),
 (8,'Admin','',0,9,'',1),
 (9,'noMenu','',0,14,'',1);
@@ -40,7 +40,9 @@ insert  into `permissions`(`id`,`name`,`description`,`controller`,`action`,`bizr
 (1,'Design index','design index','design','index',''),
 (2,'Design fetchComponents','design fetchComponents','design','fetchComponents',''),
 (3,'Design view','design view','design','showDesign',''),
-(4,'Add components','Add components','design','addComponent','')
+(4,'Add components','Add components','design','addComponent',''),
+(5,'List Components','List Components','design','listComponents', ''),
+(6,	'Create design','Create Design','design','createDesign', '')	
 ;
 
 
@@ -50,7 +52,7 @@ insert  into `roles`(`id`,`name`,`description`) values (1,'ROLE_ADMIN','administ
 
 /*Data for the table `roles_has_permissions` */
 
-insert  into `roles_has_permissions`(`permissions_id`,`roles_id`) values (1,1),(1,2),(2,1),(2,2),(3,1),(3,2),(4,1),(4,2);
+insert  into `roles_has_permissions`(`permissions_id`,`roles_id`) values (1,1),(1,2),(2,1),(2,2),(3,1),(3,2),(4,1),(4,2),(5,1),(5,2),(6,1),(6,2);
 
 /*Data for the table `users` */
 

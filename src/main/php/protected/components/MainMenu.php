@@ -21,7 +21,7 @@ class MainMenu extends CWidget {
 	public function run() {
 		$parentId = 0;
 		$programPages = Yii::app()->db->createCommand()
-			->select('p.pageId, p.pageName, p.path, p.parentId, p.menuOrder, c.pageId as childId, c.pageName as childName, c.menuOrder as childOrder')
+			->select('p.pageId, p.pageName, p.path, p.parentId, p.menuOrder, p.target, c.pageId as childId, c.pageName as childName, c.menuOrder as childOrder')
 			->from('programpages p')
 			//->join('tbl_profile p', 'u.id=p.user_id')
 			->leftJoin('programpages c', 'c.pageId = p.parentId')
@@ -36,9 +36,15 @@ class MainMenu extends CWidget {
 			if (empty($menuPages['childId']) && $menuPages['pageName'] != "noMenu") {
 				$menuParams['menuArray'][$menuPages['pageId']]['label'] = "Empty Link";
 				$menuParams['menuArray'][$menuPages['pageId']]['url'] = "";
+					if (empty($menuPages['target'])) {
+						$url = Yii::app()->controller->createUrl($menuPages['path']);
+					} else {
+						$url = "//" . $menuPages['path']; 
+					}
 					$menuParams['menuArray'][$menuPages['pageId']] = array(
 						'label' => $menuPages['pageName'],
-						'url' => Yii::app()->controller->createUrl($menuPages['path']),
+						'url' => $url,
+						'linkOptions' => array('target' => $menuPages['target'])
 					);
 			} else {
 				$pathArray = $this->arrayKeyPath((int)$menuPages['childId'], $menuParams['menuArray']);
@@ -46,7 +52,8 @@ class MainMenu extends CWidget {
 					$fullMenuPath =& $this->arrayPath($menuParams['menuArray'], $pathArray);
 					$fullMenuPath['items'][$menuPages['pageId']] = array(
 						'label' => $menuPages['pageName'],
-						'url' => $menuPages['path']
+						'url' => $menuPages['path'],
+						'linkOptions' => array('target' => $menuPages['target'])
 					);
 				}
 			}
