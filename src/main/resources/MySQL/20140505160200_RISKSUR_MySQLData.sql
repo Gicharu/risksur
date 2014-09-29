@@ -24,16 +24,16 @@ SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 --
 
 INSERT INTO `programpages` (`pageId`, `pageName`, `path`, `parentId`, `menuOrder`, `target`, `active`) VALUES
---(1,'Main','',0,1,'',1),
+-- (1,'Main','',0,1,'',1),
 (2,'Surveillance Design Framework','design/index',0,2,'',1),
 (3,'Evaluation Tool','',0,3,'',1),
 (4,'Economic Assessment','',0,4,'',1),
 (5,'Examples','',0,5,'',1),
 (6,'Statistical Tools','nightly.tracetracker.com/epitools/htdocs/',0,6,'_blank',1),
---(7,'Profile','',0,7,'',1),
+-- (7,'Profile','',0,7,'',1),
 (8,'Admin','',0,9,'',1),
 (9,'noMenu','',0,14,'',1);
---(10,'Change Password','changePassword.php',7,10,'',1);
+-- (10,'Change Password','changePassword.php',7,10,'',1);
 
 
 insert  into `permissions`(`id`,`name`,`description`,`controller`,`action`,`bizrule`) values 
