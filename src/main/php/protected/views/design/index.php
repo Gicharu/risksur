@@ -60,12 +60,16 @@ $(function(){
 		//"bDeferRender": true,
 		//"sServerMethod": "POST",
 		"aaData": <?php echo $dataArray['surveillanceList']; ?>,
-		"bAutoWidth" : false,
+			//"bAutoWidth" : true,
 		"aoColumns": [
-			{"mDataProp": "name",  "bVisible": true, sClass: "showDetails clickable underline", "sWidth": "20%"},
-			{"mDataProp": "description", "bVisible": true, "sWidth": "40%"},
-			{"mDataProp": "goalName", "bVisible": true, "sWidth": "12%"},
-			{"mData": "deleteButton", "bSortable": false, "bVisible": true, "sWidth": "8%" },
+		{"mDataProp": "name",  "bVisible": true, sClass: "showDetails clickable underline"},
+		{"mDataProp": "description", "bVisible": true},
+		{"mDataProp": "goalName", "bVisible": true},
+		{"mData": "deleteButton", "bSortable": false },
+			//{"mDataProp": "name",  "bVisible": true, sClass: "showDetails clickable underline", "sWidth": "20%"},
+			//{"mDataProp": "description", "bVisible": true, "sWidth": "30%"},
+			//{"mDataProp": "goalName", "bVisible": true, "sWidth": "12%"},
+			//{"mData": "deleteButton", "bSortable": false, "bVisible": true, "sWidth": "8%" },
 		],
 		// update the buttons stying after the table data is loaded
 		"fnDrawCallback": function() {
@@ -83,6 +87,7 @@ $(function(){
 		"bLengthChange": true
 	});
 
+	// click event to show design details
 	$('.<?php echo "showDetails"; ?>').die('click').live('click', function() {
 				var aPos = slist.fnGetPosition(this); /* Get current  row pos */
 				//console.log(aPos);
@@ -94,10 +99,9 @@ $(function(){
 });
 	</script>
 
-<div id="listSurveilance">
+<div id="listSurveilance" width="100%">
 	
-	<table id="surveilanceList" class="tableStyle"  
-		width="100%" border="0" cellspacing="0" cellpadding="0">
+	<table id="surveilanceList" width="100%" border="0" cellspacing="0" cellpadding="0">
 		<thead>
 		<tr>
 			<th title = "Name">Name</th>

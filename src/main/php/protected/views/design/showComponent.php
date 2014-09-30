@@ -1,7 +1,7 @@
 
 <script type="text/javascript">
 $(function(){
-	$("<?php echo '#designData'; ?>").dataTable({
+	$("<?php echo '#componentTable'; ?>").dataTable({
 		"bAutoWidth" : false,
 		"bJQueryUI": true,
 		"bFilter": false,
@@ -11,9 +11,9 @@ $(function(){
 	});
 });
 </script>
-<div id="designDetails" width="100%">
+<div id="componentDetails" width="100%">
 	
-	<table id="designData" class="tableStyle"  
+	<table id="componentTable" class="tableStyle"  
 		width="100%" border="0" cellspacing="0" cellpadding="0">
 		<thead>
 		<tr>
@@ -23,20 +23,12 @@ $(function(){
 		</thead>
 		<tbody>
 <?php
-if (!empty($dataArray['selectedDesign'])) {
-	foreach ($dataArray['selectedDesign'] as $values) {
+if (!empty($dataArray['selectedComponent'])) {
+	foreach ($dataArray['selectedComponent'] as  $key => $values) {
 ?>
 <tr>
-	<td>Name</td>
-	<td><?php echo $values->name; ?></td>
-</tr>
-<tr>
-	<td>Description</td>
-	<td><?php echo $values->description; ?></td>
-</tr>
-<tr>
-	<td>Goal</td>
-<td><?php echo $values->goal->pageName; ?></td>
+	<td><?php echo $key; ?></td>
+	<td><?php echo $values; ?></td>
 </tr>
 <?php
 	}

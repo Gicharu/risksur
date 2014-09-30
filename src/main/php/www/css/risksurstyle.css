@@ -389,7 +389,7 @@ h1 {
 	display: none;
 }
 body, .dataTables_wrapper{
-	display: table;
+	/*display: table;*/
 }
 #top_header, #login li, #dashboard{
 	display: inline-block;
@@ -530,7 +530,7 @@ body {
 	min-height: 50px;
 }
 #content {
-	min-width: 1200px;
+	/*min-width: 1200px;*/
 }
 #bd ul, #content, #login, .selected.connected-list.ui-sortable, .available.connected-list{
 	padding:0;
@@ -933,12 +933,12 @@ td.group {
 	width: 65%;
 }
 #dashboardWidgets .dataTables_wrapper {
-	width: 80%;
+	/*width: 80%;*/
 	float:right;
 	padding:10px;
 }
 .dataTables_wrapper .ui-widget-header {
-	height: 32.5px;
+	/*height: 32.5px;*/
 }
 
 .dataTables_length, .dataTables_info {
@@ -1290,5 +1290,8 @@ div.buttonWrapLeft {
 	margin-top: 0.1em;
 	font-size: 1.0em;
 }
+/*.container, #content{*/
+/*width:100%;*/
+/*}*/
 
 

@@ -42,7 +42,9 @@ insert  into `permissions`(`id`,`name`,`description`,`controller`,`action`,`bizr
 (3,'Design view','design view','design','showDesign',''),
 (4,'Add components','Add components','design','addComponent',''),
 (5,'List Components','List Components','design','listComponents', ''),
-(6,	'Create design','Create Design','design','createDesign', '')	
+(6,	'Create design','Create Design','design','createDesign', ''),
+(7,'Edit components','Edit components','design','editComponent',''),
+(8,'Show components','Show components','design','showComponent','')
 ;
 
 
@@ -52,7 +54,7 @@ insert  into `roles`(`id`,`name`,`description`) values (1,'ROLE_ADMIN','administ
 
 /*Data for the table `roles_has_permissions` */
 
-insert  into `roles_has_permissions`(`permissions_id`,`roles_id`) values (1,1),(1,2),(2,1),(2,2),(3,1),(3,2),(4,1),(4,2),(5,1),(5,2),(6,1),(6,2);
+insert  into `roles_has_permissions`(`permissions_id`,`roles_id`) values (1,1),(1,2),(2,1),(2,2),(3,1),(3,2),(4,1),(4,2),(5,1),(5,2),(6,1),(6,2),(7,1),(7,2),(8,1),(8,2);
 
 /*Data for the table `users` */
 
@@ -69,7 +71,7 @@ insert  into `goalMenu`(`pageId`,`pageName`,`path`,`parentId`,`menuOrder`,`targe
 
 /*Data for the table `options` */
 
-insert  into `options`(`optionId`,`elementId`,`val`,`label`) values (1,2,'source','At Source'),(2,2,'coordPoint','At Coordination point'),(3,3,'bioSample','Biological samples'),(4,3,'obs','Observations'),(5,3,'hid','Health indicator data'),(6,4,'animal','Animal'),(7,4,'herd','Heard');
+insert  into `options`(`optionId`,`elementId`,`val`,`label`) values (1,2,'source','At Source'),(2,2,'coordPoint','At Coordination point'),(3,3,'bioSample','Biological samples'),(4,3,'obs','Observations'),(5,3,'hid','Health indicator data'),(6,4,'animal','Animal'),(7,4,'herd','Herd');
 
 /*Data for the table `surForm` */
 

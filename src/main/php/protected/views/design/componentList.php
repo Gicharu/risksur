@@ -59,13 +59,18 @@ $(function(){
 		//"bDeferRender": true,
 		//"sServerMethod": "POST",
 		"aaData": <?php echo $dataArray['componentList']; ?>,
-		"bAutoWidth" : false,
+			//"bAutoWidth" : true,
 		"aoColumns": [
-			{"mDataProp": "name",  "bVisible": true, sClass: "showDetails clickable underline", "sWidth": "20%"},
-			{"mDataProp": "description", "bVisible": true, "sWidth": "40%"},
-			{"mDataProp": "description", "bVisible": true, "sWidth": "6%"},
-			{"mDataProp": "editButton", "bVisible": true, "sWidth": "6%"},
-			{"mData": "deleteButton", "bSortable": false, "bVisible": true, "sWidth": "8%" },
+			//{"mDataProp": "name",  "bVisible": true, sClass: "showDetails clickable underline", "sWidth": "20%"},
+			//{"mDataProp": "description", "bVisible": true, "sWidth": "40%"},
+			//{"mDataProp": "description", "bVisible": true, "sWidth": "6%"},
+			//{"mDataProp": "editButton", "bVisible": true, "sWidth": "6%"},
+			//{"mData": "deleteButton", "bSortable": false, "bVisible": true, "sWidth": "8%" },
+			{"mDataProp": "name",  "bVisible": true, sClass: "showDetails clickable underline"},
+			{"mDataProp": "description", "bVisible": true},
+			{"mDataProp": "description", "bVisible": true},
+			{"mDataProp": "editButton", "bVisible": true},
+			{"mData": "deleteButton", "bSortable": false, "bVisible": true },
 		],
 		// update the buttons stying after the table data is loaded
 		"fnDrawCallback": function() {
@@ -84,12 +89,20 @@ $(function(){
 		"bInfo": true,
 		"bLengthChange": true
 	});
+	// click event to show component details
+	$('.<?php echo "showDetails"; ?>').die('click').live('click', function() {
+				var aPos = clist.fnGetPosition(this); /* Get current  row pos */
+				//console.log(aPos);
+				var aData = clist.fnGetData(aPos[0]); /* Get the full row     */
+				//console.log(aData);
+				var componentId = aData['componentId'];
+		window.location.href = '<?php echo CController::createUrl("design/showComponent"); ?>' + "?compId=" + componentId;
+	});
 });
 	</script>
-<div id="listComponent">
+<div id="listComponent" width="100%">
 	
-	<table id="componentList" class="tableStyle"  
-		width="100%" border="0" cellspacing="0" cellpadding="0">
+	<table id="componentList" width="100%" border="0" cellspacing="0" cellpadding="0">
 		<thead>
 		<tr>
 			<th title = "Name">Name</th>
