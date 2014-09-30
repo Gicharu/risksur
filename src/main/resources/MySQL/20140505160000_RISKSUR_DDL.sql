@@ -50,6 +50,14 @@ CREATE TABLE `users` (
 
 -- --------------------------------------------------------
 
+/*Table structure for table `componentHead` */
+CREATE TABLE `componentHead` (
+  `componentId` int(11) NOT NULL AUTO_INCREMENT,
+  `frameworkId` int(11) DEFAULT NULL,
+  `componentName` varchar(254) DEFAULT NULL,
+  `comments` blob,
+  PRIMARY KEY (`componentId`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*Table structure for table `componentDetails` */
 
 
@@ -65,14 +73,6 @@ CREATE TABLE `componentDetails` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
-/*Table structure for table `componentHead` */
-CREATE TABLE `componentHead` (
-  `componentId` int(11) NOT NULL AUTO_INCREMENT,
-  `frameworkId` int(11) DEFAULT NULL,
-  `componentName` varchar(254) DEFAULT NULL,
-  `comments` blob,
-  PRIMARY KEY (`componentId`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*Table structure for table `goalMenu` */
 
 
