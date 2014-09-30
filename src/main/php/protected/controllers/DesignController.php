@@ -566,8 +566,8 @@ class DesignController extends Controller {
 				$editButton = "";
 					$deleteButton = "<button id='deleteComponent" . $com->componentId . 
 					"' type='button' class='bdelete' onclick=\"$('#deleteBox').dialog('open');" . 
-					"deleteConfirm('" . $com->componentId . "', '" .
-					$com->componentName . "')\">Remove</button>";
+					"deleteConfirm('" . $com->componentName . "', '" .
+					$com->componentId . "')\">Remove</button>";
 					$editButton = "<button id='editComponent" . $com->componentId . 
 					"' type='button' class='bedit' onclick=\"window.location.href ='" . CController::createUrl('design/editComponent/', array(
 						'compId' => $com->componentId)
@@ -584,10 +584,36 @@ class DesignController extends Controller {
 			}
 		}
 		$dataArray['componentList'] =  json_encode($componentListArray);
+		// return ajax json data
+		if (!empty($_GET['getComponents'])) {
+			$jsonData = json_encode(array("aaData" =>  $componentListArray));
+			echo $jsonData;
+			return ;
+		}
 		$this->render('componentList', array(
 			//'model' => $model,
 			'dataArray' => $dataArray
 		));
+	}
+	/**
+	 * actionDeleteComponent 
+	 * 
+	 * @access public
+	 * @return void
+	 */
+	public function actionDeleteComponent() {
+		Yii::log("actionDeleteComponent DesignController called", "trace", self::LOG_CAT);
+		if (isset($_POST["delId"])) {
+				$record = ComponentHead::model()->findByPk($_POST['delId']);
+			if (!$record->delete()) {
+				$errorMessage = "Error No:" . ldap_errno($ds) . "Error:" . ldap_error($ds);
+				Yii::log("Error Deleing user:" . $errorMessage, "warning", self::LOG_CAT);
+				//echo $errorMessage;
+				echo Yii::t("translation", "A problem occured when deleting a component ") . $_POST['delId'];
+			} else {
+				echo Yii::t("translation", "The component ") . Yii::t("translation", " has been successfully deleted");
+			}
+		}
 	}
 	/**
 	 * performAjaxValidation 

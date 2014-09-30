@@ -302,17 +302,17 @@ if (!Yii::app()->user->isGuest) {
 $flashMessages = Yii::app()->user->getFlashes();
 if ($flashMessages) {
 	foreach ($flashMessages as $key => $message) {
-		if ($key != 'error') {
-			Yii::app()->clientScript->registerScript(
-				'myHideEffect', 
-				'$(".flash-' . $key . '").animate({opacity: 1.0}, 180000).fadeOut("slow");',
-				CClientScript::POS_READY
-				);
-			echo '<div class="flash-' . $key . '">' . $message . "</div>\n";
-		} else {
+		//if ($key == 'error') {
+			//Yii::app()->clientScript->registerScript(
+				//'myHideEffect', 
+				//'$(".flash-' . $key . '").animate({opacity: 1.0}, 180000).fadeOut("slow");',
+				//CClientScript::POS_READY
+				//);
+			//echo '<div class="flash-' . $key . '">' . $message . "</div>\n";
+		//} else {
 			echo '<div id="flashMsgWrapper" class="flash-' . $key . '">' . $message . 
 				'<input id = "closeButtonFlash" class="ui-icon ui-icon-closethick" type="button" value="close" />'."</div>\n";
-		}
+				//}
 	}
 }
 ?>

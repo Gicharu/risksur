@@ -59,7 +59,9 @@ CREATE TABLE `componentDetails` (
   `subFormId` int(11) DEFAULT NULL,
   `value` varchar(254) DEFAULT NULL,
   `comments` blob,
-  PRIMARY KEY (`componentDetailId`)
+  PRIMARY KEY (`componentDetailId`),
+  KEY `fk_componentId` (`componentId`),
+  CONSTRAINT `fk_componentHead_componentId` FOREIGN KEY (`componentId`) REFERENCES `componentHead`(`componentId`) ON UPDATE CASCADE ON DELETE CASCADE 
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 

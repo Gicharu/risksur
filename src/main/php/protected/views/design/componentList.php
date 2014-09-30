@@ -99,6 +99,46 @@ $(function(){
 		window.location.href = '<?php echo CController::createUrl("design/showComponent"); ?>' + "?compId=" + componentId;
 	});
 });
+
+	deleteConfirm = function(confirmMsg, deleteVal) {
+	$('#deleteBox').html("<p>Are you sure you want to delete '" + confirmMsg + "' </p>");
+	$("#deleteBox").dialog('option', 'buttons', {
+		"Confirm" : function() {
+			//console.log(actionVal + ":" + confirmMsg + ":" + deleteVal + ":" + msgDivId + ":" + widId);
+				$(this).dialog("close");
+				  var opt = {'loadMsg': 'Processing delete user'};
+				$("#listComponent").showLoading(opt);
+				$.ajax({type: 'POST',
+					url: <?php echo "'" . CController::createUrl('design/deleteComponent') . "'"; ?>,
+					data: {delId:deleteVal},
+					success: function(data){
+						var checkSuccess = /successfully/i;
+						if (checkSuccess.test(data)) {
+							// add process message
+							$("#ajaxFlashMsg").html(data);
+							$("#ajaxFlashMsgWrapper").attr('class', 'flash-success').show();
+						} else{
+							// add process message
+							$("#ajaxFlashMsg").html(data);
+							$("#ajaxFlashMsgWrapper").attr('class', 'flash-error').show();
+						}
+						clist.fnReloadAjax("listComponents/getComponents/1");
+						$("#listComponent").hideLoading();
+					},
+						error: function(data){
+							$("#ajaxFlashMsg").html("Error occured while deleting data");
+							$("#ajaxFlashMsgWrapper").attr('class', 'flash-error').show();
+							//console.log("error occured while posting data" + data);
+							$("#listComponent").hideLoading();
+						},
+							dataType: "text"
+				});
+		},
+			"Cancel" : function() {
+				$(this).dialog("close");
+			}
+	});
+}
 	</script>
 <div id="listComponent" width="100%">
 	
