@@ -53,7 +53,6 @@ foreach ($iniArray as $key => $val) {
 }
 // add the log route settings from risksur_custom.ini
 $configArray['components']['log']['routes'][] = $logArray;
-
 return CMap::mergeArray($configArray, array(
 	'basePath' => dirname(__FILE__) . DIRECTORY_SEPARATOR . '..',
 	'name' => 'Risksur',
@@ -139,11 +138,11 @@ return CMap::mergeArray($configArray, array(
 		//),
 		// uncomment the following to use a MySQL database
 		'db' => array(
-			'connectionString' => 'mysql:host=localhost;dbname=risksur',
+			'connectionString' => $configArray['params']['database']['connectionString'],
 			'emulatePrepare' => true,
-			'username' => 'username',
-			'password' => '',
-			'charset' => 'charset',
+			'username' => $configArray['params']['database']['username'],
+			'password' => $configArray['params']['database']['password'],
+			'charset' => $configArray['params']['database']['charset'],
 			'enableParamLogging' => true,
 			// 'enableProfiling' => true,
 		),
