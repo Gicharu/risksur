@@ -140,8 +140,8 @@ if (isset($_GET['inactive']) && Yii::app()->user->isGuest) {
 </div>
 <div id="loginft">
 	<div id="footer">
-		<?php echo $storySettings->name; ?>, <?php echo Yii::t('translation', 'version ') . $storySettings->version . ", " . date('Y'); ?>
-		<?php echo Yii::t('translation', 'All rights reserved by '); ?> <a href='//www.tracetracker.com' target="_blank">
+		<!-- <?php //echo $storySettings->name; ?>, <?php //echo Yii::t('translation', 'version ') . $storySettings->version . ", " . date('Y'); ?> -->
+		<?php echo Yii::t('translation', 'Risksur, version '. $storySettings->version . ", " . date('Y').', Powered by '); ?> <a href='//www.tracetracker.com' target="_blank">
 		<img src="<?php echo Yii::app()->request->baseUrl; ?>/images/tt_ft_logo.png" width="109" height="12" alt="Trace Tracker logo image" /></a>
 	</div><!-- footer -->
 </div>
