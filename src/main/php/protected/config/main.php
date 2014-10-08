@@ -45,6 +45,9 @@ foreach ($iniArray as $key => $val) {
 		} else if ($key == "log") {
 			$keyParam = str_replace("log.", "", $id);
 			$logArray[$keyParam] = $value;
+		} else if ($key == "database") {
+			$keyParam = str_replace(".", "", $id);
+			$configArray['components']['db'][$keyParam] = $value;
 		} else {
 			$keyParam = str_replace($key . ".", "", $id);
 			$configArray['params'][$key][$keyParam] = $value;
@@ -53,7 +56,6 @@ foreach ($iniArray as $key => $val) {
 }
 // add the log route settings from risksur_custom.ini
 $configArray['components']['log']['routes'][] = $logArray;
-
 return CMap::mergeArray($configArray, array(
 	'basePath' => dirname(__FILE__) . DIRECTORY_SEPARATOR . '..',
 	'name' => 'Risksur',
@@ -139,11 +141,7 @@ return CMap::mergeArray($configArray, array(
 		//),
 		// uncomment the following to use a MySQL database
 		'db' => array(
-			'connectionString' => 'mysql:host=localhost;dbname=risksur',
 			'emulatePrepare' => true,
-			'username' => 'root',
-			'password' => '',
-			'charset' => 'utf8',
 			'enableParamLogging' => true,
 			// 'enableProfiling' => true,
 		),
