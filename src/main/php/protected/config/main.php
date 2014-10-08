@@ -45,6 +45,9 @@ foreach ($iniArray as $key => $val) {
 		} else if ($key == "log") {
 			$keyParam = str_replace("log.", "", $id);
 			$logArray[$keyParam] = $value;
+		} else if ($key == "database") {
+			$keyParam = str_replace(".", "", $id);
+			$configArray['components']['db'][$keyParam] = $value;
 		} else {
 			$keyParam = str_replace($key . ".", "", $id);
 			$configArray['params'][$key][$keyParam] = $value;
@@ -138,11 +141,11 @@ return CMap::mergeArray($configArray, array(
 		//),
 		// uncomment the following to use a MySQL database
 		'db' => array(
-			'connectionString' => $configArray['params']['database']['connectionString'],
+			'connectionString' => $configArray['components']['db']['connectionString'],
 			'emulatePrepare' => true,
-			'username' => $configArray['params']['database']['username'],
-			'password' => $configArray['params']['database']['password'],
-			'charset' => $configArray['params']['database']['charset'],
+			'username' => $configArray['components']['db']['username'],
+			'password' => $configArray['components']['db']['password'],
+			'charset' => $configArray['components']['db']['charset'],
 			'enableParamLogging' => true,
 			// 'enableProfiling' => true,
 		),
