@@ -141,11 +141,7 @@ return CMap::mergeArray($configArray, array(
 		//),
 		// uncomment the following to use a MySQL database
 		'db' => array(
-			'connectionString' => $configArray['components']['db']['connectionString'],
 			'emulatePrepare' => true,
-			'username' => $configArray['components']['db']['username'],
-			'password' => $configArray['components']['db']['password'],
-			'charset' => $configArray['components']['db']['charset'],
 			'enableParamLogging' => true,
 			// 'enableProfiling' => true,
 		),
