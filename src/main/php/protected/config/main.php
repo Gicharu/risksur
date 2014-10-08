@@ -141,9 +141,9 @@ return CMap::mergeArray($configArray, array(
 		'db' => array(
 			'connectionString' => 'mysql:host=localhost;dbname=risksur',
 			'emulatePrepare' => true,
-			'username' => 'username',
+			'username' => 'root',
 			'password' => '',
-			'charset' => 'charset',
+			'charset' => 'utf8',
 			'enableParamLogging' => true,
 			// 'enableProfiling' => true,
 		),
