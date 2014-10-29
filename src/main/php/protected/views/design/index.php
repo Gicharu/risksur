@@ -65,6 +65,7 @@ $(function(){
 		{"mDataProp": "name",  "bVisible": true, sClass: "showDetails clickable underline"},
 		{"mDataProp": "description", "bVisible": true},
 		{"mDataProp": "goalName", "bVisible": true},
+		{"mDataProp": "editButton", "bSortable": false },
 		{"mData": "deleteButton", "bSortable": false },
 			//{"mDataProp": "name",  "bVisible": true, sClass: "showDetails clickable underline", "sWidth": "20%"},
 			//{"mDataProp": "description", "bVisible": true, "sWidth": "30%"},
@@ -75,6 +76,8 @@ $(function(){
 		"fnDrawCallback": function() {
 			$('button.bdelete').button({
 				icons: {primary: "ui-icon-trash"}, text: false});
+			$('button.bedit').button({
+				icons: {primary: "ui-icon-pencil"}, text: false});
 		},
 		"bJQueryUI": true,
 		//"sPaginationType": "customListbox",
@@ -97,6 +100,46 @@ $(function(){
 		window.location.href = '<?php echo CController::createUrl("design/showDesign"); ?>' + "?designId=" + frameworkId;
 	});
 });
+
+	deleteConfirm = function(confirmMsg, deleteVal) {
+	$('#deleteBox').html("<p>Are you sure you want to delete '" + confirmMsg + "' </p>");
+	$("#deleteBox").dialog('option', 'buttons', {
+		"Confirm" : function() {
+			// console.log(confirmMsg + ":" + deleteVal);
+				$(this).dialog("close");
+				  var opt = {'loadMsg': 'Processing delete design'};
+				$("#listSurveilance").showLoading(opt);
+				$.ajax({type: 'POST',
+					url: <?php echo "'" . CController::createUrl('design/deleteDesign') . "'"; ?>,
+					data: {delId:deleteVal},
+					success: function(data){
+						var checkSuccess = /successfully/i;
+						if (checkSuccess.test(data)) {
+							// add process message
+							$("#ajaxFlashMsg").html(data);
+							$("#ajaxFlashMsgWrapper").attr('class', 'flash-success').show();
+						} else{
+							// add process message
+							$("#ajaxFlashMsg").html(data);
+							$("#ajaxFlashMsgWrapper").attr('class', 'flash-error').show();
+						}
+						// clist.fnReloadAjax("listComponents/getComponents/1");
+						$("#listSurveilance").hideLoading();
+					},
+						error: function(data){
+							$("#ajaxFlashMsg").html("Error occured while deleting data");
+							$("#ajaxFlashMsgWrapper").attr('class', 'flash-error').show();
+							//console.log("error occured while posting data" + data);
+							$("#listSurveilance").hideLoading();
+						},
+							dataType: "text"
+				});
+		},
+			"Cancel" : function() {
+				$(this).dialog("close");
+			}
+	});
+}
 	</script>
 
 <div id="listSurveilance" width="100%">
@@ -107,6 +150,7 @@ $(function(){
 			<th title = "Name">Name</th>
 			<th title = "Descripton">Descripton</th>
 			<th title = "Goal">Goal</th>
+			<th title = "Edit">Edit</th>
 			<th title = "Delete">Delete</th>
 		</tr>
 		</thead>

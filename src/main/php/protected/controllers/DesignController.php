@@ -71,11 +71,16 @@ class DesignController extends Controller {
 		foreach ($surveillanceList as $sur) {
 				$deleteButton = "";
 				//if (Yii::app()->user->name != $valu['userName']) {
-					$deleteButton = "<button id='deleteDesign" . $sur->frameworkId . 
-					"' type='button' class='bdelete' onclick=\"$('#deleteBox').dialog('open');" . 
-					"deleteConfirm('" . $sur->frameworkId . "', '" .
-					$sur->name . "')\">Remove</button>";
-						//}
+				$editButton = "<button id='editComponent" . $sur->frameworkId . 
+				"' type='button' class='bedit' onclick=\"window.location.href ='" . CController::createUrl('design/editDesign/', array(
+					'compId' => $sur->frameworkId)
+				) .
+				"'\">Edit</button>";
+				$deleteButton = "<button id='deleteDesign" . $sur->frameworkId . 
+				"' type='button' class='bdelete' onclick=\"$('#deleteBox').dialog('open');" . 
+				"deleteConfirm('" . $sur->name . "', '" .
+				$sur->frameworkId . "')\">Remove</button>";
+					//}
 			$surveillanceListArray[] = array (
 				'frameworkId' =>   $sur->frameworkId,
 				'name' =>   $sur->name,
@@ -83,6 +88,7 @@ class DesignController extends Controller {
 				'description' =>   $sur->description,
 				'goalId' =>   $sur->goalId,
 				'goalName' =>   $sur->goal->pageName,
+				'editButton' => $editButton,
 				'deleteButton' => $deleteButton
 			);
 		}
@@ -612,6 +618,27 @@ class DesignController extends Controller {
 				echo Yii::t("translation", "A problem occured when deleting a component ") . $_POST['delId'];
 			} else {
 				echo Yii::t("translation", "The component ") . Yii::t("translation", " has been successfully deleted");
+			}
+		}
+	}
+	/**
+	 * actionDeleteDesign 
+	 * 
+	 * @access public
+	 * @return void
+	 */
+	public function actionDeleteDesign() {
+		Yii::log("actionDeleteDesign DesignController called", "trace", self::LOG_CAT);
+		echo $_POST;die();
+		if (isset($_POST["delId"])) {
+				$record = SurFormHead::model()->findByPk($_POST['delId']);
+			if (!$record->delete()) {
+				$errorMessage = "Error No:" . ldap_errno($ds) . "Error:" . ldap_error($ds);
+				Yii::log("Error deleting design: " . $errorMessage, "warning", self::LOG_CAT);
+				//echo $errorMessage;
+				echo Yii::t("translation", "A problem occured when deleting the design ") . $_POST['delId'];
+			} else {
+				echo Yii::t("translation", "The design ") . Yii::t("translation", " has been successfully deleted");
 			}
 		}
 	}
