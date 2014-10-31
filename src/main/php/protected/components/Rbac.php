@@ -51,7 +51,7 @@
 			$command->bindParam(":controller", $controller, PDO::PARAM_STR);
 			$command->bindParam(":action", $action, PDO::PARAM_STR);
 			$permissions = $command->queryAll();
-
+			//print_r($permissions);die();
 
 			if ($fakeGET) { // lets fake GET request params for evaluating business rule
 			$save_GET = $_GET;
@@ -59,6 +59,8 @@
 			}
 
 			if (!empty($permissions)) {
+				//If record is found, allow access regardless of teh bizrule
+				$allow = true;
 				foreach ($permissions as $p) {
 					if (empty($p['bizrule']) || @eval($p['bizrule'])) {
 						$allow = true;

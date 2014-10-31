@@ -56,7 +56,9 @@ CREATE TABLE `componentHead` (
   `frameworkId` int(11) DEFAULT NULL,
   `componentName` varchar(254) DEFAULT NULL,
   `comments` blob,
-  PRIMARY KEY (`componentId`)
+  PRIMARY KEY (`componentId`),
+  KEY `frameworkId` (`frameworkId`),
+  CONSTRAINT `componenthead_fk` FOREIGN KEY (`frameworkId`) REFERENCES `frameworkheader` (`frameworkId`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*Table structure for table `componentDetails` */
 

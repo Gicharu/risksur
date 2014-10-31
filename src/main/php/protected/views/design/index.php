@@ -1,7 +1,6 @@
-
-	<script type="text/javascript">
+<script type="text/javascript">
 $(function(){
-	slist = $("<?php echo '#surveilanceList'; ?>").dataTable({
+	slist = $("<?php echo '#surveillanceList'; ?>").dataTable({
 		"sDom": '<"H"rlTf>t<"F"ip>',
 		"oTableTools": {
 		"sSwfPath": "<?php echo Yii::app()->request->baseUrl; ?>/js/copy_csv_xls_pdf.swf",
@@ -123,7 +122,7 @@ $(function(){
 							$("#ajaxFlashMsg").html(data);
 							$("#ajaxFlashMsgWrapper").attr('class', 'flash-error').show();
 						}
-						// clist.fnReloadAjax("listComponents/getComponents/1");
+						slist.fnReloadAjax("index/getDesigns/1");
 						$("#listSurveilance").hideLoading();
 					},
 						error: function(data){
@@ -144,7 +143,7 @@ $(function(){
 
 <div id="listSurveilance" width="100%">
 	
-	<table id="surveilanceList" width="100%" border="0" cellspacing="0" cellpadding="0">
+	<table id="surveillanceList" width="100%" border="0" cellspacing="0" cellpadding="0">
 		<thead>
 		<tr>
 			<th title = "Name">Name</th>

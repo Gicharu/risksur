@@ -33,7 +33,8 @@
 	<div class="row">
 		<?php echo $form->labelEx($model, 'name'); ?>
 		<?php echo $form->textField($model, 'name', array(
-			'id' => 'name'
+			'id' => 'name',
+			'value' => isset($dataArray['name']) ? $dataArray['name'] : ""
 		)); ?>
 		<?php echo $form->error($model, 'name', array('inputID' => "name")); ?>
 	</div>	
@@ -41,7 +42,8 @@
 		<?php echo $form->labelEx($model, 'description'); ?>
 		<?php echo $form->textArea($model, 'description', array(
 			'id' => 'description',
-			'rows' => 2
+			'rows' => 2,
+			'value' => isset($dataArray['description']) ? $dataArray['description'] : ""
 		)); ?>
 		<?php echo $form->error($model, 'description', array('inputID' => "description")); ?>
 	</div>	

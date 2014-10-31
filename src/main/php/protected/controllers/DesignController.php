@@ -35,7 +35,7 @@ class DesignController extends Controller {
 		Yii::log("actionIndex DesignController called", "trace", self::LOG_CAT);
 		$model = new NewDesign;
 		$dataArray = array();
-		$dataArray['dtHeader'] = "Surveillence design List";
+		$dataArray['dtHeader'] = "Surveillance design List";
 		$dataArray['surveillanceList'] =  json_encode(array());
 		$this->performAjaxValidation($model);
 
@@ -73,7 +73,7 @@ class DesignController extends Controller {
 				//if (Yii::app()->user->name != $valu['userName']) {
 				$editButton = "<button id='editComponent" . $sur->frameworkId . 
 				"' type='button' class='bedit' onclick=\"window.location.href ='" . CController::createUrl('design/editDesign/', array(
-					'compId' => $sur->frameworkId)
+					'designId' => $sur->frameworkId)
 				) .
 				"'\">Edit</button>";
 				$deleteButton = "<button id='deleteDesign" . $sur->frameworkId . 
@@ -93,7 +93,13 @@ class DesignController extends Controller {
 			);
 		}
 		$dataArray['surveillanceList'] =  json_encode($surveillanceListArray);
-		//print_r($dataArray['surveillanceList']);
+
+		if (!empty($_GET['getDesigns'])) {
+			$jsonData = json_encode(array("aaData" => $surveillanceListArray));
+			echo $jsonData;
+			return ;
+		}
+		// print_r($dataArray['surveillanceList']);die();
 		// fetch the goal dropdown data
 		$goalDropDown = GoalData::model()->findAll(array(
 			'select' => 'pageId, pageName',
@@ -543,6 +549,67 @@ class DesignController extends Controller {
 		));
 
 	}
+
+	/**
+	 * actionEditDesign 
+	 * 
+	 * @access public
+	 * @return void
+	 */
+	public function actionEditDesign() {
+		Yii::log("actionEditDesign DesignController called", "trace", self::LOG_CAT);
+		$model = new NewDesign;
+		$dataArray = array();
+		$this->performAjaxValidation($model);
+		if ( isset( $_POST['NewDesign'] ) ) {
+			$model->attributes = $_POST['NewDesign'];
+			$model->userId = Yii::app()->user->id;
+
+			if (isset($_GET['designId'])) {
+				//fetch the form data
+				$fetchDesignData = Yii::app()->db->createCommand()
+					->select('fwh.name, fwh.description, fwh.goalId')
+					->from('frameworkheader fwh')
+					->where('fwh.frameworkId =' . $_GET['designId'])
+					->queryAll();
+					// print_r($fetchDesignData);die();
+					$dataArray['name'] = $fetchDesignData[0]['name'];
+					$dataArray['description'] = $fetchDesignData[0]['description'];
+					$dataArray['goalId'] = $fetchDesignData[0]['goalId'];
+			}
+			//validate and save the design
+			if ( $model->validate() ) {
+				$model->save();
+				Yii::app()->session->add('surDesign', array(
+					'id' => $model->frameworkId,
+					'name' => $model->name,
+					'goalId' => $model->goalId
+				));
+				Yii::app()->user->setFlash('success', Yii::t("translation", "Design successfully updated"));
+				$this->redirect(array('index'));
+			}
+		}
+		// fetch the goal dropdown data
+		$goalDropDown = GoalData::model()->findAll(array(
+			'select' => 'pageId, pageName',
+			'condition' => 'parentId=:parentId AND pageName<>:pageName',
+			'params' => array(
+				':parentId' => 0,
+				':pageName' => 'noMenu'
+			),
+		));
+		// create array options for goal dropdown
+		foreach ($goalDropDown as $data) {
+			$dataArray['goalDropDown'][$data->pageId] = $data->pageName;
+		}
+
+		$this->render('createDesign', array(
+			'model' => $model,
+			'dataArray' => $dataArray
+		));
+	}
+
+
 	/**
 	 * actionListComponents 
 	 * 
@@ -629,9 +696,8 @@ class DesignController extends Controller {
 	 */
 	public function actionDeleteDesign() {
 		Yii::log("actionDeleteDesign DesignController called", "trace", self::LOG_CAT);
-		echo $_POST;die();
 		if (isset($_POST["delId"])) {
-				$record = SurFormHead::model()->findByPk($_POST['delId']);
+				$record = NewDesign::model()->findByPk($_POST['delId']);
 			if (!$record->delete()) {
 				$errorMessage = "Error No:" . ldap_errno($ds) . "Error:" . ldap_error($ds);
 				Yii::log("Error deleting design: " . $errorMessage, "warning", self::LOG_CAT);
