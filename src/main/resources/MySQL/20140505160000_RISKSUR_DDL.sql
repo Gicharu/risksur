@@ -50,13 +50,43 @@ CREATE TABLE `users` (
 
 -- --------------------------------------------------------
 
+/*Table structure for table `goalMenu` */
+
+
+CREATE TABLE `goalMenu` (
+  `pageId` int(11) NOT NULL AUTO_INCREMENT,
+  `pageName` varchar(50) DEFAULT NULL,
+  `path` varchar(254) DEFAULT NULL,
+  `parentId` int(11) DEFAULT NULL,
+  `menuOrder` int(11) DEFAULT NULL,
+  `target` varchar(20) DEFAULT NULL,
+  `active` tinyint(1) DEFAULT '1',
+  `comments` varchar(254) DEFAULT NULL,
+  PRIMARY KEY (`pageId`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+/*Table structure for table `frameworkHeader` */
+
+
+CREATE TABLE `frameworkHeader` (
+  `frameworkId` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `userId` int(11) DEFAULT NULL,
+  `goalId` int(11) DEFAULT NULL,
+  `description` blob,
+  PRIMARY KEY (`frameworkId`),
+  CONSTRAINT `goal foreign Key` FOREIGN KEY (`goalId`) REFERENCES `goalMenu`(`pageId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
 /*Table structure for table `componentHead` */
 CREATE TABLE `componentHead` (
   `componentId` int(11) NOT NULL AUTO_INCREMENT,
   `frameworkId` int(11) DEFAULT NULL,
   `componentName` varchar(254) DEFAULT NULL,
   `comments` blob,
-  PRIMARY KEY (`componentId`)
+  PRIMARY KEY (`componentId`),
+  KEY `frameworkId` (`frameworkId`),
+  CONSTRAINT `componenthead_fk` FOREIGN KEY (`frameworkId`) REFERENCES `frameworkHeader` (`frameworkId`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*Table structure for table `componentDetails` */
 
@@ -73,32 +103,6 @@ CREATE TABLE `componentDetails` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
-/*Table structure for table `goalMenu` */
-
-
-CREATE TABLE `goalMenu` (
-  `pageId` int(11) NOT NULL AUTO_INCREMENT,
-  `pageName` varchar(50) DEFAULT NULL,
-  `path` varchar(254) DEFAULT NULL,
-  `parentId` int(11) DEFAULT NULL,
-  `menuOrder` int(11) DEFAULT NULL,
-  `target` varchar(20) DEFAULT NULL,
-  `active` tinyint(1) DEFAULT '1',
-  `comments` varchar(254) DEFAULT NULL,
-  PRIMARY KEY (`pageId`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-/*Table structure for table `frameworkHeader` */
-
-
-CREATE TABLE `frameworkHeader` (
-  `frameworkId` int(11) NOT NULL AUTO_INCREMENT,
-  `name` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `userId` int(11) DEFAULT NULL,
-  `goalId` int(11) DEFAULT NULL,
-  `description` blob,
-  PRIMARY KEY (`frameworkId`),
-  CONSTRAINT `goal foreign Key` FOREIGN KEY (`goalId`) REFERENCES `goalMenu`(`pageId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
 

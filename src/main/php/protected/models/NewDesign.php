@@ -59,8 +59,7 @@ class NewDesign extends CActiveRecord {
 				'required'
 			),
 			array(
-				'name',
-				'unique'
+				'name', 'unique', 'on' => 'create'
 			)
 		);
 	}

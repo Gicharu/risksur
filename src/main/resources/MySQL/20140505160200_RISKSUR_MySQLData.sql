@@ -45,7 +45,9 @@ insert  into `permissions`(`id`,`name`,`description`,`controller`,`action`,`bizr
 (6,	'Create design','Create Design','design','createDesign', ''),
 (7,'Edit components','Edit components','design','editComponent',''),
 (8,'Show components','Show components','design','showComponent',''),
-(9,'Delete components','Delete components','design','deleteComponent','')
+(9,'Delete components','Delete components','design','deleteComponent',''),
+(10,'Delete design','Delete design','design','deleteDesign',''),
+(11,'Edit design','Edit design','design','editDesign','')
 ;
 
 
@@ -55,7 +57,7 @@ insert  into `roles`(`id`,`name`,`description`) values (1,'ROLE_ADMIN','administ
 
 /*Data for the table `roles_has_permissions` */
 
-insert  into `roles_has_permissions`(`permissions_id`,`roles_id`) values (1,1),(1,2),(2,1),(2,2),(3,1),(3,2),(4,1),(4,2),(5,1),(5,2),(6,1),(6,2),(7,1),(7,2),(8,1),(8,2),(9,1),(9,2);
+insert  into `roles_has_permissions`(`permissions_id`,`roles_id`) values (1,1),(1,2),(2,1),(2,2),(3,1),(3,2),(4,1),(4,2),(5,1),(5,2),(6,1),(6,2),(7,1),(7,2),(8,1),(8,2),(9,1),(9,2),(10,1),(10,2),(11,1),(11,2);
 
 /*Data for the table `users` */
 
