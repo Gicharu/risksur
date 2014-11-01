@@ -219,6 +219,7 @@ class DesignController extends Controller {
 		Yii::log("actionCreateDesign DesignController called", "trace", self::LOG_CAT);
 		$model = new NewDesign;
 		$dataArray = array();
+		$dataArray['formType'] = "Create";
 		$this->performAjaxValidation($model);
 
 		if ( isset( $_POST['NewDesign'] ) ) {
@@ -226,8 +227,8 @@ class DesignController extends Controller {
 			$model->userId = Yii::app()->user->id;
 
 			//validate and save the design
-			if ( $model->validate() ) {
-				$model->save();
+			if ( $model->validate("create") ) {
+				$model->save(false);
 				Yii::app()->session->add('surDesign', array(
 					'id' => $model->frameworkId,
 					'name' => $model->name,
@@ -560,26 +561,22 @@ class DesignController extends Controller {
 		Yii::log("actionEditDesign DesignController called", "trace", self::LOG_CAT);
 		$model = new NewDesign;
 		$dataArray = array();
-		$this->performAjaxValidation($model);
-		if ( isset( $_POST['NewDesign'] ) ) {
-			$model->attributes = $_POST['NewDesign'];
-			$model->userId = Yii::app()->user->id;
+		$dataArray['formType'] = "Edit";
 
 			if (isset($_GET['designId'])) {
 				//fetch the form data
-				$fetchDesignData = Yii::app()->db->createCommand()
-					->select('fwh.name, fwh.description, fwh.goalId')
-					->from('frameworkheader fwh')
-					->where('fwh.frameworkId =' . $_GET['designId'])
-					->queryAll();
-					// print_r($fetchDesignData);die();
-					$dataArray['name'] = $fetchDesignData[0]['name'];
-					$dataArray['description'] = $fetchDesignData[0]['description'];
-					$dataArray['goalId'] = $fetchDesignData[0]['goalId'];
+				$model = NewDesign::model()->findByPk($_GET['designId']);
 			}
+			//$this->performAjaxValidation($model);
+		if ( isset( $_POST['NewDesign'] ) ) {
+			$model->attributes = $_POST['NewDesign'];
+			$model->userId = Yii::app()->user->id;
+			$model->frameworkId = $_GET['designId'];
+			//print_r($model); die();
+
 			//validate and save the design
 			if ( $model->validate() ) {
-				$model->save();
+				$model->update();
 				Yii::app()->session->add('surDesign', array(
 					'id' => $model->frameworkId,
 					'name' => $model->name,
@@ -704,6 +701,8 @@ class DesignController extends Controller {
 				//echo $errorMessage;
 				echo Yii::t("translation", "A problem occured when deleting the design ") . $_POST['delId'];
 			} else {
+				// remove the default selected design from session
+				unset($_SESSION['surDesign']);
 				echo Yii::t("translation", "The design ") . Yii::t("translation", " has been successfully deleted");
 			}
 		}

@@ -55,21 +55,13 @@ $(function(){
 		},
 		"bProcessing": true,
 		"bStateSave": false,
-		//"bServerSide": true,
-		//"bDeferRender": true,
-		//"sServerMethod": "POST",
 		"aaData": <?php echo $dataArray['surveillanceList']; ?>,
-			//"bAutoWidth" : true,
 		"aoColumns": [
 		{"mDataProp": "name",  "bVisible": true, sClass: "showDetails clickable underline"},
 		{"mDataProp": "description", "bVisible": true},
 		{"mDataProp": "goalName", "bVisible": true},
 		{"mDataProp": "editButton", "bSortable": false },
 		{"mData": "deleteButton", "bSortable": false },
-			//{"mDataProp": "name",  "bVisible": true, sClass: "showDetails clickable underline", "sWidth": "20%"},
-			//{"mDataProp": "description", "bVisible": true, "sWidth": "30%"},
-			//{"mDataProp": "goalName", "bVisible": true, "sWidth": "12%"},
-			//{"mData": "deleteButton", "bSortable": false, "bVisible": true, "sWidth": "8%" },
 		],
 		// update the buttons stying after the table data is loaded
 		"fnDrawCallback": function() {
@@ -117,6 +109,10 @@ $(function(){
 							// add process message
 							$("#ajaxFlashMsg").html(data);
 							$("#ajaxFlashMsgWrapper").attr('class', 'flash-success').show();
+							// remove the elements of selected design
+							$('#designName').hide();
+							$('#addComponent').hide();
+							$('#showComponents').hide();
 						} else{
 							// add process message
 							$("#ajaxFlashMsg").html(data);
