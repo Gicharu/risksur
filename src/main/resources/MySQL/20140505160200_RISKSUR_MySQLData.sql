@@ -32,7 +32,9 @@ INSERT INTO `programpages` (`pageId`, `pageName`, `path`, `parentId`, `menuOrder
 (6,'Statistical Tools','nightly.tracetracker.com/epitools/htdocs/',0,6,'_blank',1),
 -- (7,'Profile','',0,7,'',1),
 (8,'Admin','',0,9,'',1),
-(9,'noMenu','',0,14,'',1);
+(9,'noMenu','',0,14,'',1)
+(10,'Manage Goals','',8,15,'',1)
+;
 -- (10,'Change Password','changePassword.php',7,10,'',1);
 
 
@@ -48,6 +50,7 @@ insert  into `permissions`(`id`,`name`,`description`,`controller`,`action`,`bizr
 (9,'Delete components','Delete components','design','deleteComponent',''),
 (10,'Delete design','Delete design','design','deleteDesign',''),
 (11,'Edit design','Edit design','design','editDesign','')
+(12,'List goals','List goals','admin','listGoals','')
 ;
 
 
