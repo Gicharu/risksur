@@ -22,40 +22,6 @@ $(function() {
     
 
 
-
-    $("#menubar").menubar({
-        items: [
-
-         {
-            name: "Dashboard", 
-            selecton: function(){ window.location.href = baseUrl +'dashboard/index' },
-            checkable : false
-
-        },
-
-        {
-            name: "Event Search", 
-            checkable : false
-
-            //selecton: function(){ window.location.href = baseUrl +'dashboard/index' }
-
-        },
-
-        {
-            name: "Reports", 
-            checkable : false
-
-            //selecton: function(){ window.location.href = baseUrl +'reports/reports' }
-
-        }
-        ]
-    });
-
-
-	/*$('.dataTable').dataTable({*/
-	/*"bJQueryUI": true,*/
-	/*"sPaginationType": "full_numbers"});*/
-
     $('.dataTable-simple').dataTable({
         "bJQueryUI": true,
         "bFilter":false,
