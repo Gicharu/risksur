@@ -85,7 +85,7 @@ $(function(){
 		"Confirm" : function() {
 			// console.log(confirmMsg + ":" + deleteVal);
 				$(this).dialog("close");
-				  var opt = {'loadMsg': 'Processing delete design'};
+				  var opt = {'loadMsg': 'Processing delete option'};
 				$("#listOptions").showLoading(opt);
 				$.ajax({type: 'POST',
 					url: <?php echo "'" . CController::createUrl('options/deleteOption') . "'"; ?>,
@@ -96,16 +96,13 @@ $(function(){
 							// add process message
 							$("#ajaxFlashMsg").html(data);
 							$("#ajaxFlashMsgWrapper").attr('class', 'flash-success').show();
-							// remove the elements of selected design
-							$('#designName').hide();
-							$('#addComponent').hide();
-							$('#showComponents').hide();
+							$("#ajaxFlashMsgWrapper").animate({opacity: 1.0}, 3000).fadeOut("slow");
 						} else{
 							// add process message
 							$("#ajaxFlashMsg").html(data);
 							$("#ajaxFlashMsgWrapper").attr('class', 'flash-error').show();
 						}
-						slist.fnReloadAjax("index/getDesigns/1");
+						slist.fnReloadAjax("index/getOptions/1");
 						$("#listOptions").hideLoading();
 					},
 						error: function(data){

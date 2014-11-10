@@ -50,6 +50,8 @@ insert  into `permissions`(`id`,`name`,`description`,`controller`,`action`,`bizr
 (11,'Edit design','Edit design','design','editDesign',''),
 (12,'Manage Options','Manage Options','options','index',''),
 (13,'Add Options','Add Options','options','addOption',''),
+(14,'Edit Options','Edit Options','options','editOption',''),
+(15,'Delete Options','Delete Options','options','deleteOption',''),
 
 
 /*Data for the table `roles` */
@@ -58,7 +60,7 @@ insert  into `roles`(`id`,`name`,`description`) values (1,'ROLE_ADMIN','administ
 
 /*Data for the table `roles_has_permissions` */
 
-insert  into `roles_has_permissions`(`permissions_id`,`roles_id`) values (1,1),(1,2),(2,1),(2,2),(3,1),(3,2),(4,1),(4,2),(5,1),(5,2),(6,1),(6,2),(7,1),(7,2),(8,1),(8,2),(9,1),(9,2),(10,1),(10,2),(11,1),(11,2),(12,1),(12,2),(13,1),(13,2);
+insert  into `roles_has_permissions`(`permissions_id`,`roles_id`) values (1,1),(1,2),(2,1),(2,2),(3,1),(3,2),(4,1),(4,2),(5,1),(5,2),(6,1),(6,2),(7,1),(7,2),(8,1),(8,2),(9,1),(9,2),(10,1),(10,2),(11,1),(11,2),(12,1),(12,2),(13,1),(13,2),(14,1),(14,2),(15,1),(15,2);
 
 /*Data for the table `users` */
 

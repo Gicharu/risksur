@@ -109,6 +109,7 @@ $(function(){
 							// add process message
 							$("#ajaxFlashMsg").html(data);
 							$("#ajaxFlashMsgWrapper").attr('class', 'flash-success').show();
+							$("#ajaxFlashMsgWrapper").animate({opacity: 1.0}, 3000).fadeOut("slow");
 							// remove the elements of selected design
 							$('#designName').hide();
 							$('#addComponent').hide();

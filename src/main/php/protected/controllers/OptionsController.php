@@ -48,24 +48,23 @@ class OptionsController extends Controller {
 		Yii::log("actionIndex AdminController called", "trace", self::LOG_CAT);
 		$model = new Options;
 		$dataArray = array();
-		$dataArray['dtHeader'] = "Manage Options";
+		$dataArray['dtHeader'] = "Manage Options"; // Set page title when printing the datatable
 		// Get list of options 
 		$optionsList = Options::model()->findAll(array(
 			'select' => 'optionId, label',
 		));
 		$optionsListArray = array();
-		// format datatable data
+		// Format datatable data. Define the Edit & Delete buttons
 		foreach ($optionsList as $options) {
 				$editButton = "<button id='editOption" . $options->optionId . 
 				"' type='button' class='bedit' onclick=\"window.location.href ='" . CController::createUrl('options/editOption/', array(
-					'designId' => $options->optionId)
-				) .
-				"'\">Edit</button>";
+					'optionId' => $options->optionId)
+				) . "'\">Edit</button>";
 				$deleteButton = "<button id='deleteOption" . $options->optionId . 
 				"' type='button' class='bdelete' onclick=\"$('#deleteBox').dialog('open');" . 
 				"deleteConfirm('" . $options->label . "', '" .
 				$options->optionId . "')\">Remove</button>";
-					//}
+			// Pack the data to be sent to the view
 			$optionsListArray[] = array (
 				'label' =>   $options->label,
 				'editButton' => $editButton,
@@ -73,26 +72,11 @@ class OptionsController extends Controller {
 			);
 		}
 		$dataArray['optionsList'] =  json_encode($optionsListArray);
-
-		// if (!empty($_GET['getDesigns'])) {
-		// 	$jsonData = json_encode(array("aaData" => $surveillanceListArray));
-		// 	echo $jsonData;
-		// 	return ;
-		// }
-		// // print_r($dataArray['surveillanceList']);die();
-		// // fetch the goal dropdown data
-		// $goalDropDown = GoalData::model()->findAll(array(
-		// 	'select' => 'pageId, pageName',
-		// 	'condition' => 'parentId=:parentId AND pageName<>:pageName',
-		// 	'params' => array(
-		// 		':parentId' => 0,
-		// 		':pageName' => 'noMenu'
-		// 	),
-		// ));
-		// // create array options for goal dropdown
-		// foreach ($goalDropDown as $data) {
-		// 	$dataArray['goalDropDown'][$data->pageId] = $data->pageName;
-		// }
+		if (!empty($_GET['getOptions'])) {
+			$jsonData = json_encode(array("aaData" => $optionsListArray));
+			echo $jsonData;
+			return ;
+		}
 		$this->render('index', array(
 			'model' => $model,
 			'dataArray' => $dataArray
@@ -100,7 +84,7 @@ class OptionsController extends Controller {
 	}
 
 	/**
-	 * actionIndex 
+	 * actionAddOption
 	 * 
 	 * @access public
 	 * @return void
@@ -119,6 +103,60 @@ class OptionsController extends Controller {
 				Yii::app()->end();
 			}
 		}
+		// Select all values whose inputType is ""Select"
+		$fetchOptions = Yii::app()->db->createCommand()
+			->select('sfd.subFormId, sfd.label')
+			->from('surformdetails sfd')
+			->where('sfd.inputType ="select"')
+			->queryAll();
+
+		$surformdetailsArray = array();
+		// Pack data to send to view
+		foreach ($fetchOptions as $key => $value) {
+			$surformdetailsArray[$value['subFormId']] = $value['label']; 
+		}
+
+		$this->render('add', array(
+			'model' => $model,
+			'surformdetailsArray' => $surformdetailsArray
+		));
+	}
+
+	/**
+	 * actionEditOption
+	 * 
+	 * @access public
+	 * @return void
+	 */
+	public function actionEditOption() {
+		Yii::log("actionEditOption OptionsController called", "trace", self::LOG_CAT);
+		$model = new Options;
+		$dataArray = array();
+		$dataArray['formType'] = "Edit";
+
+			if (isset($_GET['optionId'])) {
+				// fetch the form data, search using the "optionId" sent from the listing.
+				$model = Options::model()->findByPk($_GET['optionId']);
+				$fetchElementName = Yii::app()->db->createCommand()
+					->select('sfd.label')
+					->from('surformdetails sfd')
+					->where('sfd.subFormId =' . $model['elementId']  )
+					->queryAll();
+
+				// Pick the selected Option's elementId. This will be displayed as the default in the dropdown
+				$dataArray['elementName'] = $fetchElementName[0]['label'];
+			}
+		if ( isset( $_POST['Options'] ) ) {
+			$model->attributes = $_POST['Options'];
+			// Validate and save the data
+			if ( $model->validate() ) {
+				$model->update();
+				Yii::app()->user->setFlash('success', Yii::t("translation", "Option successfully updated"));
+				$this->redirect(array('index'));
+			}
+		}
+
+		// Fetch all options and send them to the view to be displayed in the dropdown
 		$fetchOptions = Yii::app()->db->createCommand()
 			->select('sfd.subFormId, sfd.label')
 			->from('surformdetails sfd')
@@ -129,11 +167,31 @@ class OptionsController extends Controller {
 		foreach ($fetchOptions as $key => $value) {
 			$surformdetailsArray[$value['subFormId']] = $value['label']; 
 		}
-
-		$this->render('add', array(
+		$this->render('edit', array(
 			'model' => $model,
+			'dataArray' => $dataArray,
 			'surformdetailsArray' => $surformdetailsArray
 		));
+	}
+
+	/**
+	 * actionDeleteOption 
+	 * 
+	 * @access public
+	 * @return void
+	 */
+	public function actionDeleteOption() {
+		Yii::log("actionDeleteOption OptionsController called", "trace", self::LOG_CAT);
+		if (isset($_POST["delId"])) {
+				$record = Options::model()->findByPk($_POST['delId']);
+			if (!$record->delete()) {
+				$errorMessage = "Error No:" . ldap_errno($ds) . "Error:" . ldap_error($ds);
+				Yii::log("Error deleting Option: " . $errorMessage, "warning", self::LOG_CAT);
+				echo Yii::t("translation", "A problem occured when deleting the Option ") . $_POST['delId'];
+			} else {
+				echo Yii::t("translation", "The Option has been successfully deleted");
+			}
+		}
 	}
 
 }
