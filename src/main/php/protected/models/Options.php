@@ -40,4 +40,32 @@ class Options extends CActiveRecord {
 	public function primaryKey() {
 		return 'optionId';
 	}
+
+	/**
+	 * rules 
+	 * 
+	 * @access public
+	 * @return void
+	 */
+	public function rules() {
+		return array(
+			array(
+				'label, elementId',
+				'required'
+			)
+		);
+	}
+
+	/**
+	 * attributeLabels 
+	 * 
+	 * @access public
+	 * @return void
+	 */
+	public function attributeLabels() {
+		return array(
+			'label' => Yii::t('translation', 'Input Name'),
+			'elementId' => Yii::t('translation', 'Option Name')
+		);
+	}
 }

@@ -88,7 +88,7 @@ $(function(){
 				  var opt = {'loadMsg': 'Processing delete design'};
 				$("#listOptions").showLoading(opt);
 				$.ajax({type: 'POST',
-					url: <?php echo "'" . CController::createUrl('design/deleteDesign') . "'"; ?>,
+					url: <?php echo "'" . CController::createUrl('options/deleteOption') . "'"; ?>,
 					data: {delId:deleteVal},
 					success: function(data){
 						var checkSuccess = /successfully/i;
