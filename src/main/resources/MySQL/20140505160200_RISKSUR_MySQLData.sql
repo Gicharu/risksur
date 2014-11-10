@@ -32,7 +32,9 @@ INSERT INTO `programpages` (`pageId`, `pageName`, `path`, `parentId`, `menuOrder
 (6,'Statistical Tools','nightly.tracetracker.com/epitools/htdocs/',0,6,'_blank',1),
 -- (7,'Profile','',0,7,'',1),
 (8,'Admin','',0,9,'',1),
-(9,'noMenu','',0,14,'',1);
+(9,'noMenu','',0,14,'',1),
+(10,'Manage Goals','admin/listGoals',8,15,'',1)
+;
 (10,'Manage Select Options','options/index',8,15,'',1);
 
 
@@ -52,6 +54,11 @@ insert  into `permissions`(`id`,`name`,`description`,`controller`,`action`,`bizr
 (13,'Add Options','Add Options','options','addOption',''),
 (14,'Edit Options','Edit Options','options','editOption',''),
 (15,'Delete Options','Delete Options','options','deleteOption',''),
+(16,'Edit design','Edit design','design','editDesign',''),
+(17,'List goals','List goals','admin','listGoals',''),
+(18,'Add goals','Add goals','admin','addGoal',''),
+(19,'Edit goals','Edit goals','admin','editGoal',''),
+(20,'Delete goals','Delete goals','admin','deleteGoal','');
 
 
 /*Data for the table `roles` */
@@ -60,7 +67,7 @@ insert  into `roles`(`id`,`name`,`description`) values (1,'ROLE_ADMIN','administ
 
 /*Data for the table `roles_has_permissions` */
 
-insert  into `roles_has_permissions`(`permissions_id`,`roles_id`) values (1,1),(1,2),(2,1),(2,2),(3,1),(3,2),(4,1),(4,2),(5,1),(5,2),(6,1),(6,2),(7,1),(7,2),(8,1),(8,2),(9,1),(9,2),(10,1),(10,2),(11,1),(11,2),(12,1),(12,2),(13,1),(13,2),(14,1),(14,2),(15,1),(15,2);
+insert  into `roles_has_permissions`(`permissions_id`,`roles_id`) values (1,1),(1,2),(2,1),(2,2),(3,1),(3,2),(4,1),(4,2),(5,1),(5,2),(6,1),(6,2),(7,1),(7,2),(8,1),(8,2),(9,1),(9,2),(10,1),(10,2),(11,1),(11,2),(12,1),(12,2),(13,1),(13,2),(14,1),(14,2),(15,1),(15,2),(16,1),(16,2),(17,1),(17,2),(18,1),(18,2),(19,1),(19,2),(20,1),(20,2);
 
 /*Data for the table `users` */
 

@@ -676,8 +676,7 @@ class DesignController extends Controller {
 		if (isset($_POST["delId"])) {
 				$record = ComponentHead::model()->findByPk($_POST['delId']);
 			if (!$record->delete()) {
-				$errorMessage = "Error No:" . ldap_errno($ds) . "Error:" . ldap_error($ds);
-				Yii::log("Error Deleing user:" . $errorMessage, "warning", self::LOG_CAT);
+				Yii::log("Error Deleing user:" . $_POST['delId'], "warning", self::LOG_CAT);
 				//echo $errorMessage;
 				echo Yii::t("translation", "A problem occured when deleting a component ") . $_POST['delId'];
 			} else {
@@ -696,8 +695,7 @@ class DesignController extends Controller {
 		if (isset($_POST["delId"])) {
 				$record = NewDesign::model()->findByPk($_POST['delId']);
 			if (!$record->delete()) {
-				$errorMessage = "Error No:" . ldap_errno($ds) . "Error:" . ldap_error($ds);
-				Yii::log("Error deleting design: " . $errorMessage, "warning", self::LOG_CAT);
+				Yii::log("Error deleting design: " . $_POST['delId'], "warning", self::LOG_CAT);
 				//echo $errorMessage;
 				echo Yii::t("translation", "A problem occured when deleting the design ") . $_POST['delId'];
 			} else {
