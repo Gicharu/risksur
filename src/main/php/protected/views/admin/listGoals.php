@@ -23,7 +23,7 @@ $(function(){
 						},
 						"sButtonText": "PDF",
 						"fnClick":  function( nButton, oConfig, flash ) {
-								flash.setFileName( "Component Listing_" + getTitle() + ".pdf" );
+								flash.setFileName( "Goal Listing_" + getTitle() + ".pdf" );
 								this.fnSetText( flash,
 									"title:"+ this.fnGetTitle(oConfig) +"\n"+
 									"message:"+ oConfig.sPdfMessage +"\n"+
@@ -43,7 +43,7 @@ $(function(){
 							page: 'current'
 						},
 						"fnClick": function ( nButton, oConfig, oFlash ) {
-						oFlash.setFileName( "Component Listing_" + getTitle() + ".csv" );
+						oFlash.setFileName( "Goal Listing_" + getTitle() + ".csv" );
 							this.fnSetText( oFlash,	"" + this.fnGetTableData(oConfig)
 							);
 						},
@@ -61,15 +61,8 @@ $(function(){
 		"aaData": <?php echo $dataArray['listGoals']; ?>,
 			//"bAutoWidth" : true,
 		"aoColumns": [
-			//{"mDataProp": "name",  "bVisible": true, sClass: "showDetails clickable underline", "sWidth": "20%"},
-			//{"mDataProp": "description", "bVisible": true, "sWidth": "40%"},
-			//{"mDataProp": "description", "bVisible": true, "sWidth": "6%"},
-			//{"mDataProp": "editButton", "bVisible": true, "sWidth": "6%"},
-			//{"mData": "deleteButton", "bSortable": false, "bVisible": true, "sWidth": "8%" },
-			{"mDataProp": "name",  "bVisible": true, sClass: "showDetails clickable underline"},
-			{"mDataProp": "description", "bVisible": true},
-			{"mDataProp": "description", "bVisible": true},
-			{"mDataProp": "editButton", "bVisible": true},
+			{"mDataProp": "name",  "bVisible": true},
+			{"mDataProp": "editButton", "bSortable": false, "bVisible": true},
 			{"mData": "deleteButton", "bSortable": false, "bVisible": true },
 		],
 		// update the buttons stying after the table data is loaded
@@ -89,15 +82,6 @@ $(function(){
 		"bInfo": true,
 		"bLengthChange": true
 	});
-	// click event to show component details
-	$('.<?php echo "showDetails"; ?>').die('click').live('click', function() {
-				var aPos = clist.fnGetPosition(this); /* Get current  row pos */
-				//console.log(aPos);
-				var aData = clist.fnGetData(aPos[0]); /* Get the full row     */
-				//console.log(aData);
-				var componentId = aData['componentId'];
-		window.location.href = '<?php echo CController::createUrl("design/showComponent"); ?>' + "?compId=" + componentId;
-	});
 });
 
 	deleteConfirm = function(confirmMsg, deleteVal) {
@@ -109,7 +93,7 @@ $(function(){
 				  var opt = {'loadMsg': 'Processing delete user'};
 				$("#goalList").showLoading(opt);
 				$.ajax({type: 'POST',
-					url: <?php echo "'" . CController::createUrl('design/deleteComponent') . "'"; ?>,
+					url: <?php echo "'" . CController::createUrl('admin/deleteGoal') . "'"; ?>,
 					data: {delId:deleteVal},
 					success: function(data){
 						var checkSuccess = /successfully/i;
@@ -122,7 +106,7 @@ $(function(){
 							$("#ajaxFlashMsg").html(data);
 							$("#ajaxFlashMsgWrapper").attr('class', 'flash-error').show();
 						}
-						clist.fnReloadAjax("listComponents/getGoals/1");
+						clist.fnReloadAjax("listGoals/getGoals/1");
 						$("#goalList").hideLoading();
 					},
 						error: function(data){
@@ -140,14 +124,20 @@ $(function(){
 	});
 }
 	</script>
+
+		<?php echo CHtml::htmlButton(Yii::t("translation", "Create Goal"), array(
+			'id' => 'newGoal',
+			'submit' => array(
+				'admin/addGoal'
+			),
+			'type' => 'button'
+		)); ?>
 <div id="goalList" width="100%">
 	
 	<table id="listGoals" width="100%" border="0" cellspacing="0" cellpadding="0">
 		<thead>
 		<tr>
 			<th title = "Name">Name</th>
-			<th title = "Descripton">Descripton</th>
-			<th title = "Details">Details</th>
 			<th title = "Edit">Edit</th>
 			<th title = "Delete">Delete</th>
 		</tr>

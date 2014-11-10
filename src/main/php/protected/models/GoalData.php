@@ -32,6 +32,23 @@ class GoalData extends CActiveRecord {
 	}
 
 	/**
+	 * rules 
+	 * 
+	 * @access public
+	 * @return void
+	 */
+	public function rules() {
+		return array(
+			array(
+				'pageName',
+				'required'
+			),
+			array(
+				'pageName', 'unique', 'on' => 'create'
+			)
+		);
+	}
+	/**
 	 * relations 
 	 * 
 	 * @access public
@@ -50,5 +67,17 @@ class GoalData extends CActiveRecord {
 	 */
 	public function primaryKey() {
 		return 'pageId';
+	}
+
+	/**
+	 * attributeLabels 
+	 * 
+	 * @access public
+	 * @return void
+	 */
+	public function attributeLabels() {
+		return array(
+			'pageName' => Yii::t('translation', 'Goal Name')
+		);
 	}
 }
