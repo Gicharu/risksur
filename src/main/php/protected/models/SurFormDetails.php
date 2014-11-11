@@ -10,6 +10,11 @@
  * @license Tracetracker {@link http://www.tracetracker.com}
  */
 class SurFormDetails extends CActiveRecord {
+    public $formId;
+    public $inputName;
+    public $label;
+    public $inputType;
+    public $required;
 	/**
 	 * model 
 	 * 
@@ -31,6 +36,19 @@ class SurFormDetails extends CActiveRecord {
 		return 'surFormDetails';
 	}
 
+    public function rules() {
+        // NOTE: you should only define rules for those attributes that
+        // will receive user inputs.
+		return array(
+            array('formId, inputName, label, inputType, required', 'required'),
+            array('formId', 'numerical', 'integerOnly'=>true),
+            array('inputName, label, inputType', 'length', 'max'=>50),
+            // The following rule is used by search().
+            // @todo Please remove those attributes that should not be searched.
+            array('subFormId, formId, inputName, label, inputType, required', 'safe', 'on'=>'search'),
+        );
+	}
+
 	/**
 	 * relations 
 	 * 
@@ -39,7 +57,7 @@ class SurFormDetails extends CActiveRecord {
 	 */
 	public function relations() {
 		return array(
-			'surFormElements' => array( self::BELONGS_TO, 'SurFormHead', 'formId' )
+			'surFormElements' => array( self::BELONGS_TO, 'SurForm', 'formId' )
 		);
 	}
 	/**
@@ -51,4 +69,13 @@ class SurFormDetails extends CActiveRecord {
 	public function primaryKey() {
 		return 'subFormId';
 	}
+
+    /**
+     * @return array
+     */
+    public function attributeLabels() {
+        return array(
+            'formId' => Yii::t('translation', 'Status'),
+        );
+    }
 }

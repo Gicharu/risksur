@@ -52,7 +52,7 @@ class MainMenu extends CWidget {
 					$fullMenuPath =& $this->arrayPath($menuParams['menuArray'], $pathArray);
 					$fullMenuPath['items'][$menuPages['pageId']] = array(
 						'label' => $menuPages['pageName'],
-						'url' => $menuPages['path'],
+						'url' => Yii::app()->createUrl($menuPages['path']),
 						'linkOptions' => array('target' => $menuPages['target'])
 					);
 				}

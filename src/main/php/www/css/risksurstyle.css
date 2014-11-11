@@ -1254,6 +1254,9 @@ div.buttonWrapLeft {
     float: left;
     display: block;
 }
+.ui-menu li ul {
+    z-index: 10;
+}
 /* button list menu */
 .goalMenuComponent {
 	float:left;
@@ -1291,6 +1294,26 @@ div.buttonWrapLeft {
 	padding: 3px;
 	margin-top: 0.1em;
 	font-size: 1.0em;
+}
+#surFormDetailsBlock {
+    width: 99%;
+}
+.operations {
+    background-color: #cccccc;
+    width: 200px;
+    padding-bottom: 1em !important;
+}
+.operations li {
+    background-color: #000000;
+    left: 1.15em;
+    padding: 0.2em 1em;
+    margin-top: 0.5em;
+}
+.operations li a {
+    text-decoration: none;
+    color: #ffffff;
+    font-weight: bold;
+    font-size: 13px;
 }
 /*.container, #content{*/
 /*width:100%;*/
