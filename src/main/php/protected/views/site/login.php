@@ -8,7 +8,13 @@ $langs = array(
 		'bs_BA',
 );
 
-$locale = http_negotiate_language($langs, $result);
+if (function_exists('http_negotiate_language')) {
+	$locale = http_negotiate_language($langs, $result);
+} else {
+	$locale = http\Env::negotiateLanguage($langs, $result);
+	//returns bs_BA so we trim
+	$locale = substr($locale, 0, 2);
+}
 $paginationLocaleFile = 'paginationLocales' . DIRECTORY_SEPARATOR . $locale . '.txt';
 Yii::app()->setLanguage($locale);
 

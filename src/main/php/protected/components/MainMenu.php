@@ -50,9 +50,14 @@ class MainMenu extends CWidget {
 				$pathArray = $this->arrayKeyPath((int)$menuPages['childId'], $menuParams['menuArray']);
 				if($menuPages['childName'] != "noMenu" && $pathArray !== FALSE) {
 					$fullMenuPath =& $this->arrayPath($menuParams['menuArray'], $pathArray);
+					if (empty($menuPages['target'])) {
+						$url = Yii::app()->controller->createUrl($menuPages['path']);
+					} else {
+						$url = "//" . $menuPages['path']; 
+					}
 					$fullMenuPath['items'][$menuPages['pageId']] = array(
 						'label' => $menuPages['pageName'],
-						'url' => Yii::app()->createUrl($menuPages['path']),
+						'url' => $url,
 						'linkOptions' => array('target' => $menuPages['target'])
 					);
 				}

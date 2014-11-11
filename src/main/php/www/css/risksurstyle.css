@@ -221,7 +221,7 @@ body {
 	padding:4px 0;
 	position:absolute;
 	right:0;
-	z-index:2003;
+	/*z-index:1000;*/
 }
 .controls li {
 	float:none;
@@ -976,7 +976,7 @@ td.group {
 	font-size: 1.177em !important;
 	/*margin-top: -80px !important;*/
 	/*position: relative !important;*/
-	z-index: 500;
+	/*z-index: 500;*/
 }
 .paginate_disabled_first {
 	background-image: url('../images/first_disabled.jpg');
@@ -1318,5 +1318,9 @@ div.buttonWrapLeft {
 /*.container, #content{*/
 /*width:100%;*/
 /*}*/
+/*lift up the sub menu z-index*/
+.ui-menu-item ul {
+	z-index: 100;
+}
 
 
