@@ -33,9 +33,9 @@ INSERT INTO `programpages` (`pageId`, `pageName`, `path`, `parentId`, `menuOrder
 -- (7,'Profile','',0,7,'',1),
 (8,'Admin','',0,9,'',1),
 (9,'noMenu','',0,14,'',1),
-(10,'Manage Goals','admin/listGoals',8,15,'',1)
+(10,'Manage Goals','admin/listGoals',8,15,'',1),
+(11,'Manage Select Options','options/index',8,15,'',1)
 ;
-(10,'Manage Select Options','options/index',8,15,'',1);
 
 
 insert  into `permissions`(`id`,`name`,`description`,`controller`,`action`,`bizrule`) values 
