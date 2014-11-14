@@ -121,6 +121,13 @@ $(function(){
 }
 	</script>
 
+<div class="row">
+	<?php echo CHtml::Button(Yii::t("translation", 'Add Option'), array(
+		'id' => 'load',
+		'submit' => array('options/addOption'),
+		'type' => 'submit'
+	)); ?>
+</div>
 <div id="listOptions" width="100%">
 	
 	<table id="optionsList" width="100%" border="0" cellspacing="0" cellpadding="0">
@@ -134,11 +141,4 @@ $(function(){
 		<tbody>
 		</tbody>
 	</table>
-</div>
-<div class="row">
-<?php echo CHtml::Button(Yii::t("translation", 'Add Option'), array(
-		'id' => 'load',
-		'submit' => array('options/addOption'),
-		'type' => 'submit'
-)); ?>
 </div>
