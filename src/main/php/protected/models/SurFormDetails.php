@@ -39,6 +39,12 @@ class SurFormDetails extends CActiveRecord {
 		return 'surFormDetails';
 	}
 
+	/**
+	 * rules 
+	 * 
+	 * @access public
+	 * @return void
+	 */
 	public function rules() {
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
