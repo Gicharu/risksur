@@ -10,14 +10,14 @@ class SurFormDetailsController extends Controller {
     /**
      * @return array
      */
-//    public function filters() {
-//        Yii::log("filters called", "trace", self::LOG_CAT);
-//        return array(
-//            array(
-//                'application.filters.RbacFilter',
-//            ) ,
-//        );
-//    }
+    public function filters() {
+        Yii::log("filters called", "trace", self::LOG_CAT);
+        return array(
+            array(
+                'application.filters.RbacFilter',
+            ) ,
+        );
+    }
 
     /**
      * Creates a new model.
@@ -107,6 +107,11 @@ class SurFormDetailsController extends Controller {
         }
         $this->render('index', array('surFormsArray' => $surFormsArray,));
     }
+
+
+    /**
+     * @return Void
+     */
     public function actionGetInputTypeOpts() {
         $optArray = array();
         if(!empty($_GET['subFormId'])) {
