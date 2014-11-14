@@ -12,11 +12,7 @@ class SurFormDetailsController extends Controller {
      */
     public function filters() {
         Yii::log("filters called", "trace", self::LOG_CAT);
-        return array(
-            array(
-                'application.filters.RbacFilter',
-            ) ,
-        );
+        return array(array('application.filters.RbacFilter',),);
     }
 
     /**
@@ -46,7 +42,7 @@ class SurFormDetailsController extends Controller {
      * @throws CHttpException
      */
     public function actionUpdate() {
-        if(empty($_GET['id'])) {
+        if (empty($_GET['id'])) {
             throw new CHttpException(404, "The requested surveilance form cannot be found");
         }
         $id = $_GET['id'];
@@ -57,7 +53,7 @@ class SurFormDetailsController extends Controller {
 
         if (isset($_POST['SurFormDetails'])) {
             $model->attributes = $_POST['SurFormDetails'];
-            if ($model->save())  {
+            if ($model->save()) {
                 $this->redirect(array('index'));
                 return;
             }
@@ -70,7 +66,7 @@ class SurFormDetailsController extends Controller {
      * @throws CHttpException
      */
     public function actionDelete() {
-        if(empty($_POST['delId'])) {
+        if (empty($_POST['delId'])) {
             throw new CHttpException(400, "The requested form element cannot be found");
         }
         $id = $_POST['delId'];
@@ -88,20 +84,20 @@ class SurFormDetailsController extends Controller {
 //        $this->layout = '//layouts/column1';
         $surForms = SurFormDetails::model()->with('surFormElements')->findAll();
         $surFormsArray = array();
-        if(!empty($surForms)) {
-            foreach( $surForms as $surFormKey => $surForm) {
+        if (!empty($surForms)) {
+            foreach ($surForms as $surFormKey => $surForm) {
                 $surFormsArray[$surFormKey] = $surForm->getAttributes();
                 // resolve the formId using the surForm table
                 $relations = $surForm->getRelated('surFormElements');
                 $surFormsArray[$surFormKey]['formName'] = '';
-                if(!empty($relations)) {
+                if (!empty($relations)) {
                     $surFormsArray[$surFormKey]['formName'] = $relations->formName;
                 }
             }
         }
         //print_r($surFormsArray);
         //die();
-        if(isset($_GET['ajax'])) {
+        if (isset($_GET['ajax'])) {
             echo json_encode(array("aaData" => $surFormsArray));
             return;
         }
@@ -114,13 +110,11 @@ class SurFormDetailsController extends Controller {
      */
     public function actionGetInputTypeOpts() {
         $optArray = array();
-        if(!empty($_GET['subFormId'])) {
+        if (!empty($_GET['subFormId'])) {
             $subFormId = $_GET['subFormId'];
-            $options = Options::model()->findAll(array(
-                "condition" => "elementId = $subFormId",
-                'select' => 'val, label'));
-            if(!empty($options)) {
-                foreach($options as $opt) {
+            $options = Options::model()->findAll(array("condition" => "elementId = $subFormId", 'select' => 'val, label'));
+            if (!empty($options)) {
+                foreach ($options as $opt) {
                     $optArray[] = $opt->getAttributes();
                 }
             }

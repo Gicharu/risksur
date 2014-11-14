@@ -2,14 +2,11 @@
 /* @var $this SurFormDetailsController */
 /* @var $model SurFormDetails */
 
-$this->breadcrumbs=array(
-	'Sur Form Details'=>array('index'),
-	'Create',
-);
+$this->breadcrumbs = array('Sur Form Details' => array('index'), 'Create',);
 
-$this->menu=array(
-	array('label'=>'View Form Elements', 'url'=>array('index')),
-	//array('label'=>'Manage SurFormDetails', 'url'=>array('admin')),
+$this->menu = array(
+    array('label' => 'View Form Elements', 'url' => array('index')),
+    //array('label'=>'Manage SurFormDetails', 'url'=>array('admin')),
 );
 ?>
 
