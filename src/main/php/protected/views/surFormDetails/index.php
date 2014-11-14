@@ -1,13 +1,14 @@
 <?php
 /* @var $this SurFormDetailsController */
+$this->menu=array(
+    array('label'=>'Add Form Elements', 'url'=>array('create')),
+    //array('label'=>'Manage SurFormDetails', 'url'=>array('admin')),
+);
 ?>
 <script type="text/javascript">
     var surFormDet;
     $(function() {
         $("#bd").attr('style', '');
-        $("#addElem").on("click", function() {
-            window.location = '<?php echo $this->createUrl("surFormDetails/create"); ?>';
-        }).button();
         surFormDet = $("#surFormDetails").dataTable({
             "sDom": '<"H"rlTf>t<"F"ip>',
             "oTableTools": {
@@ -164,5 +165,4 @@
         </tbody>
     </table>
 </div>
-<button id="addElem" type="button">Add Element</button>
 <div id="deleteBox" title="Delete Confirmation"></div>

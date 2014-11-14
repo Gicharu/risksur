@@ -85,7 +85,7 @@ class SurFormDetailsController extends Controller {
      * Lists all models.
      */
     public function actionIndex() {
-        $this->layout = '//layouts/column1';
+//        $this->layout = '//layouts/column1';
         $surForms = SurFormDetails::model()->with('surFormElements')->findAll();
         $surFormsArray = array();
         if(!empty($surForms)) {

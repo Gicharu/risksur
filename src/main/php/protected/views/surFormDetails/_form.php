@@ -102,7 +102,7 @@
 
 	<div class="row buttons">
 		<?php echo CHtml::submitButton($model->isNewRecord ? 'Create' : 'Save'); ?>
-        <?php echo CHtml::htmlButton("Cancel", array('id' => 'cancelForm')); ?>
+        <?php //echo CHtml::htmlButton("Cancel", array('id' => 'cancelForm')); ?>
 	</div>
 
 <?php $this->endWidget(); ?>

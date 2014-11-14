@@ -36,7 +36,7 @@ insert  into `permissions`(`id`,`name`,`description`,`controller`,`action`,`bizr
 
 /*Data for the table `programpages` */
 
-insert  into `programpages`(`pageId`,`pageName`,`path`,`parentId`,`menuOrder`,`target`,`active`,`comments`) values (2,'Surveillance Design Framework','design/index',0,2,'',1,NULL),(3,'Evaluation Tool','',0,3,'',1,NULL),(4,'Economic Assessment','',0,4,'',1,NULL),(5,'Examples','',0,5,'',1,NULL),(6,'Statistical Tools','nightly.tracetracker.com/epitools/htdocs/',0,6,'_blank',1,NULL),(8,'Admin','',0,9,'',1,NULL),(9,'noMenu','',0,14,'',1,NULL),(10,'Manage Goals','admin/listGoals',8,15,'',1,NULL);
+insert  into `programpages`(`pageId`,`pageName`,`path`,`parentId`,`menuOrder`,`target`,`active`,`comments`) values (2,'Surveillance Design Framework','design/index',0,2,'',1,NULL),(3,'Evaluation Tool','',0,3,'',1,NULL),(4,'Economic Assessment','',0,4,'',1,NULL),(5,'Examples','',0,5,'',1,NULL),(6,'Statistical Tools','nightly.tracetracker.com/epitools/htdocs/',0,6,'_blank',1,NULL),(8,'Admin','',0,9,'',1,NULL),(9,'noMenu','',0,14,'',1,NULL),(10,'Manage Goals','admin/listGoals',8,15,'',1,NULL),(11,'Manage Component Forms','surFormDetails/index',8,16,NULL,1,NULL);
 
 /*Data for the table `roles` */
 
