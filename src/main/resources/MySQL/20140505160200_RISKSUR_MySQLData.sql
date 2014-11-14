@@ -54,11 +54,10 @@ insert  into `permissions`(`id`,`name`,`description`,`controller`,`action`,`bizr
 (13,'Add Options','Add Options','options','addOption',''),
 (14,'Edit Options','Edit Options','options','editOption',''),
 (15,'Delete Options','Delete Options','options','deleteOption',''),
-(16,'Edit design','Edit design','design','editDesign',''),
-(17,'List goals','List goals','admin','listGoals',''),
-(18,'Add goals','Add goals','admin','addGoal',''),
-(19,'Edit goals','Edit goals','admin','editGoal',''),
-(20,'Delete goals','Delete goals','admin','deleteGoal','');
+(16,'List goals','List goals','admin','listGoals',''),
+(17,'Add goals','Add goals','admin','addGoal',''),
+(18,'Edit goals','Edit goals','admin','editGoal',''),
+(19,'Delete goals','Delete goals','admin','deleteGoal','');
 
 
 /*Data for the table `roles` */
