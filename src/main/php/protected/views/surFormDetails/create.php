@@ -5,8 +5,8 @@
 $this->breadcrumbs = array('Sur Form Details' => array('index'), 'Create',);
 
 $this->menu = array(
-    array('label' => 'View Form Elements', 'url' => array('index')),
-    //array('label'=>'Manage SurFormDetails', 'url'=>array('admin')),
+	array('label' => 'View Form Elements', 'url' => array('index')),
+	//array('label'=>'Manage SurFormDetails', 'url'=>array('admin')),
 );
 ?>
 
