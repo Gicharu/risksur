@@ -1,5 +1,9 @@
+<script type="text/javascript">
+	$(function() {
+		$("#bd").attr('style', '');
+	});
+</script>
 <div class="form">
-
 <?php $form = $this->beginWidget('CActiveForm', array(
 	'enableClientValidation' => true,
 )); ?>
@@ -8,9 +12,11 @@
 ), Yii::app()->params['headerErrorSummary'], Yii::app()->params['footerErrorSummary']); ?>
 	<?php
 	if (isset($dataArray['formType']) && $dataArray['formType'] == "Edit") {
+		$this->menu = array(array('label' => 'View Options', 'url' => array('options/index')), array('label' => 'Add Option', 'url' => array('options/addOption')));
 		$buttonText = "Update Option";
 		$dataArray['elementName'];
 	} else {
+		$this->menu = array(array('label' => 'View Options', 'url' => array('options/index')));
 		$buttonText = "Save Option";
 	}?>
 	<div class="row">

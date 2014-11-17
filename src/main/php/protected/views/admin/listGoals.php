@@ -128,14 +128,6 @@ $(function(){
 	});
 }
 	</script>
-
-		<?php echo CHtml::htmlButton(Yii::t("translation", "Create Goal"), array(
-			'id' => 'newGoal',
-			'submit' => array(
-				'admin/addGoal'
-			),
-			'type' => 'button'
-		)); ?>
 <div id="goalList" width="100%">
 	
 	<table id="listGoals" width="100%" border="0" cellspacing="0" cellpadding="0">
