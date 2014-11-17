@@ -1,11 +1,7 @@
 <div class="form">
 
 <?php $form = $this->beginWidget('CActiveForm', array(
-	'id' => 'user-form',
 	'enableClientValidation' => true,
-	'clientOptions' => array(
-		'validateOnSubmit' => true,
-	),
 )); ?>
 <?php echo $form->errorSummary(array(
 	$model
@@ -20,7 +16,7 @@
 	<div class="row">
 		<?php echo $form->labelEx($model, 'elementId'); ?>
 		<?php echo $form->dropDownList($model, 'elementId', $surformdetailsArray, array(
-			'id' => 'surformId',
+			'id' => 'elementId',
 			'selected' => isset($dataArray['elementName']) ? $dataArray['elementName'] : "",
 			)); ?>
 		<?php echo $form->error($model, 'elementId'); ?>
