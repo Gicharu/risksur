@@ -95,7 +95,7 @@ return CMap::mergeArray($configArray, array(
 	),
 	// application components
 	'components' => array(
-		'errorHandler'=> array(
+		'errorHandler' => array(
 			// use 'site/error' action to display errors
 			'errorAction' => 'site/error',
 		),

@@ -39,7 +39,7 @@ showComponentMenu = function(parentId) {
 	echo CHtml::radioButtonList($this->menuId, '', $goalParams['goalArray'], array(
 		'id' => $this->menuId,
 		'class' => 'buttonListMenu',
-		'onclick' =>'showComponentMenu($(this).val());'
+		'onclick' => 'showComponentMenu($(this).val());'
 		//'separator' => ' ',
 		//'template' => '<div>{input}&nbsp; {label}</div>',
 		//'labelOptions' => array('style' => 'display:inline'),
