@@ -49,7 +49,7 @@ class MainMenu extends CWidget {
 			} else {
 				$pathArray = $this->arrayKeyPath((int)$menuPages['childId'], $menuParams['menuArray']);
 				if($menuPages['childName'] != "noMenu" && $pathArray !== FALSE) {
-					$fullMenuPath =& $this->arrayPath($menuParams['menuArray'], $pathArray);
+					$fullMenuPath = &$this->arrayPath($menuParams['menuArray'], $pathArray);
 					if (empty($menuPages['target'])) {
 						$url = Yii::app()->controller->createUrl($menuPages['path']);
 					} else {
@@ -82,7 +82,7 @@ class MainMenu extends CWidget {
 	 *   A list of keys to ignore.
 	 * @param $path
 	 *   The intermediate path. Internal use only.
-	 * @return
+	 * @return mixed
 	 *   The path to the parent of the first occurrence of the key, represented as an array where entries are consecutive keys.
 	 */
 	function arrayKeyPath($needle, $haystack, $forbidden = array(), $path = array()) {
@@ -92,8 +92,7 @@ class MainMenu extends CWidget {
 			}
 			if (is_array($val) && is_array($sub = $this->arrayKeyPath($needle, $val, $forbidden, array_merge($path, (array)$key)))) {
 				return $sub;
-			}
-			elseif ($key === $needle) {
+			} elseif ($key === $needle) {
 				return array_merge($path, (array)$key);
 			}
 		}
@@ -109,13 +108,15 @@ class MainMenu extends CWidget {
 	 *   A keyed array.
 	 * @param $path
 	 *   An array path, represented as an array where entries are consecutive keys.
-	 * @return
+	 * @return array
 	 *   A reference to the entry that corresponds to the given path.
 	 **/
 	function &arrayPath(&$array, $path) {
-		$offset =& $array;
-		if ($path) foreach ($path as $index) {
-			$offset =& $offset[$index];
+		$offset = &$array;
+		if ($path) {
+			foreach ($path as $index) {
+				$offset = &$offset[$index];
+			}
 		}
 		return $offset;
 	}
