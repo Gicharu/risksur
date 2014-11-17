@@ -64,6 +64,19 @@
 			"bProcessing": true,
 			"aaData": <?php echo json_encode($surFormsArray); ?>,
 			"aoColumns": [
+				{"mData": "formName", "sWidth": "8%"},
+				{"mData": "inputName"},
+				{"mData": "label"},
+				{"mData": "inputType", "sWidth": "9%"},
+				{"mData": "required", "fnCreatedCell": function (nTd, sData) {
+                    var req = "Yes";
+                    if (sData != "1") {
+                        req = "No";
+                    }
+                    $(nTd).html(req);
+
+                }, "sWidth": "9%"
+				},
 				{
 					"mData": null, "sDefaultContent": '<button type="button" class="bedit">Edit</button>', "bSortable": false,
 					"fnCreatedCell": function (nTd, sData, oData) {
@@ -75,20 +88,6 @@
 					"fnCreatedCell": function (nTd, sData, oData) {
 						$(nTd).children().attr("onClick", "deleteConfirm(" + oData.subFormId + ");");
 					}, "sWidth": "5%"
-				},
-				{"mData": "formName", "sWidth": "8%"},
-				{"mData": "inputName"},
-				{"mData": "label"},
-				{"mData": "inputType", "sWidth": "9%"},
-				{
-					"mData": "required", "fnCreatedCell": function (nTd, sData) {
-					var req = "Yes";
-					if (sData != "1") {
-						req = "No";
-					}
-					$(nTd).html(req);
-
-				}, "sWidth": "9%"
 				}
 			],
 //            update the buttons stying after the table data is loaded
@@ -158,13 +157,13 @@
 	<table id="surFormDetails" border="0" cellspacing="0" cellpadding="0" width="96%" class="display">
 		<thead>
 		<tr>
-			<th title="Edit"></th>
-			<th title="Delete"></th>
 			<th title="Status">Status</th>
 			<th title="Input Name">Input Name</th>
 			<th title="Label">Label</th>
 			<th title="Input Type">Input Type</th>
 			<th title="Required">Required</th>
+			<th title="Edit"></th>
+			<th title="Delete"></th>
 		</tr>
 		</thead>
 		<tbody>
