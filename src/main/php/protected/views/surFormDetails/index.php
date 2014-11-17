@@ -162,8 +162,8 @@
 			<th title="Label">Label</th>
 			<th title="Input Type">Input Type</th>
 			<th title="Required">Required</th>
-			<th title="Edit"></th>
-			<th title="Delete"></th>
+			<th title="Edit">Edit</th>
+			<th title="Delete">Delete</th>
 		</tr>
 		</thead>
 		<tbody>
