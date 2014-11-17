@@ -16,6 +16,12 @@ class OptionsController extends Controller {
 	const LOG_CAT = "ctrl.OptionsController";
 
 	/**
+	 * @var string the default layout for the views. Defaults to '//layouts/column2', meaning
+	 * using two-column layout. See 'protected/views/layouts/column2.php'.
+	 */
+	public $layout = '//layouts/column2';
+
+	/**
 	 * filters 
 	 * 
 	 * @access public
@@ -48,7 +54,6 @@ class OptionsController extends Controller {
 		Yii::log("actionIndex AdminController called", "trace", self::LOG_CAT);
 		$model = new Options;
 		$dataArray = array();
-		// $this->layout = "componentMenu";
 		$dataArray['dtHeader'] = "Manage Options"; // Set page title when printing the datatable
 		// Get list of options 
 		// $optionsList = Options::model()->findAll(array(

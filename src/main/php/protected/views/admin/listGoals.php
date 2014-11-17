@@ -1,5 +1,9 @@
-	<script type="text/javascript">
+<?php
+$this->menu = array(array('label' => 'Create Goal', 'url' => array('admin/addGoal')),);
+?>
+<script type="text/javascript">
 $(function(){
+	$("#bd").attr('style', '');
 	clist = $("<?php echo '#listGoals'; ?>").dataTable({
 		"sDom": '<"H"rlTf>t<"F"ip>',
 		"oTableTools": {
