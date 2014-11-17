@@ -106,7 +106,7 @@ class OptionsController extends Controller {
 		// Select all values whose inputType is ""Select"
 		$fetchOptions = Yii::app()->db->createCommand()
 			->select('sfd.subFormId, sfd.label')
-			->from('surformdetails sfd')
+			->from('surFormDetails sfd')
 			->where('sfd.inputType ="select"')
 			->queryAll();
 
