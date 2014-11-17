@@ -114,10 +114,10 @@ class MainMenu extends CWidget {
 	function &arrayPath(&$array, $path) {
 		$offset = &$array;
 		if ($path) {
-            foreach ($path as $index) {
-                $offset = &$offset[$index];
-            }
-        }
+			foreach ($path as $index) {
+				$offset = &$offset[$index];
+			}
+		}
 		return $offset;
 	}
 
