@@ -14,6 +14,7 @@
 		$baseUrl . "/css/print.css" => "print",
 		$baseUrl . "/css/jquery.menubar.css" => "noMedia",
 		$baseUrl . "/css/form.css" => "noMedia",
+		$baseUrl . "/css/screen.css" => "noMedia",
 		$baseUrl . "/css/chosen.css" => "noMedia",
 		$baseUrl . "/css/showLoading.css" => "noMedia",
 		$baseUrl . "/css/jquery.dataTables.css" => "all",
