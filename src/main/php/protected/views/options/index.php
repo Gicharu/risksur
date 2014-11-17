@@ -56,6 +56,7 @@ $(function(){
 		"bStateSave": false,
 		"aaData": <?php echo $dataArray['optionsList']; ?>,
 		"aoColumns": [
+		{"mDataProp": "option",  "bVisible": true },
 		{"mDataProp": "label",  "bVisible": true },
 		{"mDataProp": "editButton", "bSortable": false },
 		{"mData": "deleteButton", "bSortable": false },
@@ -133,7 +134,8 @@ $(function(){
 	<table id="optionsList" width="100%" border="0" cellspacing="0" cellpadding="0">
 		<thead>
 		<tr>
-			<th title = "Name">Name</th>
+			<th title = "Name">Option Name</th>
+			<th title = "Name">Element Name</th>
 			<th title = "Edit">Edit</th>
 			<th title = "Delete">Delete</th>
 		</tr>

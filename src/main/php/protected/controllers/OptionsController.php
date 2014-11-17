@@ -48,25 +48,33 @@ class OptionsController extends Controller {
 		Yii::log("actionIndex AdminController called", "trace", self::LOG_CAT);
 		$model = new Options;
 		$dataArray = array();
+		// $this->layout = "componentMenu";
 		$dataArray['dtHeader'] = "Manage Options"; // Set page title when printing the datatable
 		// Get list of options 
-		$optionsList = Options::model()->findAll(array(
-			'select' => 'optionId, label',
-		));
+		// $optionsList = Options::model()->findAll(array(
+		// 	'select' => 'optionId, label',
+		// ));
+		$optionsList = Yii::app()->db->createCommand()
+			->select('opt.optionId, opt.label as option, sfd.label')
+			->from('options opt')
+			->join('surFormDetails sfd', 'sfd.subFormId = opt.elementId')
+			->queryAll();
+			// print_r($optionsList);die();
 		$optionsListArray = array();
 		// Format datatable data. Define the Edit & Delete buttons
 		foreach ($optionsList as $options) {
-				$editButton = "<button id='editOption" . $options->optionId . 
+				$editButton = "<button id='editOption" . $options['optionId'] . 
 				"' type='button' class='bedit' onclick=\"window.location.href ='" . CController::createUrl('options/editOption/', array(
-					'optionId' => $options->optionId)
+					'optionId' => $options['optionId'])
 				) . "'\">Edit</button>";
-				$deleteButton = "<button id='deleteOption" . $options->optionId . 
+				$deleteButton = "<button id='deleteOption" . $options['optionId'] . 
 				"' type='button' class='bdelete' onclick=\"$('#deleteBox').dialog('open');" . 
-				"deleteConfirm('" . $options->label . "', '" .
-				$options->optionId . "')\">Remove</button>";
+				"deleteConfirm('" . $options['label'] . "', '" .
+				$options['optionId'] . "')\">Remove</button>";
 			// Pack the data to be sent to the view
 			$optionsListArray[] = array (
-				'label' =>   $options->label,
+				'label' =>   $options['label'],
+				'option' =>   $options['option'],
 				'editButton' => $editButton,
 				'deleteButton' => $deleteButton
 			);
@@ -139,7 +147,7 @@ class OptionsController extends Controller {
 				$model = Options::model()->findByPk($_GET['optionId']);
 				$fetchElementName = Yii::app()->db->createCommand()
 					->select('sfd.label')
-					->from('surformdetails sfd')
+					->from('surFormDetails sfd')
 					->where('sfd.subFormId =' . $model['elementId']  )
 					->queryAll();
 
