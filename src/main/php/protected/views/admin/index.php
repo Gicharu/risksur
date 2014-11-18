@@ -1,6 +1,6 @@
 <script type="text/javascript">
 $(function(){
-	slist = $("<?php echo '#surveillanceList'; ?>").dataTable({
+	slist = $("<?php echo '#optionsList'; ?>").dataTable({
 		"sDom": '<"H"rlTf>t<"F"ip>',
 		"oTableTools": {
 		"sSwfPath": "<?php echo Yii::app()->request->baseUrl; ?>/js/copy_csv_xls_pdf.swf",
@@ -13,7 +13,6 @@ $(function(){
 					"bShowAll": false
 				},
 				{
-					
 					"sExtends": "collection",
 					"sButtonText": "<?php echo Yii::t('translation', 'Save')?>",
 					"aButtons" : [ {
@@ -55,11 +54,9 @@ $(function(){
 		},
 		"bProcessing": true,
 		"bStateSave": false,
-		"aaData": <?php echo $dataArray['surveillanceList']; ?>,
+		"aaData": <?php echo $dataArray['optionsList']; ?>,
 		"aoColumns": [
-		{"mDataProp": "name",  "bVisible": true, sClass: "showDetails clickable underline"},
-		{"mDataProp": "description", "bVisible": true},
-		{"mDataProp": "goalName", "bVisible": true},
+		{"mDataProp": "label",  "bVisible": true },
 		{"mDataProp": "editButton", "bSortable": false },
 		{"mData": "deleteButton", "bSortable": false },
 		],
@@ -80,16 +77,6 @@ $(function(){
 		"bInfo": true,
 		"bLengthChange": true
 	});
-
-	// click event to show design details
-	$('.<?php echo "showDetails"; ?>').die('click').live('click', function() {
-				var aPos = slist.fnGetPosition(this); /* Get current  row pos */
-				//console.log(aPos);
-				var aData = slist.fnGetData(aPos[0]); /* Get the full row     */
-				//console.log(aData);
-				var frameworkId = aData['frameworkId'];
-		window.location.href = '<?php echo CController::createUrl("design/showDesign"); ?>' + "?designId=" + frameworkId;
-	});
 });
 
 	deleteConfirm = function(confirmMsg, deleteVal) {
@@ -99,7 +86,7 @@ $(function(){
 			// console.log(confirmMsg + ":" + deleteVal);
 				$(this).dialog("close");
 				  var opt = {'loadMsg': 'Processing delete design'};
-				$("#listSurveilance").showLoading(opt);
+				$("#listOptions").showLoading(opt);
 				$.ajax({type: 'POST',
 					url: <?php echo "'" . CController::createUrl('design/deleteDesign') . "'"; ?>,
 					data: {delId:deleteVal},
@@ -109,7 +96,6 @@ $(function(){
 							// add process message
 							$("#ajaxFlashMsg").html(data);
 							$("#ajaxFlashMsgWrapper").attr('class', 'flash-success').show();
-							$("#ajaxFlashMsgWrapper").animate({opacity: 1.0}, 3000).fadeOut("slow");
 							// remove the elements of selected design
 							$('#designName').hide();
 							$('#addComponent').hide();
@@ -120,13 +106,13 @@ $(function(){
 							$("#ajaxFlashMsgWrapper").attr('class', 'flash-error').show();
 						}
 						slist.fnReloadAjax("index/getDesigns/1");
-						$("#listSurveilance").hideLoading();
+						$("#listOptions").hideLoading();
 					},
 						error: function(data){
 							$("#ajaxFlashMsg").html("Error occured while deleting data");
 							$("#ajaxFlashMsgWrapper").attr('class', 'flash-error').show();
 							//console.log("error occured while posting data" + data);
-							$("#listSurveilance").hideLoading();
+							$("#listOptions").hideLoading();
 						},
 							dataType: "text"
 				});
@@ -138,14 +124,12 @@ $(function(){
 }
 	</script>
 
-<div id="listSurveilance" width="100%">
+<div id="listOptions" width="100%">
 	
-	<table id="surveillanceList" width="100%" border="0" cellspacing="0" cellpadding="0">
+	<table id="optionsList" width="100%" border="0" cellspacing="0" cellpadding="0">
 		<thead>
 		<tr>
 			<th title = "Name">Name</th>
-			<th title = "Descripton">Descripton</th>
-			<th title = "Goal">Goal</th>
 			<th title = "Edit">Edit</th>
 			<th title = "Delete">Delete</th>
 		</tr>
@@ -154,9 +138,10 @@ $(function(){
 		</tbody>
 	</table>
 </div>
-<div id="newDesignDialog" style="display:none" >
-	<div id="manageDashProcess" class="loading" style="display:none;">
-			<p><?php echo Yii::t("translation", "Processing...")?></p>
-	</div>
-	<div id="msgNewDesign"></div>
+<div class="row">
+<?php echo CHtml::Button(Yii::t("translation", 'Add Option'), array(
+		'id' => 'load',
+		'submit' => array('options/addOption'),
+		'type' => 'submit'
+)); ?>
 </div>

@@ -1300,7 +1300,7 @@ div.buttonWrapLeft {
 }
 .operations {
     background-color: #cccccc;
-    width: 200px;
+    width: 90%;
     padding-bottom: 1em !important;
 }
 .operations li {
@@ -1308,6 +1308,7 @@ div.buttonWrapLeft {
     left: 1.15em;
     padding: 0.2em 1em;
     margin-top: 0.5em;
+    width: 60%;
 }
 .operations li a {
     text-decoration: none;
