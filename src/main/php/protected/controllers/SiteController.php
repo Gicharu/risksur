@@ -647,4 +647,18 @@ class SiteController extends Controller {
 		}
 		
 	}
+
+	/**
+	 * actionRegisterUser 
+	 * 
+	 * @access public
+	 * @return void
+	 */
+	public function actionRegisterUser() {
+		Yii::log("actionRegisterUser called", "trace", self::LOG_CAT);
+		$model = new RegisterForm;
+		$this->render('register', array(
+			'model' => $model
+		));
+	}
 }
