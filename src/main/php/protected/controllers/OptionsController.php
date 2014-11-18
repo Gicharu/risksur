@@ -172,7 +172,7 @@ class OptionsController extends Controller {
 		// Fetch all options and send them to the view to be displayed in the dropdown
 		$fetchOptions = Yii::app()->db->createCommand()
 			->select('sfd.subFormId, sfd.label')
-			->from('surformdetails sfd')
+			->from('surFormDetails sfd')
 			->where('sfd.inputType ="select"')
 			->queryAll();
 
