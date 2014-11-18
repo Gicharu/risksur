@@ -29,23 +29,6 @@
 				),
 			);
 		}
-		public function init() {
-			// Setup Design controller side menus
-			if (empty(Yii::app()->session['surDesign'])) {	
-				$this->menu = array(
-					array('label' => Yii::t("translation", "New Surveillance Design"), 'url' => array('createDesign')),
-					array('label' => Yii::t("translation", "List Existing Designs"), 'url' => array('index')),
-				);
-			} else {
-				$this->menu = array(
-					array('label' => Yii::t("translation", "New Surveillance Design"), 'url' => array('createDesign')),
-					array('label' => Yii::t("translation", "List Existing Designs"), 'url' => array('index')),
-					array('label' => Yii::t("translation", "Add Component"), 'url' => array('addComponent')),
-					array('label' => Yii::t("translation", "List Components"), 'url' => array('listComponents')),
-					//array('label'=>'Manage SurFormDetails', 'url'=>array('admin')),
-				);
-			}
-		}
 
 		/**
 		 * actionIndex
