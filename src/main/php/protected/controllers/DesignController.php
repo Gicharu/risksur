@@ -12,6 +12,8 @@
 	 */
 	class DesignController extends Controller {
 		const LOG_CAT = "ctrl.DesignController";
+		//Use layout 
+		public $layout = '//layouts/column2';
 
 		/**
 		 * filters

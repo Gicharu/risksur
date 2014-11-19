@@ -1,5 +1,9 @@
-	<script type="text/javascript">
+<?php
+$this->menu = array(array('label' => 'Create Goal', 'url' => array('admin/addGoal')),);
+?>
+<script type="text/javascript">
 $(function(){
+	$("#bd").attr('style', '');
 	clist = $("<?php echo '#listGoals'; ?>").dataTable({
 		"sDom": '<"H"rlTf>t<"F"ip>',
 		"oTableTools": {
@@ -124,14 +128,6 @@ $(function(){
 	});
 }
 	</script>
-
-		<?php echo CHtml::htmlButton(Yii::t("translation", "Create Goal"), array(
-			'id' => 'newGoal',
-			'submit' => array(
-				'admin/addGoal'
-			),
-			'type' => 'button'
-		)); ?>
 <div id="goalList" width="100%">
 	
 	<table id="listGoals" width="100%" border="0" cellspacing="0" cellpadding="0">

@@ -321,74 +321,7 @@ if ($flashMessages) {
 	<span id="ajaxFlashMsg"></span><input id = "closeButtonAjax" class="ui-icon ui-icon-closethick" type="button" value="close" />
 </div>
 <!-- End Flash Message Area -->
-	<?php
-		// only show menu for Design controller actions
-		if (Yii::app()->controller->id == 'design') {
-	?>
-	<div id="leftSide" style="width:20%; float:left">
-		<div id="designButtons">
-		<?php echo CHtml::htmlButton(Yii::t("translation", "New Surveillance Design"), array(
-			'id' => 'newDesign',
-			//'onclick' => '$("#newDesignDialog").dialog("open"); $("#goalId").val($("#goalId option:first").val()); $("#goalId").trigger("change");',
-			'submit' => array(
-				'design/createDesign'
-			),
-			'type' => 'button'
-		)); ?>
-		<?php echo CHtml::htmlButton(Yii::t("translation", "List Existing Designs"), array(
-			'id' => 'showDesigns',
-			'submit' => array(
-				'design/index'
-			),
-			'type' => 'button'
-		)); ?>
-		<?php
-			if (!empty(Yii::app()->session['surDesign'])) {	
-		?>
-		<?php echo CHtml::htmlButton(Yii::t("translation", "Add Component"), array(
-			'id' => 'addComponent',
-			'submit' => array(
-				'design/addComponent'
-			),
-			'type' => 'button'
-		)); ?>
-		<?php echo CHtml::htmlButton(Yii::t("translation", "List Components"), array(
-			'id' => 'showComponents',
-			'submit' => array(
-				'design/listComponents'
-			),
-			'type' => 'button'
-		)); ?>
-		<?php
-			}
-		?>
-		</div>
-	<?php
-		}
-	?>
-	</div>
-	<div id="bd" style="width:80%;float:right;">
-	<div id="componentMenuWrapper" style="float:right;">
-	</div>
-<!--<form>
-  <fieldset>
-    <legend>Favorite jQuery Project</legend>
-    <div id="radio">
-      <input type="radio" id="sizzle" name="project">
-      <label for="sizzle">Sizzle</label>
- 
-      <input type="radio" id="qunit" name="project">
-      <label for="qunit">QUnit</label>
- 
-      <input type="radio" id="color" name="project">
-      <label for="color">Color</label>
-    </div>
-  </fieldset>
-  </form> -->
- 
-<script>
-$("#goalMenu").buttonset();
-</script>
+	<div id="bd" >
 	<?php echo $content; ?>
 	</div>
 
