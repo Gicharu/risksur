@@ -657,6 +657,19 @@ class SiteController extends Controller {
 	public function actionRegisterUser() {
 		Yii::log("actionRegisterUser called", "trace", self::LOG_CAT);
 		$model = new RegisterForm;
+		if (isset($_POST['RegisterForm'])) {
+			$model->attributes = $_POST['RegisterForm'];
+			$model->password = md5($_POST['RegisterForm']['password']);
+			if ($model->validate()) {
+				$model->save();
+				Yii::app()->user->setFlash('success', "User Created Successfully");
+				$this->redirect( array( 'site/login' ) );
+				return;
+			} else {
+				echo CActiveForm::validate($model);
+				Yii::app()->end();
+			}
+		}
 		$this->render('register', array(
 			'model' => $model
 		));

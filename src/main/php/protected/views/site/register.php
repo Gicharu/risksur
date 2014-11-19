@@ -19,30 +19,35 @@ $this->pageTitle = Yii::app()->name . Yii::t("translation", " - Register New Use
 //remove the trailing asteriks
 CHtml::$afterRequiredLabel = '';
 ?>
+
 <div id="bd">
 	<div class="form">
 		<?php $form = $this->beginWidget('CActiveForm', array(
 			'id' => 'login-form',
-			'enableClientValidation' => false,
+			'enableClientValidation' => true,
 			'clientOptions' => array(
 				'validateOnSubmit' => true,
 			),
 		)); ?>
+<?php 
+	echo $form->errorSummary(array(
+	$model), Yii::app()->params['headerErrorSummary'], Yii::app()->params['footerErrorSummary']); 
+?>
 		<div id="j_idt12" class="ui-messages ui-widget">
 			<ul id="formLogin">
 				<li>
 					<?php
-						echo $form->labelEx($model, 'username', array(
-						'id' => 'label-username',
-						'inputID' => 'label-username'
+						echo $form->labelEx($model, 'userName', array(
+						'id' => 'label-userName',
+						'inputID' => 'label-userName'
 						));
-						echo $form->textField($model, 'username');
+						echo $form->textField($model, 'userName');
 					?>
 				</li>
 				<li>
 					<?php 
-						if(strpos($form->error($model, 'username'), "Username cannot be blank.")) {
-							echo "<b><font color='red'>" . $form->error($model, 'username') . "</font></b>"; 
+						if(strpos($form->error($model, 'userName'), "Username cannot be blank.")) {
+							echo "<b><font color='red'>" . $form->error($model, 'userName') . "</font></b>"; 
 						}
 					?>
 				</li>
@@ -74,7 +79,7 @@ CHtml::$afterRequiredLabel = '';
 				<li>
 					<?php 
 						if(strpos($form->error($model, 'password'), "Password cannot be blank.")) {
-									echo "<b><font color='red'>" . $form->error($model, 'password') . "</font></b>"; 
+							echo "<b><font color='red'>" . $form->error($model, 'password') . "</font></b>"; 
 						}
 					?>
 				</li>
@@ -99,7 +104,7 @@ CHtml::$afterRequiredLabel = '';
 		<div class="row">
 		<?php echo CHtml::Button(Yii::t("translation", "Register"), array(
 				'id' => 'register',
-				'onclick' => CController::createUrl('site/registerUser'),
+				// 'onclick' => CController::createUrl('site/registerUser'),
 				'type' => 'submit'
 		)); ?>
 		</div>

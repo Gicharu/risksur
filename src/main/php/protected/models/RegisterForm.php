@@ -2,7 +2,7 @@
 /**
  * RegisterForm 
  * 
- * @uses CFormModel
+ * @uses CActiveRecord
  * @package 
  * @version $id$
  * @copyright Tracetracker
@@ -10,14 +10,45 @@
  * @license Tracetracker {@link http://www.tracetracker.com}
  * @SuppressWarnings checkUnusedVariables
  */
-class RegisterForm extends CFormModel {
-	public $username;
+class RegisterForm extends CActiveRecord {
+	public $userName;
 	public $email;
 	public $password;
 	public $confirmPassword;
+
+	/**
+	 * model 
+	 * 
+	 * @param mixed $className 
+	 * @static
+	 * @access public
+	 * @return void
+	 */
+	public static function model($className = __CLASS__) {
+		return parent::model($className);
+	}
+	/**
+	 * tableName 
+	 * 
+	 * @access public
+	 * @return void
+	 */
+	public function tableName() {
+		return 'users';
+	}
+
+	/**
+	 * primaryKey 
+	 * 
+	 * @access public
+	 * @return void
+	 */
+	public function primaryKey() {
+		return 'userId';
+	}
 	/**
 	 * Declares the validation rules.
-	 * The rules state that username and password are required,
+	 * The rules state that userName and password are required,
 	 * and password needs to be authenticated.
 	 */
 	/**
@@ -28,9 +59,9 @@ class RegisterForm extends CFormModel {
 	 */
 	public function rules() {
 		return array(
-			// username and password are required
+			// userName and password are required
 			array(
-				'username, email, password, confirmPassword',
+				'userName, email, password, confirmPassword',
 				'required'
 			),
 		);
@@ -43,7 +74,7 @@ class RegisterForm extends CFormModel {
 	public function attributeLabels() {
 		return array(
 			'email' => Yii::t("translation", "Email"),
-			'username' => Yii::t("translation", "Username"),
+			'userName' => Yii::t("translation", "Username"),
 			'password' => Yii::t("translation", "Password"),			
 			'confirmPassword' => Yii::t("translation", "Re-Type Password"),			
 		);
