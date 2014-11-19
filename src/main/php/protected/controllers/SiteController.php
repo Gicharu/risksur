@@ -279,7 +279,8 @@ class SiteController extends Controller {
 			}
 			$toMailName = $users->userName;
 			$email = $users->email;
-			$resetEncrypt = base64_encode($email . ",resetTrue");
+			// construct data and set expiry to 24 hrs
+			$resetEncrypt = base64_encode($email . ",resetTrue,". (strtotime(date("H:i:s")) + 86400));
 			$passwordUrl = "http://" . $_SERVER["HTTP_HOST"] . Yii::app()->request->baseUrl . "/index.php/site/changepassword?data=$resetEncrypt" . 
 				"&redirect_uri=" . $cancelLink;
 			$mail = new TTMailer();
@@ -347,6 +348,14 @@ class SiteController extends Controller {
 		$resetParams = $_GET['data'];
 		$data = base64_decode($resetParams);
 		$dataValues = explode(",", $data);
+		//check if 24 hours has elapsed
+		if (strtotime(date("H:i:s")) > $dataValues[2]) {
+			$this->redirect(array(
+				'site/login?LinkerrorMsg=true'
+			));
+			Yii::app()->user->setFlash('error', Yii::t("translation", "Password reset link has expired"));
+			return;
+		}
 		if(!empty($dataValues[0])) {
 			$model->email = $dataValues[0];
 		}
