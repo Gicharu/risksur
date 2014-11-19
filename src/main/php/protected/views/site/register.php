@@ -1,115 +1,43 @@
-<?php
-/*USE http_negotiate_language TO GET THE USER'S LOCALE AND USE IT FOR THE APP*/
-$langs = array(
-		'en',
-		'en-us',
-		'en-gb',
-		'bs',
-		'bs_BA',
-);
-
-if (function_exists('http_negotiate_language')) {
-	$locale = http_negotiate_language($langs, $result);
-} else {
-	$locale = http\Env::negotiateLanguage($langs, $result);
-	$locale = substr($locale, 0, 2);
-}
-Yii::app()->setLanguage($locale);
-$this->pageTitle = Yii::app()->name . Yii::t("translation", " - Register New User");
-//remove the trailing asteriks
-CHtml::$afterRequiredLabel = '';
+<div class="form">
+<?php $form = $this->beginWidget('CActiveForm', array(
+	'enableClientValidation' => true,
+));
 ?>
-
-<div id="bd">
-	<div class="form">
-		<?php $form = $this->beginWidget('CActiveForm', array(
-			'id' => 'login-form',
-			'enableClientValidation' => true,
-			'clientOptions' => array(
-				'validateOnSubmit' => true,
-			),
-		)); ?>
-<?php 
-	echo $form->errorSummary(array(
-	$model), Yii::app()->params['headerErrorSummary'], Yii::app()->params['footerErrorSummary']); 
-?>
-		<div id="j_idt12" class="ui-messages ui-widget">
-			<ul id="formLogin">
-				<li>
-					<?php
-						echo $form->labelEx($model, 'userName', array(
-						'id' => 'label-userName',
-						'inputID' => 'label-userName'
-						));
-						echo $form->textField($model, 'userName');
-					?>
-				</li>
-				<li>
-					<?php 
-						if(strpos($form->error($model, 'userName'), "Username cannot be blank.")) {
-							echo "<b><font color='red'>" . $form->error($model, 'userName') . "</font></b>"; 
-						}
-					?>
-				</li>
-				<li>
-					<?php
-						echo $form->labelEx($model, 'email', array(
-						'id' => 'label-email',
-						'inputID' => 'label-email'
-						));
-						echo $form->textField($model, 'email');
-					?>
-				</li>
-				<li>
-					<?php 
-						if(strpos($form->error($model, 'email'), "Email cannot be blank.")) {
-							echo "<b><font color='red'>" . $form->error($model, 'email') . "</font></b>"; 
-						}
-					?>
-				</li>
-				<li>
-					<?php
-						echo $form->labelEx($model, 'password', array(
-							'id' => 'label-password',
-							'inputID' => 'label-password'
-						));
-						echo $form->passwordField($model, 'password');
-					?>
-				</li>
-				<li>
-					<?php 
-						if(strpos($form->error($model, 'password'), "Password cannot be blank.")) {
-							echo "<b><font color='red'>" . $form->error($model, 'password') . "</font></b>"; 
-						}
-					?>
-				</li>
-				<li>
-					<?php
-						echo $form->labelEx($model, 'confirmPassword', array(
-							'id' => 'label-confirmPassword',
-							'inputID' => 'label-confirmPassword'
-						));
-						echo $form->passwordField($model, 'confirmPassword');
-					?>
-				</li>
-				<li>
-					<?php 
-						if(strpos($form->error($model, 'confirmPassword'), "Confirm Password cannot be blank.")) {
-							echo "<b><font color='red'>" . $form->error($model, 'confirmPassword') . "</font></b>"; 
-						}
-					?>
-				</li>
-			</ul>
-		</div>
-		<div class="row">
-		<?php echo CHtml::Button(Yii::t("translation", "Register"), array(
-				'id' => 'register',
-				// 'onclick' => CController::createUrl('site/registerUser'),
-				'type' => 'submit'
-		)); ?>
-		</div>
-
-
-		<?php $this->endWidget(); ?>
+<?php echo $form->errorSummary(array(
+	$model
+), Yii::app()->params['headerErrorSummary'], Yii::app()->params['footerErrorSummary']); ?>
+	<div class="row">
+		<?php echo $form->labelEx($model, 'userName'); ?>
+		<?php echo $form->textField($model, 'userName'); ?>
+		<?php echo $form->error($model, 'userName'); ?>
 	</div>
+	<div class="row">
+		<?php echo $form->labelEx($model, 'email'); ?>
+		<?php echo $form->textField($model, 'email'); ?>
+		<?php echo $form->error($model, 'email'); ?>
+	</div>
+	<div class="row" style="width:17%">
+		<?php echo $form->labelEx($model, 'password'); ?>
+		<?php
+		$this->widget('ext.EStrongPassword.EStrongPassword', array(
+			'form' => $form,
+			'model' => $model,
+			'attribute' => 'password'
+		));
+		echo $form->passwordField($model, 'password', array('autocomplete' => 'off')); ?>
+		<?php echo $form->error($model, 'password'); ?>
+	</div>
+	<div class="row">
+		<?php echo $form->labelEx($model, 'confirmPassword'); ?>
+		<?php echo $form->passwordField($model, 'confirmPassword', array('autocomplete' => 'off')); ?>
+		<?php echo $form->error($model, 'confirmPassword'); ?>
+	</div>
+	<div class="row buttons">
+		<?php echo CHtml::htmlButton('Register', array(
+			'id' => 'register',
+			'onclick' => CController::createUrl('site/registerUser'),
+			'type' => 'submit'
+		)); ?>
+	</div>
+<?php $this->endWidget(); ?>
 </div>

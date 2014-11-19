@@ -20,7 +20,10 @@ class SiteController extends Controller {
 	 */
 	public $loggedName;
 
-
+	/**
+	 * Declares the salt.
+	 */
+	private $salt = "#fxdHJ&^%DS";
 
 	/**
 	 * init 
@@ -107,6 +110,20 @@ class SiteController extends Controller {
 		$this->render('index', array(
 			//'model' => $model
 		));
+	}
+
+	/**
+	 * performAjaxValidation
+	 *
+	 * @param mixed $model
+	 * @access protected
+	 * @return void
+	 */
+	protected function performAjaxValidation($model) {
+		if (isset($_POST['ajax']) && $_POST['ajax'] === 'usersForm') {
+			echo CActiveForm::validate($model);
+			Yii::app()->end();
+		}
 	}
 	/**
 	 * actionContact 
@@ -656,17 +673,65 @@ class SiteController extends Controller {
 	 */
 	public function actionRegisterUser() {
 		Yii::log("actionRegisterUser called", "trace", self::LOG_CAT);
-		$model = new RegisterForm;
-		if (isset($_POST['RegisterForm'])) {
+		$model = new RegisterForm; // Form to add users
+		$rolesModel = new Roles; // Form to add roles to users_has_roles table
+		if (isset($_POST['RegisterForm'])) { // Check if there is a post
 			$model->attributes = $_POST['RegisterForm'];
-			$model->password = md5($_POST['RegisterForm']['password']);
-			if ($model->validate()) {
-				$model->save();
-				Yii::app()->user->setFlash('success', "User Created Successfully");
-				$this->redirect( array( 'site/login' ) );
+			if ($model->userName == "" || $model->email == "" || $model->password == "") { // Check for blanks
+				Yii::app()->user->setFlash('error', 'All fields must be filled in!');
+				$this->render('register', array(
+					'model' => $model
+				));
 				return;
+			}
+			if (!filter_var($model->email, FILTER_VALIDATE_EMAIL)) { // Check fo rinvalid email address
+				Yii::app()->user->setFlash('error', 'Enter a valid email address!');
+				$this->render('register', array(
+					'model' => $model
+				));
+				return;
+			}
+			if ($model->confirmPassword !== $model->password) { // Check for password mismatch
+				Yii::app()->user->setFlash('error', 'Password mismatch! Re-type the password');
+				$this->render('register', array(
+					'model' => $model
+				));
+				return;
+			}
+			if ($model->validate()) {
+			$model->password = md5($this->salt . $_POST['RegisterForm']['password']); // MD5 and Salt the password b4 saving
+				try {
+					if ($model->save()) // Save to users table
+						$rolesModel->users_id = $model->userId; // Get the last inserted userId in users table
+						$rolesModel->roles_id = "3"; // Insert roleId 3 i.e. normal user as defined in roles table
+						$rolesModel->save(); // Save to users_has_roles table
+						$mail = new TTMailer();
+						$originUrl = Yii::app()->createAbsoluteUrl("site/login");
+						$subject = 'User Registration';
+						$altBody = 'To view the message, please use an HTML compatible email viewer!';
+						$message = 'Dear ' . $model->userName . ',<br><br>';
+						$message .= 'You have successfully registered at ' . $originUrl . '. Below are your login details:<br><br>';
+						$message .= '<b>Username : ' . $model->userName . '</b><br>';
+						$message .= '<b>Email : </b>' . $model->email . '<br>';
+						$message .= '<b>Password : ' . $_POST['RegisterForm']['password'] . '</b><br><br>';
+						$message .= 'You can now login using the username and password and enjoy the experience of RiskSur.';
+						$toAddress = $model->email;
+						$toName = $model->userName;
+
+						/*IF EMAIL IS NOT SENT THEN LOG THE ERROR*/
+						if (!$mail->ttSendMail($subject, $altBody, $message, $toAddress, $toName)) {
+							Yii::log("Error in sending user registration email to " . $model->email, "error", self::LOG_CAT);
+							return;
+						}
+						Yii::app()->user->setFlash('success', "User Created Successfully");
+						$this->redirect( array( 'site/login' ) );
+						return;
+					}
+				catch(CDbException $e) {
+			        Yii::app()->user->setFlash('error', "Username already exists!");
+				}
 			} else {
-				echo CActiveForm::validate($model);
+				// echo CActiveForm::validate($model);
 				Yii::app()->end();
 			}
 		}
