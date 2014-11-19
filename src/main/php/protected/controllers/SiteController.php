@@ -266,74 +266,9 @@ class SiteController extends Controller {
 			if ($model->validate()) {
 				$email = $model->email;
 			}
-			$encryption = Yii::app()->tixencryption;
-			$ldapConnection = $this->ldap->ldapConnect();
-			$defaultDn = Yii::app()->params->ldap['dn'];
-			$ldapOu = Yii::app()->params->ldap['ou'];
-			$individualOu = explode(",", $ldapOu); //Get all OUs from the ini file
-			//$gnsEnvironment = $configuration->getConfigSettings()->gnsEnvironment;
-			//search in LDAP for email captured from variable $email.
-			//$newLdpaOu = explode(",", $ldapOu);
-			//$newDn = array();
-			//foreach ($newLdpaOu as $key => $value) {
-				//$newDn[] = "ou=" . $value . " , " . $defaultDn;
-			//}
-
-			//$ou = "$ldapOu";
-			$filter = "(mail=$email)";
-			//$filter ="(cn=*)";
-			//$attr = array("*");
-			$filterOus = "(|";
-			foreach ($individualOu as $ouParams) {
-				$filterOus .= "(ou=$ouParams)";
-			}
-			$filterOus .= ")";
-			$filter = "(&" . $filterOus . $filter . ")";
-			$attribute = array(
-				"*"
-			);
-
-				$start = round(microtime(true) * 1000);
-				$queryLdap = $this->ldap->ldapSearch($ldapConnection, $defaultDn, $filter, $attribute);
-				$stop = round(microtime(true) * 1000);
-				$msTotal = $stop - $start;
-
-			if ($queryLdap['count'] == 0) {
-				Yii::app()->user->setFlash('success', Yii::t("translation", "A reset password link has been sent to your email"));
-				Yii::log("Spent $msTotal ms to fail sending password reset mail to user $filter", "info", self::LOG_CAT);
-				$this->redirect(array(
-					'site/login'
-				));
-				return;
-			} 
-			$info = array();
-			if (is_string($queryLdap) && substr($queryLdap, 0, 5) == "Error") {
-				$errorMessage = "Error No:" . ldap_errno($ldapConnection) . "Error:" . ldap_error($ldapConnection);
-				Yii::log($errorMessage, "warning", self::LOG_CAT);
-				Yii::app()->user->setFlash('error', Yii::t("translation", "Unable to retrieve information (") . self::LDAPERROR . 
-					ldap_errno($ldapConnection) . Yii::t("translation", "), please try again or contact your administrator"));
-				$this->redirect(array(
-					'site/login'
-				));
-				return;
-			} 
-			$info = $queryLdap;
-
-			$groups = array();
-			
-			foreach ($info as $datadrop) {
-				if (is_array($datadrop)) {
-					$groups['mail'] = $datadrop['mail'][0];
-					$groups['cn'] = $datadrop['cn'][0];
-					$groups["organization"] = $datadrop['o'][0];
-					$groups['uid'] = $datadrop['uid'][0];
-					$groups['givenname'] = $datadrop['givenname'][0];
-					$groups['ou'] = $datadrop['ou'][0];
-				}
-			}
-
+			$users = Users::model()->findByAttributes( array( 'email' => $email ) );
 			//if message was sent issue appropriate flash maeesage and log
-			if (empty($groups['uid']) && empty($groups['mail'])) {
+			if (empty($users)) {
 				Yii::log("No uid or mail attribute for $email", "error", self::LOG_CAT);
 				Yii::app()->user->setFlash('error', Yii::t("translation", "Unable to fetch information, please try again or contact your administrator if " . 
 					"this problem persists"));
@@ -342,23 +277,20 @@ class SiteController extends Controller {
 				));
 				return;
 			}
-			$toMailName = $groups['givenname'];
-			$email = $groups['mail'];
-			// construct data encryption and set expiry to 24 hrs
-			$resetEncrypt = urlencode($encryption->encrypt($groups['uid'] . "," . $email . ",resetTrue", 86400, self::FORGOT_SALT));
+			$toMailName = $users->userName;
+			$email = $users->email;
+			$resetEncrypt = base64_encode($email . ",resetTrue");
 			$passwordUrl = "http://" . $_SERVER["HTTP_HOST"] . Yii::app()->request->baseUrl . "/index.php/site/changepassword?data=$resetEncrypt" . 
 				"&redirect_uri=" . $cancelLink;
 			$mail = new TTMailer();
-			$subject = Yii::t("translation", "GTNet user password request");
+			$subject = Yii::t("translation", "User password request");
 			$altBody = Yii::t("translation", "To view the message, please use an HTML compatible email viewer!");
-			$message = Yii::t('translation', 'Dear ') . $groups['givenname'] . ',<br /><br />' . 
+			$message = Yii::t('translation', 'Dear ') . $toMailName . ',<br /><br />' .
 			Yii::t('translation', 'Your password has been reset, please visit ') . '<a href="' . 
 					$passwordUrl . '">' . $passwordUrl . '</a>' . Yii::t('translation', ' to change it. ') .
 					'<p></p>' . Yii::t('translation', 'This message was automatically generated.') . '<br />' . 
 					Yii::t('translation', ' If you think it was sent incorrectly, ') . 
-					Yii::t('translation', 'please contact your GTNet administrator');
-			//$mail->SMTPDebug = 1;
-			//$mail->Send();
+					Yii::t('translation', 'please contact your administrator');
 			//if mail is not sent successfully issue appropriate flash message
 			if (!$mail->ttSendMail($subject, $altBody, $message, $email, $toMailName)) {
 				if(!Yii::app()->user->hasFlash('error')) {
@@ -372,30 +304,6 @@ class SiteController extends Controller {
 				return;
 				
 			} 
-			// update the passwordChanged param on ldap
-			// NOTE! We do not need this see STORY-794
-			// $start = round(microtime(true) * 1000);
-			// $authorize = $this->ldap->ldapBindAdmin($ldapConnection);
-			// $stop = round(microtime(true) * 1000);
-			// $msTotal = $start - $stop;
-			// if (!$authorize) {
-			// 	Yii::log("Spent $msTotal ms to fail to authorize user $userLogged", "info", self::LOG_CAT);
-			// 	$errorMessage = "Error No:" . ldap_errno($ldapConnection) . "Error:" . ldap_error($ldapConnection);
-			// 	Yii::log($errorMessage, "warning", self::LOG_CAT);
-			// }
-			// $data = array();
-			// $data["passwordChanged"] = "TRUE";
-			// $cn = $this->ldap->ldapEscape($groups['uid']);
-			// $start = round(microtime(TRUE) * 1000);
-			// $ou = $groups['ou'];
-			// $dn = "ou=$ou , $defaultDn";
-			// $updateData = $this->ldap->ldapModify($ldapConnection, "uid= $cn, $dn", $data);
-			// $stop = round(microtime(TRUE) * 1000);
-			// $msTotal = $start - $stop;
-			// if (is_string($updateData) && substr($updateData, 0, 5) == "Error") {
-			// 	$errorMessage = "Failed Updating passwordChanged param. Error No:" . ldap_errno($ldapConnection) . "Error:" . ldap_error($ldapConnection);
-			// 	Yii::log($errorMessage, "warning", self::LOG_CAT);
-			// }
 			Yii::log("Reset password link successfully sent to $email", "trace", self::LOG_CAT);
 			Yii::app()->user->setFlash('success', Yii::t("translation", "A reset password link has been sent to your email"));
 			$this->redirect(array(
@@ -424,11 +332,7 @@ class SiteController extends Controller {
 		}
 		$this->layout = 'mainNoMenu';
 		$model = new ChangepasswordForm;
-		$encryption = Yii::app()->tixencryption;
 		$cancelLink = $this->createUrl('site/login');
-		$defaultDn = Yii::app()->params->ldap['dn'];
-		$ldapOu = Yii::app()->params->ldap['ou'];
-		$individualOu = explode(",", $ldapOu); //Get all OUs from the ini file
 		$localeSession = isset(Yii::app()->session['locale']) ? Yii::app()->session['locale'] : 'en';
 		Yii::app()->setLanguage($localeSession);
 		if(!empty($_GET['redirect_uri'])) {
@@ -441,183 +345,59 @@ class SiteController extends Controller {
 			return;
 		}
 		$resetParams = $_GET['data'];
-		// $passChanged = "FALSE";
-		$resetDecrypt = $encryption->decrypt($resetParams, self::FORGOT_SALT); // decrypt  and extract the data variables
-		$dataValues = explode(",", $resetDecrypt);
-		if(!empty($dataValues[1])) {
-			$model->email = $dataValues[1]; //rawurldecode($_GET['mail']);
+		$data = base64_decode($resetParams);
+		$dataValues = explode(",", $data);
+		if(!empty($dataValues[0])) {
+			$model->email = $dataValues[0];
 		}
-		if (count($dataValues) == 3 && $dataValues[2] == "resetTrue") {
-			$userName = $dataValues[0]; //$this->loggedName;
+		if ($dataValues[1] == "resetTrue") {
+			$userName = $dataValues[0];
 			Yii::app()->user->setName($userName);
-			$ldapConnection = $this->ldap->ldapConnect();//LDAP connection
-			$filter = "(uid=" . $this->ldap->ldapEscape($userName) . ")";//search for and confirm logged_names's password was oldpassword
-			$filterOus = "(|";
-			foreach ($individualOu as $ouParams) {
-				$filterOus .= "(ou=$ouParams)";
-			}
-			$filterOus .= ")";
-			$filter = "(&" . $filterOus . $filter . ")";
-			$attribute = array(
-				"givenName",
-				"mail",
-				"cn",
-				"uid",
-				"ou",
-				"passwordChanged",
-				"memberOf",
-				"o"
-			);
-			$showName = $userName;
-			$queryLdap = $this->ldap->ldapSearch($ldapConnection, $defaultDn, $filter, $attribute);
-			if ($queryLdap['count'] == 1) {
-				if (empty($queryLdap[0]['ou'][0]) || !isset($queryLdap[0]['ou'][0])) {
-					Yii::log("No ou parameter found for user: " . $this->username, "error", self::LOG_CAT);
-					Yii::app()->user->setFlash('error', Yii::t("translation", "Error in user properties, Please contact the administrator."));
-					return;
-				}
-				$ou = $queryLdap[0]['ou'][0];
-				$showName = isset($queryLdap[0]['givenname'][0]) ? $queryLdap[0]['givenname'][0] : $userName;
-				if (is_string($queryLdap) && substr($queryLdap, 0, 5) == "Error") {
-					Yii::log("User not found in LDAP", "warn", self::LOG_CAT);
-					Yii::app()->user->setFlash('error', Yii::t("translation", "Unable to store data (") . self::LDAPERROR . ldap_errno($ldapConnection) . 
-						Yii::t("translation", "), please contact your administrator if this problem persists"));
-					$this->redirect(array(
-						'site/login'
-					));
-					return;
-				}
-				// if($queryLdap[0]['passwordchanged'][0] == "TRUE") { // check if the passwordChanged param is set
-				// 	$passChanged = "TRUE";
-				// }
-			}
-		}
-		// if the link has expired or not valid give error message to user
-		if ($encryption->isExpired() || !isset($dataValues[0]) || !isset($dataValues[2]) || $dataValues[2] != "resetTrue") { // || $passChanged == "FALSE") {
-			$this->render('changepassword', array(
-				'model' => $model,
-				'cancelLink' => $cancelLink,
-				'expiredLink' => true
-			));
-			return;
 		}
 		if (isset($_POST['ChangepasswordForm'])) {
 			$model->attributes = $_POST['ChangepasswordForm'];
 			Yii::app()->user->setName($userName);
 			if ($model->validate()) {
-				$verifyPassword = $this->configuration->generate($userName, $model->verifyPassword);
-				$userLogged = $queryLdap[0]['uid'][0]; //compare the password to be changed and the password in LDAP
-				$email = $queryLdap[0]['mail'][0]; //$logged_in_password = $queryLdap[0]['userpassword'][0];
-				if ($this->ldap->ldapEscape($userName) == $userLogged || $userName == $userLogged) {
-					$start = round(microtime(true) * 1000);
-					$authorize = $this->ldap->ldapBindAdmin($ldapConnection);
-					$stop = round(microtime(true) * 1000);
-					$msTotal = $start - $stop;
-					if (!$authorize) {
-						Yii::log("Spent $msTotal ms to fail to authorize user $userLogged", "info", self::LOG_CAT);
-						$errorMessage = "Error No:" . ldap_errno($ldapConnection) . "Error:" . ldap_error($ldapConnection);
-						Yii::log($errorMessage, "warning", self::LOG_CAT);
-					}
-					//write the new (verified password)to LDAP for user.
-					$data = array();
-					$data["userPassword"] = $verifyPassword;
-					$data["passwordChanged"] = "FALSE";
-					$data["passwordTimestamp"] = time();
-					$cn = $this->ldap->ldapEscape($userName);
-					$start = round(microtime(TRUE) * 1000);
-					$dn = "ou=$ou , $defaultDn";
-					$updateData = $this->ldap->ldapModify($ldapConnection, "uid= $cn, $dn", $data);
-					$stop = round(microtime(TRUE) * 1000);
-					$msTotal = $start - $stop;
-					if ($updateData) {
-						Yii::log("Spent $msTotal ms to change password for $userLogged", "info", self::LOG_CAT);
-						$loginTime = date('c');
-						$loginTime = new DateTime($loginTime);
-						Yii::app()->session->add('loginTime', $loginTime);
-						foreach ($queryLdap[0]['memberof'] as $key => $groups) {
-							if (is_numeric($key)) {
-								$group = explode(",", $groups);
-								$userGroups[] = str_replace("cn=", "", $group[0]);
-							}
-						}
-						$displayName = empty($queryLdap[0]["displayname"][0]) ? $queryLdap[0]["uid"][0] : $queryLdap[0]["displayname"][0];
-						Yii::app()->session->add('displayName', $displayName);
-						Yii::app()->session->add('userGroups', $userGroups);
-						Yii::app()->session->add('mail', $queryLdap[0]['mail'][0]);
-						Yii::app()->session->add('organization', $queryLdap[0]["o"][0]);
-						$gnsEnvironment = Yii::app()->params->gns['environment'];
-						// get users organization name
-						$organizations = $this->dashboard->getOrg( 'organization' );
-						Yii::app()->session->add('organizationName', $organizations[Yii::app()->session['organization']]);
-						Yii::app()->user->setFlash('success', Yii::t("translation", "Password changed succesfully"));
-						unset(Yii::app()->session['changePassword']);
-						if(!empty(Yii::app()->params->constants['userActivityNode'])) {
-							$userActivityQuery = $this->mds->mdsQueryString("vocabularyName=" . Yii::app()->params->gns['nodeVocabulary'] . 
-								'&EQATTR_NID=' . Yii::app()->params->constants['userActivityNode'] . "&EQATTR_ENV=$gnsEnvironment");
-							$rsUserActivity = $this->mds->elementListMdsQuery($userActivityQuery);
-							$recordPasswordChange = false;
-							if(!empty($rsUserActivity->error)) {
-								Yii::log('Error retrieving node details for ' . Yii::app()->params->constants['userActivityNode'] . ' : ' . 
-									$rsUserActivity->error, 'error', self::LOG_CAT);
-							} else {
-								$userActivityUrl = preg_replace('/\/tix\/.*/', '/tix', $rsUserActivity->result[0]['AA']);
-								Yii::app()->session->add('userActivityNodeUrl', $userActivityUrl);
-								$loginTime = date('c');
-								$loginTime = new DateTime($loginTime);
-								Yii::app()->session->add('loginTime', $loginTime);
-								$recordPasswordChange = $this->dashboard->saveUserActivity('passwordChange');
-							}
-							if(!$recordPasswordChange) {
-								Yii::log('There was an error when trying to upload user activity info', 'warning', self::LOG_CAT);
-							}
-						} else {
-							Yii::log('The node required to save user activity is not configured in story_custom.ini', 'warning', self::LOG_CAT);
-						}
-						// inform the user by email that thier password was changed
-						$mail = new TTMailer();
-						$subject = Yii::t('translation', 'GTNet user password updated');
-						$altBody = Yii::t('translation', 'To view the message, please use an HTML compatible email viewer!');
-						$message = Yii::t('translation', 'Dear ') . $showName . ',<br /><br />' . 
-						Yii::t('translation', 'Your password has been updated, ') . '<br/>' . 
-								Yii::t('translation', 'your login id is: ') . $userName .
-								'<p></p>' . Yii::t('translation', 'This message was automatically generated.') . '<br />' . 
-								Yii::t('translation', ' If you think it was sent incorrectly, ') . 
-								Yii::t('translation', 'or you have not changed your password, ') .
-								Yii::t('translation', 'please contact your GTNet administrator');
-						$toAddress = $email;
-						//if mail is not sent successfully add a log message 
-						if (!$mail->ttSendMail($subject, $altBody, $message, $toAddress, $showName)) {
-							$errorMessage = "Failed to send an informational email to the user $userName";
-							Yii::log($errorMessage, "warning", self::LOG_CAT);
-						}
-						if (!empty($_GET['redirect_uri'])) {
-							$redirectUri = urldecode($_GET['redirect_uri']);
-							// Yii::app()->user->logout();
-							$this->redirect($redirectUri);
-							return;
-						} 
-						
-						$controllerAction = 'site/login';
-						$identity = new UserIdentity($userLogged, $verifyPassword, 1);
-						if($identity->authenticate()) {
-
-							Yii::app()->user->login($identity, Yii::app()->session->timeout);
-							$controllerAction = 'dashboard/setNode';
-						}
-						
-						$this->redirect(array(
-							$controllerAction
-						));
-						return;
-
-					} elseif (is_string($updateData) && substr($updateData, 0, 5) == "Error") {
-						$errorMessage = "Failed Updating. Error No:" . ldap_errno($ldapConnection) . "Error:" . ldap_error($ldapConnection);
-						Yii::log($errorMessage, "warning", self::LOG_CAT);
-						Yii::app()->user->setFlash('error', Yii::t("translation", "Failed to change password, please contact your administrator"));
-					}
-				} else {
-					Yii::app()->user->setFlash('error', Yii::t("translation", "Failed to change password, please contact your administrator"));
+				$password = $model->newPassword;
+				$userToUpdate = Users::model()->findByAttributes( array( 'email' => $userName ) );
+				$userToUpdate->password = $userToUpdate->hashPassword($password, $userToUpdate->salt);
+				$updateData = $userToUpdate-> saveAttributes(array('password'));
+				$displayName = $userToUpdate->userName;
+				Yii::app()->session->add('displayName', $displayName);
+				Yii::app()->user->setFlash('success', Yii::t("translation", "Password changed succesfully"));
+				unset(Yii::app()->session['changePassword']);
+				$mail = new TTMailer();
+				$subject = Yii::t('translation', 'User password updated');
+				$altBody = Yii::t('translation', 'To view the message, please use an HTML compatible email viewer!');
+				$message = Yii::t('translation', 'Dear ') . $displayName . ',<br /><br />' .
+				Yii::t('translation', 'Your password has been updated, ') . '<br/>' .
+						Yii::t('translation', 'your login id is: ') . $displayName . '<br/>' .
+						Yii::t('translation', 'your password is: ') . $password .
+						'<p></p>' . Yii::t('translation', 'This message was automatically generated.') . '<br />' .
+						Yii::t('translation', ' If you think it was sent incorrectly, ') .
+						Yii::t('translation', 'or you have not changed your password, ') .
+						Yii::t('translation', 'please contact your administrator');
+				//if mail is not sent successfully add a log message
+				if (!$mail->ttSendMail($subject, $altBody, $message, $userName, $displayName)) {
+					$errorMessage = "Failed to send an informational email to the user $userName";
+					Yii::log($errorMessage, "warning", self::LOG_CAT);
 				}
+				if (!empty($_GET['redirect_uri'])) {
+					$redirectUri = urldecode($_GET['redirect_uri']);
+					$this->redirect($redirectUri);
+					return;
+				}
+				$controllerAction = 'site/login';
+				$identity = new UserIdentity($userLogged, $verifyPassword, 1);
+				if($identity->authenticate()) {
+
+					Yii::app()->user->login($identity, Yii::app()->session->timeout);
+					$controllerAction = 'dashboard/setNode';
+				}
+				$this->redirect(array(
+					$controllerAction
+				));
+				return;
 			}
 		}
 		$this->render('changepassword', array(
