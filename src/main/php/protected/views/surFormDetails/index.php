@@ -1,9 +1,9 @@
 <?php
-    /* @var $this SurFormDetailsController */
-    $this->menu = array(
-        array('label' => 'Add Form Elements', 'url' => array('create')),
-        //array('label'=>'Manage SurFormDetails', 'url'=>array('admin')),
-    );
+	/* @var $this SurFormDetailsController */
+	$this->menu = array(
+		array('label' => 'Add Form Elements', 'url' => array('create')),
+		//array('label'=>'Manage SurFormDetails', 'url'=>array('admin')),
+	);
 ?>
 <script type="text/javascript">
 	var surFormDet;
@@ -69,13 +69,13 @@
 				{"mData": "label"},
 				{"mData": "inputType", "sWidth": "9%"},
 				{"mData": "required", "fnCreatedCell": function (nTd, sData) {
-                    var req = "Yes";
-                    if (sData != "1") {
-                        req = "No";
-                    }
-                    $(nTd).html(req);
+					var req = "Yes";
+					if (sData != "1") {
+						req = "No";
+					}
+					$(nTd).html(req);
 
-                }, "sWidth": "9%"
+				}, "sWidth": "9%"
 				},
 				{
 					"mData": null, "sDefaultContent": '<button type="button" class="bedit">Edit</button>', "bSortable": false,
