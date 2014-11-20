@@ -63,6 +63,18 @@ $(function() {
         }
     });
 
+	/*$('#copyBox').dialog({ */
+	/*autoOpen: false,*/
+	/*bgiframe: true,*/
+
+	/*modal: true,*/
+	/*resizable: true,*/
+	/*overlay: {*/
+	/*backgroundColor: '#000',*/
+	/*opacity: 0.5*/
+	/*}*/
+	/*});*/
+
 	$( "#btnAdminVerify" ).button({
 		icons: {
 			primary: "ui-icon-check"

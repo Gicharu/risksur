@@ -51,7 +51,7 @@ class ComponentHead extends CActiveRecord {
 	 */
 	public function relations() {
 		return array(
-			'compDetails' => array( self::HAS_MANY, 'ComponentDetails', 'componentDetailId' )
+			'compDetails' => array( self::HAS_MANY, 'ComponentDetails', 'componentId' )
 		);
 	}
 }
