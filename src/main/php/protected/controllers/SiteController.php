@@ -380,8 +380,7 @@ class SiteController extends Controller {
 				$altBody = Yii::t('translation', 'To view the message, please use an HTML compatible email viewer!');
 				$message = Yii::t('translation', 'Dear ') . $displayName . ',<br /><br />' .
 				Yii::t('translation', 'Your password has been updated, ') . '<br/>' .
-						Yii::t('translation', 'your login id is: ') . $displayName . '<br/>' .
-						Yii::t('translation', 'your password is: ') . $password .
+						Yii::t('translation', 'your login id is: ') . $displayName .
 						'<p></p>' . Yii::t('translation', 'This message was automatically generated.') . '<br />' .
 						Yii::t('translation', ' If you think it was sent incorrectly, ') .
 						Yii::t('translation', 'or you have not changed your password, ') .
