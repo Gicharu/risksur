@@ -40,7 +40,7 @@ class ComponentDetails extends CActiveRecord {
 	 * @return void
 	 */
 	public function primaryKey() {
-		return 'componentDetailsId';
+		return 'componentDetailId';
 	}
 
 	/**
