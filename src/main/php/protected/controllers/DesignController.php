@@ -659,13 +659,18 @@
 							)
 						) .
 						"'\">Edit</button>";
+					$duplicateButton = "<button id='duplicateComponent" . $com->componentId .
+						"' type='button' class='bcopy' onclick=\"$('#copyBox').dialog('open');" .
+						"duplicatePopup('" . $com->componentId . "', '" .
+						$com->componentName . "')\">Duplicate</button>";
 					$componentListArray[] = array(
 						'componentId' => $com->componentId,
 						'frameworkId' => $com->frameworkId,
 						'name' => $com->componentName,
 						'description' => $com->comments,
 						'editButton' => $editButton,
-						'deleteButton' => $deleteButton
+						'deleteButton' => $deleteButton,
+						'duplicateButton' => $duplicateButton,
 					);
 				}
 			}
@@ -689,7 +694,7 @@
 		 * @return void
 		 */
 		public function actionDeleteComponent() {
-			Yii::log("actionDeleteComponent DesignController called", "trace", self::LOG_CAT);
+			Yii::log("actionDeleteComponent called", "trace", self::LOG_CAT);
 			if (isset($_POST["delId"])) {
 				$record = ComponentHead::model()->findByPk($_POST['delId']);
 				if (!$record->delete()) {
@@ -699,6 +704,42 @@
 				} else {
 					echo Yii::t("translation", "The component ") . Yii::t("translation", " has been successfully deleted");
 				}
+			}
+		}
+
+		/**
+		 * actionDuplicateComponent 
+		 * 
+		 * @access public
+		 * @return void
+		 */
+		public function actionDuplicateComponent() {
+			Yii::log("actionDuplicateComponent called", "trace", self::LOG_CAT);
+			$component = new ComponentHead;
+			$componentDetails = new ComponentDetails;
+			if (isset($_POST["oldComponentId"]) && $_POST['newComponentName']) {
+				$record = ComponentHead::model()->with("compDetails")->findByPk($_POST['oldComponentId']);
+					$component->componentName =  $_POST['newComponentName'];
+					$component->frameworkId = Yii::app()->session['surDesign']['id'];
+					//save the componentHead values
+					$component->save();
+					$componentId = $component->componentId;
+					// fetch the old component details data and save as new components
+					foreach ($record->compDetails as $val) {
+						$details = $val->attributes;
+						$componentDetails->setIsNewRecord(true);
+						$componentDetails->componentDetailId = null;
+						$componentDetails->componentId = $componentId;
+						$componentDetails->subFormId = $details['subFormId'];
+						$componentDetails->value = $details['value'];
+						$componentDetails->save();
+						//echo $key . "=>" . $val ."<br>";
+						//print_r($details['subFormId']);
+					}
+					echo Yii::t("translation", "Component successfully duplicated");
+			} else {
+				Yii::log("Error duplicating component id:" . $_POST['oldComponentId'], "warning", self::LOG_CAT);
+				echo Yii::t("translation", "A problem occured when duplicating the component ");
 			}
 		}
 
