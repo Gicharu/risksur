@@ -45,7 +45,8 @@ CREATE TABLE `users` (
   `session` char(32) CHARACTER SET latin1 DEFAULT NULL,
   `ip` varchar(15) CHARACTER SET latin1 DEFAULT NULL,
   PRIMARY KEY (`userId`),
-  UNIQUE KEY `userName` (`userName`)
+  UNIQUE KEY `userName` (`userName`),
+  UNIQUE KEY `email` (`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------

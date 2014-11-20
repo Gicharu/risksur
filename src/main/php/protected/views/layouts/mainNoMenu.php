@@ -13,7 +13,7 @@
 			$baseUrl . "/css/jquery.menubar.css" => "noMedia",
 			$baseUrl . "/css/demo_table.css" => "noMedia",
 			$baseUrl . "/css/jquery-ui-1.8.21.custom.css" => "noMedia",
-			$baseUrl . "/css/storystyle.css" => "noMedia",
+			$baseUrl . "/css/risksurstyle.css" => "noMedia",
 			$baseUrl . "/css/form.css" => "noMedia",
 			$baseUrl . "/css/details.css" => "noMedia"
 		);
