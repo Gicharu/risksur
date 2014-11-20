@@ -58,7 +58,7 @@ insert  into `surFormDetails`(`subFormId`,`formId`,`inputName`,`label`,`inputTyp
 
 /*Data for the table `users` */
 
-insert  into `users`(`userId`,`userName`,`password`,`email`,`active`,`passReset`,`cookie`,`session`,`ip`) values (7,'admin','f8892166ddb74acc4a3437e7a7e9f63b','admin@me.com',1,0,NULL,NULL,NULL),(8,'user','f8892166ddb74acc4a3437e7a7e9f63b','admin@me.com',1,0,NULL,NULL,NULL);
+insert  into `users`(`userId`,`userName`,`password`,`email`,`active`,`passReset`,`cookie`,`session`,`ip`) values (7,'admin','f8892166ddb74acc4a3437e7a7e9f63b','admin@me.com',1,0,NULL,NULL,NULL),(8,'user','f8892166ddb74acc4a3437e7a7e9f63b','admin@you.com',1,0,NULL,NULL,NULL);
 
 /*Data for the table `users_has_roles` */
 
