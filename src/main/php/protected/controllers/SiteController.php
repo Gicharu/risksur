@@ -463,17 +463,59 @@ class SiteController extends Controller {
 		Yii::log("actionRegisterUser called", "trace", self::LOG_CAT);
 		$model = new RegisterForm; // Form to add users
 		$rolesModel = new Roles; // Form to add roles to users_has_roles table
-		if (isset($_POST['RegisterForm'])) { // Check if there is a post
+		$encryption = Yii::app()->encryption;
+		if (isset($_GET['usd']) && isset($_GET['risksur'])) { // Check if incoming url has these values. i.e. user has clicked on confirmation link.
+			$password = $_GET['risksur']; // Get the user password
+			$decryptData = $encryption->decrypt($_GET['usd'], self::FORGOT_SALT); // Decrypt the user details
+			$userDetails = explode(",", $decryptData);
+
+			// if the link has expired or not valid give error message to user
+			if ($encryption->isExpired() || !isset($userDetails[0]) || !isset($userDetails[2]) || $userDetails[2] != "newUser") {
+				Yii::app()->user->setFlash('error', 'The account activation data is either expired or invalid. Kindly register again.');
+				Yii::log("Expired link or invalid parameters in link sent by confirmationUrl", "error", self::LOG_CAT);
+				$this->redirect(array('site/login'));
+				return;
+			}
+
+			// Arrange data to be saved to the db i.e. creating the user.
+			$model->userName = $userDetails[0];
+			$model->email = $userDetails[1];
+			$model->password = $password;
+			$model->confirmPassword = $password;
+			$model->active = "1"; // Set status to active
+			// $model->save(); // Save the user details
+			if (!$model->save()) { // If the user hasn't been saved to users yable then show an error
+				Yii::app()->user->setFlash('error', 'There was a problem activating your account. Please contact the RiskSur admin on info@tracetracker.com');
+				$this->redirect(array('site/login'));
+				return;
+			}
+
+			$rolesModel->users_id = $model->userId; // Get the last inserted userId in users table
+			$rolesModel->roles_id = "3"; // Insert roleId 3 i.e. normal user as defined in roles table
+			// $rolesModel->save(); // Save to users_has_roles table
+			if (!$rolesModel->save()) { // If the user roles haven't been save then show an error
+				Yii::app()->user->setFlash('error', 'There was a problem activating your account. Please contact the RiskSur admin on info@tracetracker.com');
+				$this->redirect(array('site/login'));
+				return;
+			}
+			// Else if all data was saved show a success message.
+			Yii::app()->user->setFlash('success', 'Thank you for registering on Risksur, please login to continue.');
+			$this->redirect(array('site/login'));
+			return;
+		}
+		if (isset($_POST['RegisterForm'])) { // Check if there is a post i.e. user has entered data
 			$model->attributes = $_POST['RegisterForm'];
 			if ($model->userName == "" || $model->email == "" || $model->password == "") { // Check for blanks
 				Yii::app()->user->setFlash('error', 'All fields must be filled in!');
+				Yii::log("Blank fields posted", "error", self::LOG_CAT);
 				$this->render('register', array(
 					'model' => $model
 				));
 				return;
 			}
-			if (!filter_var($model->email, FILTER_VALIDATE_EMAIL)) { // Check fo rinvalid email address
+			if (!filter_var($model->email, FILTER_VALIDATE_EMAIL)) { // Check for invalid email address
 				Yii::app()->user->setFlash('error', 'Enter a valid email address!');
+				Yii::log("Invalid format of email address provided", "error", self::LOG_CAT);
 				$this->render('register', array(
 					'model' => $model
 				));
@@ -481,47 +523,67 @@ class SiteController extends Controller {
 			}
 			if ($model->confirmPassword !== $model->password) { // Check for password mismatch
 				Yii::app()->user->setFlash('error', 'Password mismatch! Re-type the password');
+				Yii::log("Password mis-match", "error", self::LOG_CAT);
 				$this->render('register', array(
 					'model' => $model
 				));
 				return;
 			}
-			if ($model->validate()) {
-			$model->password = md5($this->salt . $_POST['RegisterForm']['password']); // MD5 and Salt the password b4 saving
-				try {
-					if ($model->save()) // Save to users table
-						$rolesModel->users_id = $model->userId; // Get the last inserted userId in users table
-						$rolesModel->roles_id = "3"; // Insert roleId 3 i.e. normal user as defined in roles table
-						$rolesModel->save(); // Save to users_has_roles table
-						$mail = new TTMailer();
-						$originUrl = Yii::app()->createAbsoluteUrl("site/login");
-						$subject = 'User Registration';
-						$altBody = 'To view the message, please use an HTML compatible email viewer!';
-						$message = 'Dear ' . $model->userName . ',<br><br>';
-						$message .= 'You have successfully registered at ' . $originUrl . '. Below are your login details:<br><br>';
-						$message .= '<b>Username : ' . $model->userName . '</b><br>';
-						$message .= '<b>Email : </b>' . $model->email . '<br>';
-						$message .= '<b>Password : ' . $_POST['RegisterForm']['password'] . '</b><br><br>';
-						$message .= 'You can now login using the username and password and enjoy the experience of RiskSur.';
-						$toAddress = $model->email;
-						$toName = $model->userName;
+			// Query for the email address provided
+			$queryUserEmail = Yii::app()->db->createCommand()
+				->select('*')
+				->from('users')
+				->where('email = "' . $model->email . '" ')
+				->queryAll();
 
-						/*IF EMAIL IS NOT SENT THEN LOG THE ERROR*/
-						if (!$mail->ttSendMail($subject, $altBody, $message, $toAddress, $toName)) {
-							Yii::log("Error in sending user registration email to " . $model->email, "error", self::LOG_CAT);
-							return;
-						}
-						Yii::app()->user->setFlash('success', "User Created Successfully");
-						$this->redirect( array( 'site/login' ) );
-						return;
-					}
-				catch(CDbException $e) {
-			        Yii::app()->user->setFlash('error', "Username already exists!");
-				}
-			} else {
-				// echo CActiveForm::validate($model);
-				Yii::app()->end();
+			if (count($queryUserEmail) > 0) { // If the email address already exists shown an error message
+				Yii::app()->user->setFlash('error', 'The email is already registered. Enter a different email address.');
+				Yii::log("Email already registered", "error", self::LOG_CAT);
+				$this->render('register', array(
+					'model' => $model
+				));
+				return;
 			}
+			// Query for the username provided
+			$queryUserName = Yii::app()->db->createCommand()
+				->select('*')
+				->from('users')
+				->where('userName = "' . $model->userName . '" ')
+				->queryAll();
+
+			if (count($queryUserName) > 0) { // If the username already exists show an error message
+				Yii::app()->user->setFlash('error', 'The username is already registered. Enter a different username.');
+				Yii::log("Username already registered", "error", self::LOG_CAT);
+				$this->render('register', array(
+					'model' => $model
+				));
+				return;
+			}
+			$model->password = md5($this->salt . $_POST['RegisterForm']['password']); // MD5 and Salt the password b4 saving
+			$mail = new TTMailer(); // Initiate mailer
+			$originUrl = Yii::app()->createAbsoluteUrl("site/login");
+			$cancelLink = $this->createUrl('site/login'); // Not sure what this is for but wth, just leave it there
+			$encryptUserData = urlencode($encryption->encrypt($model->userName . "," . $model->email . ",newUser", 86400, self::FORGOT_SALT));
+			$confirmationUrl = "http://" . $_SERVER["HTTP_HOST"] . Yii::app()->request->baseUrl . "/index.php/site/registerUser?usd=$encryptUserData" . 
+				"&redirect_uri=" . $cancelLink . "&risksur=" . $model->password;
+			$subject = 'User Registration';
+			$altBody = 'To view the message, please use an HTML compatible email viewer!';
+			$message = 'Dear ' . $model->userName . ',<br><br>';
+			$message .= 'You have successfully registered at ' . $originUrl . '. Click on the link below to activate your account:<br><br>';
+			$message .= '<a href="' . $confirmationUrl . '">' . $confirmationUrl . '</a><br><br>';
+			$message .= '<b>Best Regards,</b><br><br>';
+			$message .= '<b>Team RiskSur</b>';
+			$toAddress = $model->email;
+			$toName = $model->userName;
+
+			/*IF EMAIL IS NOT SENT THEN LOG THE ERROR*/
+			if (!$mail->ttSendMail($subject, $altBody, $message, $toAddress, $toName)) {
+				Yii::log("Error in sending user registration email to " . $model->email, "error", self::LOG_CAT);
+				return;
+			}
+			Yii::app()->user->setFlash('success', "User Created Successfully");
+			$this->redirect( array( 'site/login' ) );
+			return;
 		}
 		$this->render('register', array(
 			'model' => $model

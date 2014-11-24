@@ -14,6 +14,7 @@ class RegisterForm extends CActiveRecord {
 	public $userName;
 	public $email;
 	public $password;
+	public $active;
 	public $confirmPassword;
 
 	/**
