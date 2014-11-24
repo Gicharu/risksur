@@ -29,6 +29,7 @@
 class Users extends CActiveRecord {
 
 	public $salt = '#fxdHJ&^%DS';
+	public $confirmPassword;
 	/**
 	 *
 	 *
@@ -49,7 +50,7 @@ class Users extends CActiveRecord {
 		return array(
 			array( 'active, passReset', 'numerical', 'integerOnly' => true ),
 			array( 'userName', 'length', 'max' => 20 ),
-			array( 'password, email', 'length', 'max' => 40 ),
+			array( 'password, email, confirmPassword', 'length', 'max' => 40 ),
 			array( 'cookie, session', 'length', 'max' => 32 ),
 			array( 'ip', 'length', 'max' => 15 ),
 			// The following rule is used by search().
@@ -69,6 +70,7 @@ class Users extends CActiveRecord {
 			'userId' => 'User',
 			'userName' => 'User Name',
 			'password' => 'Password',
+			'confirmPassword' => Yii::t("translation", "Re-Type Password"),
 			'email' => 'Email',
 			'active' => 'Active',
 			'passReset' => 'Pass Reset',
