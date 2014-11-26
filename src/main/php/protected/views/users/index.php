@@ -3,7 +3,7 @@ $this->breadcrumbs=array(
 	'Users',
 );
 $this->menu=array(
-	array('label'=>'Add User', 'url'=>array('create')),
+	array('label'=>'Add User', 'url'=>array('createUser')),
 );
 ?>
 <h1>Users</h1>
@@ -98,7 +98,7 @@ $(function(){
 				  var opt = {'loadMsg': 'Processing delete option'};
 				$("#listOptions").showLoading(opt);
 				$.ajax({type: 'POST',
-					url: <?php echo "'" . CController::createUrl('users/delete') . "'"; ?>,
+					url: <?php echo "'" . CController::createUrl('users/deleteUser') . "'"; ?>,
 					data: {delId:deleteVal},
 					success: function(data){
 						var checkSuccess = /successfully/i;

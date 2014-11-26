@@ -6,7 +6,7 @@ $this->breadcrumbs=array(
 );
 $this->menu=array(
 	array('label'=>'View Users', 'url'=>array('index')),
-	array('label'=>'Add User', 'url'=>array('create')),
+	array('label'=>'Add User', 'url'=>array('createUser')),
 );
 ?>
 <h1>Update Users <?php echo $model->userId; ?></h1>

@@ -3,6 +3,13 @@
 	'id'=>'users-form',
 	'enableClientValidation' => true,
 )); ?>
+	<?php
+		/*REMOVE THE TEXT role_ FROM THE ROLES.*/
+		$roleArray = array();
+		foreach ($model->getRoles() as $key => $value) {
+			$roleArray[$key] = str_replace("ROLE_", "", $value);
+		}
+	?>
 	<p class="note">Fields with <span class="required">*</span> are required.</p>
 	<?php echo $form->errorSummary($model); ?>
 	<div class="row">
@@ -11,26 +18,10 @@
 		if ($model->scenario == 'update') {
 			echo $form->textField($model,'userName',array('size'=>40,'maxlength'=>40, 'readOnly'=>"readonly")); 
 		 } else {
-		 	echo $form->textField($model,'userName',array('size'=>40,'maxlength'=>40)); 
+			echo $form->textField($model,'userName',array('size'=>40,'maxlength'=>40));
 		 }
 		?>
 		<?php echo $form->error($model,'userName'); ?>
-	</div>
-	<div class="row" style="width:17%">
-		<?php echo $form->labelEx($model, 'password'); ?>
-		<?php
-		$this->widget('ext.EStrongPassword.EStrongPassword', array(
-			'form' => $form,
-			'model' => $model,
-			'attribute' => 'password'
-		));
-		echo $form->passwordField($model, 'password', array('autocomplete' => 'off')); ?>
-		<?php echo $form->error($model, 'password'); ?>
-	</div>
-	<div class="row">
-		<?php echo $form->labelEx($model, 'confirmPassword'); ?>
-		<?php echo $form->passwordField($model, 'confirmPassword', array('autocomplete' => 'off')); ?>
-		<?php echo $form->error($model, 'confirmPassword'); ?>
 	</div>
 	<div class="row">
 		<?php echo $form->labelEx($model,'email'); ?>
@@ -38,10 +29,22 @@
 		if ($model->scenario == 'update') {
 			echo $form->textField($model,'email',array('size'=>40,'maxlength'=>40, 'readOnly'=>"readonly")); 
 		 } else {
-		 	echo $form->textField($model,'email',array('size'=>40,'maxlength'=>40)); 
+			echo $form->textField($model,'email',array('size'=>40,'maxlength'=>40));
 		 }
 		?>
 		<?php echo $form->error($model,'email'); ?>
+	</div>
+	<div class="row">
+		<?php echo $form->labelEx($model, 'roles'); ?>
+		<?php echo $form->radioButtonList($model, 'roles', $roleArray,
+			array(
+				'class' => 'checkBoxes',
+				'separator' => ' ',
+				'template' => '<div>{input}&nbsp; {label}</div>',
+				'labelOptions' => array('style' => 'display:inline')
+			));
+		?>
+		<?php echo $form->error($model, 'roles'); ?>
 	</div>
 	<div class="row buttons">
 		<?php echo CHtml::submitButton($model->isNewRecord ? 'Create' : 'Save'); ?>

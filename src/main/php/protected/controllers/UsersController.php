@@ -10,19 +10,32 @@ class UsersController extends Controller
 	public $page;
 	private	$configuration;
 	const LOG_CAT = "ctrl.OptionsController";
-
+	/**
+	 * init
+	 *
+	 * @access public
+	 * @return void
+	 */
+	public function init() {
+		if(Yii::app()->user->isGuest) {
+			$this->redirect(array('site/login?inactive=true'));
+		}
+	}
 	/**
 	 * Creates a new model.
 	 * If creation is successful, the browser will be redirected to the 'index' page.
 	 */
-	public function actionCreate()
+	public function actionCreateUser()
 	{
+		Yii::log("actionCreate called", "trace", self::LOG_CAT);
+		$cancelLink = $this->createUrl('site/login');
 		$model=new Users;
 		if(isset($_POST['Users']))
 		{
 			$model->attributes=$_POST['Users'];
+			$model->roles = $_POST['Users']['roles'];
 			// Check for blanks
-			if ($model->userName == "" || $model->email == "" || $model->password == "") {
+			if ($model->userName == "" || $model->email == "" || $model->roles == "") {
 				Yii::app()->user->setFlash('error', 'All fields must be filled in!');
 				$this->render('create', array(
 					'model' => $model
@@ -37,25 +50,36 @@ class UsersController extends Controller
 				));
 				return;
 			}
-			// Check for password mismatch
-			if ($model->confirmPassword !== $model->password) {
-				Yii::app()->user->setFlash('error', 'Password mismatch! Re-type the password');
-				$this->render('create', array(
-					'model' => $model
-				));
-				return;
-			}
 			//check if user exists
 			$findEmail = Users::model()->find("email = '".$model->email."'");
 			if (empty($findEmail)){
 				$findUsername = Users::model()->find("userName = '".$model->userName."'");
 				if (empty($findUsername)) {
 					if ($model->validate()) {
-						if($model->save()){
-							//$roles = new Roles; //add roles to users_has_roles table
-							//$roles->users_id = $model->userId;
-							//$roles->roles_id = "3"; // Insert roleId 3
-							//$roles->save();
+						if($model->save() && $model->saveRoles($model->userId, "create")){
+							// send the user the email link:
+							$toMailName = $model->userName;
+							$email = $model->email;
+							// construct data and set expiry to 24 hrs
+							$resetEncrypt = base64_encode($email . ",resetTrue,". (strtotime(date("H:i:s")) + 86400));
+							$passwordUrl = "http://" . $_SERVER["HTTP_HOST"] . Yii::app()->request->baseUrl . "/index.php/site/changepassword?data=$resetEncrypt" . 
+								"&redirect_uri=" . $cancelLink;
+							$mail = new TTMailer();
+							$subject = Yii::t('translation', 'User created');
+							$altBody = Yii::t('translation', 'To view the message, please use an HTML compatible email viewer!');
+							$message = Yii::t('translation', 'Dear ') . $toMailName . ',<br /><br />' .
+							Yii::t('translation', 'your user account has been created, please visit ');
+							$message .= '<a href="' . $passwordUrl . '">' . $passwordUrl . '</a>' .
+							Yii::t('translation', ' to activate it and set a new password. ') .
+							'<p></p>' . Yii::t('translation', 'This message was automatically generated.') . '<br />' .
+							Yii::t('translation', ' If you think it was sent incorrectly, ') .
+							Yii::t('translation', 'please contact your administrator.');
+							//if mail is not sent successfully issue appropriate message
+							if (!$mail->ttSendMail($subject, $altBody, $message, $email, $toMailName)) {
+								Yii::log("Error in sending the password to the user", "error", self::LOG_CAT);
+								$msg = Yii::t('translation', "Error in sending the password to the user");
+								return $msg;
+							}
 							Yii::app()->user->setFlash('success', "User successfully created.");
 							$this->redirect(array('users/index'));
 						}
@@ -85,22 +109,18 @@ class UsersController extends Controller
 	 * If update is successful, the browser will be redirected to the 'view' page.
 	 * @param integer $id the ID of the model to be updated
 	 */
-	public function actionUpdate()
+	public function actionUpdateUser()
 	{
+		Yii::log("actionUpdate called", "trace", self::LOG_CAT);
 		if (isset($_GET['userId'])) {
-			$model=$this->loadModel($_GET['userId']);
+			$model=Users::model()->findByAttributes(array( 'userId' => $_GET['userId'] ));
+			$role = UsersHasRoles::model()->findByAttributes(array( 'users_id' => $_GET['userId'] ));
+			$model->roles = $role->roles_id;
 			if(isset($_POST['Users']))
 			{
 				$model->attributes=$_POST['Users'];
-				// Check for password mismatch
-				if ($model->confirmPassword !== $model->password) {
-					Yii::app()->user->setFlash('error', 'Password mismatch! Re-type the password');
-					$this->render('create', array(
-						'model' => $model
-					));
-					return;
-				}
-				if($model->save()) {
+				$model->roles = $_POST['Users']['roles'];
+				if($model->update() && $model->saveRoles($_GET['userId'], 'update')) {
 					Yii::app()->user->setFlash('success', Yii::t("translation", "User successfully updated"));
 					$this->redirect(array('users/index'));
 				}
@@ -117,8 +137,9 @@ class UsersController extends Controller
 	 * If deletion is successful, the browser will be redirected to the 'index' page.
 	 * @param integer $id the ID of the model to be deleted
 	 */
-	public function actionDelete()
+	public function actionDeleteUser()
 	{
+		Yii::log("actionDelete called", "trace", self::LOG_CAT);
 		if (isset($_POST["delId"])) {
 			$this->loadModel($_POST["delId"])->delete();
 			echo Yii::t("translation", "The user has been successfully deleted");
@@ -137,7 +158,7 @@ class UsersController extends Controller
 		// Format datatable data. Define the Edit & Delete buttons
 		foreach ($dataProvider->getData() as $user) {
 			$editButton = "<button id='editOption" . $user['userId'] . 
-				"' type='button' class='bedit' onclick=\"window.location.href ='" . CController::createUrl('users/update/', array(
+				"' type='button' class='bedit' onclick=\"window.location.href ='" . CController::createUrl('users/updateUser/', array(
 					'userId' => $user['userId'])
 				) . "'\">Edit</button>";
 				$deleteButton = "<button id='deleteOption" . $user['userId'] . 
@@ -177,18 +198,5 @@ class UsersController extends Controller
 		if($model===null)
 			throw new CHttpException(404,'The requested page does not exist.');
 		return $model;
-	}
-
-	/**
-	 * Performs the AJAX validation.
-	 * @param Users $model the model to be validated
-	 */
-	protected function performAjaxValidation($model)
-	{
-		if(isset($_POST['ajax']) && $_POST['ajax']==='users-form')
-		{
-			echo CActiveForm::validate($model);
-			Yii::app()->end();
-		}
 	}
 }
