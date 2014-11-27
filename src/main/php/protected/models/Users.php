@@ -48,6 +48,7 @@ class Users extends CActiveRecord {
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
+			array( 'userName', 'unique', 'on' => 'insert' ),
 			array( 'active, passReset', 'numerical', 'integerOnly' => true ),
 			array( 'userName', 'length', 'max' => 20 ),
 			array( 'password, email', 'length', 'max' => 40 ),

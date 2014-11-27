@@ -47,7 +47,6 @@ class TTMailer extends CApplicationComponent {
 	 */
 	public function ttSendMail($subject, $altBody, $message, $toAddress, $toName) {
 		$mailResource = Yii::app()->mailresource;
-
 		$mailResource->resources['Host'] = Yii::app()->params->mail['host'];
 		$mailResource->resources['SMTPAuth'] = Yii::app()->params->mail['smtpauth'];
 		$mailResource->resources['Username'] = Yii::app()->params->mail['username'];
