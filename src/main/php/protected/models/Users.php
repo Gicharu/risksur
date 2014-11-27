@@ -29,6 +29,7 @@
 class Users extends CActiveRecord {
 
 	public $salt = '#fxdHJ&^%DS';
+	public $roles;
 	/**
 	 *
 	 *
@@ -53,6 +54,7 @@ class Users extends CActiveRecord {
 			array( 'password, email', 'length', 'max' => 40 ),
 			array( 'cookie, session', 'length', 'max' => 32 ),
 			array( 'ip', 'length', 'max' => 15 ),
+			array( 'userName, email, roles', 'required' ),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
 			array( 'userId, userName, password, email, active, passReset, cookie, session, ip', 'safe', 'on' => 'search' ),
@@ -70,6 +72,7 @@ class Users extends CActiveRecord {
 			'userId' => 'User',
 			'userName' => 'User Name',
 			'password' => 'Password',
+			'roles' => 'Roles',
 			'email' => 'Email',
 			'active' => 'Active',
 			'passReset' => 'Pass Reset',
@@ -145,7 +148,36 @@ class Users extends CActiveRecord {
 	 * @return bool
 	 */
 	public function beforeSave() {
-		$this->password = $this->hashPassword( $this->password, $this->salt );
+		if ($this->scenario == 'insert') {
+			$this->password = $this->hashPassword( $this->password, $this->salt );
+		}
 		return parent::beforeSave();
+	}
+
+	/**
+	 * getRoles
+	 * @return array
+	 */
+	public function getRoles() {
+		$roles = Roles::model()->findAll();
+		$rolesArray = CHtml::listData( $roles, 'id' , 'name');
+		return $rolesArray;
+	}
+
+	/**
+	 * saveRoles
+	 * @return boolean
+	 */
+	public function saveRoles($userId, $action) {
+		$roles =new UsersHasRoles;
+		if ($action == 'create') {
+			$roles->users_id = $userId;
+			$roles->roles_id = $this->roles;
+			return $roles->save();
+		} else {
+			$updateRole = UsersHasRoles::model()->findByAttributes(array( 'users_id' => $userId ));
+			$updateRole->roles_id = $this->roles;
+			return $updateRole->update();
+		}
 	}
 }
