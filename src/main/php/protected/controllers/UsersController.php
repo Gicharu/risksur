@@ -9,17 +9,20 @@ class UsersController extends Controller
 	public $layout='//layouts/column2';
 	public $page;
 	private	$configuration;
-	const LOG_CAT = "ctrl.OptionsController";
+	const LOG_CAT = "ctrl.OptionsController";#
+
 	/**
-	 * init
+	 * filters
 	 *
 	 * @access public
 	 * @return void
 	 */
-	public function init() {
-		if(Yii::app()->user->isGuest) {
-			$this->redirect(array('site/login?inactive=true'));
-		}
+	public function filters() {
+		return array(
+			array(
+				'application.filters.RbacFilter',
+			),
+		);
 	}
 	/**
 	 * Creates a new model.

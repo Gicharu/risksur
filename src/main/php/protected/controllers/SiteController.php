@@ -462,7 +462,7 @@ class SiteController extends Controller {
 	public function actionRegisterUser() {
 		Yii::log("actionRegisterUser called", "trace", self::LOG_CAT);
 		$model = new RegisterForm; // Form to add users
-		$rolesModel = new Roles; // Form to add roles to users_has_roles table
+		$rolesModel = new UsersHasRoles; // Form to add roles to users_has_roles table
 		$encryption = Yii::app()->encryption;
 		if (isset($_GET['usd']) && isset($_GET['risksur'])) { // Check if incoming url has these values. i.e. user has clicked on confirmation link.
 			$password = $_GET['risksur']; // Get the user password
