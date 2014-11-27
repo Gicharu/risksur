@@ -76,6 +76,7 @@ return CMap::mergeArray($configArray, array(
 		//'application.extensions.EpitoolsFunctions.*',
 		'application.extensions.TSettingsIni.*',
 		'application.extensions.TTMailer.*',
+		'application.extensions.Encryption.*',
 		//'application.extensions.LightOpenIdYii.*',
 		//'application.extensions.TKmlResource.*',
 		/*'application.extensions.timeout-dialog.*',*/
@@ -164,6 +165,9 @@ return CMap::mergeArray($configArray, array(
 		'tsettings' => array(
 			'class' => 'TSettingsIni',
 			'resources' => array(),
+		),
+		'encryption' => array(
+			'class' => 'Encryption',
 		),
 		//'ldapresource' => array(
 			//'class' => 'TLdapResource',

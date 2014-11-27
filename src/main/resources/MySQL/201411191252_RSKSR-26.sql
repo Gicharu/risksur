@@ -8,8 +8,12 @@ INSERT INTO `permissions`(`id`,`name`,`description`,`controller`,`action`,`bizru
 (25,'Edit Options','Edit Options','options','editOption',''),
 (26,'Delete Options','Delete Options','options','deleteOption','');
 
+INSERT  INTO `roles`(`id`,`name`,`description`) values
+(3,'ROLE_USER','Normal User');
+
 INSERT INTO `roles_has_permissions`(`permissions_id`,`roles_id`) values
 (23,1),(23,2),
 (24,1),(24,2),
 (25,1),(25,2),
-(26,1),(26,2);
+(26,1),(26,2),
+(1,3),(2,3),(3,3),(4,3),(5,3),(6,3),(7,3),(8,3),(11,3),(16,3),(19,3),(20,3),(22,3),(23,3),(24,3),(25,3);
