@@ -160,12 +160,14 @@ class Users extends CActiveRecord {
 	 */
 	public function getRoles() {
 		$roles = Roles::model()->findAll();
-		$rolesArray = CHtml::listData( $roles, 'id' , 'name');
+		$rolesArray = CHtml::listData( $roles, 'id', 'name');
 		return $rolesArray;
 	}
 
 	/**
 	 * saveRoles
+	 * @param string $userId
+	 * @param string $action
 	 * @return boolean
 	 */
 	public function saveRoles($userId, $action) {

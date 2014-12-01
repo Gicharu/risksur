@@ -1,9 +1,9 @@
 <?php
-$this->breadcrumbs=array(
+$this->breadcrumbs = array(
 	'Users',
 );
-$this->menu=array(
-	array('label'=>'Add User', 'url'=>array('createUser')),
+$this->menu = array(
+	array('label' => 'Add User', 'url' => array('createUser')),
 );
 ?>
 <h1>Users</h1>

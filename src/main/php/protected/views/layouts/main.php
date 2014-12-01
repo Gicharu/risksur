@@ -259,7 +259,7 @@ $msg = 0;
 ?>
 			</li>
 			<li id="userName">
-				<div title="<?php echo Yii::app()->user->name;?>"><?php echo Yii::app()->user->name;;?></div>
+				<div title="<?php echo Yii::app()->user->name;?>"><?php echo Yii::app()->user->name;?></div>
 			</li>
 		</ul>
 	</div>
@@ -334,7 +334,8 @@ if ($flashMessages) {
 </div>
 	<div id="footer" style="width:100%; float:right;">
 		<!-- <?php //echo $storySettings->name; ?>, <?php //echo Yii::t('translation', 'version ') . $storySettings->version . ", " . date('Y'); ?> -->
-		<?php echo Yii::t('translation', 'Risksur, version '. $storySettings->version . ", " . date('Y') .', Powered by '); ?> <a href='//www.tracetracker.com' target="_blank">
+		<?php echo Yii::t('translation', 'Risksur, version '. $storySettings->version . ", " . date('Y') .', Powered by '); ?> <a href='//www.tracetracker.com'
+		 target="_blank">
 <img src="<?php echo $baseUrl; ?>/images/tt_ft_logo.png" width="109" 
 	height="12" alt="Trace Tracker logo image" />
 </a>  
