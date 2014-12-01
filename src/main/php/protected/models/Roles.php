@@ -24,14 +24,13 @@ class Roles extends CActiveRecord
 	/**
 	 * @return array validation rules for model attributes.
 	 */
-	public function rules()	{
+	public function rules() {
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
 			array('name, description', 'required'),
 			array('name, description', 'length', 'max' => 45),
 			// The following rule is used by search().
-			// @todo Please remove those attributes that should not be searched.
 			array('id, name, description', 'safe', 'on' => 'search'),
 		);
 	}
@@ -72,13 +71,10 @@ class Roles extends CActiveRecord
 	 * based on the search/filter conditions.
 	 */
 	public function search() {
-		// @todo Please modify the following code to remove attributes that should not be searched.
-
 		$criteria = new CDbCriteria;
-
-		$criteria->compare('id',$this->id);
-		$criteria->compare('name',$this->name,true);
-		$criteria->compare('description',$this->description,true);
+		$criteria->compare('id', $this->id);
+		$criteria->compare('name', $this->name, true);
+		$criteria->compare('description', $this->description, true);
 
 		return new CActiveDataProvider($this, array(
 			'criteria' => $criteria,

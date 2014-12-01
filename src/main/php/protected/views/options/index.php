@@ -1,5 +1,5 @@
 <?php
-$this->menu = array(array('label' => 'Add Option', 'url' => array('options/addOption')),);
+$this->menu = array(array('label' => 'Add Option', 'url' => array('options/addOption')), );
 ?>
 <script type="text/javascript">
 $(function(){

@@ -2,7 +2,7 @@
 /* @var $this SurFormDetailsController */
 /* @var $model SurFormDetails */
 
-$this->breadcrumbs = array('Sur Form Details' => array('index'), 'Create',);
+$this->breadcrumbs = array('Sur Form Details' => array('index'), 'Create', );
 
 $this->menu = array(
 	array('label' => 'View Form Elements', 'url' => array('index')),
@@ -10,4 +10,4 @@ $this->menu = array(
 );
 ?>
 
-<?php $this->renderPartial('_form', array('model'=>$model)); ?>
+<?php $this->renderPartial('_form', array('model' => $model)); ?>

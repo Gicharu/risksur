@@ -56,7 +56,6 @@ class Users extends CActiveRecord {
 			array( 'ip', 'length', 'max' => 15 ),
 			array( 'userName, email, roles', 'required' ),
 			// The following rule is used by search().
-			// @todo Please remove those attributes that should not be searched.
 			array( 'userId, userName, password, email, active, passReset, cookie, session, ip', 'safe', 'on' => 'search' ),
 		);
 	}
@@ -95,10 +94,7 @@ class Users extends CActiveRecord {
 	 * based on the search/filter conditions.
 	 */
 	public function search() {
-		// @todo Please modify the following code to remove attributes that should not be searched.
-
 		$criteria = new CDbCriteria;
-
 		$criteria->compare( 'userId', $this->userId, true );
 		$criteria->compare( 'userName', $this->userName, true );
 		$criteria->compare( 'password', $this->password, true );
@@ -171,7 +167,7 @@ class Users extends CActiveRecord {
 	 * @return boolean
 	 */
 	public function saveRoles($userId, $action) {
-		$roles =new UsersHasRoles;
+		$roles = new UsersHasRoles;
 		if ($action == 'create') {
 			$roles->users_id = $userId;
 			$roles->roles_id = $this->roles;

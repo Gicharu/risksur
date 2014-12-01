@@ -37,9 +37,9 @@
 			'id' => 'goalId',
 			//'empty' => "Choose one",
 			'ajax' => array(
-				'type'=>'POST', //request type
-				'url'=>CController::createUrl('design/fetchComponents'), //url to call.
-				'update'=>'#component', //selector to update
+				'type' => 'POST', //request type
+				'url' => CController::createUrl('design/fetchComponents'), //url to call.
+				'update' => '#component', //selector to update
 			)
 			)); ?>
 		<?php echo $form->error($model, 'goalId', array('inputID' => "goalId")); ?>

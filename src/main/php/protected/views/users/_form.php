@@ -16,22 +16,20 @@
 		<?php echo $form->labelEx($model, 'userName'); ?>
 		<?php
 		if ($model->scenario == 'update') {
-			echo $form->textField($model,'userName', array('size' => 40,'maxlength' => 40, 'readOnly' => "readonly"));
+			echo $form->textField($model, 'userName' , array('size' => 40, 'maxlength' => 40, 'readOnly' => "readonly"));
 		 } else {
-			echo $form->textField($model,'userName', array('size' => 40,'maxlength' => 40));
-		 }
-		?>
+			echo $form->textField($model, 'userName' , array('size' => 40, 'maxlength' => 40));
+		 }?>
 		<?php echo $form->error($model, 'userName'); ?>
 	</div>
 	<div class="row">
 		<?php echo $form->labelEx($model, 'email'); ?>
 		<?php
 		if ($model->scenario == 'update') {
-			echo $form->textField($model, 'email',array('size' => 40,'maxlength' => 40, 'readOnly' => "readonly"));
+			echo $form->textField($model, 'email', array('size' => 40, 'maxlength' => 40, 'readOnly' => "readonly"));
 		 } else {
-			echo $form->textField($model, 'email',array('size' => 40,'maxlength' => 40));
-		 }
-		?>
+			echo $form->textField($model, 'email', array('size' => 40, 'maxlength' => 40));
+		 }?>
 		<?php echo $form->error($model, 'email'); ?>
 	</div>
 	<div class="row">

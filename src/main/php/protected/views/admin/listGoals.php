@@ -1,5 +1,5 @@
 <?php
-$this->menu = array(array('label' => 'Create Goal', 'url' => array('admin/addGoal')),);
+$this->menu = array(array('label' => 'Create Goal', 'url' => array('admin/addGoal')), );
 ?>
 <script type="text/javascript">
 $(function(){

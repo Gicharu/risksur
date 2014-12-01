@@ -46,7 +46,7 @@
 </script>
 <div class="form">
 
-<?php $form=$this->beginWidget('CActiveForm', array(
+<?php $form = $this->beginWidget('CActiveForm', array(
 	'id'=>'sur-form-details-form',
 	'enableClientValidation' => true,
 	'clientOptions' => array(
@@ -64,20 +64,20 @@
 		Yii::app()->params['footerErrorSummary']); ?>
 
 	<div class="row">
-		<?php echo $form->labelEx($model,'formId'); ?>
-		<?php echo $form->dropDownList($model,'formId', CHtml::listData(SurForm::model()->findAll(), 'formId', 'formName')); ?>
-		<?php echo $form->error($model,'formId'); ?>
+		<?php echo $form->labelEx($model, 'formId'); ?>
+		<?php echo $form->dropDownList($model, 'formId', CHtml::listData(SurForm::model()->findAll(), 'formId', 'formName')); ?>
+		<?php echo $form->error($model, 'formId'); ?>
 	</div>
 
 	<div class="row">
-		<?php echo $form->labelEx($model,'inputName'); ?>
-		<?php echo $form->textField($model,'inputName',array('size'=>50,'maxlength'=>50)); ?>
-		<?php echo $form->error($model,'inputName'); ?>
+		<?php echo $form->labelEx($model, 'inputName'); ?>
+		<?php echo $form->textField($model, 'inputName',array('size' => 50,'maxlength' => 50)); ?>
+		<?php echo $form->error($model, 'inputName'); ?>
 	</div>
 
 	<div class="row">
-		<?php echo $form->labelEx($model,'label'); ?>
-		<?php echo $form->textField($model,'label',array('size'=>50,'maxlength'=>50)); ?>
+		<?php echo $form->labelEx($model, 'label'); ?>
+		<?php echo $form->textField($model, 'label',array('size' => 50,'maxlength' => 50)); ?>
 		<?php echo $form->error($model,'label'); ?>
 	</div>
 
@@ -95,9 +95,9 @@
 	</div>
 
 	<div class="row">
-		<?php echo $form->labelEx($model,'required'); ?>
-		<?php echo $form->dropDownList($model,'required', array('No', 'Yes')); ?>
-		<?php echo $form->error($model,'required'); ?>
+		<?php echo $form->labelEx($model, 'required'); ?>
+		<?php echo $form->dropDownList($model, 'required', array('No', 'Yes')); ?>
+		<?php echo $form->error($model, 'required'); ?>
 	</div>
 
 	<div class="row buttons">

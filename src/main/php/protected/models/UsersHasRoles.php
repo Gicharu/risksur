@@ -69,8 +69,8 @@ class UsersHasRoles extends CActiveRecord
 
 		$criteria = new CDbCriteria;
 
-		$criteria->compare('users_id',$this->users_id,true);
-		$criteria->compare('roles_id',$this->roles_id);
+		$criteria->compare('users_id', $this->users_id,true);
+		$criteria->compare('roles_id', $this->roles_id);
 
 		return new CActiveDataProvider($this, array(
 			'criteria' => $criteria,
