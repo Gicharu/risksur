@@ -399,6 +399,74 @@
 		}
 
 		/**
+		 * actionAddMultipleComponents
+		 *
+		 * @access public
+		 * @return void
+		 */
+		public function actionAddMultipleComponents() {
+			Yii::log("actionAddMultipleComponents DesignController called", "trace", self::LOG_CAT);
+			$component = new ComponentHead;
+			$componentDetails = new ComponentDetails;
+			$currentDesignId = Yii::app()->session['surDesign']['id']; // Current selected design
+			$errorMessage = "";
+			$errorStatus = "";
+			if (isset($_GET['txtComponentName'])) { // Check if there is a post from the page
+				foreach ($_GET['txtComponentName'] as $componentCheckKey => $componentCheck) { // Loop thru posted data components
+					if (!isset($componentCheck) || empty($componentCheck)) { // Check if there is a blank value meaning user hasnt entered the value
+						$componentCheckKey = $componentCheckKey + 1;
+						$errorStatus = "foundError";
+						$errorMessage.= "Enter a component name on line " . $componentCheckKey . "<br>"; // Append error
+					}
+				}
+				foreach ($_GET['txtInitiator'] as $initiatorCheckKey => $initiatorCheck) { // Loop thru posted data initiators
+					if (!isset($initiatorCheck) || empty($initiatorCheck)) { // Check for blanks
+						$initiatorCheckKey = $initiatorCheckKey + 1;
+						$errorStatus = "foundError";
+						$errorMessage.= "Enter the initiator name on line " . $initiatorCheckKey . "<br>"; // Append error
+					}
+				}
+				if ($errorStatus != "") {
+					echo Yii::app()->user->setFlash('error', $errorMessage); // Display errors to user
+				} else {
+					foreach ($_GET['txtComponentName'] as $componentKey => $componentName) {
+						$component->setIsNewRecord(true); // Set this so that subsequent records can be added
+						$component->componentId = null; // Set this so that subsequent records can be added
+						$component->componentName = $componentName;
+						$component->frameworkId = Yii::app()->session['surDesign']['id'];
+						if ($component->save()) { // Save record
+							$componentStatus = "added";
+							$componentId = $component->componentId; // Get id of last inserted record
+						} else {
+							Yii::app()->user->setFlash('error', "Component " . $componentName . " was not added");
+							return; // If there was an error show message and abort mission
+						}
+
+						for ($i=0; $i < count($_GET['txtInitiator']); $i++) { //As you add the component also add the details 
+							$componentDetails->setIsNewRecord(true);
+							$componentDetails->componentDetailId = null;
+							$componentDetails->componentId = $componentId;
+							$componentDetails->subFormId = "8"; // NOT SURE WHAT SHOULD GO HERE
+							$componentDetails->value = $_GET['txtInitiator'][$componentKey];
+							if ($componentDetails->save()) {
+								break;
+							} else {
+								Yii::app()->user->setFlash('error', "Component details for component " . $componentName . " were not added");
+								return;
+							}
+						}
+					}
+					if (isset($componentStatus)) { // If everything went well show success message
+						Yii::app()->user->setFlash('success', "Components successfully added.");
+					}
+				}
+			}
+			$this->render('multipleComponent', array(
+				'errorStatus' => $errorStatus
+			));
+		}
+
+		/**
 		 * actionEditComponent
 		 *
 		 * @access public

@@ -8,6 +8,16 @@ body {
 	color:#000;background:none;
 	font-size:10pt;
 }
+.buttons{
+	border-style:solid;
+	border-color: #FFF #6c6c6c #6c6c6c #FFF;
+	border-width:1px;
+}
+.tableFrame {
+    padding: 10px;
+    margin-bottom:10px;
+    border: solid 1px #ccc;
+}
 .container {
 	background:none;
 }
