@@ -409,6 +409,9 @@
 			$component = new ComponentHead;
 			$componentDetails = new ComponentDetails;
 			$currentDesignId = Yii::app()->session['surDesign']['id']; // Current selected design
+			$settings = Yii::app()->tsettings;
+			$risksurSettings = $settings->getSettings();
+			$multipleRowsToShow = $risksurSettings->multipleComponentsRows;
 			$errorMessage = "";
 			$errorStatus = "";
 			if (isset($_GET['txtComponentName'])) { // Check if there is a post from the page
@@ -462,7 +465,8 @@
 				}
 			}
 			$this->render('multipleComponent', array(
-				'errorStatus' => $errorStatus
+				'errorStatus' => $errorStatus,
+				'multipleRowsToShow' => $multipleRowsToShow
 			));
 		}
 

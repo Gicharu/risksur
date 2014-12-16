@@ -50,7 +50,21 @@ class TSettingsIni extends CApplicationComponent {
 		$configParams['epcisNamespace'] = "http://www.globaltraceability.net/schema/epcis";
 		$configParams['gtnetNamespace'] = "http://www.tracetracker.com/data";
 		$configParams['legendbuttontext'] = "Legend";
+		// $configParams['multipleComponentsRows'] = 5;
 
+		// add [other] and [log] category params
+		$customIniArray = self::getCustomIniParams();
+		if(!empty($customIniArray['other']) && !empty($customIniArray['log'])) {
+			// echo $customIniArray['other']['multipleComponentsRows'];die();
+		// merge [other] and [log] categories
+			$mergedIniParams = array_merge($customIniArray['other'], $customIniArray['log']);
+			// add params to configParams array
+			foreach ($mergedIniParams as $paramK => $paramV) {
+				$configParams[$paramK] = $paramV;
+			}
+		} else {
+			Yii::log("No [other] or [log] params set in story_custom.ini", "error", self::LOG_CAT);
+		}
 		$defaultThemeOnFail = "risksurTheme/jquery-ui-1.9.2.custom.css";
 
 		/*ORGANIZATION VALUES. FIRST CHECK IF THE SESSION organization IS SET*/
@@ -119,6 +133,7 @@ class TSettingsIni extends CApplicationComponent {
 			$this->settings->epcisNamespace = $configParams['epcisNamespace'];
 			$this->settings->gtnetNamespace = $configParams['gtnetNamespace'];
 			$this->settings->legendbuttontext = $configParams['legendbuttontext'];
+			$this->settings->multipleComponentsRows = $configParams['multipleComponentsRows'];
 			//$this->settings->pentahoServer = $iniArray['pentaho.server'];
 		} else {
 			$this->settings->error = $error;
@@ -134,6 +149,7 @@ class TSettingsIni extends CApplicationComponent {
 			$this->settings->epcisNamespace = $configParams['epcisNamespace'];
 			$this->settings->gtnetNamespace = $configParams['gtnetNamespace'];
 			$this->settings->legendbuttontext = $configParams['legendbuttontext'];
+			$this->settings->multipleComponentsRows = $configParams['multipleComponentsRows'];
 		}
 		return $this->settings;
 	}
@@ -328,6 +344,54 @@ class TSettingsIni extends CApplicationComponent {
 			}
 			echo '<link rel="stylesheet" type="text/css" href="' . $cssPath . '" ' . $mediaValue . '/>' . "\n";
 		}
+	}
+	/**
+	 * getCustomIniParams 
+	 * @return array
+	 */
+	private function getCustomIniParams() {
+		Yii::log("getCustomIniParams called", "trace", self::LOG_CAT);
+		$iniArray = array();
+		$ttl = 3600;
+		$error = '';
+		$iniArray = Yii::app()->EnvCache->get("risksurCustomIni" . Yii::app()->user->name);
+		if(is_array($iniArray) && count($iniArray) > 0) {  
+			Yii::log("risksur_custom.ini found in EnvCache", "trace", self::LOG_CAT);
+		} else {
+			$rootPath = str_replace('index.php', '', Yii::app()->request->scriptFile);
+			$rootPath = str_replace('snippet.php', '', $rootPath);
+			if (file_exists($rootPath . '/classes/resources/risksur_custom.ini')) {
+				$iniArray = parse_ini_file($rootPath . '/classes/resources/risksur_custom.ini', true);
+				Yii::app()->EnvCache->set("risksurCustomIni" . Yii::app()->user->name, $iniArray, $ttl);
+				Yii::log("Stored to EnvCache: risksurCustomIni" . Yii::app()->user->name, "trace", self::LOG_CAT);
+				
+			} elseif (file_exists(Yii::app()->params['mainPath'] . '../resources/risksur_custom.ini')) {
+				$iniArray = parse_ini_file(Yii::app()->params['mainPath'] . '../resources/risksur_custom.ini', true);
+				// check if the values returned from risksur_custom.ini are empty. If empty clear the iniArray to use default values
+				if(count($iniArray) > 0) {
+					Yii::app()->EnvCache->set("risksurCustomIni" . Yii::app()->user->name, $iniArray, $ttl);
+					Yii::log("Stored to EnvCache: risksurCustomIni" . Yii::app()->user->name, "trace", self::LOG_CAT);
+				} else {
+					$iniArray = array();
+					Yii::log("risksur_custom.ini values are empty", "warning", self::LOG_CAT);
+				}
+			} elseif (file_exists(Yii::app()->params['mainPath'] . '../../resources/risksur_custom.ini')) {
+				$iniArray = parse_ini_file(Yii::app()->params['mainPath'] . '../../resources/risksur_custom.ini', true);
+				// check if the values returned from risksur_custom.ini are empty. If empty clear the iniArray to use default values
+				if(count($iniArray) > 0) {
+					Yii::app()->EnvCache->set("risksurCustomIni" . Yii::app()->user->name, $iniArray, $ttl);
+					Yii::log("Stored to EnvCache: risksurCustomIni" . Yii::app()->user->name, "trace", self::LOG_CAT);
+				} else {
+					$iniArray = array();
+					Yii::log("risksur_custom.ini values are empty", "warning", self::LOG_CAT);
+				}
+			} else {
+				$error = "risksur_custom.ini file not found";
+				Yii::log($error, "error", self::LOG_CAT);
+			}
+		}		
+		
+		return $iniArray;
 	}
 }
 /**
