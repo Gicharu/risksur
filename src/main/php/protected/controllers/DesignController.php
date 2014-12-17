@@ -642,10 +642,35 @@
 						':frameworkId' => Yii::app()->session['surDesign']['id'],
 					),
 				));
+
+				$formDetails = SurFormDetails::model()->findAll(array(
+					//'select' => 'pageId, pageName',
+					'condition' => 'formId=:formId  and showOnComponentList=:showOnList',
+					'params' => array(
+						':formId' => Yii::app()->session['surDesign']['goalId'],
+						':showOnList' => true,
+					),
+				));
+				$selectOptions = Options::model()->findAll();
+				$optionsArray = array();
+				// process the selecte options data into an array
+				foreach ($selectOptions as $params) {
+					$optionsArray[$params->optionId] = $params->label;
+				}
+				$formDetailsArray = array();
+				$selectElements = array();
+				foreach ($formDetails as $data) {
+					$formDetailsArray[$data->subFormId] = $data->label;
+					if($data->inputType == "select") {
+						$selectElement[$data->subFormId] = $data->subFormId;
+					}
+				}
 				//print_r($componentList); die();
 				$componentListArray = array();
 				// format datatable data
+				$count = 0;
 				foreach ($componentList as $com) {
+					//print_r($com->compDetails); die();
 					$deleteButton = "";
 					$editButton = "";
 					$deleteButton = "<button id='deleteComponent" . $com->componentId .
@@ -663,15 +688,31 @@
 						"' type='button' class='bcopy' onclick=\"$('#copyBox').dialog('open');" .
 						"duplicatePopup('" . $com->componentId . "', '" .
 						$com->componentName . "')\">Duplicate</button>";
-					$componentListArray[] = array(
+					$componentListArray[$count] = array(
 						'componentId' => $com->componentId,
 						'frameworkId' => $com->frameworkId,
 						'name' => $com->componentName,
-						'description' => $com->comments,
+						//'description' => $com->comments,
 						'editButton' => $editButton,
 						'deleteButton' => $deleteButton,
 						'duplicateButton' => $duplicateButton,
 					);
+					$subDetails = array();
+					foreach ($com->compDetails as $data) {
+						$subDetails[$data->subFormId] = $data->value;
+					}
+					foreach ($formDetailsArray as $key => $val) {
+						$columnVal = "";
+						if(!empty($subDetails[$key])) {
+							$columnVal = $subDetails[$key];
+							if(!empty($selectElement[$key]) && !empty($optionsArray[$subDetails[$key]])) {
+								$columnVal = $optionsArray[$subDetails[$key]];
+							}
+						}
+						$componentListArray[$count][$key] = $columnVal;
+					}
+					$count ++;
+
 				}
 			}
 			$dataArray['componentList'] = json_encode($componentListArray);
@@ -683,7 +724,8 @@
 			}
 			$this->render('componentList', array(
 				//'model' => $model,
-				'dataArray' => $dataArray
+				'dataArray' => $dataArray,
+				'columnsArray' => $formDetailsArray
 			));
 		}
 

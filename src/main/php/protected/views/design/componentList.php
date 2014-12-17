@@ -67,8 +67,11 @@ $(function(){
 			//{"mDataProp": "editButton", "bVisible": true, "sWidth": "6%"},
 			//{"mData": "deleteButton", "bSortable": false, "bVisible": true, "sWidth": "8%" },
 			{"mDataProp": "name",  "bVisible": true, sClass: "showDetails clickable underline"},
-			{"mDataProp": "description", "bVisible": true},
-			{"mDataProp": "description", "bVisible": true},
+			<?php 
+				foreach ($columnsArray as $key => $val) {
+					echo '{"mDataProp": "' . $key . '", "bVisible": true},';
+				}
+			?>
 			{"mDataProp": "editButton", "bVisible": true},
 			{"mDataProp": "deleteButton", "bSortable": false, "bVisible": true },
 			{"mDataProp": "duplicateButton", "bSortable": false, "bVisible": true },
@@ -236,8 +239,11 @@ $(function(){
 		<thead>
 		<tr>
 			<th title = "Name">Name</th>
-			<th title = "Descripton">Descripton</th>
-			<th title = "Details">Details</th>
+			<?php 
+				foreach ($columnsArray as $val) {
+					echo '<th title = "' . $val . '">' . $val . '</th>';
+				}
+			?>
 			<th title = "Edit">Edit</th>
 			<th title = "Delete">Delete</th>
 			<th title = "Duplicate">Duplicate</th>
