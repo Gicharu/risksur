@@ -1,3 +1,4 @@
--- update the table structure for surFormDetails, add column showOnComponentList
-ALTER TABLE `surFormDetails` ADD COLUMN `showOnComponentList` TINYINT(1) DEFAULT 0 NULL AFTER `required`; 
-
+-- add sample columns for componenent list
+UPDATE `surFormDetails` SET `showOnComponentList` = '1' WHERE `subFormId` = '1'; 
+UPDATE `surFormDetails` SET `showOnComponentList` = '1' WHERE `subFormId` = '2'; 
+UPDATE `surFormDetails` SET `showOnComponentList` = '1' WHERE `subFormId` = '7'; 
