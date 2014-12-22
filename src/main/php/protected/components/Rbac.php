@@ -46,6 +46,15 @@
 			AND p.controller=:controller
 			AND p.action=:action
 			ORDER BY p.bizrule ASC';
+			//$sql =<<<END
+			//SELECT p.`id`,p.`name`, p.`controller`, p.`action` , rp.`roles_id`, u.`userName`
+			//FROM
+			//permissions p
+			//INNER JOIN roles_has_permissions rp ON rp.`permissions_id` = p.`id`
+			//INNER JOIN users_has_roles ur ON ur.`roles_id` = rp.`roles_id`
+			//INNER JOIN users u ON u.`userId` = ur.`users_id`
+			//WHERE ur.`users_id` = :uid AND p.`controller` = :controller AND p.`action` = :action;
+//END;
 			$command = Yii::app()->db->createCommand($sql);
 			$command->bindParam(":uid", $user, PDO::PARAM_INT);
 			$command->bindParam(":controller", $controller, PDO::PARAM_STR);
