@@ -8,6 +8,7 @@
  * @copyright Tracetracker
  * @author Chirag Doshi <chirag@tracetracker.com> 
  * @license Tracetracker {@link http://www.tracetracker.com}
+ * @SuppressWarnings checkUnusedVariables
  */
 class GoalMenu extends CWidget {
 	public $parentId = 0;

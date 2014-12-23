@@ -8,6 +8,7 @@
  * @copyright Tracetracker
  * @author Chirag Doshi <chirag@tracetracker.com> 
  * @license Tracetracker {@link http://www.tracetracker.com}
+ * @SuppressWarnings checkUnusedVariables
  */
 class MainMenu extends CWidget {
 	public $parentId = 0;
@@ -26,8 +27,8 @@ class MainMenu extends CWidget {
 			->from('programpages p')
 			//->join('tbl_profile p', 'u.id=p.user_id')
 			->leftJoin('programpages c', 'c.pageId = p.parentId')
-			->join('pages_has_roles pr','pr.pageId = p.pageId')
-			->join('users_has_roles ur','ur.roles_id = pr.roleID')
+			->join('pages_has_roles pr', 'pr.pageId = p.pageId')
+			->join('users_has_roles ur', 'ur.roles_id = pr.roleID')
 			//INNER JOIN pages_has_roles pr ON pr.`pageId` = p.`pageId`
 			//INNER JOIN users_has_roles ur ON ur.`roles_id` = pr.`roleId`
 			//->where('p.parentId=:parentId', array(':parentId'=>$parentId))

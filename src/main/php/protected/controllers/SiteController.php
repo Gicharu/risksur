@@ -106,6 +106,12 @@ class SiteController extends Controller {
 		}
 	}
 
+	/**
+	 * actionIndex 
+	 * 
+	 * @access public
+	 * @return void
+	 */
 	public function actionIndex() {
 		$this->render('index', array(
 			//'model' => $model

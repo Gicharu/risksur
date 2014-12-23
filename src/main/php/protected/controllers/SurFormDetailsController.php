@@ -22,7 +22,7 @@
 		 */
 		public function filters() {
 			Yii::log("filters called", "trace", self::LOG_CAT);
-			return array(array('application.filters.RbacFilter',),);
+			return array(array('application.filters.RbacFilter', ), );
 		}
 
 		/**
@@ -69,7 +69,7 @@
 				}
 			}
 
-			$this->render('update', array('model' => $model,));
+			$this->render('update', array('model' => $model, ));
 		}
 
 		/**
@@ -111,7 +111,7 @@
 				echo json_encode(array("aaData" => $surFormsArray));
 				return;
 			}
-			$this->render('index', array('surFormsArray' => $surFormsArray,));
+			$this->render('index', array('surFormsArray' => $surFormsArray, ));
 		}
 
 

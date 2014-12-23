@@ -69,9 +69,9 @@ class AdminController extends Controller {
 			'type' =>  'text',
 		);
 		$elements['buttons'] = array(
-			'newGoal'=>array(
-				'type'=>'submit',
-				'label'=>'Create Goal',
+			'newGoal' => array(
+				'type' => 'submit',
+				'label' => 'Create Goal',
 			),
 		);
 		//$model->_dynamicFields = $dynamicDataAttributes;
@@ -121,9 +121,9 @@ class AdminController extends Controller {
 				'type' =>  'text',
 			);
 			$elements['buttons'] = array(
-				'newGoal'=>array(
-					'type'=>'submit',
-					'label'=>'Edit Goal',
+				'newGoal' => array(
+					'type' => 'submit',
+					'label' => 'Edit Goal',
 				),
 			);
 			//$model->_dynamicFields = $dynamicDataAttributes;
