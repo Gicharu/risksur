@@ -62,7 +62,7 @@
 	<p class="note">Fields with <span class="required">*</span> are required.</p>
 	<?php echo $form->errorSummary($model, Yii::app()->params['headerErrorSummary'],
 		Yii::app()->params['footerErrorSummary']); ?>
-
+		<!-- status is active by default -->
 	<!-- <div class="row">
 		<?php //echo $form->labelEx($model, 'formId'); ?>
 		<?php //echo $form->dropDownList($model, 'formId', CHtml::listData(SurForm::model()->findAll(), 'formId', 'formName')); ?>
