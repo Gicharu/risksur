@@ -36,22 +36,23 @@
 		<?php echo $form->dropDownList($model, 'goalId', $dataArray['goalDropDown'], array(
 			'id' => 'goalId',
 			//'empty' => "Choose one",
-			'ajax' => array(
-				'type' => 'POST', //request type
-				'url' => CController::createUrl('design/fetchComponents'), //url to call.
-				'update' => '#component', //selector to update
-			)
+			// updates component dropdown
+			// 'ajax' => array(
+			// 	'type' => 'POST', //request type
+			// 	'url' => CController::createUrl('design/fetchComponents'), //url to call.
+			// 	'update' => '#component', //selector to update
+			// )
 			)); ?>
 		<?php echo $form->error($model, 'goalId', array('inputID' => "goalId")); ?>
 	</div>
-	<div class="row">
-		<?php echo $form->labelEx($model, 'component'); ?>
-		<?php echo $form->dropDownList($model, 'component', array(), array(
-			'id' => 'component',
+	<!-- <div class="row">
+		<?php //echo $form->labelEx($model, 'component'); ?>
+		<?php //echo $form->dropDownList($model, 'component', array(), array(
+			//'id' => 'component',
 			//'empty' => "Choose one"
-			)); ?>
-		<?php echo $form->error($model, 'component', array('inputID' => "component")); ?>
-	</div>
+			// )); ?>
+		<?php //echo $form->error($model, 'component', array('inputID' => "component")); ?>
+	</div> -->
 	<div class="row">
 	<?php echo CHtml::Button(Yii::t("translation", $dataArray['formType']), array(
 			'id' => 'load',

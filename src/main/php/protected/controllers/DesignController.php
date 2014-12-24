@@ -283,7 +283,9 @@
 					//'select' => 'pageId, pageName',
 					'condition' => 't.formId=:formId',
 					'params' => array(
-						':formId' => Yii::app()->session['surDesign']['goalId'],
+						// ':formId' => Yii::app()->session['surDesign']['goalId'],
+						// Make the form active.
+						':formId' => 1,
 					),
 				));
 				//$dataArray['getForm'] = $getForm;
@@ -416,7 +418,9 @@
 					//'select' => 'pageId, pageName',
 					'condition' => 't.formId=:formId',
 					'params' => array(
-						':formId' => Yii::app()->session['surDesign']['goalId'],
+						// ':formId' => Yii::app()->session['surDesign']['goalId'],
+						// Make the form active.
+						':formId' => 1,
 					),
 				));
 
@@ -647,7 +651,9 @@
 					//'select' => 'pageId, pageName',
 					'condition' => 'formId=:formId  and showOnComponentList=:showOnList',
 					'params' => array(
-						':formId' => Yii::app()->session['surDesign']['goalId'],
+						// ':formId' => Yii::app()->session['surDesign']['goalId'],
+						// Make the form active.
+						':formId' => 1,
 						':showOnList' => true,
 					),
 				));
