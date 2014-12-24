@@ -62,6 +62,16 @@ END;
 				<input type="button" id="cmdCopy" onclick="" value="Copy Data" class="buttons" />
 			</td>
 		</tr>
+		<tr>
+			<td>
+				Sample Size <input type="text" id="txtSampleSize" name="txtSampleSize" <?php if (isset($_GET['txtSampleSize'])) { echo 'value="' . $_GET['txtSampleSize'] . '"';} ?>/>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				Threat <input type="text" id="txtThreat" name="txtThreat" <?php if (isset($_GET['txtThreat'])) { echo 'value="' . $_GET['txtThreat'] . '"';} ?>/>
+			</td>
+		</tr>
 	</tbody>
 </table>
 </div>
