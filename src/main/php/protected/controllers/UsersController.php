@@ -1,15 +1,23 @@
 <?php
 
-class UsersController extends Controller
-{
+/**
+ * UsersController 
+ * 
+ * @uses Controller
+ * @package 
+ * @version $id$
+ * @copyright Tracetracker
+ * @license Tracetracker {@link http://www.tracetracker.com}
+ */
+class UsersController extends Controller {
 	/**
 	 * @var string the default layout for the views. Defaults to '//layouts/column2', meaning
 	 * using two-column layout. See 'protected/views/layouts/column2.php'.
 	 */
-	public $layout='//layouts/column2';
+	public $layout = '//layouts/column2';
 	public $page;
 	private	$configuration;
-	const LOG_CAT = "ctrl.OptionsController";#
+	const LOG_CAT = "ctrl.OptionsController";
 
 	/**
 	 * filters
@@ -32,9 +40,8 @@ class UsersController extends Controller
 	{
 		Yii::log("actionCreate called", "trace", self::LOG_CAT);
 		$cancelLink = $this->createUrl('site/login');
-		$model=new Users;
-		if(isset($_POST['Users']))
-		{
+		$model = new Users;
+		if(isset($_POST['Users'])) {
 			$model->attributes=$_POST['Users'];
 			$model->roles = $_POST['Users']['roles'];
 			// Check for blanks
@@ -55,7 +62,7 @@ class UsersController extends Controller
 			}
 			//check if user exists
 			$findEmail = Users::model()->find("email = '".$model->email."'");
-			if (empty($findEmail)){
+			if (empty($findEmail)) {
 				$findUsername = Users::model()->find("userName = '".$model->userName."'");
 				if (empty($findUsername)) {
 					if ($model->validate()) {
@@ -102,8 +109,8 @@ class UsersController extends Controller
 				return;
 			}
 		}
-		$this->render('create',array(
-			'model'=>$model,
+		$this->render('create', array(
+			'model' => $model,
 		));
 	}
 
@@ -112,15 +119,13 @@ class UsersController extends Controller
 	 * If update is successful, the browser will be redirected to the 'view' page.
 	 * @param integer $id the ID of the model to be updated
 	 */
-	public function actionUpdateUser()
-	{
+	public function actionUpdateUser() {
 		Yii::log("actionUpdate called", "trace", self::LOG_CAT);
 		if (isset($_GET['userId'])) {
-			$model=Users::model()->findByAttributes(array( 'userId' => $_GET['userId'] ));
+			$model = Users::model()->findByAttributes(array( 'userId' => $_GET['userId'] ));
 			$role = UsersHasRoles::model()->findByAttributes(array( 'users_id' => $_GET['userId'] ));
 			$model->roles = $role->roles_id;
-			if(isset($_POST['Users']))
-			{
+			if(isset($_POST['Users'])) {
 				$model->attributes=$_POST['Users'];
 				$model->roles = $_POST['Users']['roles'];
 				if($model->update() && $model->saveRoles($_GET['userId'], 'update')) {
@@ -128,7 +133,7 @@ class UsersController extends Controller
 					$this->redirect(array('users/index'));
 				}
 			}
-			$this->render('update',array(
+			$this->render('update', array(
 				'model'=>$model,
 			));
 		}
@@ -140,8 +145,7 @@ class UsersController extends Controller
 	 * If deletion is successful, the browser will be redirected to the 'index' page.
 	 * @param integer $id the ID of the model to be deleted
 	 */
-	public function actionDeleteUser()
-	{
+	public function actionDeleteUser() {
 		Yii::log("actionDelete called", "trace", self::LOG_CAT);
 		if (isset($_POST["delId"])) {
 			$this->loadModel($_POST["delId"])->delete();
@@ -152,9 +156,8 @@ class UsersController extends Controller
 	/**
 	 * Lists all models.
 	 */
-	public function actionIndex()
-	{
-		$dataProvider=new CActiveDataProvider('Users');
+	public function actionIndex() {
+		$dataProvider = new CActiveDataProvider('Users');
 		$userListArray = array();
 		$dataArray = array();
 		$dataArray['dtHeader'] = "Manage Users"; // Set page title when printing the datatable
@@ -182,8 +185,8 @@ class UsersController extends Controller
 			echo $jsonData;
 			return ;
 		}
-		$this->render('index',array(
-			'dataProvider'=>$dataProvider,
+		$this->render('index', array(
+			'dataProvider' => $dataProvider,
 			'dataArray' => $dataArray
 		));
 	}
@@ -195,11 +198,10 @@ class UsersController extends Controller
 	 * @return Users the loaded model
 	 * @throws CHttpException
 	 */
-	public function loadModel($id)
-	{
+	public function loadModel($id) {
 		$model=Users::model()->findByPk($id);
-		if($model===null)
-			throw new CHttpException(404,'The requested page does not exist.');
+		if($model === null)
+			throw new CHttpException(404, 'The requested page does not exist.');
 		return $model;
 	}
 }

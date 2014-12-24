@@ -8,6 +8,7 @@
  * @copyright Tracetracker
  * @author Chirag Doshi <chirag@tracetracker.com> 
  * @license Tracetracker {@link http://www.tracetracker.com}
+ * @SuppressWarnings checkUnusedVariables
  */
 class MainMenu extends CWidget {
 	public $parentId = 0;
@@ -20,13 +21,18 @@ class MainMenu extends CWidget {
 	 */
 	public function run() {
 		$parentId = 0;
+		$user = Yii::app()->user->id;
 		$programPages = Yii::app()->db->createCommand()
 			->select('p.pageId, p.pageName, p.path, p.parentId, p.menuOrder, p.target, c.pageId as childId, c.pageName as childName, c.menuOrder as childOrder')
 			->from('programpages p')
 			//->join('tbl_profile p', 'u.id=p.user_id')
 			->leftJoin('programpages c', 'c.pageId = p.parentId')
+			->join('pages_has_roles pr', 'pr.pageId = p.pageId')
+			->join('users_has_roles ur', 'ur.roles_id = pr.roleID')
+			//INNER JOIN pages_has_roles pr ON pr.`pageId` = p.`pageId`
+			//INNER JOIN users_has_roles ur ON ur.`roles_id` = pr.`roleId`
 			//->where('p.parentId=:parentId', array(':parentId'=>$parentId))
-			->where('p.active = 1')
+			->where('p.active = 1 and ur.users_id = :userId', array(':userId' => $user))
 			->order('p.menuOrder, c.menuOrder asc') 
 			->queryAll();
 			//print_r($programPages);

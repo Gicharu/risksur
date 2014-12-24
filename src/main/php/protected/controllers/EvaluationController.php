@@ -38,6 +38,12 @@ class EvaluationController extends Controller {
 		));
 	}
 
+	/**
+	 * actionTest 
+	 * 
+	 * @access public
+	 * @return void
+	 */
 	public function actionTest() {
 		echo "testing";
 	}

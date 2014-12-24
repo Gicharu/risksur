@@ -99,6 +99,11 @@
 		<?php echo $form->dropDownList($model, 'required', array('No', 'Yes')); ?>
 		<?php echo $form->error($model, 'required'); ?>
 	</div>
+	<div class="row">
+		<?php echo $form->labelEx($model, 'showOnComponentList'); ?>
+		<?php echo $form->dropDownList($model, 'showOnComponentList', array('No', 'Yes')); ?>
+		<?php echo $form->error($model, 'showOnComponentList'); ?>
+	</div>
 
 	<div class="row buttons">
 		<?php echo CHtml::submitButton($model->isNewRecord ? 'Create' : 'Save'); ?>
