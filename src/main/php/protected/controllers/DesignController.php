@@ -416,6 +416,13 @@
 			$multipleRowsToShow = $risksurSettings->multipleComponentsRows;
 			$errorMessage = "";
 			$errorStatus = "";
+			// Select all values whose inputType is ""Select"
+			$fetchOptions = Yii::app()->db->createCommand()
+				->select('sfd.subFormId, sfd.label')
+				->from('surFormDetails sfd')
+				->where('sfd.inputType ="select"')
+				->queryAll();
+			// print_r($fetchOptions);die();
 			if (isset($_GET['txtComponentName'])) { // Check if there is a post from the page
 				foreach ($_GET['txtComponentName'] as $componentCheckKey => $componentCheck) { // Loop thru posted data components
 					if (!isset($componentCheck) || empty($componentCheck)) { // Check if there is a blank value meaning user hasnt entered the value
