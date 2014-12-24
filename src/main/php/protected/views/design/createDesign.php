@@ -44,14 +44,14 @@
 			)); ?>
 		<?php echo $form->error($model, 'goalId', array('inputID' => "goalId")); ?>
 	</div>
-	<div class="row">
-		<?php echo $form->labelEx($model, 'component'); ?>
-		<?php echo $form->dropDownList($model, 'component', array(), array(
-			'id' => 'component',
+	<!-- <div class="row">
+		<?php //echo $form->labelEx($model, 'component'); ?>
+		<?php //echo $form->dropDownList($model, 'component', array(), array(
+			//'id' => 'component',
 			//'empty' => "Choose one"
-			)); ?>
-		<?php echo $form->error($model, 'component', array('inputID' => "component")); ?>
-	</div>
+			// )); ?>
+		<?php //echo $form->error($model, 'component', array('inputID' => "component")); ?>
+	</div> -->
 	<div class="row">
 	<?php echo CHtml::Button(Yii::t("translation", $dataArray['formType']), array(
 			'id' => 'load',

@@ -63,12 +63,12 @@
 	<?php echo $form->errorSummary($model, Yii::app()->params['headerErrorSummary'],
 		Yii::app()->params['footerErrorSummary']); ?>
 
-	<div class="row">
-		<?php echo $form->labelEx($model, 'formId'); ?>
-		<?php echo $form->dropDownList($model, 'formId', CHtml::listData(SurForm::model()->findAll(), 'formId', 'formName')); ?>
-		<?php echo $form->error($model, 'formId'); ?>
+	<!-- <div class="row">
+		<?php //echo $form->labelEx($model, 'formId'); ?>
+		<?php //echo $form->dropDownList($model, 'formId', CHtml::listData(SurForm::model()->findAll(), 'formId', 'formName')); ?>
+		<?php //echo $form->error($model, 'formId'); ?>
 	</div>
-
+ -->
 	<div class="row">
 		<?php echo $form->labelEx($model, 'inputName'); ?>
 		<?php echo $form->textField($model, 'inputName',array('size' => 50,'maxlength' => 50)); ?>

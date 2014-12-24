@@ -64,7 +64,7 @@
 			"bProcessing": true,
 			"aaData": <?php echo json_encode($surFormsArray); ?>,
 			"aoColumns": [
-				{"mData": "formName", "sWidth": "8%"},
+				// {"mData": "formName", "sWidth": "8%"},
 				{"mData": "inputName"},
 				{"mData": "label"},
 				{"mData": "inputType", "sWidth": "9%"},
@@ -157,7 +157,7 @@
 	<table id="surFormDetails" border="0" cellspacing="0" cellpadding="0" width="96%" class="display">
 		<thead>
 		<tr>
-			<th title="Status">Status</th>
+			<!-- <th title="Status">Status</th> -->
 			<th title="Input Name">Input Name</th>
 			<th title="Label">Label</th>
 			<th title="Input Type">Input Type</th>

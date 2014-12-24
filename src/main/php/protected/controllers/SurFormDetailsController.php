@@ -37,6 +37,7 @@
 
 			if (isset($_POST['SurFormDetails'])) {
 				$model->attributes = $_POST['SurFormDetails'];
+				$model->formId = 1;
 				Yii::app()->user->setFlash("success", "Form element added successfully");
 				if ($model->save()) {
 					$this->redirect(array('index'));
