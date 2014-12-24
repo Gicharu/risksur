@@ -9,6 +9,8 @@
 		
 			<th title = "Name">Component Name <span style="color:red">*</span></th>
 			<th title = "Initiator">Initiator <span style="color:red">*</span></th>
+			<th title = "Initiator">Sample Size <span style="color:red">*</span></th>
+			<th title = "Initiator">Threat <span style="color:red">*</span></th>
 		
 	</thead>
 	<tbody> 
@@ -18,6 +20,8 @@ $rowFields = <<<END
 <tr id="newRow">
 	<td><input type="text" id="txtComponentName$lineNo" name="txtComponentName[]"  size="10" class="codeBox"/></td>
 	<td><input type="text" id="txtInitiator$lineNo" name="txtInitiator" size="10" class="codeBox"/></td>
+	<td><input type="text" id="txtSampleSize$lineNo" name="txtSampleSize" size="10" class="codeBox"/></td>
+	<td><input type="text" id="txtThreat$lineNo" name="txtThreat" size="10" class="codeBox"/></td>
 	<td><img src="../../images/trash.gif" onclick="$(this).parent().parent().remove();" class="trashIcon" alt="Delete Row" title="Delete Row"/></td>	
 </tr>
 END;
@@ -34,6 +38,12 @@ END;
 						var txtInitiator = document.getElementById('txtInitiator0');
 						var txtInitiatorIterate = document.getElementById('txtInitiator'+j);
 						txtInitiatorIterate.value = txtInitiator.value;
+						var txtSampleSize = document.getElementById('txtSampleSize0');
+						var txtSampleIterate = document.getElementById('txtSampleSize'+j);
+						txtSampleIterate.value = txtSampleSize.value;
+						var txtThreat = document.getElementById('txtThreat0');
+						var txtThreatIterate = document.getElementById('txtThreat'+j);
+						txtThreatIterate.value = txtThreat.value;
 					}
 				});
 			});
@@ -44,6 +54,12 @@ END;
 			</td>
 			<td>
 				<input type="text" id="txtInitiator<?php echo $i;?>" name="txtInitiator[]" <?php if (isset($_GET['txtInitiator'][$i])) { echo 'value="' . $_GET['txtInitiator'][$i] . '"'; } ?> />
+			</td>
+			<td>
+				<input type="text" id="txtSampleSize<?php echo $i;?>" name="txtSampleSize[]" <?php if (isset($_GET['txtSampleSize'][$i])) { echo 'value="' . $_GET['txtSampleSize'][$i] . '"';} ?>/>
+			</td>
+			<td>
+				<input type="text" id="txtThreat<?php echo $i;?>" name="txtThreat[]" <?php if (isset($_GET['txtThreat'][$i])) { echo 'value="' . $_GET['txtThreat'][$i] . '"';} ?>/>
 			</td>
 			<td>
 				<img src="../../images/trash.gif" onclick="$(this).parent().parent().remove();" class="trashIcon" alt="Delete Row" title="Delete Row" />
@@ -60,16 +76,6 @@ END;
 			<td colspan="5">
 				<input type="button" onclick="$(JSON.parse(jsonRow)).insertBefore('#buttons');" value="New Row" class="buttons" />
 				<input type="button" id="cmdCopy" onclick="" value="Copy Data" class="buttons" />
-			</td>
-		</tr>
-		<tr>
-			<td>
-				Sample Size <input type="text" id="txtSampleSize" name="txtSampleSize" <?php if (isset($_GET['txtSampleSize'])) { echo 'value="' . $_GET['txtSampleSize'] . '"';} ?>/>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				Threat <input type="text" id="txtThreat" name="txtThreat" <?php if (isset($_GET['txtThreat'])) { echo 'value="' . $_GET['txtThreat'] . '"';} ?>/>
 			</td>
 		</tr>
 	</tbody>
