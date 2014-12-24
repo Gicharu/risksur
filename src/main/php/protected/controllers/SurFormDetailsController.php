@@ -37,6 +37,8 @@
 
 			if (isset($_POST['SurFormDetails'])) {
 				$model->attributes = $_POST['SurFormDetails'];
+				// Make the form to be active by default.
+				$model->formId = 1;
 				Yii::app()->user->setFlash("success", "Form element added successfully");
 				if ($model->save()) {
 					$this->redirect(array('index'));
