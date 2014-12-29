@@ -64,6 +64,7 @@ blockquote {
 	font-size:.9em;
 }
 a:link, a:visited {
+	color: #194577;
 	background:transparent;
 	font-weight:700;
 	text-decoration:underline;
@@ -870,14 +871,16 @@ div.login-error{
 
 }
 
-#designName {
-	color: #666;
-	font-size: 18px;
+#designName, #attributeSelected {
+	color: #194577;
+	font-size: 16px;
 	font-weight: bold;
 	margin-right: 5px;
-	margin-top:25px;
+	margin-top:10px;
 	padding-right: 5px;
 	float: right;
+	text-align:right;
+	width: 90%;
 }
 .header {
 	color: #448DAE;
@@ -1324,5 +1327,7 @@ div.buttonWrapLeft {
 .ui-menu-item ul {
 	z-index: 100;
 }
-
-
+.attributeHighlight {
+	background-color:#FFFF84;
+	font-weight: bold;
+}

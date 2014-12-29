@@ -277,6 +277,7 @@
 			$componentDetails = new ComponentDetails;
 			$dataArray = array();
 			$dataArray['formType'] = 'Create';
+			$attributeArray = array();
 			//print_r(Yii::app()->session['surDesign']);
 			if (!empty(Yii::app()->session['surDesign'])) {
 				$getForm = SurForm::model()->with("surFormHead")->findAll(array(
@@ -288,6 +289,17 @@
 						':formId' => 1,
 					),
 				));
+				if (!empty(Yii::app()->session['performanceAttribute'])) {
+					$attributeList = AttributeFormRelation::model()->findAll(array(
+						'condition' => 'attributeId=:attributeId',
+						'params' => array(
+							':attributeId' => Yii::app()->session['performanceAttribute']['id'],
+						),
+					));
+					foreach ($attributeList as $attrs) {
+						$attributeArray[$attrs->subFormId] = $attrs->subFormId;
+					}
+				}
 				//$dataArray['getForm'] = $getForm;
 				$elements = array();
 				//$elements['title'] = "Components Form";
@@ -321,11 +333,17 @@
 							$inputType = 'text';
 						}
 					}
+
+					$hightlightClass = "";
+					if (isset($attributeArray[$valu->subFormId])) {
+						$hightlightClass = "attributeHighlight";
+					}
 					// add the elements to the CForm array
 					$elements['elements'][$valu->inputName . "|" . $valu->subFormId] = array(
 						'label' => $valu->label,
 						'required' => $valu->required,
 						'type' => $inputType,
+						'class' => $hightlightClass
 					);
 					//add the dropdown parameters
 					if ($inputType == 'dropdownlist') {
@@ -413,6 +431,7 @@
 			$dataArray = array();
 			$dataArray['formType'] = 'Edit';
 			$model = new ComponentsForm;
+			$attributeArray = array();
 			if (!empty(Yii::app()->session['surDesign']) && !empty($_GET['compId'])) {
 				$getForm = SurForm::model()->with("surFormHead")->findAll(array(
 					//'select' => 'pageId, pageName',
@@ -424,6 +443,17 @@
 					),
 				));
 
+				if (!empty(Yii::app()->session['performanceAttribute'])) {
+					$attributeList = AttributeFormRelation::model()->findAll(array(
+						'condition' => 'attributeId=:attributeId',
+						'params' => array(
+							':attributeId' => Yii::app()->session['performanceAttribute']['id'],
+						),
+					));
+					foreach ($attributeList as $attrs) {
+						$attributeArray[$attrs->subFormId] = $attrs->subFormId;
+					}
+				}
 				//fetch the form data
 				$fetchComponentData = Yii::app()->db->createCommand()
 					->select('cd.componentDetailId, cd.componentId, cd.subFormId, cd.value, sd.inputName, sd.inputType,ch.componentName')
@@ -479,12 +509,18 @@
 							$inputType = 'text';
 						}
 					}
+
+					$hightlightClass = "";
+					if (isset($attributeArray[$valu->subFormId])) {
+						$hightlightClass = "attributeHighlight";
+					}
 					// add the elements to the CForm array
 					$attributeId = $valu->inputName . "|" . $valu->subFormId;
 					$elements['elements'][$attributeId] = array(
 						'label' => $valu->label,
 						'required' => $valu->required,
 						'type' => $inputType,
+						'class' => $hightlightClass
 					);
 					// add the values to the form
 					if (isset($componentData[$attributeId])) {

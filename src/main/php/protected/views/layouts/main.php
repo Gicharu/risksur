@@ -15,7 +15,7 @@
 		$baseUrl . "/css/jquery.menubar.css" => "noMedia",
 		$baseUrl . "/css/form.css" => "noMedia",
 		$baseUrl . "/css/screen.css" => "noMedia",
-		$baseUrl . "/css/chosen.css" => "noMedia",
+		$baseUrl . "/libraries/chosen_v1.3.0/chosen.css" => "noMedia",
 		$baseUrl . "/css/showLoading.css" => "noMedia",
 		$baseUrl . "/css/jquery.dataTables.css" => "all",
 		$baseUrl . "/libraries/DataTables-1.9.4/media/css/jquery.dataTables.css" => "all",
@@ -44,6 +44,8 @@
 		"/js/common.js",
 		"/libraries/jquery-showloading-1.0/jquery.showLoading.js",
 		"/libraries/jsTimezoneDetect-1.0.4/jstz.min.js",
+		"/libraries/chosen_v1.3.0/chosen.jquery.js",
+
 	);
 	// add the theme to the cssArray
 	$themePath = $baseUrl . "/css/themes/" . $storySettings->theme;
@@ -279,6 +281,17 @@ $msg = 0;
 	<?php
 		if (!empty(Yii::app()->session['surDesign'])) {
 			echo "Active Design: " . Yii::app()->session['surDesign']['name'];
+		}
+	?>
+	</div>
+	<div id="attributeSelected">
+	<?php
+		if (!empty(Yii::app()->session['performanceAttribute'])) {
+			echo "Active Performance Attribute: " . Yii::app()->session['performanceAttribute']['name'];
+			echo " - <a href='" . CController::createUrl("attribute/selectAttribute") . "'>Change</a>";
+		} else {
+			echo " Active Performance Attribute: ";
+			echo " <a href='" . CController::createUrl("attribute/selectAttribute") . "'>Select</a>";
 		}
 	?>
 	</div>
