@@ -41,3 +41,9 @@ INSERT
 		('11', '4'),
 		('11', '7')
 	; 
+
+INSERT INTO `permissions`(`id`,`name`,`description`,`controller`,`action`,`bizrule`) values 
+(33,'Select Attribute','Select Attribute','attribute','selectAttribute','');
+
+INSERT INTO `roles_has_permissions`(`permissions_id`,`roles_id`) values
+(33,1),(33,2),(33,3);
