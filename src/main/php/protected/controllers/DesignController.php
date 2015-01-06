@@ -338,12 +338,15 @@
 					if (isset($attributeArray[$valu->subFormId])) {
 						$hightlightClass = "attributeHighlight";
 					}
+					$button = '<img id="moreInfoButton" style="cursor:pointer" class="ui-icon ui-icon-info" title="More Information" onclick="$("#moreInfoDialog").dialog("open")"/>';
 					// add the elements to the CForm array
 					$elements['elements'][$valu->inputName . "|" . $valu->subFormId] = array(
 						'label' => $valu->label,
 						'required' => $valu->required,
 						'type' => $inputType,
-						'class' => $hightlightClass
+						'class' => $hightlightClass,
+						// 'hint' => $valu->description,
+						'layout' => '{label} {hint} {input} {error}' . '<div style="margin-right:56%;width:300px;float:right;word-wrap:break-word;color:#848484">' . $button . $valu->description . ' - <a href=' . $valu->url . ' target=_blank>' . $valu->url . '</a></div>'
 					);
 					//add the dropdown parameters
 					if ($inputType == 'dropdownlist') {

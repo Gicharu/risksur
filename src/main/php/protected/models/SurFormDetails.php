@@ -16,6 +16,9 @@ class SurFormDetails extends CActiveRecord {
 	public $label;
 	public $inputType;
 	public $required;
+	public $description;
+	public $url;
+	public $moreInfo;
 
 	/**
 	 * model
@@ -48,7 +51,7 @@ class SurFormDetails extends CActiveRecord {
 	public function rules() {
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
-		return array(array('formId, inputName, label, inputType, required, showOnComponentList', 'required'),
+		return array(array('formId, inputName, label, inputType, required, showOnComponentList, description, moreInfo, url', 'required'),
 			array('formId', 'numerical', 'integerOnly' => true),
 			array('inputName, label, inputType', 'length', 'max' => 50),
 			array('inputName', 'match', 'pattern' => '/^[a-zA-Z0-9]{1,20}$/',
