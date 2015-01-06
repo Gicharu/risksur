@@ -55,7 +55,8 @@
 		 */
 		public function actionUpdate() {
 			if (empty($_GET['id'])) {
-				throw new CHttpException(404, "The requested surveilance form cannot be found");
+				Yii::app()->user->setFlash('notice', Yii::t("translation", "Please select a form element to edit"));
+				$this->redirect(array('SurFormDetails/index'));
 			}
 			$id = $_GET['id'];
 			$model = $this->loadModel($id);
