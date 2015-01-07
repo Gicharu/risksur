@@ -109,6 +109,10 @@ class AdminController extends Controller {
 
 		if (!empty($_GET['goalId'])) {
 			$model = GoalData::model()->findByPk($_GET['goalId']);
+			if ($model === null) {
+				Yii::app()->user->setFlash('error', Yii::t("translation", "The goal does not exist"));
+				$this->redirect(array('admin/listGoals'));
+			}
 			$elements['showErrorSummary'] = true;
 			$elements['activeForm']['id'] = "GoalDataForm";
 			$elements['activeForm']['enableClientValidation'] = true;
@@ -137,6 +141,9 @@ class AdminController extends Controller {
 				Yii::app()->user->setFlash('success', Yii::t("translation", "Goal successfully updated"));
 				$this->redirect(array('listGoals'));
 			}
+		} else {
+			Yii::app()->user->setFlash('error', Yii::t("translation", "Please select a goal to edit"));
+			$this->redirect(array('admin/listGoals'));
 		}
 		$this->render('goal', array(
 			'model' => $model,

@@ -55,7 +55,8 @@
 		 */
 		public function actionUpdate() {
 			if (empty($_GET['id'])) {
-				throw new CHttpException(404, "The requested surveilance form cannot be found");
+				Yii::app()->user->setFlash('error', Yii::t("translation", "Please select a form element to edit"));
+				$this->redirect(array('SurFormDetails/index'));
 			}
 			$id = $_GET['id'];
 			$model = $this->loadModel($id);
@@ -147,7 +148,8 @@
 		public function loadModel($id) {
 			$model = SurFormDetails::model()->findByPk($id);
 			if ($model === null) {
-				throw new CHttpException(404, 'The requested page does not exist.');
+				Yii::app()->user->setFlash('error', Yii::t("translation", "The form element does not exist"));
+				$this->redirect(array('SurFormDetails/index'));
 			}
 			return $model;
 		}

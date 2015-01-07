@@ -637,6 +637,10 @@
 			$dataArray['formType'] = 'Edit';
 			$model = new ComponentsForm;
 			$attributeArray = array();
+			if (empty($_GET['compId'])) {
+				Yii::app()->user->setFlash('error', Yii::t("translation", "Please select a component to edit"));
+				$this->redirect(array('design/listComponents'));
+			}
 			if (!empty(Yii::app()->session['surDesign']) && !empty($_GET['compId'])) {
 				$getForm = SurForm::model()->with("surFormHead")->findAll(array(
 					//'select' => 'pageId, pageName',
@@ -826,6 +830,13 @@
 			if (isset($_GET['designId'])) {
 				//fetch the form data
 				$model = NewDesign::model()->findByPk($_GET['designId']);
+				if ($model === null) {
+					Yii::app()->user->setFlash('error', Yii::t("translation", "The design does not exist"));
+					$this->redirect(array('design/index'));
+				}
+			} else {
+				Yii::app()->user->setFlash('error', Yii::t("translation", "Please select a design to edit"));
+				$this->redirect(array('design/index'));
 			}
 			//$this->performAjaxValidation($model);
 			if (isset($_POST['NewDesign'])) {
