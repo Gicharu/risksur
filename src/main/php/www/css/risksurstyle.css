@@ -11,6 +11,20 @@ body {
 .container {
 	background:none;
 }
+.componentDataPopup {
+	margin-right: 56%;
+	width: 300px;
+	float: right;
+	word-wrap:break-word;
+	color: #848484;
+	border: solid 1px;
+	background: #CECEF6;
+}
+.componentImagePopup {
+	margin-right: 56%;
+	width: 3px;
+	float: right;
+}
 .panel {
 	border: solid 1px #0798a5;
 	width: 320px;

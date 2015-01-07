@@ -338,7 +338,13 @@
 					if (isset($attributeArray[$valu->subFormId])) {
 						$hightlightClass = "attributeHighlight";
 					}
-					$button = '<img id="moreInfoButton" style="cursor:pointer" class="ui-icon ui-icon-info" title="More Information" onclick="$("#moreInfoDialog").dialog("open")"/>';
+					$button = CHtml::image('','',array(
+							'id' => 'moreInfoButton' . $valu->subFormId,
+							'style' => 'cursor:pointer',
+							'class' => 'ui-icon ui-icon-info',
+							'title' => 'More Information',
+							'onClick' => '$("#moreInfoDialog").html($("#popupData' . $valu->subFormId . '").html());$("#moreInfoDialog").dialog("open")'
+							));
 					// add the elements to the CForm array
 					$elements['elements'][$valu->inputName . "|" . $valu->subFormId] = array(
 						'label' => $valu->label,
@@ -346,7 +352,7 @@
 						'type' => $inputType,
 						'class' => $hightlightClass,
 						// 'hint' => $valu->description,
-						'layout' => '{label} {hint} {input} {error}' . '<div style="margin-right:56%;width:300px;float:right;word-wrap:break-word;color:#848484">' . $button . $valu->description . ' - <a href=' . $valu->url . ' target=_blank>' . $valu->url . '</a></div>'
+						'layout' => '{label} {hint} {input} {error}' . '<div id="popupData' . $valu->subFormId .'" style="display:none">'. $valu->moreInfo.'</div>' . '<div class="componentImagePopup">' . $button . '</div>' . '<div class="componentDataPopup">' . $valu->description . ' - <a href=' . $valu->url . ' target=_blank>' . $valu->url . '</a></div>'
 					);
 					//add the dropdown parameters
 					if ($inputType == 'dropdownlist') {
@@ -517,13 +523,21 @@
 					if (isset($attributeArray[$valu->subFormId])) {
 						$hightlightClass = "attributeHighlight";
 					}
+					$button = CHtml::image('','',array(
+							'id' => 'moreInfoButton' . $valu->subFormId,
+							'style' => 'cursor:pointer',
+							'class' => 'ui-icon ui-icon-info',
+							'title' => 'More Information',
+							'onClick' => '$("#moreInfoDialog").html($("#popupData' . $valu->subFormId . '").html());$("#moreInfoDialog").dialog("open")'
+							));
 					// add the elements to the CForm array
 					$attributeId = $valu->inputName . "|" . $valu->subFormId;
 					$elements['elements'][$attributeId] = array(
 						'label' => $valu->label,
 						'required' => $valu->required,
 						'type' => $inputType,
-						'class' => $hightlightClass
+						'class' => $hightlightClass,
+						'layout' => '{label} {hint} {input} {error}' . '<div id="popupData' . $valu->subFormId .'" style="display:none">'. $valu->moreInfo.'</div>' . '<div class="componentDataPopup">' . $button . $valu->description . ' - <a href=' . $valu->url . ' target=_blank>' . $valu->url . '</a></div>'
 					);
 					// add the values to the form
 					if (isset($componentData[$attributeId])) {
