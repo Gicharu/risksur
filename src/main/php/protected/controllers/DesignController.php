@@ -304,6 +304,7 @@
 				$elements = array();
 				//$elements['title'] = "Components Form";
 				$elements['showErrorSummary'] = true;
+				$elements['showErrors'] = true;
 				$elements['activeForm']['id'] = "ComponentsForm";
 				$elements['activeForm']['enableClientValidation'] = true;
 				//$elements['activeForm']['enableAjaxValidation'] = false;
@@ -322,7 +323,7 @@
 				);
 				foreach ($components as $valu) {
 					//set the model attribute array
-					$dynamicDataAttributes[$valu->inputName . "|" . $valu->subFormId] = 1;
+					$dynamicDataAttributes[$valu->inputName . "-" . $valu->subFormId] = 1;
 					//update the element type
 					if ($valu->inputType == 'int') {
 						$inputType = 'text';
@@ -339,7 +340,7 @@
 						$hightlightClass = "attributeHighlight";
 					}
 					// add the elements to the CForm array
-					$elements['elements'][$valu->inputName . "|" . $valu->subFormId] = array(
+					$elements['elements'][$valu->inputName . "-" . $valu->subFormId] = array(
 						'label' => $valu->label,
 						'required' => $valu->required,
 						'type' => $inputType,
@@ -359,7 +360,7 @@
 							$items[$params->optionId] = $params->label;
 						}
 						// add the dropdown items to the element
-						$elements['elements'][$valu->inputName . "|" . $valu->subFormId]['items'] = $items;
+						$elements['elements'][$valu->inputName . "-" . $valu->subFormId]['items'] = $items;
 					}
 				}
 				$elements['buttons'] = array(
@@ -388,7 +389,7 @@
 								$componentDetails->setIsNewRecord(true);
 								$componentDetails->componentDetailId = null;
 								$componentDetails->componentId = $componentId;
-								$params = explode("|", $key);
+								$params = explode("-", $key);
 								$componentDetails->subFormId = $params[1];
 								$componentDetails->value = $val;
 								$componentDetails->save();
@@ -434,67 +435,192 @@
 			$multipleRowsToShow = $risksurSettings->multipleComponentsRows;
 			$errorMessage = "";
 			$errorStatus = "";
-			// Select all values whose inputType is ""Select"
-			$fetchOptions = Yii::app()->db->createCommand()
-				->select('sfd.subFormId, sfd.label')
-				->from('surFormDetails sfd')
-				->where('sfd.inputType ="select"')
-				->queryAll();
-			// print_r($fetchOptions);die();
-			if (isset($_GET['txtComponentName'])) { // Check if there is a post from the page
-				foreach ($_GET['txtComponentName'] as $componentCheckKey => $componentCheck) { // Loop thru posted data components
-					if (!isset($componentCheck) || empty($componentCheck)) { // Check if there is a blank value meaning user hasnt entered the value
-						$componentCheckKey = $componentCheckKey + 1;
-						$errorStatus = "foundError";
-						$errorMessage.= "Enter a component name on line " . $componentCheckKey . "<br>"; // Append error
-					}
-				}
-				foreach ($_GET['txtInitiator'] as $initiatorCheckKey => $initiatorCheck) { // Loop thru posted data initiators
-					if (!isset($initiatorCheck) || empty($initiatorCheck)) { // Check for blanks
-						$initiatorCheckKey = $initiatorCheckKey + 1;
-						$errorStatus = "foundError";
-						$errorMessage.= "Enter the initiator name on line " . $initiatorCheckKey . "<br>"; // Append error
-					}
-				}
-				if ($errorStatus != "") {
-					echo Yii::app()->user->setFlash('error', $errorMessage); // Display errors to user
-				} else {
-					foreach ($_GET['txtComponentName'] as $componentKey => $componentName) {
-						$component->setIsNewRecord(true); // Set this so that subsequent records can be added
-						$component->componentId = null; // Set this so that subsequent records can be added
-						$component->componentName = $componentName;
-						$component->frameworkId = Yii::app()->session['surDesign']['id'];
-						if ($component->save()) { // Save record
-							$componentStatus = "added";
-							$componentId = $component->componentId; // Get id of last inserted record
-						} else {
-							Yii::app()->user->setFlash('error', "Component " . $componentName . " was not added");
-							return; // If there was an error show message and abort mission
-						}
 
-						for ($i=0; $i < count($_GET['txtInitiator']); $i++) { //As you add the component also add the details 
-							$componentDetails->setIsNewRecord(true);
-							$componentDetails->componentDetailId = null;
-							$componentDetails->componentId = $componentId;
-							$componentDetails->subFormId = "8"; // NOT SURE WHAT SHOULD GO HERE
-							$componentDetails->value = $_GET['txtInitiator'][$componentKey];
-							if ($componentDetails->save()) {
-								break;
-							} else {
-								Yii::app()->user->setFlash('error', "Component details for component " . $componentName . " were not added");
-								return;
+			$dataArray = array();
+			$dataArray['formType'] = 'Create';
+			$attributeArray = array();
+			//print_r(Yii::app()->session['surDesign']);
+			if (!empty(Yii::app()->session['surDesign'])) {
+				$getForm = SurForm::model()->with("surFormHead")->findAll(array(
+					//'select' => 'pageId, pageName',
+					'condition' => 't.formId=:formId  and surFormHead.showOnMultiForm=:showOnMulti',
+					'params' => array(
+						// ':formId' => Yii::app()->session['surDesign']['goalId'],
+						// Make the form active.
+						':formId' => 1,
+						'showOnMulti' => 1
+					),
+				));
+				if (!empty(Yii::app()->session['performanceAttribute'])) {
+					$attributeList = AttributeFormRelation::model()->findAll(array(
+						'condition' => 'attributeId=:attributeId',
+						'params' => array(
+							':attributeId' => Yii::app()->session['performanceAttribute']['id'],
+						),
+					));
+					foreach ($attributeList as $attrs) {
+						$attributeArray[$attrs->subFormId] = $attrs->subFormId;
+					}
+				}
+				//$dataArray['getForm'] = $getForm;
+				$elements = array();
+				//$elements['title'] = "Components Form";
+				$elements['showErrorSummary'] = true;
+				//$elements['showErrors'] = true;
+				$elements['activeForm']['id'] = "ComponentsForm";
+				$elements['activeForm']['enableClientValidation'] = true;
+				$elements['activeForm']['enableAjaxValidation'] = true;
+				$elements['activeForm']['class'] = 'CActiveForm';
+				//$elements['activeForm']['validateTabular'] = true;
+				//print_r($getForm); die();
+				$components = $getForm[0]->surFormHead;
+				$dataArray['getForm'] = $components;
+				$dynamicDataAttributes = array();
+				$inputType = 'text';
+				// add componentName form element
+				$dynamicDataAttributes['componentName'] = 1;
+				//$elements['elements'][] = '<div class="div-tab-row">';
+				//$elements['elements'][] = '<div class="div-tab-col">';
+				$elements['elements']['componentName'] = array(
+					'label' => "Component Name",
+					'required' => true,
+					'type' => 'text',
+					'layout' => '{input} {hint} {error}'
+				);
+				//$elements['elements'][] = '</div>';
+				foreach ($components as $valu) {
+					//$elements['elements'][] = '<div class="div-tab-col">';
+					//set the model attribute array
+					$dynamicDataAttributes[$valu->inputName . "-" . $valu->subFormId] = 1;
+					//update the element type
+					if ($valu->inputType == 'int') {
+						$inputType = 'text';
+					} else {
+						if ($valu->inputType == 'select') {
+							$inputType = 'dropdownlist';
+						} else {
+							$inputType = 'text';
+						}
+					}
+
+					$hightlightClass = "";
+					if (isset($attributeArray[$valu->subFormId])) {
+						$hightlightClass = "attributeHighlight";
+					}
+					// add the elements to the CForm array
+					$elements['elements'][$valu->inputName . "-" . $valu->subFormId] = array(
+						'label' => $valu->label,
+						'required' => $valu->required,
+						'type' => $inputType,
+						'class' => $hightlightClass,
+						'layout' => '{input} {hint} {error}'
+					);
+					//add the dropdown parameters
+					if ($inputType == 'dropdownlist') {
+						$data = Options::model()->findAll(array(
+							'condition' => 'elementId=:elementId',
+							'params' => array(
+								':elementId' => $valu->subFormId
+							),
+						));
+						$items = array();
+						// process the dropdown data into an array
+						foreach ($data as $params) {
+							$items[$params->optionId] = $params->label;
+						}
+						// add the dropdown items to the element
+						$elements['elements'][$valu->inputName . "-" . $valu->subFormId]['items'] = $items;
+					}
+					//$elements['elements'][] = '</div>';
+				}
+				//$elements['elements'][] = '<div class="div-tab-col trashIconDiv">' . 
+				//'<img src="../../images/trash.gif" onclick="$(this).parent().parent().remove();"' . 
+				//'class="trashIcon" alt="Delete Row" title="Delete Row"/></div></div>';
+				$elements['buttons'] = array(
+					'newComponent' => array(
+						'type' => 'submit',
+						'label' => 'Create Component',
+					),
+				);
+				$model = new ComponentsForm;
+				$model->_dynamicFields = $dynamicDataAttributes;
+				// generate the components form
+				$form = new CForm($elements, $model);
+				$formHeader = new CForm($elements, $model);
+				// Select all values whose inputType is "Select"
+				$fetchOptions = Yii::app()->db->createCommand()
+					->select('sfd.subFormId, sfd.label')
+					->from('surFormDetails sfd')
+					->where('sfd.inputType ="select"')
+					->queryAll();
+				// ajax request to add a new row
+					if ($form->submitted('ComponentsForm')) {
+						//$items=$this->getItemsToUpdate();
+						if(isset($_POST['ComponentsForm'])) {
+							$valid = true;
+							foreach($_POST['ComponentsForm'] as $i => $item) {
+								$data = new ComponentsForm;
+								$data->_dynamicFields = $dynamicDataAttributes;
+								// generate the components form
+								if(isset($_POST['ComponentsForm'][$i])) {
+									$data->attributes = $_POST['ComponentsForm'][$i];
+									$valid = $data->validate() && $valid;
+									//add the models withe attributes to the model array
+									$postedModelArray[] = $data;
+								}
+							}
+							if($valid) { // all items are valid
+							// ...do something hereo
+							echo "me valid";
 							}
 						}
 					}
-					if (isset($componentStatus)) { // If everything went well show success message
-						Yii::app()->user->setFlash('success', "Components successfully added.");
+					// check if there was a post and the muliple forms are invalid
+					if (isset($_POST['ComponentsForm']) && !$valid) {
+						$modelArray = $postedModelArray; 
+					} else {
+						// number of model records to show by default on the view
+						for ($i=0; $i < $multipleRowsToShow; $i++) {
+							$modelArray[] = $model;
+						}
 					}
-				}
+
+					if(Yii::app()->request->isAjaxRequest && isset($_GET['index'])) {
+						$modelArray = array($model);
+						$this->renderPartial('_tabularInputAsTable', array(
+							'errorStatus' => $errorStatus,
+							//'multipleRowsToShow' => $multipleRowsToShow,
+							'elements' => $elements,
+							'dataArray' => $dataArray,
+							'model' => $model,
+							'form' => $form,
+							'index' => $_GET['index']
+						));
+						return;
+					}
+					//$modelArray = array($model, $model);
+				$form = new CForm($elements, $model);
+				$this->render('multipleComponent', array(
+					'errorStatus' => $errorStatus,
+					//'multipleRowsToShow' => $multipleRowsToShow,
+					'elements' => $elements,
+					'dataArray' => $dataArray,
+					'modelArray' => $modelArray,
+					'form' => $form,
+					'formHeader' => $formHeader
+				));
 			}
-			$this->render('multipleComponent', array(
-				'errorStatus' => $errorStatus,
-				'multipleRowsToShow' => $multipleRowsToShow
-			));
+		}
+
+		public function actionAddNewMultiRow() {
+			if(Yii::app()->request->isAjaxRequest && isset($_GET['index'])) {
+				$this->getController()->renderPartial($this->viewName, array(
+					'model'=>$this->getModel(),
+					'index'=>$_GET['index']
+				));
+			} else {
+				throw new CHttpException(400,'Invalid request. Please do not repeat this request again.');
+			}
 		}
 
 		/**
@@ -545,7 +671,7 @@
 				//arrange data in array
 				$componentData = array();
 				foreach ($fetchComponentData as $dat) {
-					$componentData[$dat['inputName'] . "|" . $dat['subFormId']] = array(
+					$componentData[$dat['inputName'] . "-" . $dat['subFormId']] = array(
 						'value' => $dat['value'],
 						'id' => $dat['componentDetailId']
 					);
@@ -559,6 +685,7 @@
 				$elements = array();
 				//$elements['title'] = "Components Form";
 				$elements['showErrorSummary'] = true;
+				$elements['showErrors'] = true;
 				$elements['activeForm']['id'] = "ComponentsForm";
 				$elements['activeForm']['enableClientValidation'] = true;
 				//$elements['activeForm']['enableAjaxValidation'] = false;
@@ -577,7 +704,7 @@
 				);
 				foreach ($components as $valu) {
 					//set the model attribute array
-					$dynamicDataAttributes[$valu->inputName . "|" . $valu->subFormId] = 1;
+					$dynamicDataAttributes[$valu->inputName . "-" . $valu->subFormId] = 1;
 					//update the element type
 					if ($valu->inputType == 'int') {
 						$inputType = 'text';
@@ -594,7 +721,7 @@
 						$hightlightClass = "attributeHighlight";
 					}
 					// add the elements to the CForm array
-					$attributeId = $valu->inputName . "|" . $valu->subFormId;
+					$attributeId = $valu->inputName . "-" . $valu->subFormId;
 					$elements['elements'][$attributeId] = array(
 						'label' => $valu->label,
 						'required' => $valu->required,
@@ -623,7 +750,7 @@
 							$items[$params->optionId] = $params->label;
 						}
 						// add the dropdown items to the element
-						$elements['elements'][$valu->inputName . "|" . $valu->subFormId]['items'] = $items;
+						$elements['elements'][$valu->inputName . "-" . $valu->subFormId]['items'] = $items;
 					}
 				}
 				$elements['buttons'] = array(
@@ -657,7 +784,7 @@
 								$componentDetails->setIsNewRecord(false);
 								$componentDetails->componentDetailId = $componentData[$key]['id'];
 								$componentDetails->componentId = $componentId;
-								//$params = explode("|", $key);
+								//$params = explode("-", $key);
 								//$componentDetails->subFormId = $params[1];
 								$componentDetails->value = $val;
 								$componentDetails->save(false);

@@ -59,7 +59,7 @@ class ComponentsForm extends CFormModel {
 		if (!empty($this->_dynamicFields[$name])) {
 			$this->_dynamicData[$name] = $val;
 		} else {
-			parent::__set($name, $value);
+			parent::__set($name, $val);
 		}
 	}
 	/**
