@@ -15,9 +15,6 @@
 				}
 			}
 		});
-		// $("#moreInfoButton").click(function() {
-		// 	$("#moreInfoDialog").dialog('open');
-		// });
 	});
 </script>
 <div id="moreInfoDialog" title="More Information">Very Much Information</div>

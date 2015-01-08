@@ -352,7 +352,9 @@
 						'type' => $inputType,
 						'class' => $hightlightClass,
 						// 'hint' => $valu->description,
-						'layout' => '{label} {hint} {input} {error}' . '<div id="popupData' . $valu->subFormId .'" style="display:none">'. $valu->moreInfo.'</div>' . '<div class="componentImagePopup">' . $button . '</div>' . '<div class="componentDataPopup">' . $valu->description . ' - <a href=' . $valu->url . ' target=_blank>' . $valu->url . '</a></div>'
+						'layout' => '{label}<div class="componentImagePopup">' . $button . '</div>{hint} {input} {error}' . '<div id="popupData' . 
+							$valu->subFormId .'" style="display:none">'. $valu->moreInfo.'</div>' . '<div class="componentDataPopup">' . $valu->description . 
+							' <br/> <a href=' . $valu->url . ' target=_blank>' . $valu->url . '</a></div>'
 					);
 					//add the dropdown parameters
 					if ($inputType == 'dropdownlist') {
@@ -537,7 +539,9 @@
 						'required' => $valu->required,
 						'type' => $inputType,
 						'class' => $hightlightClass,
-						'layout' => '{label} {hint} {input} {error}' . '<div id="popupData' . $valu->subFormId .'" style="display:none">'. $valu->moreInfo.'</div>' . '<div class="componentDataPopup">' . $button . $valu->description . ' - <a href=' . $valu->url . ' target=_blank>' . $valu->url . '</a></div>'
+						'layout' => '{label}<div class="componentImagePopup">' . $button . '</div>{hint} {input} {error}' . '<div id="popupData' . 
+							$valu->subFormId .'" style="display:none">'. $valu->moreInfo.'</div>' . '<div class="componentDataPopup">' . $valu->description . 
+							' <br/> <a href=' . $valu->url . ' target=_blank>' . $valu->url . '</a></div>'
 					);
 					// add the values to the form
 					if (isset($componentData[$attributeId])) {
