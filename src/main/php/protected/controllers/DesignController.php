@@ -277,100 +277,13 @@
 			$componentDetails = new ComponentDetails;
 			$dataArray = array();
 			$dataArray['formType'] = 'Create';
-			$attributeArray = array();
+			//$attributeArray = array();
 			//print_r(Yii::app()->session['surDesign']);
 			if (!empty(Yii::app()->session['surDesign'])) {
-				$getForm = SurForm::model()->with("surFormHead")->findAll(array(
-					//'select' => 'pageId, pageName',
-					'condition' => 't.formId=:formId',
-					'params' => array(
-						// ':formId' => Yii::app()->session['surDesign']['goalId'],
-						// Make the form active.
-						':formId' => 1,
-					),
-				));
-				if (!empty(Yii::app()->session['performanceAttribute'])) {
-					$attributeList = AttributeFormRelation::model()->findAll(array(
-						'condition' => 'attributeId=:attributeId',
-						'params' => array(
-							':attributeId' => Yii::app()->session['performanceAttribute']['id'],
-						),
-					));
-					foreach ($attributeList as $attrs) {
-						$attributeArray[$attrs->subFormId] = $attrs->subFormId;
-					}
-				}
-				//$dataArray['getForm'] = $getForm;
-				$elements = array();
-				//$elements['title'] = "Components Form";
-				$elements['showErrorSummary'] = true;
-				$elements['showErrors'] = true;
-				$elements['activeForm']['id'] = "ComponentsForm";
-				$elements['activeForm']['enableClientValidation'] = true;
-				//$elements['activeForm']['enableAjaxValidation'] = false;
-				$elements['activeForm']['class'] = 'CActiveForm';
-				//print_r($getForm); die();
-				$components = $getForm[0]->surFormHead;
-				$dataArray['getForm'] = $components;
-				$dynamicDataAttributes = array();
-				$inputType = 'text';
-				// add componentName form element
-				$dynamicDataAttributes['componentName'] = 1;
-				$elements['elements']['componentName'] = array(
-					'label' => "Component Name",
-					'required' => true,
-					'type' => 'text',
-				);
-				foreach ($components as $valu) {
-					//set the model attribute array
-					$dynamicDataAttributes[$valu->inputName . "-" . $valu->subFormId] = 1;
-					//update the element type
-					if ($valu->inputType == 'int') {
-						$inputType = 'text';
-					} else {
-						if ($valu->inputType == 'select') {
-							$inputType = 'dropdownlist';
-						} else {
-							$inputType = 'text';
-						}
-					}
-
-					$hightlightClass = "";
-					if (isset($attributeArray[$valu->subFormId])) {
-						$hightlightClass = "attributeHighlight";
-					}
-					// add the elements to the CForm array
-					$elements['elements'][$valu->inputName . "-" . $valu->subFormId] = array(
-						'label' => $valu->label,
-						'required' => $valu->required,
-						'type' => $inputType,
-						'class' => $hightlightClass
-					);
-					//add the dropdown parameters
-					if ($inputType == 'dropdownlist') {
-						$data = Options::model()->findAll(array(
-							'condition' => 'elementId=:elementId',
-							'params' => array(
-								':elementId' => $valu->subFormId
-							),
-						));
-						$items = array();
-						// process the dropdown data into an array
-						foreach ($data as $params) {
-							$items[$params->optionId] = $params->label;
-						}
-						// add the dropdown items to the element
-						$elements['elements'][$valu->inputName . "-" . $valu->subFormId]['items'] = $items;
-					}
-				}
-				$elements['buttons'] = array(
-					'newComponent' => array(
-						'type' => 'submit',
-						'label' => 'Create Component',
-					),
-				);
+				$returnArray = self::getElementsAndDynamicAttributes();
+				$elements = $returnArray['elements'];
 				$model = new ComponentsForm;
-				$model->_dynamicFields = $dynamicDataAttributes;
+				$model->_dynamicFields = $returnArray['dynamicDataAttributes'];
 				// generate the components form
 				$form = new CForm($elements, $model);
 				//validate and save the component data
@@ -394,21 +307,10 @@
 								$componentDetails->value = $val;
 								$componentDetails->save();
 							}
-							//echo $key . "=>" . $val ."<br>";
-							//print_r($key);
-							//print_r($val);
 						}
 					}
 					Yii::app()->user->setFlash('success', Yii::t("translation", "Component successfully created"));
-
-					//die();
-					//$account = $form['Account']->model;
-					//$email = $form['Email']->model;
-					//if ($account->save(false)) {
-					//$email->id = $account->id;
-					//$email->save(false);
 					$this->redirect(array('listComponents'));
-					//}
 				}
 			}
 
@@ -439,111 +341,12 @@
 			$dataArray = array();
 			$dataArray['formType'] = 'Create';
 			$attributeArray = array();
-			//print_r(Yii::app()->session['surDesign']);
 			if (!empty(Yii::app()->session['surDesign'])) {
-				$getForm = SurForm::model()->with("surFormHead")->findAll(array(
-					//'select' => 'pageId, pageName',
-					'condition' => 't.formId=:formId  and surFormHead.showOnMultiForm=:showOnMulti',
-					'params' => array(
-						// ':formId' => Yii::app()->session['surDesign']['goalId'],
-						// Make the form active.
-						':formId' => 1,
-						'showOnMulti' => 1
-					),
-				));
-				if (!empty(Yii::app()->session['performanceAttribute'])) {
-					$attributeList = AttributeFormRelation::model()->findAll(array(
-						'condition' => 'attributeId=:attributeId',
-						'params' => array(
-							':attributeId' => Yii::app()->session['performanceAttribute']['id'],
-						),
-					));
-					foreach ($attributeList as $attrs) {
-						$attributeArray[$attrs->subFormId] = $attrs->subFormId;
-					}
-				}
-				//$dataArray['getForm'] = $getForm;
-				$elements = array();
-				//$elements['title'] = "Components Form";
-				$elements['showErrorSummary'] = true;
-				//$elements['showErrors'] = true;
-				$elements['activeForm']['id'] = "ComponentsForm";
-				$elements['activeForm']['enableClientValidation'] = true;
-				$elements['activeForm']['enableAjaxValidation'] = true;
-				$elements['activeForm']['class'] = 'CActiveForm';
-				//$elements['activeForm']['validateTabular'] = true;
-				//print_r($getForm); die();
-				$components = $getForm[0]->surFormHead;
-				$dataArray['getForm'] = $components;
-				$dynamicDataAttributes = array();
-				$inputType = 'text';
-				// add componentName form element
-				$dynamicDataAttributes['componentName'] = 1;
-				//$elements['elements'][] = '<div class="div-tab-row">';
-				//$elements['elements'][] = '<div class="div-tab-col">';
-				$elements['elements']['componentName'] = array(
-					'label' => "Component Name",
-					'required' => true,
-					'type' => 'text',
-					'layout' => '{input} {hint} {error}'
-				);
-				//$elements['elements'][] = '</div>';
-				foreach ($components as $valu) {
-					//$elements['elements'][] = '<div class="div-tab-col">';
-					//set the model attribute array
-					$dynamicDataAttributes[$valu->inputName . "-" . $valu->subFormId] = 1;
-					//update the element type
-					if ($valu->inputType == 'int') {
-						$inputType = 'text';
-					} else {
-						if ($valu->inputType == 'select') {
-							$inputType = 'dropdownlist';
-						} else {
-							$inputType = 'text';
-						}
-					}
-
-					$hightlightClass = "";
-					if (isset($attributeArray[$valu->subFormId])) {
-						$hightlightClass = "attributeHighlight";
-					}
-					// add the elements to the CForm array
-					$elements['elements'][$valu->inputName . "-" . $valu->subFormId] = array(
-						'label' => $valu->label,
-						'required' => $valu->required,
-						'type' => $inputType,
-						'class' => $hightlightClass,
-						'layout' => '{input} {hint} {error}'
-					);
-					//add the dropdown parameters
-					if ($inputType == 'dropdownlist') {
-						$data = Options::model()->findAll(array(
-							'condition' => 'elementId=:elementId',
-							'params' => array(
-								':elementId' => $valu->subFormId
-							),
-						));
-						$items = array();
-						// process the dropdown data into an array
-						foreach ($data as $params) {
-							$items[$params->optionId] = $params->label;
-						}
-						// add the dropdown items to the element
-						$elements['elements'][$valu->inputName . "-" . $valu->subFormId]['items'] = $items;
-					}
-					//$elements['elements'][] = '</div>';
-				}
-				//$elements['elements'][] = '<div class="div-tab-col trashIconDiv">' . 
-				//'<img src="../../images/trash.gif" onclick="$(this).parent().parent().remove();"' . 
-				//'class="trashIcon" alt="Delete Row" title="Delete Row"/></div></div>';
-				$elements['buttons'] = array(
-					'newComponent' => array(
-						'type' => 'submit',
-						'label' => 'Create Component',
-					),
-				);
+				$returnArray = self::getElementsAndDynamicAttributes(array(), true);
+				$elements = $returnArray['elements'];
 				$model = new ComponentsForm;
-				$model->_dynamicFields = $dynamicDataAttributes;
+				$model->_dynamicFields = $returnArray['dynamicDataAttributes'];
+
 				// generate the components form
 				$form = new CForm($elements, $model);
 				$formHeader = new CForm($elements, $model);
@@ -560,18 +363,49 @@
 							$valid = true;
 							foreach($_POST['ComponentsForm'] as $i => $item) {
 								$data = new ComponentsForm;
-								$data->_dynamicFields = $dynamicDataAttributes;
+								$data->_dynamicFields = $returnArray['dynamicDataAttributes'];
 								// generate the components form
 								if(isset($_POST['ComponentsForm'][$i])) {
-									$data->attributes = $_POST['ComponentsForm'][$i];
+									$data->attributes = $item; //$_POST['ComponentsForm'][$i];
 									$valid = $data->validate() && $valid;
 									//add the models withe attributes to the model array
 									$postedModelArray[] = $data;
 								}
 							}
 							if($valid) { // all items are valid
-							// ...do something hereo
-							echo "me valid";
+								//print_r($form->getModel()); die();
+								foreach($_POST['ComponentsForm'] as $i => $item) {
+									$data = new ComponentsForm;
+									$data->_dynamicFields = $returnArray['dynamicDataAttributes'];
+									$data->attributes = $item;
+									//print_r($item); die();
+
+									$component->setIsNewRecord(true);
+									$component->componentId = null;
+									$component->componentName = $val = $data->componentName;
+									$component->frameworkId = Yii::app()->session['surDesign']['id'];
+									//save the componentHead values
+									$component->save();
+									$componentId = $component->componentId;
+									// fetch the form data
+									foreach ($item as $key => $val) {
+										//ignore the attribute arrays
+										if (!is_array($key) && !is_array($val)) {
+											if ($key != "componentName") {
+												$componentDetails->setIsNewRecord(true);
+												$componentDetails->componentDetailId = null;
+												$componentDetails->componentId = $componentId;
+												$params = explode("-", $key);
+												$componentDetails->subFormId = $params[1];
+												$componentDetails->value = $val;
+												$componentDetails->save();
+											}
+										}
+									}
+								}
+								Yii::app()->user->setFlash('success', Yii::t("translation", "Components successfully created"));
+
+								$this->redirect(array('listComponents'));
 							}
 						}
 					}
@@ -612,6 +446,12 @@
 			}
 		}
 
+		/**
+		 * actionAddNewMultiRow 
+		 * 
+		 * @access public
+		 * @return void
+		 */
 		public function actionAddNewMultiRow() {
 			if(Yii::app()->request->isAjaxRequest && isset($_GET['index'])) {
 				$this->getController()->renderPartial($this->viewName, array(
@@ -624,72 +464,44 @@
 		}
 
 		/**
-		 * actionEditComponent
-		 *
+		 * getElementsAndDynamicAttributes 
+		 * 
 		 * @access public
 		 * @return void
 		 */
-		public function actionEditComponent() {
-			Yii::log("actionEditComponent DesignController called", "trace", self::LOG_CAT);
-			$component = new ComponentHead;
-			$componentDetails = new ComponentDetails;
-			$dataArray = array();
-			$dataArray['formType'] = 'Edit';
-			$model = new ComponentsForm;
+		public function getElementsAndDynamicAttributes($componentData = array(), $muliForm = false) {
+			$elements = array();
 			$attributeArray = array();
-			if (empty($_GET['compId'])) {
-				Yii::app()->user->setFlash('error', Yii::t("translation", "Please select a component to edit"));
-				$this->redirect(array('design/listComponents'));
-			}
-			if (!empty(Yii::app()->session['surDesign']) && !empty($_GET['compId'])) {
-				$getForm = SurForm::model()->with("surFormHead")->findAll(array(
-					//'select' => 'pageId, pageName',
-					'condition' => 't.formId=:formId',
-					'params' => array(
-						// ':formId' => Yii::app()->session['surDesign']['goalId'],
-						// Make the form active.
-						':formId' => 1,
-					),
-				));
-
-				if (!empty(Yii::app()->session['performanceAttribute'])) {
-					$attributeList = AttributeFormRelation::model()->findAll(array(
-						'condition' => 'attributeId=:attributeId',
-						'params' => array(
-							':attributeId' => Yii::app()->session['performanceAttribute']['id'],
-						),
+			$dynamicDataAttributes = array();
+			if (!empty(Yii::app()->session['surDesign'])) {
+					$getFormCondition = 't.formId=:formId';
+					$getFormParams = array(':formId' => 1);
+					// show only the elements where showOnMultiForm = true for multi form layout
+					if ($muliForm) {
+						$getFormCondition = 't.formId=:formId  and surFormHead.showOnMultiForm=:showOnMulti';
+						$getFormParams = array(':formId' => 1, 'showOnMulti' => 1);
+					}
+					$getForm = SurForm::model()->with("surFormHead")->findAll(array(
+						//'select' => 'pageId, pageName',
+						'condition' => $getFormCondition,
+						'params' => $getFormParams
 					));
-					foreach ($attributeList as $attrs) {
-						$attributeArray[$attrs->subFormId] = $attrs->subFormId;
+					if (!empty(Yii::app()->session['performanceAttribute'])) {
+						$attributeList = AttributeFormRelation::model()->findAll(array(
+							'condition' => 'attributeId=:attributeId',
+							'params' => array(
+								':attributeId' => Yii::app()->session['performanceAttribute']['id'],
+							),
+						));
+						foreach ($attributeList as $attrs) {
+							$attributeArray[$attrs->subFormId] = $attrs->subFormId;
+						}
 					}
-				}
-				//fetch the form data
-				$fetchComponentData = Yii::app()->db->createCommand()
-					->select('cd.componentDetailId, cd.componentId, cd.subFormId, cd.value, sd.inputName, sd.inputType,ch.componentName')
-					->from('componentDetails cd')
-					->join('surFormDetails sd', 'sd.subFormId = cd.subFormId')
-					->join('componentHead ch', 'ch.componentId = cd.componentId')
-					->where('cd.componentId =' . $_GET['compId'])
-					->queryAll();
-				//print_r($fetchComponentData);
-				//arrange data in array
-				$componentData = array();
-				foreach ($fetchComponentData as $dat) {
-					$componentData[$dat['inputName'] . "-" . $dat['subFormId']] = array(
-						'value' => $dat['value'],
-						'id' => $dat['componentDetailId']
-					);
-					// add the component name to the array as well but just once
-					if (empty($componentData['componentName'])) {
-						$componentData['componentName'] = $dat['componentName'];
-					}
-				}
-
-				//$dataArray['getForm'] = $getForm;
-				$elements = array();
 				//$elements['title'] = "Components Form";
 				$elements['showErrorSummary'] = true;
-				$elements['showErrors'] = true;
+				if (!$muliForm) {
+					$elements['showErrors'] = true;
+				}
 				$elements['activeForm']['id'] = "ComponentsForm";
 				$elements['activeForm']['enableClientValidation'] = true;
 				//$elements['activeForm']['enableAjaxValidation'] = false;
@@ -697,7 +509,6 @@
 				//print_r($getForm); die();
 				$components = $getForm[0]->surFormHead;
 				$dataArray['getForm'] = $components;
-				$dynamicDataAttributes = array();
 				$inputType = 'text';
 				// add componentName form element
 				$dynamicDataAttributes['componentName'] = 1;
@@ -706,6 +517,10 @@
 					'required' => true,
 					'type' => 'text',
 				);
+				// hide the label for multiple form layout
+				if($muliForm) {
+					$elements['elements']['componentName']['layout'] = '{input} {hint} {error}';
+				}
 				foreach ($components as $valu) {
 					//set the model attribute array
 					$dynamicDataAttributes[$valu->inputName . "-" . $valu->subFormId] = 1;
@@ -724,20 +539,25 @@
 					if (isset($attributeArray[$valu->subFormId])) {
 						$hightlightClass = "attributeHighlight";
 					}
-					// add the elements to the CForm array
 					$attributeId = $valu->inputName . "-" . $valu->subFormId;
+					// add the elements to the CForm array
 					$elements['elements'][$attributeId] = array(
 						'label' => $valu->label,
 						'required' => $valu->required,
 						'type' => $inputType,
 						'class' => $hightlightClass
 					);
+					// hide the label for multiple form layout
+					if($muliForm) {
+						$elements['elements'][$attributeId]['layout'] = '{input} {hint} {error}';
+					}
+
 					// add the values to the form
-					if (isset($componentData[$attributeId])) {
+					if (!empty($componentData[$attributeId])) {
 						$elements['elements'][$attributeId]['value'] = $componentData[$attributeId]['value'];
 					}
 					// add the component name element value
-					if (isset($componentData['componentName'])) {
+					if (!empty($componentData['componentName'])) {
 						$elements['elements']['componentName']['value'] = $componentData['componentName'];
 					}
 					//add the dropdown parameters
@@ -760,14 +580,63 @@
 				$elements['buttons'] = array(
 					'newComponent' => array(
 						'type' => 'submit',
-						'label' => 'Edit Component',
+						'label' => 'Create Component',
 					),
 				);
+			}
+			$returnArray = array('elements' => $elements, 'dynamicDataAttributes' => $dynamicDataAttributes);
+			return $returnArray;
+		}
+
+		/**
+		 * actionEditComponent
+		 *
+		 * @access public
+		 * @return void
+		 */
+		public function actionEditComponent() {
+			Yii::log("actionEditComponent DesignController called", "trace", self::LOG_CAT);
+			$component = new ComponentHead;
+			$componentDetails = new ComponentDetails;
+			$dataArray = array();
+			$dataArray['formType'] = 'Edit';
+			$model = new ComponentsForm;
+			$attributeArray = array();
+			if (empty($_GET['compId'])) {
+				Yii::app()->user->setFlash('error', Yii::t("translation", "Please select a component to edit"));
+				$this->redirect(array('design/listComponents'));
+			}
+			if (!empty(Yii::app()->session['surDesign']) && !empty($_GET['compId'])) {
+				//fetch the form data
+				$fetchComponentData = Yii::app()->db->createCommand()
+					->select('cd.componentDetailId, cd.componentId, cd.subFormId, cd.value, sd.inputName, sd.inputType,ch.componentName')
+					->from('componentDetails cd')
+					->join('surFormDetails sd', 'sd.subFormId = cd.subFormId')
+					->join('componentHead ch', 'ch.componentId = cd.componentId')
+					->where('cd.componentId =' . $_GET['compId'])
+					->queryAll();
+				//print_r($fetchComponentData);
+				//arrange data in array
+				$componentData = array();
+				foreach ($fetchComponentData as $dat) {
+					$componentData[$dat['inputName'] . "-" . $dat['subFormId']] = array(
+						'value' => $dat['value'],
+						'id' => $dat['componentDetailId']
+					);
+					// add the component name to the array as well but just once
+					if (empty($componentData['componentName'])) {
+						$componentData['componentName'] = $dat['componentName'];
+					}
+				}
+
+				$returnArray = self::getElementsAndDynamicAttributes($componentData);
+				$elements = $returnArray['elements'];
 				$model = new ComponentsForm;
-				$model->_dynamicFields = $dynamicDataAttributes;
+				$model->_dynamicFields = $returnArray['dynamicDataAttributes'];
 
 				// generate the components form
 				$form = new CForm($elements, $model);
+
 				//validate and save the component data
 				if ($form->submitted('ComponentsForm') && $form->validate()) {
 					//print_r($form->getModel()); die();
@@ -796,15 +665,7 @@
 						}
 					}
 					Yii::app()->user->setFlash('success', Yii::t("translation", "Component successfully updated"));
-
-					//die();
-					//$account = $form['Account']->model;
-					//$email = $form['Email']->model;
-					//if ($account->save(false)) {
-					//$email->id = $account->id;
-					//$email->save(false);
 					$this->redirect(array('listComponents'));
-					//}
 				}
 			}
 			$this->render('component', array(
@@ -812,7 +673,6 @@
 				'dataArray' => $dataArray,
 				'form' => $form
 			));
-
 		}
 
 		/**

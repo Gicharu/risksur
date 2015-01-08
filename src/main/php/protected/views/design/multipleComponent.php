@@ -1,3 +1,4 @@
+<h3>Create Components for <?php echo Yii::app()->session['surDesign']['name'];?></h3>
 <?php
 	echo $formHeader->renderBegin();
 	//echo $form->errorSummary();
@@ -6,7 +7,42 @@
 	foreach ($formHeader->getElements() as $element) {
 		$headerTd .= "<td>" . CHtml::label($element->label, false) . "</td>";
 	}
+
+$headerTd .= "<td width='3%'>" . CHtml::htmlButton(Yii::t('translation', 'Copy First Row'), array(
+		'onClick' =><<<END
+js:var rowIndex = 0; 
+var data = $(".tabular-input-container tr").eq(rowIndex).find("input[type=text],textarea,select").serializeArray(); 
+$(".tabular-input-container tr").each(function (a) {
+	if (a != rowIndex) { 
+		$(this).find("input[type=text],textarea,select").each(function(i, element) {
+			// don't copy the component name, first element
+			if(i != 0) {
+				// set the value to the first row element value
+				$(this).val(data[i]['value']);
+			}
+		});
+	}
+});
+END
+,
+		'title' =>'Copy First Row',
+		'type' => 'button',
+		'id' => 'copyRow'
+	)
+) . "</td>";
+
+
 ?>
+<script type="text/javascript">
+$(function() {
+	$("#copyRow").button({
+		icons: {
+			primary: "ui-icon-copy"
+		},
+		text:false
+	});
+});
+</script>
 <div class="form">
 	<?php $this->widget('ext.widgets.tabularinput.XTabularInput', array(
 		'models' => $modelArray,
@@ -16,7 +52,6 @@
 		'headerTagName' => 'thead',
 		'header' =>'
 			<tr>' . $headerTd . '
-				<td></td>
 			</tr>
 		',
 		'inputContainerTagName' => 'tbody',

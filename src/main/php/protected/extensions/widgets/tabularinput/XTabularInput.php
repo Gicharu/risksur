@@ -328,7 +328,10 @@ SCRIPT;
 				'index' => $index,
 				'form' => $newForm
 			));
-			echo $this->getRemoveLinkAndIndexInput($index);
+			// make the first row not deleteable
+			if ($index > 0) {
+				echo $this->getRemoveLinkAndIndexInput($index);
+			}
 			echo CHtml::closeTag($this->inputTagName);
 		}
 	}
