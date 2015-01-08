@@ -104,6 +104,11 @@
 		<?php echo $form->dropDownList($model, 'showOnComponentList', array('No', 'Yes')); ?>
 		<?php echo $form->error($model, 'showOnComponentList'); ?>
 	</div>
+	<div class="row">
+		<?php echo $form->labelEx($model, 'showOnMultiForm'); ?>
+		<?php echo $form->dropDownList($model, 'showOnMultiForm', array('No', 'Yes')); ?>
+		<?php echo $form->error($model, 'showOnMultiForm'); ?>
+	</div>
 
 	<div class="row buttons">
 		<?php echo CHtml::submitButton($model->isNewRecord ? 'Create' : 'Save'); ?>

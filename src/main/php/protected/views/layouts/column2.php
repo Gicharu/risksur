@@ -18,6 +18,10 @@
 							'id' => 'addComponent'
 							)
 						),
+						array('label' => Yii::t("translation", "Add Multiple Components"), 'url' => array('addMultipleComponents'), 'itemOptions' => array ( 
+							'id' => 'addMultipleComponents'
+							)
+						),
 						array('label' => Yii::t("translation", "List Components"), 'url' => array('listComponents'), 'itemOptions' => array ( 
 							'id' => 'showComponents'
 							)
