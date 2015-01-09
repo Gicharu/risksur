@@ -674,13 +674,24 @@
 						if (!is_array($key) && !is_array($val)) {
 							if ($key != "componentName") {
 								$componentDetails = new ComponentDetails;
-								$componentDetails->setIsNewRecord(false);
-								$componentDetails->componentDetailId = $componentData[$key]['id'];
-								$componentDetails->componentId = $componentId;
-								//$params = explode("-", $key);
-								//$componentDetails->subFormId = $params[1];
-								$componentDetails->value = $val;
-								$componentDetails->save(false);
+								// record found edit record
+								if (!empty($componentData[$key])) {
+									$componentDetails->setIsNewRecord(false);
+									$componentDetails->componentDetailId = $componentData[$key]['id'];
+									$componentDetails->componentId = $componentId;
+									$componentDetails->value = $val;
+									$componentDetails->save(false);
+								// record not found add new record
+								} else {
+									$componentDetails->setIsNewRecord(true);
+									$componentDetails->componentDetailId = null;
+									$componentDetails->componentId = $componentId;
+									$params = explode("-", $key);
+									$componentDetails->subFormId = $params[1];
+									$componentDetails->value = $val;
+									$componentDetails->save();
+
+								}
 							}
 						}
 					}
