@@ -499,6 +499,8 @@
 					}
 				//$elements['title'] = "Components Form";
 				$elements['showErrorSummary'] = true;
+				$elements['errorSummaryHeader'] = Yii::app()->params['headerErrorSummary'];
+				$elements['errorSummaryFooter'] = Yii::app()->params['footerErrorSummary'];
 				if (!$muliForm) {
 					$elements['showErrors'] = true;
 				}
@@ -520,6 +522,8 @@
 				// hide the label for multiple form layout
 				if($muliForm) {
 					$elements['elements']['componentName']['layout'] = '{input} {hint} {error}';
+				} else {
+					$elements['elements']['componentName']['layout'] = '{label} {input} {hint} {error}';
 				}
 				foreach ($components as $valu) {
 					//set the model attribute array
@@ -550,6 +554,22 @@
 					// hide the label for multiple form layout
 					if($muliForm) {
 						$elements['elements'][$attributeId]['layout'] = '{input} {hint} {error}';
+					} else {
+						// Add an image icon that will be displayed on the ui to show more infor
+						$button = CHtml::image('','',array(
+								'id' => 'moreInfoButton' . $valu->subFormId,
+								'style' => 'cursor:pointer',
+								'class' => 'ui-icon ui-icon-info',
+								'title' => 'More Information',
+								'onClick' => '$("#moreInfoDialog").html($("#popupData' . $valu->subFormId . '").html());$("#moreInfoDialog").dialog("open")'
+								));
+						// Add the image icon and information to the layout/ui
+						if (!empty($valu->moreInfo) && !empty($valu->url) && !empty($valu->description)) {
+							$elements['elements'][$attributeId]['layout'] = '{label}<div class="componentImagePopup">' . $button . 
+							'</div>{hint} {input}' . '<div id="popupData' . $valu->subFormId .'" style="display:none">'. $valu->moreInfo.'</div>' . 
+							'<div class="componentDataPopup">' . $valu->description . 
+								' <br/> <a href=' . $valu->url . ' target=_blank>' . $valu->url . '</a></div> {error}';
+						}
 					}
 
 					// add the values to the form
