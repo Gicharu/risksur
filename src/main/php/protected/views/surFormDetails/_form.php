@@ -110,6 +110,11 @@
 		<?php echo $form->error($model, 'showOnMultiForm'); ?>
 	</div>
 	<div class="row">
+		<?php echo $form->labelEx($model, 'description'); ?>
+		<?php echo $form->textArea($model, 'description',array('size' => 50,'maxlength' => 50)); ?>
+		<?php echo $form->error($model, 'description'); ?>
+	</div>
+	<div class="row">
 		<?php echo $form->labelEx($model, 'moreInfo'); ?>
 		<?php echo $form->textArea($model, 'moreInfo',array('size' => 50,'maxlength' => 50)); ?>
 		<?php echo $form->error($model, 'moreInfo'); ?>

@@ -1,0 +1,7 @@
+UPDATE `surFormDetails` SET `description` = 'Enter a name for the initiator', `moreInfo` = 'The initiator initiates the initiated', `url` = 'http://www.karlo.org'  WHERE `subFormId` = '1';
+UPDATE `surFormDetails` SET `description` = 'Here, describe the point of capture', `moreInfo` = 'The capture point is where we capture capturees', `url` = 'http://www.ilri.org'  WHERE `subFormId` = '2';
+UPDATE `surFormDetails` SET `description` = 'What type of raw data you want', `moreInfo` = 'Raw data is just that, raw, not processed yet', `url` = 'http://www.icipe.org'  WHERE `subFormId` = '3';
+UPDATE `surFormDetails` SET `description` = 'Enter where the observation unit', `moreInfo` = 'Its a unit of observation, thats all', `url` = 'http://www.nairobi.go.ke'  WHERE `subFormId` = '4';
+UPDATE `surFormDetails` SET `description` = 'Describe the size of the samples you will collect', `moreInfo` = 'Should be substantial', `url` = 'http://www.kari.org'  WHERE `subFormId` = '5';
+UPDATE `surFormDetails` SET `description` = 'See step #1 above', `moreInfo` = 'Same as #1', `url` = 'http://www.kefri.org'  WHERE `subFormId` = '6';
+UPDATE `surFormDetails` SET `description` = 'Describe the type of threat for you data', `moreInfo` = 'Threat can be anything, terrorists, rice, rats you name it :-)', `url` = 'http://www.kemri.org'  WHERE `subFormId` = '7';
