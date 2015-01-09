@@ -272,7 +272,6 @@
 		 * @return void
 		 */
 		public function actionAddComponent() {
-			echo Yii::getVersion();
 			Yii::log("actionAddComponent DesignController called", "trace", self::LOG_CAT);
 			$component = new ComponentHead;
 			$componentDetails = new ComponentDetails;
