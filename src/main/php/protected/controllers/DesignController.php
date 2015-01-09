@@ -562,9 +562,12 @@
 								'onClick' => '$("#moreInfoDialog").html($("#popupData' . $valu->subFormId . '").html());$("#moreInfoDialog").dialog("open")'
 								));
 						// Add the image icon and information to the layout/ui
-						$elements['elements'][$attributeId]['layout'] = '{label}<div class="componentImagePopup">' . $button . '</div>{hint} {input} {error}' . '<div id="popupData' . 
-								$valu->subFormId .'" style="display:none">'. $valu->moreInfo.'</div>' . '<div class="componentDataPopup">' . $valu->description . 
+						if (!empty($valu->moreInfo) && !empty($valu->url) && !empty($valu->description)) {
+							$elements['elements'][$attributeId]['layout'] = '{label}<div class="componentImagePopup">' . $button . 
+							'</div>{hint} {input} {error}' . '<div id="popupData' . $valu->subFormId .'" style="display:none">'. $valu->moreInfo.'</div>' . 
+							'<div class="componentDataPopup">' . $valu->description . 
 								' <br/> <a href=' . $valu->url . ' target=_blank>' . $valu->url . '</a></div>';
+						}
 					}
 
 					// add the values to the form
