@@ -105,9 +105,9 @@
 		<?php echo $form->error($model, 'showOnComponentList'); ?>
 	</div>
 	<div class="row">
-		<?php echo $form->labelEx($model, 'description'); ?>
-		<?php echo $form->textArea($model, 'description',array('size' => 50,'maxlength' => 50)); ?>
-		<?php echo $form->error($model, 'description'); ?>
+		<?php echo $form->labelEx($model, 'showOnMultiForm'); ?>
+		<?php echo $form->dropDownList($model, 'showOnMultiForm', array('No', 'Yes')); ?>
+		<?php echo $form->error($model, 'showOnMultiForm'); ?>
 	</div>
 	<div class="row">
 		<?php echo $form->labelEx($model, 'moreInfo'); ?>

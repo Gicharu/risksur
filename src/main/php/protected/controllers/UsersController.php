@@ -123,6 +123,10 @@ class UsersController extends Controller {
 		Yii::log("actionUpdate called", "trace", self::LOG_CAT);
 		if (isset($_GET['userId'])) {
 			$model = Users::model()->findByAttributes(array( 'userId' => $_GET['userId'] ));
+			if ($model === null) {
+				Yii::app()->user->setFlash('error', Yii::t("translation", "The user does not exist"));
+				$this->redirect(array('users/index'));
+			}
 			$role = UsersHasRoles::model()->findByAttributes(array( 'users_id' => $_GET['userId'] ));
 			$model->roles = $role->roles_id;
 			if(isset($_POST['Users'])) {
@@ -136,6 +140,10 @@ class UsersController extends Controller {
 			$this->render('update', array(
 				'model'=>$model,
 			));
+		} else {
+			Yii::log("User not selected", "warning", self::LOG_CAT);
+			Yii::app()->user->setFlash('error', Yii::t("translation", "Please select a user to edit"));
+			$this->redirect(array('users/index'));
 		}
 		
 	}
@@ -200,8 +208,10 @@ class UsersController extends Controller {
 	 */
 	public function loadModel($id) {
 		$model=Users::model()->findByPk($id);
-		if($model === null)
-			throw new CHttpException(404, 'The requested page does not exist.');
+		if($model === null) {
+			Yii::app()->user->setFlash('error', Yii::t("translation", "The user does not exist"));
+			$this->redirect(array('users/index'));
+		}
 		return $model;
 	}
 }

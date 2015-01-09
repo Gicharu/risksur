@@ -8,6 +8,16 @@ body {
 	color:#000;background:none;
 	font-size:10pt;
 }
+.buttons{
+	/*border-style:solid;*/
+	/*border-color: #FFF #6c6c6c #6c6c6c #FFF;*/
+	/*border-width:1px;*/
+}
+.tableFrame {
+    padding: 10px;
+    margin-bottom:10px;
+    border: solid 1px #ccc;
+}
 .container {
 	background:none;
 }
@@ -1344,4 +1354,26 @@ div.buttonWrapLeft {
 .attributeHighlight {
 	background-color:#FFFF84;
 	font-weight: bold;
+}
+
+a.trashIcon{
+	/*background: image repeat scroll 0 0 transparent;*/
+	background: url("../images/trash.gif") no-repeat;
+	/*background-image: url("../images/trash.gif");*/
+	vertical-align:bottom;
+	cursor: pointer;
+	width: 16px;
+	display:block;
+	text-decoration:none;
+}
+button#copyRow {
+	width:1.6em;
+	height:1.6em;
+}
+table.tabular-container {
+	width:100%;
+}
+/* all the input elements for multi form layout */
+tr.tabular-input td input, tr.tabular-input td textarea, tr.tabular-input td select {
+	width: 95%;
 }
