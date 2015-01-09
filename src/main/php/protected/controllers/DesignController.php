@@ -272,6 +272,7 @@
 		 * @return void
 		 */
 		public function actionAddComponent() {
+			echo Yii::getVersion();
 			Yii::log("actionAddComponent DesignController called", "trace", self::LOG_CAT);
 			$component = new ComponentHead;
 			$componentDetails = new ComponentDetails;
@@ -499,6 +500,8 @@
 					}
 				//$elements['title'] = "Components Form";
 				$elements['showErrorSummary'] = true;
+				$elements['errorSummaryHeader'] = Yii::app()->params['headerErrorSummary'];
+				$elements['errorSummaryFooter'] = Yii::app()->params['footerErrorSummary'];
 				if (!$muliForm) {
 					$elements['showErrors'] = true;
 				}
