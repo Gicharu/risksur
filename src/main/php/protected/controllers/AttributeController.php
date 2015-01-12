@@ -11,6 +11,7 @@
 	 * @license Tracetracker {@link http://www.tracetracker.com}
 	 */
 	class AttributeController extends Controller {
+		private	$configuration;
 		const LOG_CAT = "ctrl.AttributeController";
 		//Use layout 
 		public $layout = '//layouts/column2';
@@ -28,6 +29,62 @@
 					'application.filters.RbacFilter',
 				),
 			);
+		}
+
+		/**
+		 * init 
+		 * 
+		 * @access public
+		 * @return void
+		 */
+		public function init() {
+			$this->configuration = Yii::app()->tsettings;
+		}
+
+		/**
+		 * actionIndex 
+		 * 
+		 * @access public
+		 * @return void
+		 */
+		public function actionIndex() {
+			Yii::log("actionIndex AttributeController called", "trace", self::LOG_CAT);
+			$model = new Attributes;
+			$dataArray = array();
+			$dataArray['dtHeader'] = "Manage Attributes"; // Set page title when printing the datatable
+			$attributesList = Yii::app()->db->createCommand()
+				->select('attributeId, name, description')
+				->from('perfAttributes')
+				->queryAll();
+			$attributesListArray = array();
+			// Format datatable data. Define the Edit & Delete buttons
+			foreach ($attributesList as $attribute) {
+					$editButton = "<button id='editAttribute" . $attribute['attributeId'] . 
+					"' type='button' class='bedit' onclick=\"window.location.href ='" . CController::createUrl('attribute/editAttribute/', array(
+						'attributeId' => $attribute['attributeId'])
+					) . "'\">Edit</button>";
+					$deleteButton = "<button id='deleteAttribute" . $attribute['attributeId'] . 
+					"' type='button' class='bdelete' onclick=\"$('#deleteBox').dialog('open');" . 
+					"deleteConfirm('" . $attribute['name'] . "', '" .
+					$attribute['attributeId'] . "')\">Remove</button>";
+				// Pack the data to be sent to the view
+				$attributesListArray[] = array (
+					'name' =>   $attribute['name'],
+					'description' =>   $attribute['description'],
+					'editButton' => $editButton,
+					'deleteButton' => $deleteButton
+				);
+			}
+			$dataArray['attributesList'] =  json_encode($attributesListArray);
+			if (!empty($_GET['getOptions'])) {
+				$jsonData = json_encode(array("aaData" => $attributesListArray));
+				echo $jsonData;
+				return ;
+			}
+			$this->render('index', array(
+				'model' => $model,
+				'dataArray' => $dataArray
+			));
 		}
 
 		/**
