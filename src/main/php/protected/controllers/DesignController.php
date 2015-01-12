@@ -331,11 +331,11 @@
 			Yii::log("actionAddMultipleComponents DesignController called", "trace", self::LOG_CAT);
 			$component = new ComponentHead;
 			$componentDetails = new ComponentDetails;
-			$currentDesignId = Yii::app()->session['surDesign']['id']; // Current selected design
+			//$currentDesignId = Yii::app()->session['surDesign']['id']; // Current selected design
 			$settings = Yii::app()->tsettings;
 			$risksurSettings = $settings->getSettings();
 			$multipleRowsToShow = $risksurSettings->multipleComponentsRows;
-			$errorMessage = "";
+			//$errorMessage = "";
 			$errorStatus = "";
 
 			$dataArray = array();
@@ -351,11 +351,11 @@
 				$form = new CForm($elements, $model);
 				$formHeader = new CForm($elements, $model);
 				// Select all values whose inputType is "Select"
-				$fetchOptions = Yii::app()->db->createCommand()
-					->select('sfd.subFormId, sfd.label')
-					->from('surFormDetails sfd')
-					->where('sfd.inputType ="select"')
-					->queryAll();
+				//$fetchOptions = Yii::app()->db->createCommand()
+					//->select('sfd.subFormId, sfd.label')
+					//->from('surFormDetails sfd')
+					//->where('sfd.inputType ="select"')
+					//->queryAll();
 				// ajax request to add a new row
 					if ($form->submitted('ComponentsForm')) {
 						//$items=$this->getItemsToUpdate();
@@ -414,7 +414,7 @@
 						$modelArray = $postedModelArray; 
 					} else {
 						// number of model records to show by default on the view
-						for ($i=0; $i < $multipleRowsToShow; $i++) {
+						for ($i = 0; $i < $multipleRowsToShow; $i++) {
 							$modelArray[] = $model;
 						}
 					}
@@ -451,15 +451,16 @@
 		 * 
 		 * @access public
 		 * @return void
+		 * @throws exception
 		 */
 		public function actionAddNewMultiRow() {
 			if(Yii::app()->request->isAjaxRequest && isset($_GET['index'])) {
 				$this->getController()->renderPartial($this->viewName, array(
-					'model'=>$this->getModel(),
-					'index'=>$_GET['index']
+					'model' => $this->getModel(),
+					'index' => $_GET['index']
 				));
 			} else {
-				throw new CHttpException(400,'Invalid request. Please do not repeat this request again.');
+				throw new CHttpException(400, 'Invalid request. Please do not repeat this request again.');
 			}
 		}
 
@@ -556,7 +557,7 @@
 						$elements['elements'][$attributeId]['layout'] = '{input} {hint} {error}';
 					} else {
 						// Add an image icon that will be displayed on the ui to show more infor
-						$button = CHtml::image('','',array(
+						$button = CHtml::image('', '', array(
 								'id' => 'moreInfoButton' . $valu->subFormId,
 								'style' => 'cursor:pointer',
 								'class' => 'ui-icon ui-icon-info',
@@ -808,7 +809,7 @@
 					$optionsArray[$params->optionId] = $params->label;
 				}
 				$formDetailsArray = array();
-				$selectElements = array();
+				$selectElement = array();
 				foreach ($formDetails as $data) {
 					$formDetailsArray[$data->subFormId] = $data->label;
 					if($data->inputType == "select") {

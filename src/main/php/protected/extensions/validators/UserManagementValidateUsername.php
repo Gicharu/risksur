@@ -1,6 +1,12 @@
 <?php
 /**
+ * UserManagementValidateUsername 
  * 
+ * @uses CValidator
+ * @package 
+ * @version $id$
+ * @copyright Tracetracker
+ * @license Tracetracker {@link http://www.tracetracker.com}
  */
 class UserManagementValidateUsername extends CValidator {
 

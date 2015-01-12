@@ -1,6 +1,12 @@
 <?php
 /**
+ * UserManagementValidateEmail 
  * 
+ * @uses CValidator
+ * @package 
+ * @version $id$
+ * @copyright Tracetracker
+ * @license Tracetracker {@link http://www.tracetracker.com}
  */
 class UserManagementValidateEmail extends CValidator {
 

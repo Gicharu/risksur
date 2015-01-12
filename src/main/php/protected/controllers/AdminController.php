@@ -198,7 +198,7 @@ class AdminController extends Controller {
 		if (!empty($_GET['getGoals'])) {
 			$jsonData = json_encode(array("aaData" =>  $goalListArray));
 			echo $jsonData;
-			return ;
+			return;
 		}
 		$this->render('listGoals', array(
 			//'model' => $model,

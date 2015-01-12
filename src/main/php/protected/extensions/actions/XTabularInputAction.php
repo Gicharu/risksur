@@ -36,8 +36,7 @@
  * @author Erik Uus <erik.uus@gmail.com>
  * @version 1.0.0
  */
-class XTabularInputAction extends CAction
-{
+class XTabularInputAction extends CAction {
 	/**
 	 * @var string name of the model class.
 	 */
@@ -51,24 +50,21 @@ class XTabularInputAction extends CAction
 	/**
 	 * Runs the action.
 	 */
-	public function run()
-	{
-		if(Yii::app()->request->isAjaxRequest && isset($_GET['index']))
-		{
+	public function run() {
+		if(Yii::app()->request->isAjaxRequest && isset($_GET['index'])) {
 			$this->getController()->renderPartial($this->viewName, array(
-				'model'=>$this->getModel(),
-				'index'=>$_GET['index']
+				'model' => $this->getModel(),
+				'index' => $_GET['index']
 			));
+		} else {
+			throw new CHttpException(400, 'Invalid request. Please do not repeat this request again.');
 		}
-		else
-			throw new CHttpException(400,'Invalid request. Please do not repeat this request again.');
 	}
 
 	/**
-	 * @return CActiveRecord
+	 * @returns CActiveRecord
 	 */
-	protected function getModel()
-	{
+	protected function getModel() {
 		return CActiveRecord::model($this->modelName);
 	}
 }

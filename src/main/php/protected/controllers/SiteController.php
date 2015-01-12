@@ -393,7 +393,7 @@ class SiteController extends Controller {
 				$password = $model->newPassword;
 				$userToUpdate = Users::model()->findByAttributes( array( 'email' => $userName ) );
 				$userToUpdate->password = $userToUpdate->hashPassword($password, $userToUpdate->salt);
-				$updateData = $userToUpdate-> saveAttributes(array('password'));
+				$updateData = $userToUpdate->saveAttributes(array('password'));
 				$displayName = $userToUpdate->userName;
 				Yii::app()->session->add('displayName', $displayName);
 				Yii::app()->user->setFlash('success', Yii::t("translation", "Password changed succesfully"));

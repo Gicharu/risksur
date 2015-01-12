@@ -36,13 +36,12 @@ class UsersController extends Controller {
 	 * Creates a new model.
 	 * If creation is successful, the browser will be redirected to the 'index' page.
 	 */
-	public function actionCreateUser()
-	{
+	public function actionCreateUser() {
 		Yii::log("actionCreate called", "trace", self::LOG_CAT);
 		$cancelLink = $this->createUrl('site/login');
 		$model = new Users;
 		if(isset($_POST['Users'])) {
-			$model->attributes=$_POST['Users'];
+			$model->attributes = $_POST['Users'];
 			$model->roles = $_POST['Users']['roles'];
 			// Check for blanks
 			if ($model->userName == "" || $model->email == "" || $model->roles == "") {
@@ -66,7 +65,7 @@ class UsersController extends Controller {
 				$findUsername = Users::model()->find("userName = '".$model->userName."'");
 				if (empty($findUsername)) {
 					if ($model->validate()) {
-						if($model->save() && $model->saveRoles($model->userId, "create")){
+						if($model->save() && $model->saveRoles($model->userId, "create")) {
 							// send the user the email link:
 							$toMailName = $model->userName;
 							$email = $model->email;
@@ -117,7 +116,7 @@ class UsersController extends Controller {
 	/**
 	 * Updates a particular model.
 	 * If update is successful, the browser will be redirected to the 'view' page.
-	 * @param integer $id the ID of the model to be updated
+	 * param integer $id the ID of the model to be updated
 	 */
 	public function actionUpdateUser() {
 		Yii::log("actionUpdate called", "trace", self::LOG_CAT);
@@ -130,7 +129,7 @@ class UsersController extends Controller {
 			$role = UsersHasRoles::model()->findByAttributes(array( 'users_id' => $_GET['userId'] ));
 			$model->roles = $role->roles_id;
 			if(isset($_POST['Users'])) {
-				$model->attributes=$_POST['Users'];
+				$model->attributes = $_POST['Users'];
 				$model->roles = $_POST['Users']['roles'];
 				if($model->update() && $model->saveRoles($_GET['userId'], 'update')) {
 					Yii::app()->user->setFlash('success', Yii::t("translation", "User successfully updated"));
@@ -138,7 +137,7 @@ class UsersController extends Controller {
 				}
 			}
 			$this->render('update', array(
-				'model'=>$model,
+				'model' => $model,
 			));
 		} else {
 			Yii::log("User not selected", "warning", self::LOG_CAT);
@@ -151,7 +150,7 @@ class UsersController extends Controller {
 	/**
 	 * Deletes a particular model.
 	 * If deletion is successful, the browser will be redirected to the 'index' page.
-	 * @param integer $id the ID of the model to be deleted
+	 * param integer $id the ID of the model to be deleted
 	 */
 	public function actionDeleteUser() {
 		Yii::log("actionDelete called", "trace", self::LOG_CAT);
@@ -191,7 +190,7 @@ class UsersController extends Controller {
 		if (!empty($_GET['getUsers'])) {
 			$jsonData = json_encode(array("aaData" => $userListArray));
 			echo $jsonData;
-			return ;
+			return;
 		}
 		$this->render('index', array(
 			'dataProvider' => $dataProvider,
@@ -202,12 +201,13 @@ class UsersController extends Controller {
 	/**
 	 * Returns the data model based on the primary key given in the GET variable.
 	 * If the data model is not found, an HTTP exception will be raised.
-	 * @param integer $id the ID of the model to be loaded
-	 * @return Users the loaded model
+	 * @param mixed $id 
+	 * param integer $id the ID of the model to be loaded
+	 * @returns Users the loaded model
 	 * @throws CHttpException
 	 */
 	public function loadModel($id) {
-		$model=Users::model()->findByPk($id);
+		$model = Users::model()->findByPk($id);
 		if($model === null) {
 			Yii::app()->user->setFlash('error', Yii::t("translation", "The user does not exist"));
 			$this->redirect(array('users/index'));
