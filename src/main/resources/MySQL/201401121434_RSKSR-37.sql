@@ -3,8 +3,8 @@ INSERT INTO `programpages` (`pageId`, `pageName`, `path`, `parentId`, `menuOrder
 
 INSERT INTO `permissions`(`id`,`name`,`description`,`controller`,`action`,`bizrule`) values 
 (35,'Manage Attributes','Manage Attributes','attribute','index',''),
-(36,'Add Attributes','Add Attributes','attribute','createAttribute',''),
-(37,'Update Attributes','Update Attributes','attribute','updateAttribute',''),
+(36,'Add Attributes','Add Attributes','attribute','addAttribute',''),
+(37,'Edit Attributes','Update Attributes','attribute','editAttribute',''),
 (38,'Delete Attributes','Delete Attributes','attribute','deleteAttribute','');
 
 INSERT INTO `roles_has_permissions`(`permissions_id`,`roles_id`) values

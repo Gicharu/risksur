@@ -1,6 +1,6 @@
 <?php
-$this->pageTitle = Yii::app()->name . ' - Add Option';
-echo $this->renderPartial('_form', array(
-		'model' => $model,
-		'surformdetailsArray' => $surformdetailsArray
-	)); ?>
+	$this->pageTitle = Yii::app()->name . ' - Add Attribute';
+	echo $this->renderPartial('_form', array(
+		'model' => $model
+	));
+?>

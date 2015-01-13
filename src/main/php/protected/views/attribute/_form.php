@@ -1,42 +1,34 @@
-<script type="text/javascript">
-	$(function() {
-		$("#bd").attr('style', '');
-	});
-</script>
 <div class="form">
 <?php $form = $this->beginWidget('CActiveForm', array(
+	'id' => 'newAttribute',
 	'enableClientValidation' => true,
-)); ?>
-<?php echo $form->errorSummary(array(
-	$model
-), Yii::app()->params['headerErrorSummary'], Yii::app()->params['footerErrorSummary']); ?>
-	<?php
+	'enableAjaxValidation' => true,
+));
+echo $form->errorSummary(array($model), Yii::app()->params['headerErrorSummary'], Yii::app()->params['footerErrorSummary']);
 	if (isset($dataArray['formType']) && $dataArray['formType'] == "Edit") {
-		$this->menu = array(array('label' => 'View Options', 'url' => array('options/index')), array('label' => 'Add Option', 'url' => array('options/addOption')));
-		$buttonText = "Update Option";
-		$dataArray['elementName'];
+		$this->menu = array(array('label' => 'View Attributes', 'url' => array('attribute/index')), array('label' => 'Add Option', 'url' => array('options/addOption')));
+		$buttonText = "Edit Attribute";
 	} else {
-		$this->menu = array(array('label' => 'View Options', 'url' => array('options/index')));
-		$buttonText = "Save Option";
-	}?>
+		$this->menu = array(array('label' => 'View Attributes', 'url' => array('attribute/index')));
+		$buttonText = "Save Attribute";
+	}
+?>
 	<div class="row">
-		<?php echo $form->labelEx($model, 'elementId'); ?>
-		<?php echo $form->dropDownList($model, 'elementId', $surformdetailsArray, array(
-			'id' => 'elementId',
-			'selected' => isset($dataArray['elementName']) ? $dataArray['elementName'] : "",
-			)); ?>
-		<?php echo $form->error($model, 'elementId'); ?>
+		<?php echo $form->labelEx($model, 'name'); ?>
+		<?php echo $form->textField($model, 'name'); ?>
+		<?php echo $form->error($model, 'name'); ?>
 	</div>
 	<div class="row">
-		<?php echo $form->labelEx($model, 'label'); ?>
-		<?php echo $form->textField($model, 'label'); ?>
-		<?php echo $form->error($model, 'label'); ?>
+		<?php echo $form->labelEx($model, 'description'); ?>
+		<?php echo $form->textArea($model, 'description'); ?>
+		<?php echo $form->error($model, 'description'); ?>
 	</div>
 	<div class="row buttons">
 		<?php echo CHtml::htmlButton($buttonText, array(
-	'id' => 'save',
-	'type' => 'submit'
-)); ?>
+				'id' => 'save',
+				'type' => 'submit'
+			));
+		?>
 	</div>
 <?php $this->endWidget(); ?>
 </div>

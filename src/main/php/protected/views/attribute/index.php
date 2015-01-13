@@ -90,8 +90,8 @@ $(function(){
 		"Confirm" : function() {
 			// console.log(confirmMsg + ":" + deleteVal);
 				$(this).dialog("close");
-				  var opt = {'loadMsg': 'Processing delete option'};
-				$("#listOptions").showLoading(opt);
+				  var opt = {'loadMsg': 'Processing delete attribute'};
+				$("#listAttributes").showLoading(opt);
 				$.ajax({type: 'POST',
 					url: <?php echo "'" . CController::createUrl('attribute/deleteAttribute') . "'"; ?>,
 					data: {delId:deleteVal},
@@ -108,13 +108,13 @@ $(function(){
 							$("#ajaxFlashMsgWrapper").attr('class', 'flash-error').show();
 						}
 						slist.fnReloadAjax("index/getAttributes/1");
-						$("#listOptions").hideLoading();
+						$("#listAttributes").hideLoading();
 					},
 						error: function(data){
 							$("#ajaxFlashMsg").html("Error occured while deleting data");
 							$("#ajaxFlashMsgWrapper").attr('class', 'flash-error').show();
 							//console.log("error occured while posting data" + data);
-							$("#listOptions").hideLoading();
+							$("#listAttributes").hideLoading();
 						},
 							dataType: "text"
 				});

@@ -52,6 +52,9 @@ class Attributes extends CActiveRecord {
 			array(
 				'name, description',
 				'required'
+			),
+			array(
+				'name', 'unique', 'on' => 'create'
 			)
 		);
 	}
