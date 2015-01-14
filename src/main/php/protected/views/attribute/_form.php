@@ -6,10 +6,10 @@
 ));
 echo $form->errorSummary(array($model), Yii::app()->params['headerErrorSummary'], Yii::app()->params['footerErrorSummary']);
 	if (isset($dataArray['formType']) && $dataArray['formType'] == "Edit") {
-		$this->menu = array(array('label' => 'View Attributes', 'url' => array('attribute/index')), array('label' => 'Add Option', 'url' => array('options/addOption')));
+		$this->menu = array(array('label' => 'View Attributes', 'url' => array('attribute/index')), array('label' => 'Add Attribute', 'url' => array('attribute/addAttribute')));
 		$buttonText = "Edit Attribute";
 	} else {
-		$this->menu = array(array('label' => 'View Attributes', 'url' => array('attribute/index')));
+		$this->menu = array(array('label' => 'View Attributes', 'url' => array('attribute/index')), array('label' => 'View Relations', 'url' => array('attribute/listRelations')));
 		$buttonText = "Save Attribute";
 	}
 ?>

@@ -1,10 +1,10 @@
 <?php
-$this->menu = array(array('label' => 'Add Attribute', 'url' => array('attribute/addAttribute')), array('label' => 'Add Relation', 'url' => array('attribute/addRelation')));
+$this->menu = array(array('label' => 'Add Relation', 'url' => array('attribute/addRelation')));
 ?>
 <script type="text/javascript">
 $(function(){
 	$("#bd").attr('style', '');
-	slist = $("<?php echo '#attributesList'; ?>").dataTable({
+	slist = $("<?php echo '#relationsList'; ?>").dataTable({
 		"sDom": '<"H"rlTf>t<"F"ip>',
 		"oTableTools": {
 		"sSwfPath": "<?php echo Yii::app()->request->baseUrl; ?>/js/copy_csv_xls_pdf.swf",
@@ -58,10 +58,10 @@ $(function(){
 		},
 		"bProcessing": true,
 		"bStateSave": false,
-		"aaData": <?php echo $dataArray['attributesList']; ?>,
+		"aaData": <?php echo $dataArray['relationsList']; ?>,
 		"aoColumns": [
-		{"mDataProp": "name",  "bVisible": true },
-		{"mDataProp": "description",  "bVisible": true },
+		{"mDataProp": "Attribute",  "bVisible": true },
+		{"mDataProp": "FormElement",  "bVisible": true },
 		{"mDataProp": "editButton", "bSortable": false },
 		{"mData": "deleteButton", "bSortable": false },
 		],
@@ -85,15 +85,15 @@ $(function(){
 });
 
 	deleteConfirm = function(confirmMsg, deleteVal) {
-	$('#deleteBox').html("<p>Are you sure you want to delete '" + confirmMsg + "' </p>");
+	$('#deleteBox').html("<p>Are you sure you want to delete the relation '" + confirmMsg + "' </p>");
 	$("#deleteBox").dialog('option', 'buttons', {
 		"Confirm" : function() {
 			// console.log(confirmMsg + ":" + deleteVal);
 				$(this).dialog("close");
-				  var opt = {'loadMsg': 'Processing delete attribute'};
-				$("#listAttributes").showLoading(opt);
+				  var opt = {'loadMsg': 'Processing delete relation'};
+				$("#listRelations").showLoading(opt);
 				$.ajax({type: 'POST',
-					url: <?php echo "'" . CController::createUrl('attribute/deleteAttribute') . "'"; ?>,
+					url: <?php echo "'" . CController::createUrl('attribute/deleteRelation') . "'"; ?>,
 					data: {delId:deleteVal},
 					success: function(data){
 						var checkSuccess = /successfully/i;
@@ -107,14 +107,14 @@ $(function(){
 							$("#ajaxFlashMsg").html(data);
 							$("#ajaxFlashMsgWrapper").attr('class', 'flash-error').show();
 						}
-						slist.fnReloadAjax("index/getAttributes/1");
-						$("#listAttributes").hideLoading();
+						slist.fnReloadAjax("index/getRelations/1");
+						$("#listRelations").hideLoading();
 					},
 						error: function(data){
 							$("#ajaxFlashMsg").html("Error occured while deleting data");
 							$("#ajaxFlashMsgWrapper").attr('class', 'flash-error').show();
 							//console.log("error occured while posting data" + data);
-							$("#listAttributes").hideLoading();
+							$("#listRelations").hideLoading();
 						},
 							dataType: "text"
 				});
@@ -125,13 +125,13 @@ $(function(){
 	});
 }
 </script>
-<div id="listAttributes" width="100%">
+<div id="listRelations" width="100%">
 	
-	<table id="attributesList" width="100%" border="0" cellspacing="0" cellpadding="0">
+	<table id="relationsList" width="100%" border="0" cellspacing="0" cellpadding="0">
 		<thead>
 		<tr>
-			<th title = "Name">Name</th>
-			<th title = "Name">Description</th>
+			<th title = "Attribute">Attribute</th>
+			<th title = "subFormId">Form Element</th>
 			<th title = "Edit">Edit</th>
 			<th title = "Delete">Delete</th>
 		</tr>

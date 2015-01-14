@@ -33,4 +33,32 @@ class AttributeFormRelation extends CActiveRecord {
 		return 'attributeFormRelation';
 	}
 
+	/**
+	 * rules 
+	 * 
+	 * @access public
+	 * @return void
+	 */
+	public function rules() {
+		return array(
+			array(
+				'attributeId, subFormId',
+				'required'
+			)
+		);
+	}
+
+	/**
+	 * attributeLabels 
+	 * 
+	 * @access public
+	 * @return void
+	 */
+	public function attributeLabels() {
+		return array(
+			'attributeId' => Yii::t('translation', 'Attribute'),
+			'subFormId' => Yii::t('translation', 'Form Element')
+		);
+	}
+
 }

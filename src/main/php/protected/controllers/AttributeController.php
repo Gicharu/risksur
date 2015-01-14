@@ -231,6 +231,137 @@
 				'dataArray' => $dataArray
 			));
 		}
+
+		/**
+		 * actionAddRelation
+		 * 
+		 * @access public
+		 * @return void
+		 */
+		public function actionAddRelation() {
+			Yii::log("actionaddRelation AttributeController called", "trace", self::LOG_CAT);
+			$formRelationModel = new AttributeFormRelation;
+			$attributeModel = new Attributes;
+			$surFormDetailsModel = new SurFormDetails;
+			if (isset($_POST['AttributeFormRelation'])) {
+				$formRelationModel->attributes = $_POST['AttributeFormRelation'];
+				if ($formRelationModel->validate()) {
+					$formRelationModel->save();
+					Yii::app()->user->setFlash('success', "Relation successfully created.");
+					$this->redirect( array( 'attribute/listRelations' ) );
+				}
+			}
+			// QUERY FOR ALL ATTRIBUTES
+			$queryAttributes = Yii::app()->db->createCommand()
+				->select('attributeId, name')
+				->from('perfAttributes')
+				->queryAll();
+
+			// QUERY FOR ALL SURFORM DETAILS
+			$querySurformDetails = Yii::app()->db->createCommand()
+				->select('subFormId, inputName')
+				->from('surFormDetails')
+				->queryAll();
+
+			$attributesArray = array();
+			$surformDetailsArray = array();
+			// Pack data to send to view
+			foreach ($queryAttributes as $key => $value) {
+				$attributesArray[$value['attributeId']] = $value['name']; 
+			}
+			foreach ($querySurformDetails as $key => $value) {
+				$surformDetailsArray[$value['subFormId']] = $value['inputName']; 
+			}
+
+			$this->render('addRelation', array(
+				'attributeModel' => $attributeModel,
+				'formRelationModel' => $formRelationModel,
+				'surFormDetailsModel' => $surFormDetailsModel,
+				'attributesArray' => $attributesArray,
+				'surformDetailsArray' => $surformDetailsArray
+			));
+		}
+
+		/**
+		 * actionListRelations 
+		 * 
+		 * @access public
+		 * @return void
+		 */
+		public function actionListRelations() {
+			Yii::log("actionListRelations AttributeController called", "trace", self::LOG_CAT);
+			$model = new AttributeFormRelation;
+			$dataArray = array();
+			$dataArray['dtHeader'] = "Manage Attribute-Form Relations"; // Set page title when printing the datatable
+			$relationsList = Yii::app()->db->createCommand()
+				->select('attributeId, subFormId')
+				->from('attributeFormRelation')
+				->queryAll();
+			$relationsArray = array();
+			// Format datatable data. Define the Edit & Delete buttons
+			foreach ($relationsList as $key => $relation) {
+				//GET THE ATTRIBUTE NAME TO BE DISPLAYED
+				$queryAttributes = Yii::app()->db->createCommand()
+					->select('name')
+					->from('perfAttributes')
+					->where('attributeId="' . $relation['attributeId'].'"')
+					->queryAll();
+				//GET THE SUFORM INPUTNAME TO BE DISPLAYED
+				$querySurformDetails = Yii::app()->db->createCommand()
+					->select('inputName')
+					->from('surFormDetails')
+					->where('subFormId="' . $relation['subFormId'].'"')
+					->queryAll();
+
+				$editButton = "<button id='editRelation" . $relation['attributeId'] . 
+				"' type='button' class='bedit' onclick=\"window.location.href ='" . CController::createUrl('attribute/editRelation/', array(
+					'attributeId' => $relation['attributeId'])
+				) . "'\">Edit</button>";
+				$deleteButton = "<button id='deleteRelation" . $relation['attributeId'] . 
+				"' type='button' class='bdelete' onclick=\"$('#deleteBox').dialog('open');" . 
+				"deleteConfirm('" . $queryAttributes[0]['name'] . " <-> " . $querySurformDetails[0]['inputName'] . "', '" .
+				$relation['attributeId'] . "')\">Remove</button>";
+				// Pack the data to be sent to the view
+				$relationsArray[] = array (
+					'Attribute' =>   $queryAttributes[0]['name'],
+					'FormElement' =>   $querySurformDetails[0]['inputName'],
+					'editButton' => $editButton,
+					'deleteButton' => $deleteButton
+				);
+			}
+			$dataArray['relationsList'] = json_encode($relationsArray);
+			if (!empty($_GET['getRelations'])) {
+				$jsonData = json_encode(array("aaData" => $relationsArray));
+				echo $jsonData;
+				return ;
+			}
+			$this->render('relationsIndex', array(
+				'model' => $model,
+				'dataArray' => $dataArray
+			));
+		}
+
+		/**
+		 * actionDeleteRelation 
+		 * 
+		 * @access public
+		 * @return void
+		 */
+		public function actionDeleteRelation() {
+			Yii::log("actionDeleteRelation AttributeController called", "trace", self::LOG_CAT);
+			if (isset($_POST["delId"])) {
+				$record = Attributes::model()->findAll($_POST['delId']);
+				if (!$record->delete()) {
+					Yii::log("Error deleting Attribute: " . $_POST['delId'], "error", self::LOG_CAT);
+					echo Yii::t("translation", "A problem occured when deleting the Relation ") . $_POST['delId'] . ". Please contact the Risksur Admin";
+				} else {
+					echo Yii::t("translation", "The Relation has been successfully destroyed!");
+				}
+			}
+		}
+
+
+
 		/**
 		 * performAjaxValidation
 		 *
