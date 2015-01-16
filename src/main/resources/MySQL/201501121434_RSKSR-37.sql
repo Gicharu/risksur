@@ -7,10 +7,12 @@ INSERT INTO `permissions`(`id`,`name`,`description`,`controller`,`action`,`bizru
 (37,'Edit Attributes','Update Attributes','attribute','editAttribute',''),
 (38,'Delete Attributes','Delete Attributes','attribute','deleteAttribute',''),
 (39,'Add Relation','Add Relation','attribute','addRelation',''),
-(40,'View Relations','View Relations','attribute','listRelations','');
+(40,'View Relations','View Relations','attribute','listRelations',''),
+(41,'Delete Relation','Delete Relation','attribute','deleteRelation','')
+;
 
 INSERT INTO `roles_has_permissions`(`permissions_id`,`roles_id`) values
-(35,1),(35,2),(36,1),(36,2),(37,1),(37,2),(38,1),(38,2),(39,1),(39,2),(40,1),(40,2);
+(35,1),(35,2),(36,1),(36,2),(37,1),(37,2),(38,1),(38,2),(39,1),(39,2),(40,1),(40,2),(41,1),(41,2);
 
 INSERT INTO `pages_has_roles`(`pageId`,`roleId`) VALUES
 (14,1),(14,2),(14,3);

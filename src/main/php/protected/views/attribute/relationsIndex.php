@@ -60,18 +60,42 @@ $(function(){
 		"bStateSave": false,
 		"aaData": <?php echo $dataArray['relationsList']; ?>,
 		"aoColumns": [
-		{"mDataProp": "Attribute",  "bVisible": true },
+		{"mDataProp": "Attribute",  "bVisible": false },
 		{"mDataProp": "FormElement",  "bVisible": true },
-		{"mDataProp": "editButton", "bSortable": false },
+		//{"mDataProp": "editButton", "bSortable": false },
 		{"mData": "deleteButton", "bSortable": false },
 		],
 		// update the buttons stying after the table data is loaded
-		"fnDrawCallback": function() {
+		"fnDrawCallback": function(oSettings) {
 			$('button.bdelete').button({
 				icons: {primary: "ui-icon-trash"}, text: false});
 			$('button.bedit').button({
 				icons: {primary: "ui-icon-pencil"}, text: false});
+				if ( oSettings.aiDisplay.length == 0 ) {
+					return;
+				}
+
+				var nTrs = $('#relationsList tbody tr');
+				var iColspan = nTrs[0].getElementsByTagName('td').length;
+				var sLastGroup = "";
+				for ( var i=0 ; i<nTrs.length ; i++ ) {
+					var iDisplayIndex = oSettings._iDisplayStart + i;
+					var sGroup = oSettings.aoData[ oSettings.aiDisplay[iDisplayIndex] ]._aData['Attribute'];
+					//console.log(sGroup);
+					if ( sGroup != sLastGroup ) {
+						var nGroup = document.createElement( 'tr' );
+						var nCell = document.createElement( 'td' );
+						nCell.colSpan = iColspan;
+						nCell.className = "group";
+						nCell.innerHTML = sGroup;
+						nGroup.appendChild( nCell );
+						//console.log(nCell);
+						nTrs[i].parentNode.insertBefore( nGroup, nTrs[i] );
+						sLastGroup = sGroup;
+					}
+				}
 		},
+		"aaSortingFixed": [[ 0, 'asc' ]],
 		"bJQueryUI": true,
 		//"sPaginationType": "customListbox",
 		"sPaginationType": "buttons_input",
@@ -107,7 +131,7 @@ $(function(){
 							$("#ajaxFlashMsg").html(data);
 							$("#ajaxFlashMsgWrapper").attr('class', 'flash-error').show();
 						}
-						slist.fnReloadAjax("index/getRelations/1");
+						slist.fnReloadAjax("listRelations/getRelations/1");
 						$("#listRelations").hideLoading();
 					},
 						error: function(data){
@@ -132,7 +156,7 @@ $(function(){
 		<tr>
 			<th title = "Attribute">Attribute</th>
 			<th title = "subFormId">Form Element</th>
-			<th title = "Edit">Edit</th>
+			<!--<th title = "Edit">Edit</th>-->
 			<th title = "Delete">Delete</th>
 		</tr>
 		</thead>

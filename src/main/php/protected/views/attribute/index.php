@@ -1,5 +1,9 @@
 <?php
-$this->menu = array(array('label' => 'Add Attribute', 'url' => array('attribute/addAttribute')), array('label' => 'Add Relation', 'url' => array('attribute/addRelation')));
+$this->menu = array(
+	array('label' => 'Add Attribute', 'url' => array('attribute/addAttribute')), 
+	array('label' => 'Add Relation', 'url' => array('attribute/addRelation')),
+	array('label' => 'List Relation', 'url' => array('attribute/listRelations'))
+);
 ?>
 <script type="text/javascript">
 $(function(){
