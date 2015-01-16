@@ -88,7 +88,7 @@ class OptionsController extends Controller {
 		if (!empty($_GET['getOptions'])) {
 			$jsonData = json_encode(array("aaData" => $optionsListArray));
 			echo $jsonData;
-			return ;
+			return;
 		}
 		$this->render('index', array(
 			'model' => $model,

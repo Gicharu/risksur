@@ -58,6 +58,8 @@ class AdminController extends Controller {
 		$elements = array();
 		//$elements['title'] = "Components Form";
 		$elements['showErrorSummary'] = true;
+		$elements['errorSummaryHeader'] = Yii::app()->params['headerErrorSummary'];
+		$elements['errorSummaryFooter'] = Yii::app()->params['footerErrorSummary'];
 		$elements['activeForm']['id'] = "GoalDataForm";
 		$elements['activeForm']['enableClientValidation'] = true;
 		//$elements['activeForm']['enableAjaxValidation'] = false;
@@ -114,6 +116,8 @@ class AdminController extends Controller {
 				$this->redirect(array('admin/listGoals'));
 			}
 			$elements['showErrorSummary'] = true;
+			$elements['errorSummaryHeader'] = Yii::app()->params['headerErrorSummary'];
+			$elements['errorSummaryFooter'] = Yii::app()->params['footerErrorSummary'];
 			$elements['activeForm']['id'] = "GoalDataForm";
 			$elements['activeForm']['enableClientValidation'] = true;
 			//$elements['activeForm']['enableAjaxValidation'] = false;
@@ -198,7 +202,7 @@ class AdminController extends Controller {
 		if (!empty($_GET['getGoals'])) {
 			$jsonData = json_encode(array("aaData" =>  $goalListArray));
 			echo $jsonData;
-			return ;
+			return;
 		}
 		$this->render('listGoals', array(
 			//'model' => $model,

@@ -199,7 +199,7 @@ return CMap::mergeArray($configArray, array(
 			'adminEmail' => 'info@tracetracker.com',
 			// 'pngUrl' => ''
 			'mainPath' => dirname(__FILE__) . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR,
-			'headerErrorSummary' => "<div class='ui-widget'><div class='ui-state-error ui-corner-all'><p>" . 
+			'headerErrorSummary' => "<div class='ui-widget'><div class='ui-state-error ui-corner-all'><p> <strong>Error Summary: </strong>" . 
 				"<span class='ui-icon ui-icon-alert' style='float: left; margin-right: .3em;'></span>",
 			'footerErrorSummary' => "</p></div></div>",
 			'AdminUrl' => (isset($_SERVER['HTTP_HOST'])) ? $_SERVER['HTTP_HOST'] : exec("hostname"),

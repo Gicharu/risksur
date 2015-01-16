@@ -1377,3 +1377,9 @@ table.tabular-container {
 tr.tabular-input td input, tr.tabular-input td textarea, tr.tabular-input td select {
 	width: 95%;
 }
+
+/* list style for error summary */
+.ui-widget .ui-state-error li {
+	list-style: circle;
+	margin-left: 35px;
+}

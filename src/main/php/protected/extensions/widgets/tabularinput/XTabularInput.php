@@ -224,38 +224,65 @@ class XTabularInput extends CWidget {
 	public $form;
 	public $elements;
 	/**
+	 * init 
 	 * Initializes the widget.
+	 * 
+	 * @access public
+	 * @return void
 	 */
 	public function init() {
-		if (isset($this->containerHtmlOptions['id'])) $this->id = $this->containerHtmlOptions['id'];
-		else $this->containerHtmlOptions['id'] = $this->id;
-		if (!isset($this->containerHtmlOptions['class'])) $this->containerHtmlOptions = array_merge($this->containerHtmlOptions, array(
+		if (isset($this->containerHtmlOptions['id'])) {
+			$this->id = $this->containerHtmlOptions['id'];
+		} else {
+			$this->containerHtmlOptions['id'] = $this->id;
+		}
+		if (!isset($this->containerHtmlOptions['class'])) {
+			$this->containerHtmlOptions = array_merge($this->containerHtmlOptions, array(
 			'class' => $this->containerCssClass
 		));
-		else $this->containerHtmlOptions['class'].= ' ' . $this->containerCssClass;
-		if (!isset($this->inputContainerHtmlOptions['class'])) $this->inputContainerHtmlOptions = array_merge($this->inputContainerHtmlOptions, array(
+		} else {
+			$this->containerHtmlOptions['class'].= ' ' . $this->containerCssClass;
+		}
+		if (!isset($this->inputContainerHtmlOptions['class'])) {
+			$this->inputContainerHtmlOptions = array_merge($this->inputContainerHtmlOptions, array(
 			'class' => $this->inputContainerCssClass
 		));
-		else $this->inputContainerHtmlOptions['class'].= ' ' . $this->inputContainerCssClass;
-		if (!isset($this->headerHtmlOptions['class'])) $this->headerHtmlOptions = array_merge($this->headerHtmlOptions, array(
+		} else {
+			$this->inputContainerHtmlOptions['class'].= ' ' . $this->inputContainerCssClass;
+		}
+		if (!isset($this->headerHtmlOptions['class'])) {
+			$this->headerHtmlOptions = array_merge($this->headerHtmlOptions, array(
 			'class' => $this->headerCssClass
 		));
-		else $this->headerHtmlOptions['class'].= ' ' . $this->headerCssClass;
-		if (!isset($this->inputHtmlOptions['class'])) $this->inputHtmlOptions = array_merge($this->inputHtmlOptions, array(
+		} else {
+			$this->headerHtmlOptions['class'].= ' ' . $this->headerCssClass;
+		}
+		if (!isset($this->inputHtmlOptions['class'])) {
+			$this->inputHtmlOptions = array_merge($this->inputHtmlOptions, array(
 			'class' => $this->inputCssClass
 		));
-		else $this->inputHtmlOptions['class'].= ' ' . $this->inputCssClass;
-		if (!isset($this->removeHtmlOptions['class'])) $this->removeHtmlOptions = array_merge($this->removeHtmlOptions, array(
+		} else {
+			$this->inputHtmlOptions['class'].= ' ' . $this->inputCssClass;
+		}
+		if (!isset($this->removeHtmlOptions['class'])) {
+			$this->removeHtmlOptions = array_merge($this->removeHtmlOptions, array(
 			'class' => $this->removeCssClass
 		));
-		else $this->removeHtmlOptions['class'].= ' ' . $this->removeCssClass;
-		if (!isset($this->addHtmlOptions['class'])) $this->addHtmlOptions = array_merge($this->addHtmlOptions, array(
+		} else{
+			$this->removeHtmlOptions['class'].= ' ' . $this->removeCssClass;
+		}
+		if (!isset($this->addHtmlOptions['class'])) {
+			$this->addHtmlOptions = array_merge($this->addHtmlOptions, array(
 			'class' => $this->addCssClass
 		));
-		else $this->addHtmlOptions['class'].= ' ' . $this->addCssClass;
-		if ($this->models === array()) $this->headerHtmlOptions = array_merge($this->headerHtmlOptions, array(
+		} else {
+			$this->addHtmlOptions['class'].= ' ' . $this->addCssClass;
+		}
+		if ($this->models === array()) {
+			$this->headerHtmlOptions = array_merge($this->headerHtmlOptions, array(
 			'style' => 'display:none'
 		));
+		}
 	}
 	/**
 	 * Renders the widget.
@@ -286,7 +313,7 @@ class XTabularInput extends CWidget {
 		// register inline javascript
 		$script = <<<SCRIPT
 		$(".addNewButton").button();
-	$("#{$this->id} .{$this->addCssClass}").click(function(event){
+	$("#{$this->id} .{$this->addCssClass}").click(function(event) {
 		event.preventDefault();
 		var input = $(this).parents(".{$this->containerCssClass}:first").children(".{$this->inputContainerCssClass}");
 		var index = input.find(".{$this->indexCssClass}").length>0 ? input.find(".{$this->indexCssClass}").max()+1 : 0;
