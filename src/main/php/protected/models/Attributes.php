@@ -1,16 +1,15 @@
 <?php
 /**
- * AttributeFormRelation 
+ * Options 
  * 
  * @uses CActiveRecord
  * @package 
  * @version $id$
  * @copyright Tracetracker
- * @author Chirag Doshi <chirag@tracetracker.com> 
+ * @author Eric Thuku <eric@tracetracker.com> 
  * @license Tracetracker {@link http://www.tracetracker.com}
  */
-class AttributeFormRelation extends CActiveRecord {
-
+class Attributes extends CActiveRecord {
 	/**
 	 * model 
 	 * 
@@ -22,7 +21,6 @@ class AttributeFormRelation extends CActiveRecord {
 	public static function model($className = __CLASS__) {
 		return parent::model($className);
 	}
-
 	/**
 	 * tableName 
 	 * 
@@ -30,7 +28,17 @@ class AttributeFormRelation extends CActiveRecord {
 	 * @return void
 	 */
 	public function tableName() {
-		return 'attributeFormRelation';
+		return 'perfAttributes';
+	}
+
+	/**
+	 * primaryKey 
+	 * 
+	 * @access public
+	 * @return void
+	 */
+	public function primaryKey() {
+		return 'attributeId';
 	}
 
 	/**
@@ -42,8 +50,11 @@ class AttributeFormRelation extends CActiveRecord {
 	public function rules() {
 		return array(
 			array(
-				'attributeId, subFormId',
+				'name, description',
 				'required'
+			),
+			array(
+				'name', 'unique', 'on' => 'create'
 			)
 		);
 	}
@@ -56,9 +67,8 @@ class AttributeFormRelation extends CActiveRecord {
 	 */
 	public function attributeLabels() {
 		return array(
-			'attributeId' => Yii::t('translation', 'Attribute'),
-			'subFormId' => Yii::t('translation', 'Form Element')
+			'name' => Yii::t('translation', 'Name'),
+			'description' => Yii::t('translation', 'Description')
 		);
 	}
-
 }

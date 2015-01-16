@@ -107,7 +107,7 @@ class OptionsController extends Controller {
 		$model = new Options;
 		if (isset($_POST['Options'])) {
 			$model->attributes = $_POST['Options'];
-			if ( $model->validate() ) {
+			if ($model->validate()) {
 				$model->save();
 				Yii::app()->user->setFlash('success', "Option successfully created.");
 				$this->redirect( array( 'options/index' ) );
@@ -147,25 +147,25 @@ class OptionsController extends Controller {
 		$dataArray = array();
 		$dataArray['formType'] = "Edit";
 
-			if (!empty($_GET['optionId'])) {
-				// fetch the form data, search using the "optionId" sent from the listing.
-				$model = Options::model()->findByPk($_GET['optionId']);
-				if ($model === null) {
-					Yii::app()->user->setFlash('error', Yii::t("translation", "The option does not exist"));
-					$this->redirect(array('options/index'));
-				}
-				$fetchElementName = Yii::app()->db->createCommand()
-					->select('sfd.label')
-					->from('surFormDetails sfd')
-					->where('sfd.subFormId =' . $model['elementId']  )
-					->queryAll();
-
-				// Pick the selected Option's elementId. This will be displayed as the default in the dropdown
-				$dataArray['elementName'] = $fetchElementName[0]['label'];
-			} else {
-				Yii::app()->user->setFlash('notice', Yii::t("translation", "Please select an option to edit"));
+		if (!empty($_GET['optionId'])) {
+			// fetch the form data, search using the "optionId" sent from the listing.
+			$model = Options::model()->findByPk($_GET['optionId']);
+			if ($model === null) {
+				Yii::app()->user->setFlash('error', Yii::t("translation", "The option does not exist"));
 				$this->redirect(array('options/index'));
 			}
+			$fetchElementName = Yii::app()->db->createCommand()
+				->select('sfd.label')
+				->from('surFormDetails sfd')
+				->where('sfd.subFormId =' . $model['elementId']  )
+				->queryAll();
+
+			// Pick the selected Option's elementId. This will be displayed as the default in the dropdown
+			$dataArray['elementName'] = $fetchElementName[0]['label'];
+		} else {
+			Yii::app()->user->setFlash('notice', Yii::t("translation", "Please select an option to edit"));
+			$this->redirect(array('options/index'));
+		}
 		if ( isset( $_POST['Options'] ) ) {
 			$model->attributes = $_POST['Options'];
 			// Validate and save the data
