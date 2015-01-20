@@ -111,9 +111,6 @@ class OptionsController extends Controller {
 				$model->save();
 				Yii::app()->user->setFlash('success', "Option successfully created.");
 				$this->redirect( array( 'options/index' ) );
-			} else {
-				echo CActiveForm::validate($model);
-				Yii::app()->end();
 			}
 		}
 		// Select all values whose inputType is ""Select"
