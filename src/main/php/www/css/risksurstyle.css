@@ -1325,31 +1325,117 @@ div.buttonWrapLeft {
 #surFormDetailsBlock {
     width: 99%;
 }
+
 .operations {
-    background-color: #cccccc;
-    width: 90%;
-    padding-bottom: 1em !important;
+	/*background-color: #888;*/
+	width: 90%;
+	padding: 1em !important;
 }
-.operations li {
-    background-color: #000000;
-	/*left: 1.15em;*/
-    padding: 0.2em;
-    margin-top: 0.5em;
-    margin-left: 0.5em;
-    width: 85%;
+
+/* Start Style the Sidebar Menu */
+ul.operations, ul.operations ul {
+  list-style-type:none;
+  margin: 0;
+  padding: 0;
+  /*width: 90%;*/
 }
-.operations li a {
-    text-decoration: none;
-    color: #ffffff;
-    font-weight: bold;
-    font-size: 13px;
+
+ul.operations a {
+  display: block;
+  text-decoration: none;	
 }
+
+ul.operations li {
+  margin-top: 1px;
+}
+
+ul.operations li a {
+	background: #333;
+  color: #fff;	
+  padding: 0.5em;
+}
+
+ul.operations li a:hover {
+  background: #00498F;
+  color: #fff;
+}
+
+ul.operations li ul li a {
+	/*background: #e0e0e0;*/
+	background: #A0A0A0 ;
+  color: #000;
+  padding-left: 20px;
+  text-align: left;
+}
+
+ul.operations li ul li a:hover {
+  background: #00498F;
+  color: #fff;
+
+  border-left: 5px #333 solid;
+  padding-left: 15px;
+}
+
+ul.operations li ul li li a {
+  background: #e0e0e0;
+  color: #000;
+  padding-left: 25px;
+}
+
+ul.operations li ul li li a:hover {
+  background: #00498F;
+  border-left: 5px #000 solid;
+  padding-left: 20px;
+}
+
+ul.operations li ul li li li a {
+  background: #e0e0e0;
+  color: #000;
+  padding-left: 30px;
+}
+
+ul.operations li ul li li li a:hover {
+  background: #ccc;
+  border-left: 5px #000 solid;
+  padding-left: 25px;
+}
+
+ul.operations li.active >a,
+ul.operations li.selected >a,
+ul.operations li.current_page_item > a,
+ul.operations li.current-menu-ancestor > a,
+ul.operations li.current-menu-item > a,
+ul.operations li.current-menu-parent > a {
+	background: #aaa;
+	color: #000;
+}
+
+ul.operations li.current-menu-parent > a {
+	background: #ddd;
+	color: #000;
+}
+
+* html ul.operations li.active a,
+* html ul.operations li.selected a,
+* html ul.operations li.current_page_item a,
+* html ul.operations li.current-menu-ancestor a,
+* html ul.operations ul li.current-menu-item a,
+* html ul.operations ul li.current-menu-parent a,
+* html ul.operations ul li a:hover {
+	background: #aaa;
+	color: #000;
+}
+/* End Style the Sidebar Menu */
+
 /*.container, #content{*/
 /*width:100%;*/
 /*}*/
 /*lift up the sub menu z-index*/
 .ui-menu-item ul {
 	z-index: 100;
+}
+.activeMnu {
+  background: #00498F;
 }
 .attributeHighlight {
 	background-color:#FFFF84;
