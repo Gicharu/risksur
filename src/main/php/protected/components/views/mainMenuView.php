@@ -1,6 +1,6 @@
 <?php
 	$this->widget('zii.widgets.CMenu', array(
-		'activeCssClass' => 'active',
+		'activeCssClass' => 'activeMnu',
 		'activateParents' => true,
 		'id' => 'menu',
 		'items' => $menuParams['menuArray']

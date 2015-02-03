@@ -47,10 +47,16 @@ class MainMenu extends CWidget {
 					} else {
 						$url = "//" . $menuPages['path']; 
 					}
+
+					//$classSet = '';
+					//if (strstr($menuPages['path'], Yii::app()->controller->id)) {
+						//$classSet = 'ui-active';
+					//}
 					$menuParams['menuArray'][$menuPages['pageId']] = array(
 						'label' => $menuPages['pageName'],
 						'url' => $url,
-						'linkOptions' => array('target' => $menuPages['target'])
+						'linkOptions' => array('target' => $menuPages['target']),
+						'active' => strstr($menuPages['path'], Yii::app()->controller->id)
 					);
 			} else {
 				$pathArray = $this->arrayKeyPath((int)$menuPages['childId'], $menuParams['menuArray']);
@@ -64,7 +70,8 @@ class MainMenu extends CWidget {
 					$fullMenuPath['items'][$menuPages['pageId']] = array(
 						'label' => $menuPages['pageName'],
 						'url' => $url,
-						'linkOptions' => array('target' => $menuPages['target'])
+						'linkOptions' => array('target' => $menuPages['target']),
+						'active' => strstr($menuPages['path'], Yii::app()->controller->id)
 					);
 				}
 			}

@@ -11,6 +11,7 @@
  */
 class EvaluationController extends Controller {
 	const LOG_CAT = "ctrl.EvaluationController";
+	public $layout = '//layouts/column2';
 	/**
 	 * filters 
 	 * 

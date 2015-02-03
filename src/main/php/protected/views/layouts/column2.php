@@ -30,12 +30,36 @@
 					);
 				}
 			}
+			//Evaluation controller side menus
+
+			if (Yii::app()->controller->id == 'evaluation') {
+				$this->menu = array(
+					array('label' => Yii::t("translation", "Introduction to Evaluation of Surveillance "), 'url' => array('createDesign'),
+						'items' => array(
+							array('label' => 'The EVA Tool', 'url' => array('index')), 
+							array('label' => 'Evaluation Concepts', 'url' => array('index'))
+						)
+					),
+					array('label' => Yii::t("translation", "Describe Evaluation Context"), 'url' => array('index')),
+					array('label' => Yii::t("translation", "Select Evaluation Question"), 'url' => array('index')),
+					array('label' => Yii::t("translation", "Assessment Criteria"), 'url' => array('index')),
+					array('label' => Yii::t("translation", "Economic Assessment"), 'url' => array('index')),
+					array('label' => Yii::t("translation", "Evaluation Attributes"), 'url' => array('index'),
+						'items' => array(
+							array('label' => 'Methods of Assessment', 'url' => array('index')), 
+							array('label' => 'Final list of attributes', 'url' => array('index'))
+						)
+					),
+					array('label' => Yii::t("translation", "Summary and Reports"), 'url' => array('index'),
+					),
+				);
+			}
 //        $this->beginWidget('zii.widgets.CPortlet', array(
 //            'title' => 'Operations',
 //        ));
 		$this->beginWidget('zii.widgets.CMenu', array(
 			'items' => $this->menu,
-			'itemCssClass' => 'ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only',
+			//'itemCssClass' => 'ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only',
 			'htmlOptions' => array(
 				'class' => 'operations'
 			),
