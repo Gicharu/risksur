@@ -34,9 +34,9 @@
 
 			if (Yii::app()->controller->id == 'evaluation') {
 				$this->menu = array(
-					array('label' => Yii::t("translation", "Introduction to Evaluation of Surveillance "), 'url' => array('createDesign'),
+					array('label' => Yii::t("translation", "Introduction to Evaluation of Surveillance "), 'url' => array('evaPage'),
 						'items' => array(
-							array('label' => 'The EVA Tool', 'url' => array('index')), 
+							array('label' => 'The EVA Tool', 'url' => array('evaPage')), 
 							array('label' => 'Evaluation Concepts', 'url' => array('index'))
 						)
 					),

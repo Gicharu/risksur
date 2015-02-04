@@ -34,18 +34,129 @@ class EvaluationController extends Controller {
 	 */
 	public function actionIndex() {
 		Yii::log("actionIndex EvaluationController called", "trace", self::LOG_CAT);
-		$this->render('index', array(
-			//'model' => $model
-		));
+
+			$model = new EvaluationHeader;
+			$dataArray = array();
+			$dataArray['dtHeader'] = "Evaluation List";
+			$dataArray['evalList'] = json_encode(array());
+
+			// get list of evaluation
+			$evalList = EvaluationHeader::model()->with("designFrameworks")->findAll(array(
+				'condition' => 't.userId=:userId',
+				'params' => array(
+					':userId' => Yii::app()->user->id,
+				),
+			));
+			//print_r($evalList); die();
+			$evalListArray = array();
+			// format datatable data
+			foreach ($evalList as $eval) {
+				$deleteButton = "";
+				//if (Yii::app()->user->name != $valu['userName']) {
+				$deleteButton = "<button id='deleteDesign" . $eval->evalId .
+					"' type='button' class='bdelete' onclick=\"$('#deleteBox').dialog('open');" .
+					"deleteConfirm('" . $eval->evaluationName . "', '" .
+					$eval->evalId . "')\">Remove</button>";
+				//}
+				//print_r($eval->designFrameworks); die();
+				$evalListArray[] = array(
+					'evalId' => $eval->evalId,
+					'name' => $eval->evaluationName,
+					'userId' => $eval->userId,
+					'description' => $eval->evaluationDescription,
+					'design' => $eval->frameworkId,
+					'frameworkName' => $eval->designFrameworks[0]->name,
+					//'frameworkName' => $eval->frameworkId,
+					'deleteButton' => $deleteButton
+				);
+			}
+			$dataArray['evalList'] = json_encode($evalListArray);
+
+			if (!empty($_GET['getDesigns'])) {
+				$jsonData = json_encode(array("aaData" => $evalListArray));
+				echo $jsonData;
+				return;
+			}
+			$this->render('index', array(
+				'model' => $model,
+				'dataArray' => $dataArray
+			));
 	}
+/**
+ * actionEvaToolPage 
+ * 
+ * @access public
+ * @return void
+ */
+public function actionEvaPage() {
+	Yii::log("actionEvaPage called", "trace", self::LOG_CAT);
+
+	$model = DocPages::model()->findByPk("1");
+	$this->render('evaPage', array(
+		'model' => $model,
+		//'dataArray' => $dataArray
+	));
+}
 
 	/**
-	 * actionTest 
+	 * actionSaveEvaPage 
 	 * 
 	 * @access public
 	 * @return void
 	 */
-	public function actionTest() {
-		echo "testing";
+	public function actionSaveEvaPage() {
+		Yii::log("actionSaveEvaPage called", "trace", self::LOG_CAT);
+		$model = DocPages::model()->findByPk("1");
+		if (isset($_POST['redactor'])) {
+			$model->docData = self::clearTags($_POST['redactor']);
+			$model->update();
+		}
+		echo json_encode(array());
 	}
+
+	/**
+	 * actionImageUpload 
+	 * 
+	 * @access public
+	 * @return void
+	 */
+	public function actionImageUpload() {
+		// files storage folder
+		$dir = dirname(Yii::app()->request->scriptFile) . '/images/customImageUpload/';
+		$_FILES['file']['type'] = strtolower($_FILES['file']['type']);
+
+		if ($_FILES['file']['type'] == 'image/png'
+		|| $_FILES['file']['type'] == 'image/jpg'
+		|| $_FILES['file']['type'] == 'image/gif'
+		|| $_FILES['file']['type'] == 'image/jpeg'
+		|| $_FILES['file']['type'] == 'image/pjpeg') {
+			// setting file's mysterious name
+			$filename = md5(date('YmdHis')).'.jpg';
+			$file = $dir.$filename;
+
+			// copying
+			move_uploaded_file($_FILES['file']['tmp_name'], $file);
+
+			// displaying file
+			$array = array(
+				'filelink' => Yii::app()->request->baseUrl . '/images/customImageUpload/'.$filename
+			);
+			echo stripslashes(json_encode($array));
+
+		}
+	}
+
+/**
+ * clearTags 
+ * 
+ * @param mixed $str 
+ * @access public
+ * @return void
+ */
+function clearTags($str) {
+	return strip_tags($str, '<code><span><div><label><a><br><p><b><i><del><strike><u><img><video><audio><iframe>' . 
+	'<object><embed><param><blockquote><mark><cite><small><ul><ol><li><hr><dl><dt><dd><sup><sub>' . 
+	'<big><pre><code><figure><figcaption><strong><em><table><tr><td><th><tbody><thead><tfoot><h1><h2><h3><h4><h5><h6>');
+}
+
 }

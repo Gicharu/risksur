@@ -410,9 +410,9 @@ table {
 .selected li, .available li {
 	cursor: pointer;
 }
-h1 {
-	display: none;
-}
+/*h1 {*/
+/*display: none;*/
+/*}*/
 body, .dataTables_wrapper{
 	/*display: table;*/
 }
