@@ -1,5 +1,6 @@
 -- updated the evaluation menu to evaluation/Index
 UPDATE `programpages` SET `path` = 'evaluation/index' WHERE `PageId` = '3'; 
+UPDATE `programpages` SET `pageName` = 'Evaluation' WHERE `PageId` = '3'; 
 
 -- remove economic assessment menu and examples menu
 DELETE FROM programpages WHERE pageId = 4;
