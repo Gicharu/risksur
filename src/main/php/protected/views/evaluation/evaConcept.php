@@ -1,13 +1,14 @@
 <?php
-	if (!$editPage) {
-
-	echo CHtml::htmlButton(Yii::t('translation', 'Edit'), array(
-		'submit' => array(
-			'evaluation/evaConcept?edit=1'
-		),
-		'type' => 'submit',
-		'style' => 'float:right;'
-	));
+		if ($editButton) {
+			echo CHtml::htmlButton(Yii::t('translation', 'Edit'), array(
+				'submit' => array(
+					'evaluation/evaConcept?edit=1'
+				),
+				'type' => 'submit',
+				'style' => 'float:right;'
+			));
+		}
+	if (!$editButton OR !$editPage) {
 		echo urldecode($model->docData);
 	} else {
 Yii::import('ext.imperavi-redactor-widget.ImperaviRedactorWidget');

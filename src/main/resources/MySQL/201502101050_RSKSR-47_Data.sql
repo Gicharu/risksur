@@ -8,10 +8,10 @@ INSERT INTO `permissions`(`id`,`name`,`description`,`controller`,`action`,`bizru
 
 INSERT INTO `roles_has_permissions`(`permissions_id`,`roles_id`) values
 (43,1),(43,2),(43,3),
-(44,1),(44,2),(44,3),
-(45,1),(45,2),(45,3),
+(44,1),(44,2),
+(45,1),(45,2),
 (46,1),(46,2),(46,3),
-(47,1),(47,2),(47,3)
+(47,1),(47,2)
 ;
 
 insert  into `docPages`(`docId`,`docName`,`docData`) values (1,'evaPage','%3Cp%3E%0A%09%3Cstrong%3ELo%3Cspan%20style%3D%22color%3A%20rgb(36%2C%2064%2C%2097)%3B%22%20data-redactor-tag%3D%22span%22%3Erem%20Ipsum%20is%20simply%20dumext%3C%2Fspan%3E%20of%20the%20printing%20%3C%2Fstrong%3E%0A%3C%2Fp%3E%0A%3Cp%3E%0A%09%3Cimg%20style%3D%22%22%20rel%3D%22%22%20src%3D%22%2Frisksur%2Fimages%2FcustomImageUpload%2F2089d06b17e2de380bf07bc6dc5f4d79.jpg%22%3E%0A%3C%2Fp%3E%0A%3Cp%3E%0A%09%3Cem%3Ean%3Cspan%20style%3D%22background-color%3A%20rgb(217%2C%20150%2C%20148)%3B%22%20data-redactor-tag%3D%22span%22%3Ed%20typesetting%20industry.%20Lorem%20Ips%3C%2Fspan%3Eum%20has%20been%20the%20industry\'s%20%3C%2Fem%3E%0A%3C%2Fp%3E%0A%3Col%3E%0A%09%3Cli%3Estandard%20dummy%20text%20ever%20since%20the%20%3Cem%3E1500s%2C%20when%20an%20unknown%20printer%20took%20a%20galley%20of%20%3C%2Fem%3E%3C%2Fli%3E%0A%3C%2Fol%3E%0A%3Cp%3E%0A%09%3Cdel%3Etype%20and%20scrambled%20it%20to%20make%20a%20type%20specimen%20book.%20It%20has%20survived%20not%20only%20five%20centuries%2C%20%3C%2Fdel%3E%0A%3C%2Fp%3E%0A%3Cp%3E%0A%09but%20also%20the%20leap%20into%20electronic%0A%3C%2Fp%3E%0A%3Ch2%3E%20typesetting%2C%20remaining%20essentially%20unchanged.%20%3C%2Fh2%3E%0A%3Cblockquote%3E%0A%09It%20was%20popularised%20in%20the%201960s%20with%0A%3C%2Fblockquote%3E%0A%3Cp%3E%0A%09the%20release%20of%20Letraset%20sheets%20containing%20Lorem%20Ipsum%20passages%2C%20and%20more%20recently%20with%20desktop%20publishing%20software%20like%20Aldus%20PageMaker%20including%20versions%20of%20Lorem%20Ipsum.%0A%3C%2Fp%3E');
