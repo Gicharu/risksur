@@ -51,7 +51,7 @@ hr {
 	border:none;
 }
 h1, h2, h3, h4, h5, h6 {
-	font-family:"Helvetica Neue", Arial, "Lucida Grande", sans-serif;
+	/*font-family:"Helvetica Neue", Arial, "Lucida Grande", sans-serif;*/
 }
 .graphDetailsHeader {
 	font-size: 1.2em;
@@ -434,9 +434,9 @@ select, input, button, textarea, button {
 body{
 	font-family:Arial,Helvetica,sans-serif;
 }
-h1, h2{
-	font-size:100%;
-}
+/*h1, h2{*/
+/*font-size:100%;*/
+/*}*/
 #footer {
 	font-size: 10px;
 }
@@ -452,9 +452,9 @@ body, .ui-top-menu, .ui-top-menu .ui-menu-item{
 .ui-top-menu, .ui-top-menu .ui-menu-item, .ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default{
 	font-weight: bold;
 }
-h1, h2, .ui-top-menu, .ui-top-menu .ui-menu-item, #menubar li, #menubar .ui-menu-item-first, #menubar .ui-menu-item-last, #dataTable td a{
-	font-weight:normal;
-}
+/*h1, h2, .ui-top-menu, .ui-top-menu .ui-menu-item, #menubar li, #menubar .ui-menu-item-first, #menubar .ui-menu-item-last, #dataTable td a{*/
+/*font-weight:normal;*/
+/*}*/
 /* Removes blue border on IE */
 a img {
 	border: 0px;
@@ -1406,7 +1406,8 @@ ul.operations li.current_page_item > a,
 ul.operations li.current-menu-ancestor > a,
 ul.operations li.current-menu-item > a,
 ul.operations li.current-menu-parent > a {
-	background: #aaa;
+	background: #00498F;
+	border-left: 5px #000 solid;
 	color: #000;
 }
 
@@ -1435,7 +1436,8 @@ ul.operations li.current-menu-parent > a {
 	z-index: 100;
 }
 .activeMnu {
-  background: #00498F;
+	background: #00498F;
+
 }
 .attributeHighlight {
 	background-color:#FFFF84;

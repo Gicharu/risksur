@@ -3,7 +3,7 @@
 
 	echo CHtml::htmlButton(Yii::t('translation', 'Edit'), array(
 		'submit' => array(
-			'evaluation/evaPage?edit=1'
+			'evaluation/evaConcept?edit=1'
 		),
 		'type' => 'submit',
 		'style' => 'float:right;'
@@ -26,7 +26,7 @@ $this->widget('ImperaviRedactorWidget', array(
 		'toolbar' => true,
 		'buttonSource' => true,
 		'iframe' => false,
-		'autosave' => 'saveEvaPage',
+		'autosave' => 'saveEvaConcept',
 		'autosaveOnChange' => true,
 		'autosaveCallback' => 'js:function(json) {
 			//console.log(json);
@@ -55,14 +55,14 @@ $this->widget('ImperaviRedactorWidget', array(
 	),
 
 ));
-
 	echo CHtml::htmlButton(Yii::t('translation', 'View'), array(
 		'submit' => array(
-			'evaluation/evaPage'
+			'evaluation/evaConcept'
 		),
 		'type' => 'submit',
 		'style' => 'float:right; z-index:2000'
 	));
+
 ?>
 <form action="" id="formID" method="post">
 <textarea id="redactor" name="redactor">

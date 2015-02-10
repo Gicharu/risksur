@@ -82,21 +82,79 @@ class EvaluationController extends Controller {
 				'dataArray' => $dataArray
 			));
 	}
-/**
- * actionEvaToolPage 
- * 
- * @access public
- * @return void
- */
-public function actionEvaPage() {
-	Yii::log("actionEvaPage called", "trace", self::LOG_CAT);
 
-	$model = DocPages::model()->findByPk("1");
-	$this->render('evaPage', array(
-		'model' => $model,
-		//'dataArray' => $dataArray
-	));
-}
+	/**
+	 * actionEvaToolPage 
+	 * 
+	 * @access public
+	 * @return void
+	 */
+	public function actionEvaPage() {
+		Yii::log("actionEvaPage called", "trace", self::LOG_CAT);
+
+		$model = DocPages::model()->findByPk("1");
+		$userId = Yii::app()->user->id;
+
+		// check if the user has roles 1 or 2 - admin roles
+		$userRoles = UsersHasRoles::model()->findAll(array(
+			'condition' => 't.users_id = :users_id AND (t.roles_id = :roleA OR t.roles_id = :roleB)',
+			'params' => array(
+				':users_id' => $userId,
+				':roleA' => 1,
+				':roleB' => 2
+			),
+		));
+		$editButton = false;
+		if (!empty($userRoles)) {
+			$editButton = true;
+		}
+		$editPage = false;
+		if (!empty($_GET['edit']) && $_GET['edit'] == 1) {
+			$editPage = true;
+		}
+
+		$this->render('evaPage', array(
+			'model' => $model,
+			'editButton' => $editButton,
+			'editPage' => $editPage
+		));
+	}
+
+	/**
+	 * actionEvaConcept 
+	 * 
+	 * @access public
+	 * @return void
+	 */
+	public function actionEvaConcept() {
+		Yii::log("actionEvaConcept called", "trace", self::LOG_CAT);
+
+		$model = DocPages::model()->findByPk("2");
+		$userId = Yii::app()->user->id;
+
+		// check if the user has roles 1 or 2 - admin roles
+		$userRoles = UsersHasRoles::model()->findAll(array(
+			'condition' => 't.users_id = :users_id AND (t.roles_id = :roleA OR t.roles_id = :roleB)',
+			'params' => array(
+				':users_id' => $userId,
+				':roleA' => 1,
+				':roleB' => 2
+			),
+		));
+		$editButton = false;
+		if (!empty($userRoles)) {
+			$editButton = true;
+		}
+		$editPage = false;
+		if (!empty($_GET['edit']) && $_GET['edit'] == 1) {
+			$editPage = true;
+		}
+		$this->render('evaConcept', array(
+			'model' => $model,
+			'editButton' => $editButton,
+			'editPage' => $editPage
+		));
+	}
 
 	/**
 	 * actionSaveEvaPage 
@@ -107,6 +165,22 @@ public function actionEvaPage() {
 	public function actionSaveEvaPage() {
 		Yii::log("actionSaveEvaPage called", "trace", self::LOG_CAT);
 		$model = DocPages::model()->findByPk("1");
+		if (isset($_POST['redactor'])) {
+			$model->docData = self::clearTags($_POST['redactor']);
+			$model->update();
+		}
+		echo json_encode(array());
+	}
+
+	/**
+	 * actionSaveEvaConcept 
+	 * 
+	 * @access public
+	 * @return void
+	 */
+	public function actionSaveEvaConcept() {
+		Yii::log("actionSaveEvaConcept called", "trace", self::LOG_CAT);
+		$model = DocPages::model()->findByPk("2");
 		if (isset($_POST['redactor'])) {
 			$model->docData = self::clearTags($_POST['redactor']);
 			$model->update();
