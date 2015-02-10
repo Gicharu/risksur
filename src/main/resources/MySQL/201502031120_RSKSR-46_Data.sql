@@ -11,4 +11,4 @@ INSERT INTO `permissions`(`id`,`name`,`description`,`controller`,`action`,`bizru
 ;
 
 INSERT INTO `roles_has_permissions`(`permissions_id`,`roles_id`) values
-(42,1),(42,2);
+(42,1),(42,2),(42,3);

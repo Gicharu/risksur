@@ -286,7 +286,7 @@ $msg = 0;
 	</div>
 	<div id="attributeSelected">
 	<?php
-		if (!Yii::app()->controller->id == 'evaluation') {
+		if (Yii::app()->controller->id <> 'evaluation') {
 			if (!empty(Yii::app()->session['performanceAttribute'])) {
 				echo "Active Performance Attribute: " . Yii::app()->session['performanceAttribute']['name'];
 				echo " - <a href='" . CController::createUrl("attribute/selectAttribute") . "'>Change</a>";
