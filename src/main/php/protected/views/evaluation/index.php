@@ -136,7 +136,16 @@ $(function(){
 	});
 }
 	</script>
+<?php
 
+	echo CHtml::htmlButton(Yii::t('translation', 'Create New Evaluation Protocol'), array(
+		'submit' => array(
+			'evaluation/evaProtocol'
+		),
+		'type' => 'submit',
+		//'style' => 'float:right;'
+	));
+?>
 <div id="listEvaluation" width="100%">
 	
 	<table id="evalList" width="100%" border="0" cellspacing="0" cellpadding="0">
