@@ -44,21 +44,21 @@ class UsersController extends Controller {
 			$model->attributes = $_POST['Users'];
 			$model->roles = $_POST['Users']['roles'];
 			// Check for blanks
-			if ($model->userName == "" || $model->email == "" || $model->roles == "") {
-				Yii::app()->user->setFlash('error', 'All fields must be filled in!');
-				$this->render('create', array(
-					'model' => $model
-				));
-				return;
-			}
-			// Check for invalid email address
-			if (!filter_var($model->email, FILTER_VALIDATE_EMAIL)) {
-				Yii::app()->user->setFlash('error', 'Enter a valid email address!');
-				$this->render('create', array(
-					'model' => $model
-				));
-				return;
-			}
+			// if ($model->userName == "" || $model->email == "" || $model->roles == "") {
+			// 	Yii::app()->user->setFlash('error', 'All fields must be filled in!');
+			// 	$this->render('create', array(
+			// 		'model' => $model
+			// 	));
+			// 	return;
+			// }
+			// // Check for invalid email address
+			// if (!filter_var($model->email, FILTER_VALIDATE_EMAIL)) {
+			// 	Yii::app()->user->setFlash('error', 'Enter a valid email address!');
+			// 	$this->render('create', array(
+			// 		'model' => $model
+			// 	));
+			// 	return;
+			// }
 			//check if user exists
 			$findEmail = Users::model()->find("email = '".$model->email."'");
 			if (empty($findEmail)) {
