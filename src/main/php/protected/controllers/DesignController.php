@@ -574,13 +574,13 @@
 					}
 
 					// add the values to the form
-					if (!empty($componentData[$attributeId])) {
-						$elements['elements'][$attributeId]['value'] = $componentData[$attributeId]['value'];
-					}
+					//if (!empty($componentData[$attributeId])) {
+						//$elements['elements'][$attributeId]['value'] = $componentData[$attributeId]['value'];
+					//}
 					// add the component name element value
-					if (!empty($componentData['componentName'])) {
-						$elements['elements']['componentName']['value'] = $componentData['componentName'];
-					}
+					//if (!empty($componentData['componentName'])) {
+						//$elements['elements']['componentName']['value'] = $componentData['componentName'];
+					//}
 					//add the dropdown parameters
 					if ($inputType == 'dropdownlist') {
 						$data = Options::model()->findAll(array(
@@ -639,21 +639,26 @@
 				//print_r($fetchComponentData);
 				//arrange data in array
 				$componentData = array();
-				foreach ($fetchComponentData as $dat) {
-					$componentData[$dat['inputName'] . "-" . $dat['subFormId']] = array(
-						'value' => $dat['value'],
-						'id' => $dat['componentDetailId']
-					);
-					// add the component name to the array as well but just once
-					if (empty($componentData['componentName'])) {
-						$componentData['componentName'] = $dat['componentName'];
-					}
-				}
 
-				$returnArray = self::getElementsAndDynamicAttributes($componentData);
+				$returnArray = self::getElementsAndDynamicAttributes();
 				$elements = $returnArray['elements'];
 				$model = new ComponentsForm;
 				$model->_dynamicFields = $returnArray['dynamicDataAttributes'];
+
+				// update the model with the data values and add id
+				foreach ($fetchComponentData as $dat) {
+					$compKey = $dat['inputName'] . "-" . $dat['subFormId'];
+					$componentData[$compKey] = array(
+						'value' => $dat['value'],
+						'id' => $dat['componentDetailId']
+					);
+					$model->{$compKey} = $dat['value'];
+					// add the component name to the array as well but just once
+					if (empty($componentData['componentName'])) {
+						$componentData['componentName'] = $dat['componentName'];
+						$model->componentName = $dat['componentName'];
+					}
+				}
 
 				// generate the components form
 				$form = new CForm($elements, $model);

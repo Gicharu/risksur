@@ -51,7 +51,9 @@
 							array('label' => 'Evaluation Concepts', 'url' => array('evaConcept'), 'active' => strstr('evaConcept', $currentView))
 						)
 					),
-					array('label' => Yii::t("translation", "Describe Evaluation Context"), 'url' => array('index')),
+					array('label' => Yii::t("translation", "Describe Evaluation Context"), 'url' => array('addEvaContext'),
+						'active' => strstr('addEvaContext', $currentView),
+					),
 					array('label' => Yii::t("translation", "Select Evaluation Question"), 'url' => array('index')),
 					array('label' => Yii::t("translation", "Assessment Criteria"), 'url' => array('index')),
 					array('label' => Yii::t("translation", "Economic Assessment"), 'url' => array('index')),
