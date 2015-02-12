@@ -49,6 +49,7 @@ class Users extends CActiveRecord {
 		// will receive user inputs.
 		return array(
 			array( 'userName', 'unique', 'on' => 'insert' ),
+			array( 'email', 'unique', 'on' => 'insert' ),
 			array( 'active, passReset', 'numerical', 'integerOnly' => true ),
 			array( 'userName', 'length', 'max' => 20 ),
 			array( 'password, email', 'length', 'max' => 40 ),
