@@ -43,69 +43,34 @@ class UsersController extends Controller {
 		if(isset($_POST['Users'])) {
 			$model->attributes = $_POST['Users'];
 			$model->roles = $_POST['Users']['roles'];
-			// Check for blanks
-			if ($model->userName == "" || $model->email == "" || $model->roles == "") {
-				Yii::app()->user->setFlash('error', 'All fields must be filled in!');
-				$this->render('create', array(
-					'model' => $model
-				));
-				return;
-			}
-			// Check for invalid email address
-			if (!filter_var($model->email, FILTER_VALIDATE_EMAIL)) {
-				Yii::app()->user->setFlash('error', 'Enter a valid email address!');
-				$this->render('create', array(
-					'model' => $model
-				));
-				return;
-			}
-			//check if user exists
-			$findEmail = Users::model()->find("email = '".$model->email."'");
-			if (empty($findEmail)) {
-				$findUsername = Users::model()->find("userName = '".$model->userName."'");
-				if (empty($findUsername)) {
-					if ($model->validate()) {
-						if($model->save() && $model->saveRoles($model->userId, "create")) {
-							// send the user the email link:
-							$toMailName = $model->userName;
-							$email = $model->email;
-							// construct data and set expiry to 24 hrs
-							$resetEncrypt = base64_encode($email . ",resetTrue,". (strtotime(date("H:i:s")) + 86400));
-							$passwordUrl = "http://" . $_SERVER["HTTP_HOST"] . Yii::app()->request->baseUrl . "/index.php/site/changepassword?data=$resetEncrypt" . 
-								"&redirect_uri=" . $cancelLink;
-							$mail = new TTMailer();
-							$subject = Yii::t('translation', 'User created');
-							$altBody = Yii::t('translation', 'To view the message, please use an HTML compatible email viewer!');
-							$message = Yii::t('translation', 'Dear ') . $toMailName . ',<br /><br />' .
-							Yii::t('translation', 'your user account has been created, please visit ');
-							$message .= '<a href="' . $passwordUrl . '">' . $passwordUrl . '</a>' .
-							Yii::t('translation', ' to activate it and set a new password. ') .
-							'<p></p>' . Yii::t('translation', 'This message was automatically generated.') . '<br />' .
-							Yii::t('translation', ' If you think it was sent incorrectly, ') .
-							Yii::t('translation', 'please contact your administrator.');
-							//if mail is not sent successfully issue appropriate message
-							if (!$mail->ttSendMail($subject, $altBody, $message, $email, $toMailName)) {
-								Yii::log("Error in sending the password to the user", "error", self::LOG_CAT);
-								$msg = Yii::t('translation', "Error in sending the password to the user");
-								return $msg;
-							}
-							Yii::app()->user->setFlash('success', "User successfully created.");
-							$this->redirect(array('users/index'));
-						}
+			if ($model->validate("insert")) {
+				if($model->save() && $model->saveRoles($model->userId, "create")) {
+					// send the user the email link:
+					$toMailName = $model->userName;
+					$email = $model->email;
+					// construct data and set expiry to 24 hrs
+					$resetEncrypt = base64_encode($email . ",resetTrue,". (strtotime(date("H:i:s")) + 86400));
+					$passwordUrl = "http://" . $_SERVER["HTTP_HOST"] . Yii::app()->request->baseUrl . "/index.php/site/changepassword?data=$resetEncrypt" . 
+						"&redirect_uri=" . $cancelLink;
+					$mail = new TTMailer();
+					$subject = Yii::t('translation', 'User created');
+					$altBody = Yii::t('translation', 'To view the message, please use an HTML compatible email viewer!');
+					$message = Yii::t('translation', 'Dear ') . $toMailName . ',<br /><br />' .
+					Yii::t('translation', 'your user account has been created, please visit ');
+					$message .= '<a href="' . $passwordUrl . '">' . $passwordUrl . '</a>' .
+					Yii::t('translation', ' to activate it and set a new password. ') .
+					'<p></p>' . Yii::t('translation', 'This message was automatically generated.') . '<br />' .
+					Yii::t('translation', ' If you think it was sent incorrectly, ') .
+					Yii::t('translation', 'please contact your administrator.');
+					//if mail is not sent successfully issue appropriate message
+					if (!$mail->ttSendMail($subject, $altBody, $message, $email, $toMailName)) {
+						Yii::log("Error in sending the password to the user", "error", self::LOG_CAT);
+						$msg = Yii::t('translation', "Error in sending the password to the user");
+						return $msg;
 					}
-				} else {
-					Yii::app()->user->setFlash('error', 'Username already exists!');
-					$this->render('create', array(
-						'model' => $model
-					));
-					return;
+					Yii::app()->user->setFlash('success', "User successfully created.");
+					$this->redirect(array('users/index'));
 				}
-			} else {
-				Yii::app()->user->setFlash('error', 'Email address already exists!');
-				$this->render('create', array(
-					'model' => $model
-				));
-				return;
 			}
 		}
 		$this->render('create', array(
