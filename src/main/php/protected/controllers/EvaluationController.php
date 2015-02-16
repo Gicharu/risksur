@@ -235,8 +235,17 @@ class EvaluationController extends Controller {
 					}
 				}
 			}
+			//update the session variable for design
+			$modelDesign = NewDesign::model()->findByPk($form->model->frameworkId);
+			if (!empty($modelDesign)) {
+				Yii::app()->session->add('surDesign', array(
+					'id' => $modelDesign->frameworkId,
+					'name' => $modelDesign->name,
+					'goalId' => $modelDesign->goalId
+				));
+			}
 			Yii::app()->user->setFlash('success', Yii::t("translation", "Evaluation successfully created"));
-			//$this->redirect(array('listComponents'));
+			$this->redirect(array('addEvaContext'));
 		}
 
 		$this->render('context', array(

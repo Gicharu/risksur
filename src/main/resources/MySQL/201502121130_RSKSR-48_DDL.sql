@@ -5,7 +5,8 @@ CREATE TABLE
 	`evalId` INT(11), 
 	`evalElementsId` INT(11), 
 	`value` VARCHAR(254), 
-	`comments` BLOB, PRIMARY KEY (`evalDetailsId`),
+	`comments` BLOB, 
+	PRIMARY KEY (`evalDetailsId`),
 	CONSTRAINT `fk_evaluationHeader_evalId` FOREIGN KEY (`evalId`) REFERENCES `evaluationHeader`(`evalId`) ON UPDATE CASCADE ON DELETE CASCADE 
 ); 
 
@@ -16,6 +17,16 @@ CREATE TABLE
 	`inputName` VARCHAR(50), 
 	`label` VARCHAR(50), 
 	`inputType` VARCHAR(50), 
-	`required` TINYINT(1) DEFAULT 1, PRIMARY KEY (`evalElementsId`) 
+	`required` TINYINT(1) DEFAULT 1, 
+	PRIMARY KEY (`evalElementsId`) 
 ); 
+
+CREATE TABLE 
+`evaluationQuestion`( 
+	`evalQuestionId` INT(11) NOT NULL AUTO_INCREMENT, 
+	`question` TEXT, 
+	`shortName` VARCHAR(50), 
+	PRIMARY KEY (`evalQuestionId`) 
+); 
+
 

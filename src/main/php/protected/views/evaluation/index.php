@@ -140,7 +140,7 @@ $(function(){
 
 	echo CHtml::htmlButton(Yii::t('translation', 'Create New Evaluation Protocol'), array(
 		'submit' => array(
-			'evaluation/evaProtocol'
+			'evaluation/addEvaContext'
 		),
 		'type' => 'submit',
 		//'style' => 'float:right;'
