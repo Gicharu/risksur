@@ -154,7 +154,7 @@
 </script>
 <div id="surFormDetailsBlock">
 
-	<table id="surFormDetails" border="0" cellspacing="0" cellpadding="0" width="96%" class="display">
+	<table id="surFormDetails" border="0" cellspacing="0" cellpadding="0" width="100%" class="display">
 		<thead>
 		<tr>
 			<!-- <th title="Status">Status</th> -->
