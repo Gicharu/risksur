@@ -334,9 +334,6 @@ ol.widgets {
 #menubar .ui-menu-item-first, #menubar .ui-menu-item-last {
 	background-image: none;
 }
-.ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default{
-	/*background-image: url("../images/ui-bg_highlight-soft_50_6eac2c_1x100.png");*/
-}
 .selected .ui-state-default.ui-element.ui-state-hover, .ui-button.ui-state-hover{
 	/*background-image: url("../images/ui-bg_highlight-soft_100_93c4e5_1x100.png");*/
 }
@@ -504,7 +501,6 @@ body {
 	background-repeat:no-repeat;
 	height:70px;
 	margin-top: -0.25em;
-
 }
 #storyLogo {
 	padding-left: 4px;
@@ -900,11 +896,10 @@ div.login-error{
 	font-size: 16px;
 	font-weight: bold;
 	margin-right: 5px;
-	margin-top:10px;
+	/*margin-top:10px;*/
 	padding-right: 5px;
-	float: right;
+	/*float: right;*/
 	text-align:right;
-	width: 90%;
 }
 .header {
 	color: #448DAE;
@@ -1117,12 +1112,14 @@ div.flash-tixId {
 .widgetRefresh:hover, .widgetClose:hover, .widgetOpen:hover, .widgetDelete:hover, .widgetTotalFullscreen:hover {
 	background-color: #eae7e7;
 }
-
+table.dataTable {
+    width: 100%;
+}
 /* Enable changing of column widths dynamically on data tables */
-table {
+/*table {
 	table-layout: fixed;
 	word-wrap:break-word;
-}
+}*/
 
 .masterDataWidgetOptions {
 	/*float:right;*/
@@ -1407,7 +1404,7 @@ ul.operations li.current-menu-ancestor > a,
 ul.operations li.current-menu-item > a,
 ul.operations li.current-menu-parent > a {
 	background: #00498F;
-	border-left: 5px #000 solid;
+	/*border-left: 5px #000 solid;*/
 	color: #000;
 }
 
@@ -1471,3 +1468,17 @@ tr.tabular-input td input, tr.tabular-input td textarea, tr.tabular-input td sel
 	list-style: circle;
 	margin-left: 35px;
 }
+#mainmenu {
+	width: 100% !important;
+}
+
+#content {
+	width: 100% !important;
+}
+@media (max-width: 750px) {
+	.span-19 {
+	    width: 75% !important;
+	}
+}
+
+
