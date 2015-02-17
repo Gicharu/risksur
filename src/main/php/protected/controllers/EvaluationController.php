@@ -58,21 +58,20 @@ class EvaluationController extends Controller {
 					"deleteConfirm('" . $eval->evaluationName . "', '" .
 					$eval->evalId . "')\">Remove</button>";
 				//}
-				//print_r($eval->designFrameworks); die();
 				$evalListArray[] = array(
 					'evalId' => $eval->evalId,
 					'name' => $eval->evaluationName,
 					'userId' => $eval->userId,
 					'description' => $eval->evaluationDescription,
 					'design' => $eval->frameworkId,
-					'frameworkName' => $eval->designFrameworks[0]->name,
+					'frameworkName' => $eval->designFrameworks->name,
 					//'frameworkName' => $eval->frameworkId,
 					'deleteButton' => $deleteButton
 				);
 			}
 			$dataArray['evalList'] = json_encode($evalListArray);
 
-			if (!empty($_GET['getDesigns'])) {
+			if (!empty($_GET['getEval'])) {
 				$jsonData = json_encode(array("aaData" => $evalListArray));
 				echo $jsonData;
 				return;
@@ -188,6 +187,297 @@ class EvaluationController extends Controller {
 		echo json_encode(array());
 	}
 
+
+	/**
+	 * actionAddEvaContext 
+	 * 
+	 * @access public
+	 * @return void
+	 */
+	public function actionAddEvaContext() {
+		Yii::log("actionAddEvaContext called", "trace", self::LOG_CAT);
+		$evaluationHeader = new EvaluationHeader;
+		$evaluationDetails = new EvaluationDetails;
+		$dataArray = array();
+		$dataArray['formType'] = 'Create';
+
+		$returnArray = self::getElementsAndDynamicAttributes(array("frameworkId" => '2'));
+		$elements = $returnArray['elements'];
+		$model = new EvaluationForm;
+		//print_r($returnArray); die();
+		$model->_dynamicFields = $returnArray['dynamicDataAttributes'];
+		if (!empty(Yii::app()->session['surDesign'])) {
+			$model->frameworkId = Yii::app()->session['surDesign']['id'];
+		}
+		// generate the elements form
+		$form = new CForm($elements, $model);
+		//validate and save the evaluation data
+		if ($form->submitted('EvaluationForm') && $form->validate()) {
+			//print_r($form->getModel()); die();
+			$evaluationHeader->evaluationName = $form->model->evaluationName;
+			$evaluationHeader->frameworkId = $form->model->frameworkId;
+			$evaluationHeader->userId = Yii::app()->user->id;
+			//save the componentHead values
+			$evaluationHeader->save();
+			$evalId = $evaluationHeader->evalId;
+			// fetch the form data
+			foreach ($form->model as $key => $val) {
+				//ignore the attribute arrays
+				if (!is_array($key) && !is_array($val)) {
+					if ($key != "evaluationName" && $key != "frameworkId") {
+						$evaluationDetails->setIsNewRecord(true);
+						$evaluationDetails->evalDetailsId = null;
+						$evaluationDetails->evalId = $evalId;
+						$params = explode("-", $key);
+						$evaluationDetails->evalElementsId = $params[1];
+						$evaluationDetails->value = $val;
+						$evaluationDetails->save();
+					}
+				}
+			}
+			//update the session variable for design
+			$modelDesign = NewDesign::model()->findByPk($form->model->frameworkId);
+			if (!empty($modelDesign)) {
+				Yii::app()->session->add('surDesign', array(
+					'id' => $modelDesign->frameworkId,
+					'name' => $modelDesign->name,
+					'goalId' => $modelDesign->goalId
+				));
+			}
+			Yii::app()->session->add('evaContext', array(
+				'id' => $evaluationHeader->evaId,
+				'name' => $evaluationHeader->evaluationName,
+			));
+			Yii::app()->user->setFlash('success', Yii::t("translation", "Evaluation successfully created"));
+			$this->redirect(array('addEvaContext'));
+		}
+
+		$this->render('context', array(
+			'model' => $model,
+			'dataArray' => $dataArray,
+			'form' => $form
+		));
+	}
+
+		/**
+		 * actionShowEval 
+		 * 
+		 * @access public
+		 * @return void
+		 */
+		public function actionShowEval() {
+			Yii::log("actionShowEval called", "trace", self::LOG_CAT);
+			$model = new EvaluationHeader;
+			$dataArray = array();
+			if (isset($_GET['evalId'])) {
+				$selectedEval = Yii::app()->db->createCommand()
+					->select(' h.evalId,
+						h.evaluationName,
+						fh.frameworkId,
+						fh.name,
+						fh.goalId,
+						ee.label,
+						ed.value'
+					)
+					->from('evaluationHeader h')
+					->join('frameworkHeader fh', 'h.frameworkId = fh.frameworkId')
+					->join('evaluationDetails ed', 'ed.evalId = h.evalId')
+					->join('evalElements ee', 'ee.evalElementsId = ed.evalElementsId')
+					->where('h.evalId =' . $_GET['evalId'])
+					->queryAll();
+					// prepare the array for the view
+					foreach ($selectedEval as $dat) {
+						if (empty($dataArray['selectedEval']['Evaluation Name'])) {
+							$dataArray['selectedEval']['Evaluation Name'] = $dat['evaluationName'];
+						}
+						if (empty($dataArray['selectedEval']['Design Context'])) {
+							$dataArray['selectedEval']['Design Context'] = $dat['name'];
+						}
+						$dataArray['selectedEval'][$dat['label']] = $dat['value'];
+					}
+				//$dataArray['selectedEval'] = $selectedEval[0];
+				//add the surveilance design to the session
+				if (count($selectedEval) >= 1) {
+					Yii::app()->session->add('evaContext', array(
+						'id' => $_GET['evalId'],
+						'name' => $selectedEval[0]['evaluationName'],
+					));
+
+					//update the session variable for design
+					Yii::app()->session->add('surDesign', array(
+						'id' => $selectedEval[0]['frameworkId'],
+						'name' => $selectedEval[0]['name'],
+						'goalId' => $selectedEval[0]['goalId']
+					));
+				} else {
+					Yii::app()->session->remove('evaContext');
+				}
+				//print_r($selectedEval);
+				//print_r($_SESSION);
+			}
+
+			$this->render('showEval', array(
+				'model' => $model,
+				'dataArray' => $dataArray
+			));
+		}
+
+	/**
+	 * actionDeleteEval 
+	 * 
+	 * @access public
+	 * @return void
+	 */
+	public function actionDeleteEval() {
+		Yii::log("actionDeleteEval called", "trace", self::LOG_CAT);
+		if (isset($_POST["delId"])) {
+			$record = EvaluationHeader::model()->findByPk($_POST['delId']);
+			if (!$record->delete()) {
+				Yii::log("Error deleting evaluation:" . $_POST['delId'], "warning", self::LOG_CAT);
+				//echo $errorMessage;
+				echo Yii::t("translation", "A problem occured when deleting an evaluation ") . $_POST['delId'];
+			} else {
+				echo Yii::t("translation", "The Evaluation Context ") . Yii::t("translation", " has been successfully deleted");
+			}
+		}
+	}
+
+	/**
+	 * getElementsAndDynamicAttributes 
+	 * 
+	 * @param array $componentData 
+	 * @access public
+	 * @return void
+	 */
+	public function getElementsAndDynamicAttributes($componentData = array()) {
+		$elements = array();
+		$attributeArray = array();
+		$dynamicDataAttributes = array();
+			//$getFormCondition = 't.formId=:formId';
+			//$getFormParams = array(':formId' => 1);
+			$getForm = EvaluationElements::model()->findAll();
+			//$elements['title'] = "Components Form";
+			$elements['showErrorSummary'] = true;
+			$elements['errorSummaryHeader'] = Yii::app()->params['headerErrorSummary'];
+			$elements['errorSummaryFooter'] = Yii::app()->params['footerErrorSummary'];
+			$elements['activeForm']['id'] = "EvaluationForm";
+			$elements['activeForm']['enableClientValidation'] = true;
+			//$elements['activeForm']['enableAjaxValidation'] = false;
+			$elements['activeForm']['class'] = 'CActiveForm';
+			//print_r($getForm); die();
+			$evalElements = $getForm;
+			$dataArray['getForm'] = $elements;
+			$inputType = 'text';
+			// add evaluationName form element
+			$dynamicDataAttributes['evaluationName'] = 1;
+			$elements['elements']['evaluationName'] = array(
+				'label' => "Evaluation Name",
+				'required' => true,
+				'type' => 'text',
+			);
+
+			$dynamicDataAttributes['frameworkId'] = 1;
+			$elements['elements']['frameworkId'] = array(
+				'label' => "Design Framework",
+				'required' => true,
+				'type' => 'dropdownlist'
+			);
+			$designData = NewDesign::model()->findAll(array(
+				//'select' => 'pageId, pageName',
+				'condition' => 'userId=:userId',
+				'params' => array(
+					':userId' => Yii::app()->user->id,
+				),
+			));
+			$designItems = array();
+			// process the dropdown data into an array
+			foreach ($designData as $params) {
+				$designItems[$params->frameworkId] = $params->name;
+			}
+			// add the dropdown items to the element
+			$elements['elements']['frameworkId']['items'] = $designItems;
+
+				$elements['elements']['evaluationName']['layout'] = '{label} {input} {hint} {error}';
+			foreach ($evalElements as $valu) {
+				//set the model attribute array
+				$dynamicDataAttributes[$valu->inputName . "-" . $valu->evalElementsId] = 1;
+				//update the element type
+				if ($valu->inputType == 'int') {
+					$inputType = 'text';
+				} else {
+					if ($valu->inputType == 'select') {
+						$inputType = 'dropdownlist';
+					} else {
+						$inputType = 'text';
+					}
+				}
+
+				$hightlightClass = "";
+				if (isset($attributeArray[$valu->evalElementsId])) {
+					$hightlightClass = "attributeHighlight";
+				}
+				$attributeId = $valu->inputName . "-" . $valu->evalElementsId;
+				// add the elements to the CForm array
+				$elements['elements'][$attributeId] = array(
+					'label' => $valu->label,
+					'required' => $valu->required,
+					'type' => $inputType,
+					'class' => $hightlightClass
+				);
+				// Add an image icon that will be displayed on the ui to show more infor
+				$button = CHtml::image('', '', array(
+						'id' => 'moreInfoButton' . $valu->evalElementsId,
+						'style' => 'cursor:pointer',
+						'class' => 'ui-icon ui-icon-info',
+						'title' => 'More Information',
+						'onClick' => '$("#moreInfoDialog").html($("#popupData' . $valu->evalElementsId . '").html());$("#moreInfoDialog").dialog("open")'
+						));
+				// Add the image icon and information to the layout/ui
+				if (!empty($valu->moreInfo) && !empty($valu->url) && !empty($valu->description)) {
+					$elements['elements'][$attributeId]['layout'] = '{label}<div class="componentImagePopup">' . $button . 
+					'</div>{hint} {input}' . '<div id="popupData' . $valu->evalElementsId .'" style="display:none">'. $valu->moreInfo.'</div>' . 
+					'<div class="componentDataPopup">' . $valu->description . 
+						' <br/> <a href=' . $valu->url . ' target=_blank>' . $valu->url . '</a></div> {error}';
+				}
+
+				// add the values to the form
+				if (!empty($componentData[$attributeId])) {
+					$elements['elements'][$attributeId]['value'] = $componentData[$attributeId]['value'];
+				}
+				// add the component name element value
+				if (!empty($componentData['evaluationName'])) {
+					$elements['elements']['evaluationName']['value'] = $componentData['evaluationName'];
+				}
+				// add the frameworkId element value
+				if (!empty($componentData['frameworkId'])) {
+					$elements['elements']['frameworkId']['value'] = $componentData['frameworkId'];
+				}
+				//add the dropdown parameters
+				if ($inputType == 'dropdownlist') {
+					$data = Options::model()->findAll(array(
+						'condition' => 'elementId=:elementId',
+						'params' => array(
+							':elementId' => $valu->evalElementsId
+						),
+					));
+					$items = array();
+					// process the dropdown data into an array
+					foreach ($data as $params) {
+						$items[$params->optionId] = $params->label;
+					}
+					// add the dropdown items to the element
+					$elements['elements'][$valu->inputName . "-" . $valu->evalElementsId]['items'] = $items;
+				}
+			}
+			$elements['buttons'] = array(
+				'newComponent' => array(
+					'type' => 'submit',
+					'label' => 'Create Evaluation',
+				),
+			);
+		$returnArray = array('elements' => $elements, 'dynamicDataAttributes' => $dynamicDataAttributes);
+		return $returnArray;
+	}
 	/**
 	 * actionImageUpload 
 	 * 

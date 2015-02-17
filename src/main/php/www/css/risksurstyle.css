@@ -891,7 +891,7 @@ div.login-error{
 
 }
 
-#designName, #attributeSelected {
+#designName, #attributeSelected, #evalName {
 	color: #194577;
 	font-size: 16px;
 	font-weight: bold;

@@ -10,8 +10,8 @@
  * @license Tracetracker {@link http://www.tracetracker.com}
  */
 class NewDesign extends CActiveRecord {
-	//public $name;
-	//public $description;
+	public $name;
+	public $description;
 	//public $goal;
 	public $component;
 

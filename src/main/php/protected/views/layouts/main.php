@@ -284,6 +284,13 @@ $msg = 0;
 		}
 	?>
 	</div>
+	<div id="evalName">
+	<?php
+		if (!empty(Yii::app()->session['evaContext']) && Yii::app()->controller->id == 'evaluation') {
+			echo "Active Evaluation Context: " . Yii::app()->session['evaContext']['name'];
+		}
+	?>
+	</div>
 	<div id="attributeSelected">
 	<?php
 		if (Yii::app()->controller->id <> 'evaluation') {

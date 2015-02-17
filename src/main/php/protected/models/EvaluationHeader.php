@@ -51,8 +51,11 @@ class EvaluationHeader extends CActiveRecord {
 	public function rules() {
 		return array(
 			array(
-				'evaluationName, evaluationDescription, frameworkId, userId',
+				'evaluationName, frameworkId, userId',
 				'required'
+			),
+			array(
+				'evaluationDescription', 'safe'
 			),
 			array(
 				'evaluationName', 'unique', 'on' => 'create'
@@ -68,7 +71,8 @@ class EvaluationHeader extends CActiveRecord {
 	 */
 	public function relations() {
 		return array(
-			'designFrameworks' => array( self::HAS_MANY, 'NewDesign', 'frameworkId' )
+			'designFrameworks' => array(self::BELONGS_TO, 'NewDesign', 'frameworkId'),
+			'evalDetails' => array(self::HAS_MANY, 'EvaluationDetails', 'evalId')
 		);
 	}
 	/**
