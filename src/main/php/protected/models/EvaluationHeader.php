@@ -72,7 +72,7 @@ class EvaluationHeader extends CActiveRecord {
 	public function relations() {
 		return array(
 			'designFrameworks' => array(self::BELONGS_TO, 'NewDesign', 'frameworkId'),
-			'evalDetails' => array(self::HAS_MANY, 'EvaluationDeatils', 'evalId')
+			'evalDetails' => array(self::HAS_MANY, 'EvaluationDetails', 'evalId')
 		);
 	}
 	/**

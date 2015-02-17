@@ -58,7 +58,7 @@ $(function(){
 		"aaData": <?php echo $dataArray['evalList']; ?>,
 		"aoColumns": [
 		{"mDataProp": "name",  "bVisible": true, sClass: "showDetails clickable underline"},
-		{"mDataProp": "description", "bVisible": true},
+		//{"mDataProp": "description", "bVisible": true},
 		{"mDataProp": "frameworkName", "bVisible": true},
 		{"mData": "deleteButton", "bSortable": false },
 		],
@@ -87,7 +87,7 @@ $(function(){
 				var aData = slist.fnGetData(aPos[0]); /* Get the full row     */
 				//console.log(aData);
 				var evalId = aData['evalId'];
-		window.location.href = '<?php echo CController::createUrl("evaluation/showDesign"); ?>' + "?evalId=" + evalId;
+		window.location.href = '<?php echo CController::createUrl("evaluation/showEval"); ?>' + "?evalId=" + evalId;
 	});
 });
 
@@ -100,7 +100,7 @@ $(function(){
 				  var opt = {'loadMsg': 'Processing delete evaluation'};
 				$("#listEvaluation").showLoading(opt);
 				$.ajax({type: 'POST',
-					url: <?php echo "'" . CController::createUrl('evaluation/deleteDesign') . "'"; ?>,
+					url: <?php echo "'" . CController::createUrl('evaluation/deleteEval') . "'"; ?>,
 					data: {delId:deleteVal},
 					success: function(data){
 						var checkSuccess = /successfully/i;
@@ -118,7 +118,7 @@ $(function(){
 							$("#ajaxFlashMsg").html(data);
 							$("#ajaxFlashMsgWrapper").attr('class', 'flash-error').show();
 						}
-						slist.fnReloadAjax("index/getDesigns/1");
+						slist.fnReloadAjax("index/getEval/1");
 						$("#listEvaluation").hideLoading();
 					},
 						error: function(data){
@@ -152,7 +152,6 @@ $(function(){
 		<thead>
 		<tr>
 			<th title = "Name">Name</th>
-			<th title = "Descripton">Descripton</th>
 			<th title = "Design">Design</th>
 			<th title = "Delete">Delete</th>
 		</tr>

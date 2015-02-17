@@ -71,7 +71,7 @@ class EvaluationController extends Controller {
 			}
 			$dataArray['evalList'] = json_encode($evalListArray);
 
-			if (!empty($_GET['getDesigns'])) {
+			if (!empty($_GET['getEval'])) {
 				$jsonData = json_encode(array("aaData" => $evalListArray));
 				echo $jsonData;
 				return;
@@ -244,6 +244,10 @@ class EvaluationController extends Controller {
 					'goalId' => $modelDesign->goalId
 				));
 			}
+			Yii::app()->session->add('evaContext', array(
+				'id' => $evaluationHeader->evaId,
+				'name' => $evaluationHeader->evaluationName,
+			));
 			Yii::app()->user->setFlash('success', Yii::t("translation", "Evaluation successfully created"));
 			$this->redirect(array('addEvaContext'));
 		}
@@ -253,6 +257,89 @@ class EvaluationController extends Controller {
 			'dataArray' => $dataArray,
 			'form' => $form
 		));
+	}
+
+		/**
+		 * actionShowEval 
+		 * 
+		 * @access public
+		 * @return void
+		 */
+		public function actionShowEval() {
+			Yii::log("actionShowEval called", "trace", self::LOG_CAT);
+			$model = new EvaluationHeader;
+			$dataArray = array();
+			if (isset($_GET['evalId'])) {
+				$selectedEval = Yii::app()->db->createCommand()
+					->select(' h.evalId,
+						h.evaluationName,
+						fh.frameworkId,
+						fh.name,
+						fh.goalId,
+						ee.label,
+						ed.value'
+					)
+					->from('evaluationHeader h')
+					->join('frameworkHeader fh', 'h.frameworkId = fh.frameworkId')
+					->join('evaluationDetails ed', 'ed.evalId = h.evalId')
+					->join('evalElements ee', 'ee.evalElementsId = ed.evalElementsId')
+					->where('h.evalId =' . $_GET['evalId'])
+					->queryAll();
+					// prepare the array for the view
+					foreach ($selectedEval as $dat) {
+						if (empty($dataArray['selectedEval']['Evaluation Name'])) {
+							$dataArray['selectedEval']['Evaluation Name'] = $dat['evaluationName'];
+						}
+						if (empty($dataArray['selectedEval']['Design Context'])) {
+							$dataArray['selectedEval']['Design Context'] = $dat['name'];
+						}
+						$dataArray['selectedEval'][$dat['label']] = $dat['value'];
+					}
+				//$dataArray['selectedEval'] = $selectedEval[0];
+				//add the surveilance design to the session
+				if (count($selectedEval) >= 1) {
+					Yii::app()->session->add('evaContext', array(
+						'id' => $_GET['evalId'],
+						'name' => $selectedEval[0]['evaluationName'],
+					));
+
+					//update the session variable for design
+					Yii::app()->session->add('surDesign', array(
+						'id' => $selectedEval[0]['frameworkId'],
+						'name' => $selectedEval[0]['name'],
+						'goalId' => $selectedEval[0]['goalId']
+					));
+				} else {
+					Yii::app()->session->remove('evaContext');
+				}
+				//print_r($selectedEval);
+				//print_r($_SESSION);
+			}
+
+			$this->render('showEval', array(
+				'model' => $model,
+				'dataArray' => $dataArray
+			));
+		}
+
+	/**
+	 * actionDeleteEval 
+	 * 
+	 * @access public
+	 * @return void
+	 */
+	public function actionDeleteEval() {
+		Yii::log("actionDeleteEval called", "trace", self::LOG_CAT);
+		if (isset($_POST["delId"])) {
+			$record = EvaluationHeader::model()->findByPk($_POST['delId']);
+			if (!$record->delete()) {
+				Yii::log("Error deleting evaluation:" . $_POST['delId'], "warning", self::LOG_CAT);
+				//echo $errorMessage;
+				echo Yii::t("translation", "A problem occured when deleting an evaluation ") . $_POST['delId'];
+			} else {
+				echo Yii::t("translation", "The Evaluation Context ") . Yii::t("translation", " has been successfully deleted");
+			}
+		}
 	}
 
 	/**
