@@ -279,9 +279,13 @@ $msg = 0;
 	</div>
 	<div id="designName">
 	<?php
+		$activeDesignAction = 'Select';
+		$activeDesignName = '';
 		if (!empty(Yii::app()->session['surDesign'])) {
-			echo "Active Design: " . Yii::app()->session['surDesign']['name'];
+			$activeDesignName = Yii::app()->session['surDesign']['name'] . ' - ';
+			$activeDesignAction = 'Change';
 		}
+		echo "Active Design: $activeDesignName <a href='" . CController::createUrl("design/index") . "'>$activeDesignAction</a>";
 	?>
 	</div>
 	<div id="evalName">
@@ -294,13 +298,13 @@ $msg = 0;
 	<div id="attributeSelected">
 	<?php
 		if (Yii::app()->controller->id <> 'evaluation') {
+			$activeAttributeName = '';
+			$activeAttributeAction = 'Select';
 			if (!empty(Yii::app()->session['performanceAttribute'])) {
-				echo "Active Performance Attribute: " . Yii::app()->session['performanceAttribute']['name'];
-				echo " - <a href='" . CController::createUrl("attribute/selectAttribute") . "'>Change</a>";
-			} else {
-				echo " Active Performance Attribute: ";
-				echo " <a href='" . CController::createUrl("attribute/selectAttribute") . "'>Select</a>";
+				$activeAttributeName = Yii::app()->session['performanceAttribute']['name'] . ' - ';
+				$activeAttributeAction = 'Change';
 			}
+			echo "Active Performance Attribute: $activeAttributeName <a href='" . CController::createUrl("attribute/selectAttribute") . "'>$activeAttributeAction</a>";
 		}
 	?>
 	</div>
