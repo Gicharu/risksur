@@ -302,6 +302,9 @@
 					'formHeader' => $formHeader
 				));
 			}
+			Yii::app()->user->setFlash('notice', Yii::t("translation", "Please select a surveillance context first"));
+			$this->redirect(array('design/listComponents'));
+			return;
 		}
 
 		/**
@@ -480,7 +483,7 @@
 			$componentDetails = new ComponentDetails;
 			$dataArray = array();
 			$dataArray['formType'] = 'Edit';
-			$model = new ComponentsForm;
+			$model = new DynamicForm();
 			$attributeArray = array();
 			if (empty($_GET['compId'])) {
 				Yii::app()->user->setFlash('error', Yii::t("translation", "Please select a component to edit"));
@@ -501,7 +504,7 @@
 
 				$returnArray = self::getElementsAndDynamicAttributes();
 				$elements = $returnArray['elements'];
-				$model = new ComponentsForm;
+				//$model = new ComponentsForm;
 				$model->_dynamicFields = $returnArray['dynamicDataAttributes'];
 
 				// update the model with the data values and add id

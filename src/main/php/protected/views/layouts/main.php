@@ -285,7 +285,7 @@ $msg = 0;
 			$activeDesignName = Yii::app()->session['surDesign']['name'] . ' - ';
 			$activeDesignAction = 'Change';
 		}
-		echo "Active Design: $activeDesignName <a href='" . Yii::app()->createUrl("context/list") . "'>$activeDesignAction</a>";
+		echo "Active Context: $activeDesignName <a href='" . Yii::app()->createUrl("context/list") . "'>$activeDesignAction</a>";
 	?>
 	</div>
 	<div id="evalName">
