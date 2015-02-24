@@ -10,7 +10,7 @@
  * @uses      Controller
  * @license   Tracetracker {@link http://www.tracetracker.com}
  */
-class SiteController extends Controller {
+class SiteController extends CController {
 	const LOG_CAT = "ctrl.SiteController";
 	const LDAPERROR = 'LDAP';
 	const FORGOT_SALT = 'Re$etTrackerS@lt';
@@ -24,6 +24,7 @@ class SiteController extends Controller {
 	 * Declares the salt.
 	 */
 	private $salt = "#fxdHJ&^%DS";
+	public $breadcrumbs = array();
 
 	/**
 	 * init 
@@ -43,7 +44,7 @@ class SiteController extends Controller {
 	 * actions
 	 *
 	 * @access public
-	 * @return void
+	 * @return array
 	 */
 	public function actions() {
 		return array(
@@ -229,7 +230,7 @@ class SiteController extends Controller {
 			if ($model->validate() && $model->login()) { // || Yii::app()->user->login($identity)) {
 				// if nodeId provided set the selectedTix session variable to skip the select node page
 				$this->redirect(array(
-					'design/index'
+					'context/list'
 				));
 				return;
 			}

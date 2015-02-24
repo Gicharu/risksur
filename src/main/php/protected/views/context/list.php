@@ -5,11 +5,10 @@ $(function(){
 		"oTableTools": {
 		"sSwfPath": "<?php echo Yii::app()->request->baseUrl; ?>/js/copy_csv_xls_pdf.swf",
 			"aButtons": [
-				//"print",
 				{
 					"sExtends": "print",
 					"sButtonText": "<?php echo Yii::t('translation', 'Print')?>",
-					"sMessage": '<p class="printHeader"><?php echo $dataArray["dtHeader"]; ?></p>',
+					"sMessage": '<p class="printHeader">Surveillance Context List</p>',
 					"bShowAll": false
 				},
 				{
@@ -43,10 +42,10 @@ $(function(){
 							page: 'current'
 						},
 						"fnClick": function ( nButton, oConfig, oFlash ) {
-						oFlash.setFileName( "Object Listing_" + getTitle() + ".csv" );
+						oFlash.setFileName( "Context List_" + getTitle() + ".csv" );
 							this.fnSetText( oFlash,	"" + this.fnGetTableData(oConfig)
 							);
-						},
+						}
 					}
 					],
 					"bShowAll": false
@@ -59,7 +58,6 @@ $(function(){
 		"aoColumns": [
 		{"mDataProp": "name",  "bVisible": true, sClass: "showDetails clickable underline"},
 		{"mDataProp": "description", "bVisible": true},
-		{"mDataProp": "goalName", "bVisible": true},
 		{"mDataProp": "editButton", "bSortable": false },
 		{"mData": "deleteButton", "bSortable": false },
 		],
@@ -74,21 +72,18 @@ $(function(){
 		//"sPaginationType": "customListbox",
 		"sPaginationType": "buttons_input",
 		"iDisplayLength": 10,
-		"aLengthMenu": [[10, 25, 50, 75, 100], [10, 25, 50, 75, 100]],
-		"bFilter": true,
-		"bSort": true,
-		"bInfo": true,
-		"bLengthChange": true
+		"aLengthMenu": [[10, 25, 50, 75, 100], [10, 25, 50, 75, 100]]
 	});
 
-	// click event to show design details
-	$('.<?php echo "showDetails"; ?>').die('click').live('click', function() {
+	// click event to show context details
+//	$('.showDetails').die('click').live('click', function() {
+	$('#surveillanceList').on('click','.showDetails', function() {
 				var aPos = slist.fnGetPosition(this); /* Get current  row pos */
 				//console.log(aPos);
 				var aData = slist.fnGetData(aPos[0]); /* Get the full row     */
 				//console.log(aData);
 				var frameworkId = aData['frameworkId'];
-		window.location.href = '<?php echo CController::createUrl("design/showDesign"); ?>' + "?designId=" + frameworkId;
+		window.location.href = '<?php echo $this->createUrl("context/view"); ?>' + "?contextId=" + frameworkId;
 	});
 });
 
@@ -98,10 +93,10 @@ $(function(){
 		"Confirm" : function() {
 			// console.log(confirmMsg + ":" + deleteVal);
 				$(this).dialog("close");
-				  var opt = {'loadMsg': 'Processing delete design'};
+				  var opt = {'loadMsg': 'Processing delete context'};
 				$("#listSurveilance").showLoading(opt);
 				$.ajax({type: 'POST',
-					url: <?php echo "'" . CController::createUrl('design/deleteDesign') . "'"; ?>,
+					url: <?php echo "'" . $this->createUrl('context/delete') . "'"; ?>,
 					data: {delId:deleteVal},
 					success: function(data){
 						var checkSuccess = /successfully/i;
@@ -110,7 +105,7 @@ $(function(){
 							$("#ajaxFlashMsg").html(data);
 							$("#ajaxFlashMsgWrapper").attr('class', 'flash-success').show();
 							$("#ajaxFlashMsgWrapper").animate({opacity: 1.0}, 3000).fadeOut("slow");
-							// remove the elements of selected design
+							// remove the elements of selected context
 							$('#designName').hide();
 							$('#addComponent').hide();
 							$('#showComponents').hide();
@@ -119,7 +114,7 @@ $(function(){
 							$("#ajaxFlashMsg").html(data);
 							$("#ajaxFlashMsgWrapper").attr('class', 'flash-error').show();
 						}
-						slist.fnReloadAjax("index/getDesigns/1");
+						slist.fnReloadAjax("index/getContext/1");
 						$("#listSurveilance").hideLoading();
 					},
 						error: function(data){
@@ -145,7 +140,6 @@ $(function(){
 		<tr>
 			<th title = "Name">Name</th>
 			<th title = "Descripton">Descripton</th>
-			<th title = "Goal">Goal</th>
 			<th title = "Edit">Edit</th>
 			<th title = "Delete">Delete</th>
 		</tr>

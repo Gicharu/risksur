@@ -17,13 +17,6 @@
 		 */
 		public $layout = '//layouts/column2';
 
-		/**
-		 * @return array
-		 */
-		public function filters() {
-			Yii::log("filters called", "trace", self::LOG_CAT);
-			return array(array('application.filters.RbacFilter', ), );
-		}
 
 		/**
 		 * Creates a new model.

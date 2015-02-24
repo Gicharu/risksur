@@ -32,7 +32,6 @@ $this->pageTitle = Yii::app()->name . Yii::t("translation", " - Login");
 //remove the trailing asteriks
 CHtml::$afterRequiredLabel = '';
 ?>
-
 <div id="bd">
 	<div class="form">
 		<?php $form = $this->beginWidget('CActiveForm', array(

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * ComponentsForm 
+ * DynamicForm
  * 
  * @uses CFormModel
  * @package 
@@ -11,14 +11,14 @@
  * @license Tracetracker {@link http://www.tracetracker.com}
  * @SuppressWarnings checkUnusedVariables
  */
-class ComponentsForm extends CFormModel {
+class DynamicForm extends CFormModel {
 	private $_dynamicData = array();
 	public $_dynamicFields = array(); 
 	/**
 	 * attributeNames 
 	 * 
 	 * @access public
-	 * @return void
+	 * @return array
 	 */
 	public function attributeNames() {
 		return array_merge(
@@ -27,12 +27,11 @@ class ComponentsForm extends CFormModel {
 		);
 	}
 
+
 	/**
-	 * __get 
-	 * 
-	 * @param mixed $name 
-	 * @access public
-	 * @return void
+	 * __get
+	 * @param string $name
+	 * @return mixed|null|void
 	 */
 	public function __get($name) {
 		if (!empty($this->_dynamicFields[$name])) {
@@ -66,7 +65,7 @@ class ComponentsForm extends CFormModel {
 	 * rules 
 	 * 
 	 * @access public
-	 * @return void
+	 * @return array
 	 */
 	public function rules() {
 		$required = array();

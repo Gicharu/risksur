@@ -16,157 +16,6 @@
 		public $layout = '//layouts/column2';
 
 		/**
-		 * filters
-		 *
-		 * @access public
-		 * @return void
-		 */
-		public function filters() {
-			Yii::log("filters called", "trace", self::LOG_CAT);
-			return array(
-				array(
-					'application.filters.RbacFilter',
-				),
-			);
-		}
-
-		/**
-		 * actionIndex
-		 *
-		 * @access public
-		 * @return void
-		 */
-		public function actionIndex() {
-			Yii::log("actionIndex DesignController called", "trace", self::LOG_CAT);
-			$model = new NewDesign;
-			$dataArray = array();
-			$dataArray['dtHeader'] = "Surveillance design List";
-			$dataArray['surveillanceList'] = json_encode(array());
-			$this->performAjaxValidation($model);
-
-			if (isset($_POST['NewDesign'])) {
-				$model->attributes = $_POST['NewDesign'];
-				$model->userId = Yii::app()->user->id;
-				//$model->tool = $model->tool == '' ? null : $model->tool;
-				//$model->path = $model->tool === null ? $model->path : "tools/index";
-
-				//$model->setAttribute('menuOrder', $mnuResult->lastMenu + 1);
-				if ($model->validate()) {
-					$model->save();
-					//Yii::app()->user->setFlash('success', "Page created successfully");
-					echo "saved successfully";
-					//$this->redirect( array( 'index' ) );
-					return;
-				} else {
-					echo CActiveForm::validate($model);
-					Yii::app()->end();
-				}
-			}
-
-			// get list of surveillance designs
-			$surveillanceList = NewDesign::model()->with("goal")->findAll(array(
-				//'select' => 'pageId, pageName',
-				'condition' => 'userId=:userId',
-				'params' => array(
-					':userId' => Yii::app()->user->id,
-				),
-			));
-			$surveillanceListArray = array();
-			// format datatable data
-			foreach ($surveillanceList as $sur) {
-				$deleteButton = "";
-				//if (Yii::app()->user->name != $valu['userName']) {
-				$editButton = "<button id='editComponent" . $sur->frameworkId .
-					"' type='button' class='bedit' onclick=\"window.location.href ='" .
-					CController::createUrl('design/editDesign/', array(
-							'designId' => $sur->frameworkId
-						)
-					) .
-					"'\">Edit</button>";
-				$deleteButton = "<button id='deleteDesign" . $sur->frameworkId .
-					"' type='button' class='bdelete' onclick=\"$('#deleteBox').dialog('open');" .
-					"deleteConfirm('" . $sur->name . "', '" .
-					$sur->frameworkId . "')\">Remove</button>";
-				//}
-				$surveillanceListArray[] = array(
-					'frameworkId' => $sur->frameworkId,
-					'name' => $sur->name,
-					'userId' => $sur->userId,
-					'description' => $sur->description,
-					'goalId' => $sur->goalId,
-					'goalName' => $sur->goal->pageName,
-					'editButton' => $editButton,
-					'deleteButton' => $deleteButton
-				);
-			}
-			$dataArray['surveillanceList'] = json_encode($surveillanceListArray);
-
-			if (!empty($_GET['getDesigns'])) {
-				$jsonData = json_encode(array("aaData" => $surveillanceListArray));
-				echo $jsonData;
-				return;
-			}
-			// print_r($dataArray['surveillanceList']);die();
-			// fetch the goal dropdown data
-			$goalDropDown = GoalData::model()->findAll(array(
-				'select' => 'pageId, pageName',
-				'condition' => 'parentId=:parentId AND pageName<>:pageName',
-				'params' => array(
-					':parentId' => 0,
-					':pageName' => 'noMenu'
-				),
-			));
-			// create array options for goal dropdown
-			foreach ($goalDropDown as $data) {
-				$dataArray['goalDropDown'][$data->pageId] = $data->pageName;
-			}
-			$this->render('index', array(
-				'model' => $model,
-				'dataArray' => $dataArray
-			));
-		}
-
-		/**
-		 * actionShowDesign
-		 *
-		 * @access public
-		 * @return void
-		 */
-		public function actionShowDesign() {
-			Yii::log("actionShowDesign DesignController called", "trace", self::LOG_CAT);
-			$model = new NewDesign;
-			$dataArray = array();
-			if (isset($_GET['designId'])) {
-				$selectedDesign = NewDesign::model()->with("goal")->findAll(array(
-					//'select' => 'pageId, pageName',
-					'condition' => 'frameworkId=:frameworkId AND userId=:userId',
-					'params' => array(
-						':frameworkId' => $_GET['designId'],
-						':userId' => Yii::app()->user->id,
-					),
-				));
-				$dataArray['selectedDesign'] = $selectedDesign;
-				//add the surveilance design to the session
-				if (count($selectedDesign) == 1) {
-					Yii::app()->session->add('surDesign', array(
-						'id' => $_GET['designId'],
-						'name' => $selectedDesign[0]->name,
-						'goalId' => $selectedDesign[0]->goalId
-					));
-				} else {
-					Yii::app()->session->remove('surDesign');
-				}
-				//print_r($selectedDesign);
-				//print_r($_SESSION);
-			}
-
-			$this->render('showDesign', array(
-				'model' => $model,
-				'dataArray' => $dataArray
-			));
-		}
-
-		/**
 		 * actionShowComponent
 		 *
 		 * @access public
@@ -274,20 +123,21 @@
 		public function actionAddComponent() {
 			Yii::log("actionAddComponent DesignController called", "trace", self::LOG_CAT);
 			$component = new ComponentHead;
-			$componentDetails = new ComponentDetails;
+			$componentDetails = new ComponentDetails();
 			$dataArray = array();
 			$dataArray['formType'] = 'Create';
 			//$attributeArray = array();
-			//print_r(Yii::app()->session['surDesign']);
+//			print_r(Yii::app()->session['surDesign']); die('here');
+
 			if (!empty(Yii::app()->session['surDesign'])) {
 				$returnArray = self::getElementsAndDynamicAttributes();
 				$elements = $returnArray['elements'];
-				$model = new ComponentsForm;
+				$model = new DynamicForm();
 				$model->_dynamicFields = $returnArray['dynamicDataAttributes'];
 				// generate the components form
 				$form = new CForm($elements, $model);
 				//validate and save the component data
-				if ($form->submitted('ComponentsForm') && $form->validate()) {
+				if ($form->submitted('DynamicForm') && $form->validate()) {
 					//print_r($form->getModel()); die();
 					$component->componentName = $val = $form->model->componentName;
 					$component->frameworkId = Yii::app()->session['surDesign']['id'];
@@ -311,14 +161,22 @@
 					}
 					Yii::app()->user->setFlash('success', Yii::t("translation", "Component successfully created"));
 					$this->redirect(array('listComponents'));
+					return;
 				}
-			}
+//				print_r($model);
+//				print_r($form); die('here');
 
-			$this->render('component', array(
-				'model' => $model,
-				'dataArray' => $dataArray,
-				'form' => $form
-			));
+				$this->render('component', array(
+					'model' => $model,
+					'dataArray' => $dataArray,
+					'form' => $form
+				));
+				return;
+			}
+			Yii::app()->user->setFlash('notice', Yii::t("translation", "Please select a surveillance context first"));
+			$this->redirect(array('design/listComponents'));
+			return;
+
 		}
 
 		/**
@@ -344,7 +202,7 @@
 			if (!empty(Yii::app()->session['surDesign'])) {
 				$returnArray = self::getElementsAndDynamicAttributes(array(), true);
 				$elements = $returnArray['elements'];
-				$model = new ComponentsForm;
+				$model = new DynamicForm();
 				$model->_dynamicFields = $returnArray['dynamicDataAttributes'];
 
 				// generate the components form
@@ -357,15 +215,15 @@
 					//->where('sfd.inputType ="select"')
 					//->queryAll();
 				// ajax request to add a new row
-					if ($form->submitted('ComponentsForm')) {
+					if ($form->submitted('DynamicForm')) {
 						//$items=$this->getItemsToUpdate();
-						if(isset($_POST['ComponentsForm'])) {
+						if(isset($_POST['DynamicForm'])) {
 							$valid = true;
-							foreach($_POST['ComponentsForm'] as $i => $item) {
+							foreach($_POST['DynamicForm'] as $i => $item) {
 								$data = new ComponentsForm;
 								$data->_dynamicFields = $returnArray['dynamicDataAttributes'];
 								// generate the components form
-								if(isset($_POST['ComponentsForm'][$i])) {
+								if(isset($_POST['DynamicForm'][$i])) {
 									$data->attributes = $item; //$_POST['ComponentsForm'][$i];
 									$valid = $data->validate() && $valid;
 									//add the models withe attributes to the model array
@@ -374,7 +232,7 @@
 							}
 							if($valid) { // all items are valid
 								//print_r($form->getModel()); die();
-								foreach($_POST['ComponentsForm'] as $i => $item) {
+								foreach($_POST['DynamicForm'] as $i => $item) {
 									$data = new ComponentsForm;
 									$data->_dynamicFields = $returnArray['dynamicDataAttributes'];
 									$data->attributes = $item;
@@ -464,11 +322,12 @@
 			}
 		}
 
+
 		/**
-		 * getElementsAndDynamicAttributes 
-		 * 
-		 * @access public
-		 * @return void
+		 * getElementsAndDynamicAttributes
+		 * @param array $componentData
+		 * @param bool $muliForm
+		 * @return array
 		 */
 		public function getElementsAndDynamicAttributes($componentData = array(), $muliForm = false) {
 			$elements = array();
@@ -505,7 +364,7 @@
 				if (!$muliForm) {
 					$elements['showErrors'] = true;
 				}
-				$elements['activeForm']['id'] = "ComponentsForm";
+				$elements['activeForm']['id'] = "DynamicForm";
 				$elements['activeForm']['enableClientValidation'] = true;
 				//$elements['activeForm']['enableAjaxValidation'] = false;
 				$elements['activeForm']['class'] = 'CActiveForm';
@@ -712,67 +571,7 @@
 			));
 		}
 
-		/**
-		 * actionEditDesign
-		 *
-		 * @access public
-		 * @return void
-		 */
-		public function actionEditDesign() {
-			Yii::log("actionEditDesign DesignController called", "trace", self::LOG_CAT);
-			$model = new NewDesign;
-			$dataArray = array();
-			$dataArray['formType'] = "Edit";
 
-			if (isset($_GET['designId'])) {
-				//fetch the form data
-				$model = NewDesign::model()->findByPk($_GET['designId']);
-				if ($model === null) {
-					Yii::app()->user->setFlash('error', Yii::t("translation", "The design does not exist"));
-					$this->redirect(array('design/index'));
-				}
-			} else {
-				Yii::app()->user->setFlash('error', Yii::t("translation", "Please select a design to edit"));
-				$this->redirect(array('design/index'));
-			}
-			//$this->performAjaxValidation($model);
-			if (isset($_POST['NewDesign'])) {
-				$model->attributes = $_POST['NewDesign'];
-				$model->userId = Yii::app()->user->id;
-				$model->frameworkId = $_GET['designId'];
-				//print_r($model); die();
-
-				//validate and save the design
-				if ($model->validate()) {
-					$model->update();
-					Yii::app()->session->add('surDesign', array(
-						'id' => $model->frameworkId,
-						'name' => $model->name,
-						'goalId' => $model->goalId
-					));
-					Yii::app()->user->setFlash('success', Yii::t("translation", "Design successfully updated"));
-					$this->redirect(array('index'));
-				}
-			}
-			// fetch the goal dropdown data
-			$goalDropDown = GoalData::model()->findAll(array(
-				'select' => 'pageId, pageName',
-				'condition' => 'parentId=:parentId AND pageName<>:pageName',
-				'params' => array(
-					':parentId' => 0,
-					':pageName' => 'noMenu'
-				),
-			));
-			// create array options for goal dropdown
-			foreach ($goalDropDown as $data) {
-				$dataArray['goalDropDown'][$data->pageId] = $data->pageName;
-			}
-
-			$this->render('createDesign', array(
-				'model' => $model,
-				'dataArray' => $dataArray
-			));
-		}
 
 
 		/**
@@ -787,6 +586,9 @@
 			$dataArray = array();
 			$dataArray['componentList'] = json_encode(array());
 			$dataArray['dtHeader'] = "Components List";
+			$componentListArray = array();
+			$formDetailsArray = array();
+
 			if (!empty(Yii::app()->session['surDesign'])) {
 				// get list of surveillance designs
 				$componentList = ComponentHead::model()->with("compDetails")->findAll(array(
@@ -796,7 +598,6 @@
 						':frameworkId' => Yii::app()->session['surDesign']['id'],
 					),
 				));
-
 				$formDetails = SurFormDetails::model()->findAll(array(
 					//'select' => 'pageId, pageName',
 					'condition' => 'formId=:formId  and showOnComponentList=:showOnList',
@@ -813,7 +614,6 @@
 				foreach ($selectOptions as $params) {
 					$optionsArray[$params->optionId] = $params->label;
 				}
-				$formDetailsArray = array();
 				$selectElement = array();
 				foreach ($formDetails as $data) {
 					$formDetailsArray[$data->subFormId] = $data->label;
@@ -822,7 +622,6 @@
 					}
 				}
 				//print_r($componentList); die();
-				$componentListArray = array();
 				// format datatable data
 				$count = 0;
 				foreach ($componentList as $com) {
@@ -835,7 +634,7 @@
 						$com->componentId . "')\">Remove</button>";
 					$editButton = "<button id='editComponent" . $com->componentId .
 						"' type='button' class='bedit' onclick=\"window.location.href ='" .
-						CController::createUrl('design/editComponent/', array(
+						$this->createUrl('design/editComponent/', array(
 								'compId' => $com->componentId
 							)
 						) .
@@ -942,28 +741,6 @@
 		}
 
 		/**
-		 * actionDeleteDesign
-		 *
-		 * @access public
-		 * @return void
-		 */
-		public function actionDeleteDesign() {
-			Yii::log("actionDeleteDesign DesignController called", "trace", self::LOG_CAT);
-			if (isset($_POST["delId"])) {
-				$record = NewDesign::model()->findByPk($_POST['delId']);
-				if (!$record->delete()) {
-					Yii::log("Error deleting design: " . $_POST['delId'], "warning", self::LOG_CAT);
-					//echo $errorMessage;
-					echo Yii::t("translation", "A problem occured when deleting the design ") . $_POST['delId'];
-				} else {
-					// remove the default selected design from session
-					unset($_SESSION['surDesign']);
-					echo Yii::t("translation", "The design ") . Yii::t("translation", " has been successfully deleted");
-				}
-			}
-		}
-
-		/**
 		 * performAjaxValidation
 		 *
 		 * @param mixed $model
@@ -1005,7 +782,7 @@
 				'select' => 'pageId, pageName',
 				'condition' => 'parentId=:parentId',
 				'params' => array(
-					':parentId' => $postData['NewDesign']['goalId'],
+					':parentId' => $postData['FrameworkContext']['goalId'],
 				),
 			));
 
