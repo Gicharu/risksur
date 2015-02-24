@@ -68,4 +68,15 @@ class Options extends CActiveRecord {
 			'elementId' => Yii::t('translation', 'Option Name')
 		);
 	}
+
+	public function getContextFieldOptions($contextInputId) {
+		$optionsRs = $this->findAll('frameworkfieldId=' . $contextInputId);
+		$options = array();
+		if(!empty($optionsRs)) {
+			foreach($optionsRs as $option) {
+				$options[$option->val] = $option->label;
+			}
+		}
+		return $options;
+	}
 }

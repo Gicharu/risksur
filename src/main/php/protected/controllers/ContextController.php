@@ -264,6 +264,10 @@
 					'required' => $field->required,
 					'type' => $field->inputType
 				);
+				if($field->inputType == 'dropdownlist') {
+					$elements['elements']['contextDetails']['elements'][$field->inputName . '-' . $field->id]['items'] =
+						Options::model()->getContextFieldOptions($field->id);
+				}
 				$modelData[$field->inputName . '-' . $field->id] = $field->value;
 			}
 			$elements['buttons'] = array(
