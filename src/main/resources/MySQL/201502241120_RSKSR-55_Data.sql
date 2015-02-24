@@ -1,4 +1,9 @@
-UPDATE `risksur`.`programpages` SET `pageName` = 'Sunrveilance Context' , `path` = 'context/list' WHERE `pageId` = '2';
+UPDATE `risksur`.`programpages` SET `pageName` = 'Design' , `path` = 'design/listComponents' WHERE `pageId` = '2';
+INSERT INTO `risksur`.`programpages` (`pageName`, `path`, `parentId`, `menuOrder`) VALUES ('Surveillance Context', 'context/list', '0', '1');
+UPDATE `risksur`.`programpages` SET `menuOrder` = '2' WHERE `pageId` = '1';
+INSERT INTO `risksur`.`pages_has_roles` (`pageId`, `roleId`) VALUES ('15', '1');
+INSERT INTO `risksur`.`pages_has_roles` (`pageId`, `roleId`) VALUES ('15', '2');
+INSERT INTO `risksur`.`pages_has_roles` (`pageId`, `roleId`) VALUES ('15', '3');
 
 INSERT INTO `risksur`.`permissions` (`name`, `description`, `controller`, `action`) VALUES ('List context', 'List surveillance context', 'context', 'list');
 INSERT INTO `risksur`.`permissions` (`name`, `description`, `controller`, `action`) VALUES ('Create context', 'Create surveillance context', 'context', 'create');

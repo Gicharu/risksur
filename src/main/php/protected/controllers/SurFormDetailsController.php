@@ -19,8 +19,12 @@
 
 
 		/**
+		 * actionCreate 
+		 * 
 		 * Creates a new model.
 		 * If creation is successful, the browser will be redirected to the 'index' page.
+		 * @access public
+		 * @return void
 		 */
 		public function actionCreate() {
 			$model = new SurFormDetails;
@@ -44,6 +48,10 @@
 
 
 		/**
+		 * actionUpdate 
+		 * 
+		 * @access public
+		 * @return void
 		 * @throws CHttpException
 		 */
 		public function actionUpdate() {
@@ -69,6 +77,10 @@
 		}
 
 		/**
+		 * actionDelete 
+		 * 
+		 * @access public
+		 * @return void
 		 * @throws CHttpException
 		 */
 		public function actionDelete() {
@@ -84,7 +96,11 @@
 		}
 
 		/**
+		 * actionIndex 
+		 * 
 		 * Lists all models.
+		 * @access public
+		 * @return void
 		 */
 		public function actionIndex() {
 //        $this->layout = '//layouts/column1';
@@ -112,7 +128,10 @@
 
 
 		/**
-		 * @return Void
+		 * actionGetInputTypeOpts 
+		 * 
+		 * @access public
+		 * @return void
 		 */
 		public function actionGetInputTypeOpts() {
 			$optArray = array();
@@ -148,8 +167,12 @@
 		}
 
 		/**
+		 * performAjaxValidation 
+		 * 
 		 * Performs the AJAX validation.
 		 * @param SurFormDetails $model the model to be validated
+		 * @access protected
+		 * @return void
 		 */
 		protected function performAjaxValidation($model) {
 			if (isset($_POST['ajax']) && $_POST['ajax'] === 'sur-form-details-form') {
