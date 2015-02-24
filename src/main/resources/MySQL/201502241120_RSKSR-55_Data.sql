@@ -1,3 +1,5 @@
+UPDATE `risksur`.`programpages` SET `pageName` = 'Sunrveilance Context' , `path` = 'context/list' WHERE `pageId` = '2';
+
 INSERT INTO `risksur`.`permissions` (`name`, `description`, `controller`, `action`) VALUES ('List context', 'List surveillance context', 'context', 'list');
 INSERT INTO `risksur`.`permissions` (`name`, `description`, `controller`, `action`) VALUES ('Create context', 'Create surveillance context', 'context', 'create');
 INSERT INTO `risksur`.`permissions` (`name`, `description`, `controller`, `action`) VALUES ('Delete context', 'Delete surveillance context', 'context', 'delete');
