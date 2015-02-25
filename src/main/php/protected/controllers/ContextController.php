@@ -239,19 +239,26 @@
 				$context->userId = Yii::app()->user->id;
 				//$_POST; die('here');
 				if($context->save(false)) {
+//				if(true) {
 					$frameworkFieldData = array();
 					foreach($_POST['DynamicFormDetails'] as $inputName => $inputVal) {
 						$inputNameArray = explode('-', $inputName);
-						$frameworkFieldData = array(
+						$frameworkFieldData[] = array(
 							'id' => null,
 							'frameworkId' => $context->primaryKey,
 							'frameworkFieldId' => $inputNameArray[1],
 							'value' => $inputVal
 						);
 					}
-					$frameworkFieldDataModel->setIsNewRecord(true);
-					$frameworkFieldDataModel->attributes = $frameworkFieldData;
-					if ($frameworkFieldDataModel->save()) {
+					$command = FrameworkFieldData::model()
+							->getDbConnection()
+							->getSchema()
+							->getCommandBuilder()
+					->createMultipleInsertCommand($frameworkFieldDataModel->tableName(), $frameworkFieldData);
+
+
+					//print_r($frameworkFieldData); die;
+					if ($command->execute()) {
 						Yii::app()->user->setFlash('success', 'Surveillance context updated successfully');
 					}
 					//print_r($frameworkFieldDataModel); die;
