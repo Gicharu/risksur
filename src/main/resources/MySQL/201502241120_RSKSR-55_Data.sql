@@ -28,7 +28,7 @@ INSERT INTO `roles_has_permissions` (`permissions_id`, `roles_id`) VALUES ('56',
 
 
 INSERT INTO `frameworkFields` (`id`, `label`, `inputName`, `inputType`, `required`, `showOnContextList`, `description`) VALUES
-  (4, NULL, 'hazardName', 'text', 1, 0, NULL),
+  (4,  NULL, 'hazardName', 'text', 1, 0, NULL),
   (5, NULL, 'surveillanceObjectiv', 'text', 1, 0, NULL),
   (6, NULL, 'geographicalArea', 'text', 1, 0, NULL),
   (7, NULL, 'susceptibleSpecies', 'text', 1, 0, NULL),

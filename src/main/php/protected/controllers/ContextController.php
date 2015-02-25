@@ -237,7 +237,9 @@
 				$form->loadData();
 				$frameworkFieldDataModel = new FrameworkFieldData();
 				$context->userId = Yii::app()->user->id;
+				//$_POST; die('here');
 				if($context->save(false)) {
+					$frameworkFieldData = array();
 					foreach($_POST['DynamicFormDetails'] as $inputName => $inputVal) {
 						$inputNameArray = explode('-', $inputName);
 						$frameworkFieldData = array(
@@ -248,7 +250,7 @@
 						);
 					}
 					$frameworkFieldDataModel->setIsNewRecord(true);
-					$frameworkFieldDataModel->setAttributes($frameworkFieldData);
+					$frameworkFieldDataModel->attributes = $frameworkFieldData;
 					if ($frameworkFieldDataModel->save()) {
 						Yii::app()->user->setFlash('success', 'Surveillance context updated successfully');
 					}
@@ -369,7 +371,7 @@
 								'value' => $inputVal
 							);
 							$frameworkFieldDataModel->attributes = $attributes;
-							$frameworkFieldDataModel->setIsNewRecord(true);
+							$frameworkFieldDataModel->setIsNewRecord(true	);
 							$frameworkFieldDataModel->save();
 
 						}
