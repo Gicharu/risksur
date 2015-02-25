@@ -503,6 +503,12 @@
 				$componentData = array();
 
 				$returnArray = self::getElementsAndDynamicAttributes();
+				$returnArray['elements']['buttons'] = array(
+					'updateComponent' => array(
+						'type' => 'submit',
+						'label' => 'Update component',
+					),
+				);
 				$elements = $returnArray['elements'];
 				//$model = new ComponentsForm;
 				$model->_dynamicFields = $returnArray['dynamicDataAttributes'];
@@ -526,7 +532,7 @@
 				$form = new CForm($elements, $model);
 
 				//validate and save the component data
-				if ($form->submitted('ComponentsForm') && $form->validate()) {
+				if ($form->submitted('DynamicForm') && $form->validate()) {
 					//print_r($form->getModel()); die();
 					$component->setIsNewRecord(false);
 					$component->componentName = $form->model->componentName;
