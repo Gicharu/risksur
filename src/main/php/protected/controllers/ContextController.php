@@ -201,24 +201,65 @@
 		public function actionCreate() {
 			Yii::log("actionCreate ContextController called", "trace", self::LOG_CAT);
 			$context = new FrameworkContext();
+			$dForm = new DynamicFormDetails('create', 'frameworkFields');
+
 			$elements = self::getDefaultElements();
-			$elements['elements'] = self::getElements($context, array('name', 'description'));
+			$elements['elements']['context']['elements'] = self::getElements($context, array('name', 'description'));
+
 			$elements['buttons'] = self::getButtons(array(
 				'name' => 'createContext',
 				'label' => 'Create'
 			));
-			$form = new CForm($elements, $context);
+			$elements['elements']['context']['type'] = 'form';
+			$elements['elements']['contextFields']['type'] = 'form';
+			$contextFields = $dForm->findAll();
+			$dynamicDataAttributes = array();
+			foreach($contextFields as $field) {
+				$dynamicDataAttributes[$field->inputName . '-' . $field->id] = $field->inputName;
+				$elements['elements']['contextFields']['elements'][$field->inputName . '-' . $field->id] = array(
+					'label' => isset($field->label) ? $field->label : $dForm->generateAttributeLabel($field->inputName),
+					'required' => $field->required,
+					'type' => $field->inputType
+				);
+				if($field->inputType == 'dropdownlist') {
+					$elements['elements']['contextFields']['elements'][$field->inputName . '-' . $field->id]['items'] =
+						Options::model()->getContextFieldOptions($field->id);
+				}
+				//$modelData[$field->inputName . '-' . $field->id] = $field->value;
+			}
+//			print_r($elements); die;
+			$dForm->_dynamicFields = $dynamicDataAttributes;
+			$form = new CForm($elements);
+			$form['context']->model = $context;
+			$form['contextFields']->model = $dForm;
 			if($form->submitted('createContext')) {
+				//print_r($_POST); die;
 				$form->loadData();
+				$frameworkFieldDataModel = new FrameworkFieldData();
 				$context->userId = Yii::app()->user->id;
-				if($context->save()) {
-					Yii::app()->user->setFlash('success', 'Surveillance framework created successfully');
+				if($context->save(false)) {
+					foreach($_POST['DynamicFormDetails'] as $inputName => $inputVal) {
+						$inputNameArray = explode('-', $inputName);
+						$frameworkFieldData = array(
+							'id' => null,
+							'frameworkId' => $context->primaryKey,
+							'frameworkFieldId' => $inputNameArray[1],
+							'value' => $inputVal
+						);
+					}
+					$frameworkFieldDataModel->setIsNewRecord(true);
+					$frameworkFieldDataModel->setAttributes($frameworkFieldData);
+					if ($frameworkFieldDataModel->save()) {
+						Yii::app()->user->setFlash('success', 'Surveillance context updated successfully');
+					}
+					//print_r($frameworkFieldDataModel); die;
+
+
 					$this->redirect('list');
 					return;
 
 				}
 
-//				$context->userId = Yii::app()->user->id;
 				Yii::app()->user->setFlash('error', 'A problem occurred while creating the surveillance context, ' .
 					'please try again or contact the administrator if this persists');
 
@@ -230,11 +271,12 @@
 
 		public function actionUpdate() {
 			Yii::log("actionUpdate ContextController called", "trace", self::LOG_CAT);
-			$model = new FrameworkContext();
+			//$model = new FrameworkContext();
 			$dForm = new DynamicFormDetails('update', 'frameworkFields');
+
 			//print_r($_POST); die;
-			$dataArray = array();
-			$dataArray['formType'] = "Edit";
+//			$dataArray = array();
+//			$dataArray['formType'] = "Edit";
 			if (isset($_GET['contextId'])) {
 				//fetch the form data
 				$model = FrameworkContext::model()->findByPk($_GET['contextId']);
@@ -248,19 +290,21 @@
 				$this->redirect(array('context/list'));
 			}
 
-			$contextFields = $dForm->findAll('frameworkId=' . $_GET['contextId']);
+			$frameworkFieldData = FrameworkFieldData::model()->findAll('frameworkId=' . $_GET['contextId']);
+			$frameworkFieldDataModel = new FrameworkFieldData();
+			$contextFields = $dForm->findAll();
 			$elements = self::getDefaultElements();
 			$elements['elements']['context']['elements'] = self::getElements($model, array('name', 'description'));
-
 			//$contextForm = new CForm($modelElements, $model);
 			$modelData = array();
 			$dynamicDataAttributes = array();
 			$elements['elements']['context']['type'] = 'form';
 			$elements['elements']['contextDetails']['type'] = 'form';
+			$fieldDataMap = array();
 			foreach($contextFields as $field) {
 				$dynamicDataAttributes[$field->inputName . '-' . $field->id] = 1;
 				$elements['elements']['contextDetails']['elements'][$field->inputName . '-' . $field->id] = array(
-					'label' => $field->inputName,
+					'label' => isset($field->label) ? $field->label : $dForm->generateAttributeLabel($field->inputName),
 					'required' => $field->required,
 					'type' => $field->inputType
 				);
@@ -268,7 +312,15 @@
 					$elements['elements']['contextDetails']['elements'][$field->inputName . '-' . $field->id]['items'] =
 						Options::model()->getContextFieldOptions($field->id);
 				}
-				$modelData[$field->inputName . '-' . $field->id] = $field->value;
+				foreach($frameworkFieldData as $fieldValue) {
+					if($fieldValue->frameworkFieldId == $field->id) {
+
+						$modelData[$field->inputName . '-' . $field->id] = $fieldValue->value;
+						$fieldDataMap[$field->id] = $fieldValue->id;
+
+					}
+					//print_r($fieldValue); die;
+				}
 			}
 			$elements['buttons'] = array(
 				'updateContext' => array(
@@ -288,33 +340,62 @@
 			$form['context']->model = $model;
 			$form['contextDetails']->model = $dForm;
 
-			//print_r($form); die('here');
-			if ($form->submitted('updateContext') && $form->validate()) {
+			//var_dump($form->validate()); die('here');
+			if ($form->submitted('updateContext')) {
 				$context = $form['context']->model;
 				$context->userId = Yii::app()->user->id;
-				if($context->save(false)) {
+				$error = false;
+				//print_r($_POST['DynamicFormDetails']); die;
+				if($context->save()) {
 					foreach($_POST['DynamicFormDetails'] as $inputName => $inputVal) {
-						$attributes = array(
-							'value' => $inputVal,
-						);
+						$inputNameArray = explode('-', $inputName);
+						$fieldId = null;
+						if(!empty($fieldDataMap[$inputNameArray[1]])) {
+							$fieldId = $fieldDataMap[$inputNameArray[1]];
+							$attributes = array(
+								'id' =>  $fieldId,
+								'frameworkId' => $context->primaryKey,
+								'frameworkFieldId' => $inputNameArray[1],
+								'value' => $inputVal
+							);
+							$frameworkFieldDataModel->updateByPk($fieldId, $attributes);
 
-						if ($dForm->updateByPk(substr($inputName, -1), $attributes)) {
-							Yii::app()->user->setFlash('success', 'Surveillance context updated successfully');
 						} else {
-							Yii::app()->user->setFlash('error', 'A problem occurred while updating the surveillance context, ' .
-								'please try again or contact the administrator if this persists');
-							break;
+							$operation = 'save';
+							$attributes = array(
+								'id' =>  $fieldId,
+								'frameworkId' => $context->primaryKey,
+								'frameworkFieldId' => $inputNameArray[1],
+								'value' => $inputVal
+							);
+							$frameworkFieldDataModel->attributes = $attributes;
+							$frameworkFieldDataModel->setIsNewRecord(true);
+							$frameworkFieldDataModel->save();
 
 						}
+						//print_r($dataModel); die;
+						//var_dump($newRecord, $fieldId, $fieldDataMap, $inputNameArray, $frameworkFieldDataModel); die;
+//						if (!$frameworkFieldDataModel->$operation()) {
+//							Yii::app()->user->setFlash('error', 'A problem occurred while updating the surveillance context, ' .
+//								'please try again or contact the administrator if this persists');
+//							$error = true;
+//							break;
+//						}
 					}
 
-				} else {
-					Yii::app()->user->setFlash('error', 'A problem occurred while updating the surveillance context, ' .
-						'please try again or contact the administrator if this persists');
+					if(!$error) {
+						Yii::app()->user->setFlash('success', 'Surveillance context updated successfully');
+						$this->redirect('list');
+						return;
+					}
+					//$frameworkFieldDataModel->setIsNewRecord(true);
+					//$frameworkFieldDataModel->setAttributes($frameworkFieldData);
+
 
 				}
-				$this->redirect('list');
-				return;
+				Yii::app()->user->setFlash('error', 'A problem occurred while updating the surveillance context, ' .
+					'please try again or contact the administrator if this persists');
+
 			}
 
 			$this->render('update', array(

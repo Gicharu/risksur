@@ -25,4 +25,4 @@ CREATE TABLE `frameworkFields` (
 ALTER TABLE `risksur`.`frameworkHeader` DROP COLUMN `goalId`, DROP INDEX `goal foreign Key`, DROP FOREIGN KEY `goal foreign Key`;
 Alter table `risksur`.`options`
 add column `frameworkFieldId` int(11) UNSIGNED NULL after `label`,
-add constraint `idx_frameworkfieldid` foreign key (`frameworkFieldId`) references `risksur`.`frameworkFields`(`id`) on update Cascade on delete Cascade
+add constraint `fk_frameworkfieldid` foreign key (`frameworkFieldId`) references `risksur`.`frameworkFields`(`id`) on update Cascade on delete Cascade
