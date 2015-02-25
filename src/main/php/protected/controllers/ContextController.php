@@ -233,13 +233,10 @@
 			$form['context']->model = $context;
 			$form['contextFields']->model = $dForm;
 			if($form->submitted('createContext')) {
-				//print_r($_POST); die;
 				$form->loadData();
 				$frameworkFieldDataModel = new FrameworkFieldData();
 				$context->userId = Yii::app()->user->id;
-				//$_POST; die('here');
 				if($context->save(false)) {
-//				if(true) {
 					$frameworkFieldData = array();
 					foreach($_POST['DynamicFormDetails'] as $inputName => $inputVal) {
 						$inputNameArray = explode('-', $inputName);
@@ -255,15 +252,9 @@
 							->getSchema()
 							->getCommandBuilder()
 					->createMultipleInsertCommand($frameworkFieldDataModel->tableName(), $frameworkFieldData);
-
-
-					//print_r($frameworkFieldData); die;
 					if ($command->execute()) {
 						Yii::app()->user->setFlash('success', 'Surveillance context updated successfully');
 					}
-					//print_r($frameworkFieldDataModel); die;
-
-
 					$this->redirect('list');
 					return;
 
