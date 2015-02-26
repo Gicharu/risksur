@@ -220,23 +220,27 @@
 						if(isset($_POST['DynamicForm'])) {
 							$valid = true;
 							foreach($_POST['DynamicForm'] as $i => $item) {
-								$data = new ComponentsForm;
+								$data = new DynamicForm();
 								$data->_dynamicFields = $returnArray['dynamicDataAttributes'];
+
 								// generate the components form
+
 								if(isset($_POST['DynamicForm'][$i])) {
-									$data->attributes = $item; //$_POST['ComponentsForm'][$i];
+//									$data->attributes = $item; //$_POST['ComponentsForm'][$i];
+									$data->setAttributes($item, false); //$_POST['ComponentsForm'][$i];
 									$valid = $data->validate() && $valid;
-									//add the models withe attributes to the model array
+									//add the models with attributes to the model array
 									$postedModelArray[] = $data;
 								}
 							}
+									//	die;
 							if($valid) { // all items are valid
 								//print_r($form->getModel()); die();
 								foreach($_POST['DynamicForm'] as $i => $item) {
-									$data = new ComponentsForm;
+									$data = new DynamicForm();
 									$data->_dynamicFields = $returnArray['dynamicDataAttributes'];
-									$data->attributes = $item;
-									//print_r($item); die();
+									//$data->attributes = $item;
+									$data->setAttributes($item, false);
 
 									$component->setIsNewRecord(true);
 									$component->componentId = null;
@@ -268,7 +272,7 @@
 						}
 					}
 					// check if there was a post and the muliple forms are invalid
-					if (isset($_POST['ComponentsForm']) && !$valid) {
+					if (isset($_POST['DynamicForm']) && !$valid) {
 						$modelArray = $postedModelArray; 
 					} else {
 						// number of model records to show by default on the view
@@ -301,6 +305,7 @@
 					'form' => $form,
 					'formHeader' => $formHeader
 				));
+				return;
 			}
 			Yii::app()->user->setFlash('notice', Yii::t("translation", "Please select a surveillance context first"));
 			$this->redirect(array('design/listComponents'));

@@ -97,7 +97,7 @@ function addNewDesign() {
 	var data=$("#newDesignForm").serialize();
 	$.ajax({
 		type: 'POST',
-		url: '<?php echo Yii::app()->createAbsoluteUrl("design/index"); ?>',
+		url: '<?php echo Yii::app()->createAbsoluteUrl("context/create"); ?>',
 		data:data,
 		success:function(data){
 				// reset the form if success

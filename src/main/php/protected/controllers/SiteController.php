@@ -185,7 +185,7 @@ class SiteController extends CController {
 		}
 		if (!Yii::app()->user->isGuest) {
 			$this->redirect(array(
-				'design/index'
+				'context/list'
 			));
 		}
 		$model = new LoginForm;
