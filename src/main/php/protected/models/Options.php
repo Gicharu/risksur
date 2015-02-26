@@ -69,6 +69,10 @@ class Options extends CActiveRecord {
 		);
 	}
 
+	/**
+	 * @param $contextInputId
+	 * @return array
+	 */
 	public function getContextFieldOptions($contextInputId) {
 		$optionsRs = $this->findAll('frameworkfieldId=' . $contextInputId);
 		$options = array();

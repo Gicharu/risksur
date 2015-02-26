@@ -66,53 +66,53 @@
 			));
 		}
 
-		/**
-		 * actionCreateDesign
-		 *
-		 * @access public
-		 * @return void
-		 */
-		public function actionCreateDesign() {
-			Yii::log("actionCreateDesign DesignController called", "trace", self::LOG_CAT);
-			$model = new NewDesign;
-			$dataArray = array();
-			$dataArray['formType'] = "Create";
-			$this->performAjaxValidation($model);
-
-			if (isset($_POST['NewDesign'])) {
-				$model->attributes = $_POST['NewDesign'];
-				$model->userId = Yii::app()->user->id;
-
-				//validate and save the design
-				if ($model->validate("create")) {
-					$model->save(false);
-					Yii::app()->session->add('surDesign', array(
-						'id' => $model->frameworkId,
-						'name' => $model->name,
-						'goalId' => $model->goalId
-					));
-					Yii::app()->user->setFlash('success', Yii::t("translation", "Design successfully created"));
-					$this->redirect(array('index'));
-				}
-			}
-			// fetch the goal dropdown data
-			$goalDropDown = GoalData::model()->findAll(array(
-				'select' => 'pageId, pageName',
-				'condition' => 'parentId=:parentId AND pageName<>:pageName',
-				'params' => array(
-					':parentId' => 0,
-					':pageName' => 'noMenu'
-				),
-			));
-			// create array options for goal dropdown
-			foreach ($goalDropDown as $data) {
-				$dataArray['goalDropDown'][$data->pageId] = $data->pageName;
-			}
-			$this->render('createDesign', array(
-				'model' => $model,
-				'dataArray' => $dataArray
-			));
-		}
+//		/**
+//		 * actionCreateDesign
+//		 *
+//		 * @access public
+//		 * @return void
+//		 */
+//		public function actionCreateDesign() {
+//			Yii::log("actionCreateDesign DesignController called", "trace", self::LOG_CAT);
+//			$model = new NewDesign;
+//			$dataArray = array();
+//			$dataArray['formType'] = "Create";
+//			$this->performAjaxValidation($model);
+//
+//			if (isset($_POST['NewDesign'])) {
+//				$model->attributes = $_POST['NewDesign'];
+//				$model->userId = Yii::app()->user->id;
+//
+//				//validate and save the design
+//				if ($model->validate("create")) {
+//					$model->save(false);
+//					Yii::app()->session->add('surDesign', array(
+//						'id' => $model->frameworkId,
+//						'name' => $model->name,
+//						'goalId' => $model->goalId
+//					));
+//					Yii::app()->user->setFlash('success', Yii::t("translation", "Design successfully created"));
+//					$this->redirect(array('index'));
+//				}
+//			}
+//			// fetch the goal dropdown data
+//			$goalDropDown = GoalData::model()->findAll(array(
+//				'select' => 'pageId, pageName',
+//				'condition' => 'parentId=:parentId AND pageName<>:pageName',
+//				'params' => array(
+//					':parentId' => 0,
+//					':pageName' => 'noMenu'
+//				),
+//			));
+//			// create array options for goal dropdown
+//			foreach ($goalDropDown as $data) {
+//				$dataArray['goalDropDown'][$data->pageId] = $data->pageName;
+//			}
+//			$this->render('createDesign', array(
+//				'model' => $model,
+//				'dataArray' => $dataArray
+//			));
+//		}
 
 		/**
 		 * actionAddComponent

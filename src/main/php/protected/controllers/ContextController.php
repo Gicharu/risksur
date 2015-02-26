@@ -1,4 +1,5 @@
 <?php
+
 	/**
 	 * ContextController
 	 *
@@ -9,8 +10,7 @@
 	 * @uses      Controller
 	 * @license   Tracetracker {@link http://www.tracetracker.com}
 	 */
-
-	class ContextController extends Controller{
+	class ContextController extends Controller {
 		const LOG_CAT = 'ctrl.ContextController';
 		// use 2 column layout
 		public $layout = '//layouts/column2';
@@ -71,8 +71,10 @@
 			}
 		}
 
+
 		/**
-		 * actionList
+		 * actionlist
+		 * @return void
 		 */
 		public function actionlist() {
 			Yii::log("actionContextList ContextController called", "trace", self::LOG_CAT);
@@ -149,7 +151,7 @@
 		}
 
 		/**
-		 * actionShowDesign
+		 * actionView
 		 *
 		 * @access public
 		 * @return void
@@ -186,6 +188,10 @@
 			));
 		}
 
+		/**
+		 * actionCreate
+		 * @return void
+		 */
 		public function actionCreate() {
 			Yii::log("actionCreate ContextController called", "trace", self::LOG_CAT);
 			$context = new FrameworkContext();
@@ -204,21 +210,21 @@
 				'errorSummaryHeader' => Yii::app()->params['headerErrorSummary'],
 				'errorSummaryFooter' => Yii::app()->params['footerErrorSummary'],
 			);
-			
+
 			$elements['elements']['context']['type'] = 'form';
 			$elements['elements']['contextFields']['type'] = 'form';
 			$elements['elements']['context'] = array_merge($elements['elements']['context'], $errorArray);
 			$elements['elements']['contextFields'] = array_merge($elements['elements']['contextFields'], $errorArray);
 			$contextFields = $dForm->findAll();
 			$dynamicDataAttributes = array();
-			foreach($contextFields as $field) {
+			foreach ($contextFields as $field) {
 				$dynamicDataAttributes[$field->inputName . '-' . $field->id] = $field->inputName;
 				$elements['elements']['contextFields']['elements'][$field->inputName . '-' . $field->id] = array(
 					'label' => isset($field->label) ? $field->label : $dForm->generateAttributeLabel($field->inputName),
 					'required' => $field->required,
 					'type' => $field->inputType
 				);
-				if($field->inputType == 'dropdownlist') {
+				if ($field->inputType == 'dropdownlist') {
 					$elements['elements']['contextFields']['elements'][$field->inputName . '-' . $field->id]['items'] =
 						Options::model()->getContextFieldOptions($field->id);
 				}
@@ -229,13 +235,13 @@
 			$form = new CForm($elements);
 			$form['context']->model = $context;
 			$form['contextFields']->model = $dForm;
-			if($form->submitted('createContext')) {
+			if ($form->submitted('createContext')) {
 				$form->loadData();
 				$frameworkFieldDataModel = new FrameworkFieldData();
 				$context->userId = Yii::app()->user->id;
-				if($context->save(false)) {
+				if ($context->save(false)) {
 					$frameworkFieldData = array();
-					foreach($_POST['DynamicFormDetails'] as $inputName => $inputVal) {
+					foreach ($_POST['DynamicFormDetails'] as $inputName => $inputVal) {
 						$inputNameArray = explode('-', $inputName);
 						$frameworkFieldData[] = array(
 							'id' => null,
@@ -245,10 +251,10 @@
 						);
 					}
 					$command = FrameworkFieldData::model()
-							->getDbConnection()
-							->getSchema()
-							->getCommandBuilder()
-					->createMultipleInsertCommand($frameworkFieldDataModel->tableName(), $frameworkFieldData);
+						->getDbConnection()
+						->getSchema()
+						->getCommandBuilder()
+						->createMultipleInsertCommand($frameworkFieldDataModel->tableName(), $frameworkFieldData);
 					if ($command->execute()) {
 						Yii::app()->user->setFlash('success', 'Surveillance context updated successfully');
 					}
@@ -266,6 +272,10 @@
 		}
 
 
+		/**
+		 * actionUpdate
+		 * @return void
+		 */
 		public function actionUpdate() {
 			Yii::log("actionUpdate ContextController called", "trace", self::LOG_CAT);
 			//$model = new FrameworkContext();
@@ -298,19 +308,19 @@
 			$elements['elements']['context']['type'] = 'form';
 			$elements['elements']['contextFields']['type'] = 'form';
 			$fieldDataMap = array();
-			foreach($contextFields as $field) {
+			foreach ($contextFields as $field) {
 				$dynamicDataAttributes[$field->inputName . '-' . $field->id] = 1;
 				$elements['elements']['contextFields']['elements'][$field->inputName . '-' . $field->id] = array(
 					'label' => isset($field->label) ? $field->label : $dForm->generateAttributeLabel($field->inputName),
 					'required' => $field->required,
 					'type' => $field->inputType
 				);
-				if($field->inputType == 'dropdownlist') {
+				if ($field->inputType == 'dropdownlist') {
 					$elements['elements']['contextFields']['elements'][$field->inputName . '-' . $field->id]['items'] =
 						Options::model()->getContextFieldOptions($field->id);
 				}
-				foreach($frameworkFieldData as $fieldValue) {
-					if($fieldValue->frameworkFieldId == $field->id) {
+				foreach ($frameworkFieldData as $fieldValue) {
+					if ($fieldValue->frameworkFieldId == $field->id) {
 
 						$modelData[$field->inputName . '-' . $field->id] = $fieldValue->value;
 						$fieldDataMap[$field->id] = $fieldValue->id;
@@ -343,14 +353,14 @@
 				$context->userId = Yii::app()->user->id;
 				$error = false;
 				//print_r($_POST['DynamicFormDetails']); die;
-				if($context->save()) {
-					foreach($_POST['DynamicFormDetails'] as $inputName => $inputVal) {
+				if ($context->save()) {
+					foreach ($_POST['DynamicFormDetails'] as $inputName => $inputVal) {
 						$inputNameArray = explode('-', $inputName);
 						$fieldId = null;
-						if(!empty($fieldDataMap[$inputNameArray[1]])) {
+						if (!empty($fieldDataMap[$inputNameArray[1]])) {
 							$fieldId = $fieldDataMap[$inputNameArray[1]];
 							$attributes = array(
-								'id' =>  $fieldId,
+								'id' => $fieldId,
 								'frameworkId' => $context->primaryKey,
 								'frameworkFieldId' => $inputNameArray[1],
 								'value' => $inputVal
@@ -360,13 +370,13 @@
 						} else {
 							$operation = 'save';
 							$attributes = array(
-								'id' =>  $fieldId,
+								'id' => $fieldId,
 								'frameworkId' => $context->primaryKey,
 								'frameworkFieldId' => $inputNameArray[1],
 								'value' => $inputVal
 							);
 							$frameworkFieldDataModel->attributes = $attributes;
-							$frameworkFieldDataModel->setIsNewRecord(true	);
+							$frameworkFieldDataModel->setIsNewRecord(true);
 							$frameworkFieldDataModel->save();
 
 						}
@@ -380,7 +390,7 @@
 //						}
 					}
 
-					if(!$error) {
+					if (!$error) {
 						Yii::app()->user->setFlash('success', 'Surveillance context updated successfully');
 						$this->redirect('list');
 						return;
@@ -401,6 +411,10 @@
 		}
 
 
+		/**
+		 * actionDelete
+		 * @return void
+		 */
 		public function actionDelete() {
 			Yii::log("actionDelete ContextController called", "trace", self::LOG_CAT);
 			if (isset($_POST["delId"])) {
@@ -425,11 +439,11 @@
 		public static function getElements($model, $attributes = array()) {
 			$modelAttributes = $model->getAttributes();
 			$modelElements = array();
-			foreach($modelAttributes as $attrName => $attrVal) {
+			foreach ($modelAttributes as $attrName => $attrVal) {
 
-				if(!empty($attributes)) {
-					foreach($attributes as $attr) {
-						if($attrName === $attr) {
+				if (!empty($attributes)) {
+					foreach ($attributes as $attr) {
+						if ($attrName === $attr) {
 							$modelElements[$attr] = array(
 								'label' => $model->getAttributeLabel($attr),
 								'required' => $model->isAttributeRequired($attr),
@@ -451,6 +465,10 @@
 			return $modelElements;
 		}
 
+		/**
+		 * @param bool $errorDisplay
+		 * @return array
+		 */
 		public static function getDefaultElements($errorDisplay = true) {
 			$errorParams = array(
 				'showErrorSummary' => true,
@@ -458,7 +476,7 @@
 				'errorSummaryHeader' => Yii::app()->params['headerErrorSummary'],
 				'errorSummaryFooter' => Yii::app()->params['footerErrorSummary'],
 			);
-			$defaultParams =	array(
+			$defaultParams = array(
 				'activeForm' => array(
 					'id' => 'DynamicForm',
 					'class' => 'CActiveForm',
@@ -471,6 +489,11 @@
 			return $errorDisplay ? array_merge($errorParams, $defaultParams) : $defaultParams;
 		}
 
+		/**
+		 * @param array $buttonName
+		 * @param string $url
+		 * @return array
+		 */
 		public static function getButtons($buttonName = array("name" => "save", "label" => "Save"), $url = 'context/list') {
 			return array(
 				$buttonName['name'] => array(
@@ -484,6 +507,7 @@
 				)
 			);
 		}
+
 		/**
 		 * performAjaxValidation
 		 * @param $model

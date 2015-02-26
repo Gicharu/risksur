@@ -32,6 +32,7 @@
 		 * Overrides default instantiation logic.
 		 * Instantiates AR class by providing table name
 		 * @see CActiveRecord::instantiate()
+		 * @param $attributes
 		 * @return CActiveRecord
 		 */
 		protected function instantiate($attributes) {
