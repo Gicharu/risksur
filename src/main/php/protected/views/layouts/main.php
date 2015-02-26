@@ -97,7 +97,7 @@ function addNewDesign() {
 	var data=$("#newDesignForm").serialize();
 	$.ajax({
 		type: 'POST',
-		url: '<?php echo Yii::app()->createAbsoluteUrl("design/index"); ?>',
+		url: '<?php echo Yii::app()->createAbsoluteUrl("context/create"); ?>',
 		data:data,
 		success:function(data){
 				// reset the form if success
@@ -272,7 +272,7 @@ $msg = 0;
 	<div id="header" 
 	style="background-image:url(<?php echo $baseUrl;?>/<?php echo $storySettings->backgroundpath; ?>)">
 	<div id="storyLogo">
-		<a href='<?php echo $baseUrl; ?>/index.php/design/index'>
+		<a href='<?php echo $baseUrl; ?>/index.php/context/list'>
 			<img src="<?php echo $baseUrl; ?>/<?php echo $storySettings->logopath;?>" 
 				alt="link to landing page" />
 		</a>
@@ -285,7 +285,7 @@ $msg = 0;
 			$activeDesignName = Yii::app()->session['surDesign']['name'] . ' - ';
 			$activeDesignAction = 'Change';
 		}
-		echo "Active Design: $activeDesignName <a href='" . CController::createUrl("design/index") . "'>$activeDesignAction</a>";
+		echo "Active Context: $activeDesignName <a href='" . Yii::app()->createUrl("context/list") . "'>$activeDesignAction</a>";
 	?>
 	</div>
 	<div id="evalName">
@@ -304,7 +304,7 @@ $msg = 0;
 				$activeAttributeName = Yii::app()->session['performanceAttribute']['name'] . ' - ';
 				$activeAttributeAction = 'Change';
 			}
-			echo "Active Performance Attribute: $activeAttributeName <a href='" . CController::createUrl("attribute/selectAttribute") . "'>$activeAttributeAction</a>";
+			echo "Active Performance Attribute: $activeAttributeName <a href='" . Yii::app()->createUrl("attribute/selectAttribute") . "'>$activeAttributeAction</a>";
 		}
 	?>
 	</div>

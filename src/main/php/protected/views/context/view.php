@@ -34,10 +34,6 @@ if (!empty($dataArray['selectedDesign'])) {
 	<td>Description</td>
 	<td><?php echo $values->description; ?></td>
 </tr>
-<tr>
-	<td>Goal</td>
-<td><?php echo $values->goal->pageName; ?></td>
-</tr>
 <?php
 	}
 }

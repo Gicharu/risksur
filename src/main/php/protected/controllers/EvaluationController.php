@@ -12,20 +12,7 @@
 class EvaluationController extends Controller {
 	const LOG_CAT = "ctrl.EvaluationController";
 	public $layout = '//layouts/column2';
-	/**
-	 * filters 
-	 * 
-	 * @access public
-	 * @return void
-	 */
-	public function filters() {
-		Yii::log("filters called", "trace", self::LOG_CAT);
-		return array(
-			array(
-				'application.filters.RbacFilter',
-			),
-		);
-	}
+
 	/**
 	 * actionIndex 
 	 * 
@@ -203,7 +190,7 @@ class EvaluationController extends Controller {
 
 		$returnArray = self::getElementsAndDynamicAttributes(array("frameworkId" => '2'));
 		$elements = $returnArray['elements'];
-		$model = new EvaluationForm;
+		$model = new DynamicForm();
 		//print_r($returnArray); die();
 		$model->_dynamicFields = $returnArray['dynamicDataAttributes'];
 		if (!empty(Yii::app()->session['surDesign'])) {
@@ -212,7 +199,7 @@ class EvaluationController extends Controller {
 		// generate the elements form
 		$form = new CForm($elements, $model);
 		//validate and save the evaluation data
-		if ($form->submitted('EvaluationForm') && $form->validate()) {
+		if ($form->submitted('DynamicForm') && $form->validate()) {
 			//print_r($form->getModel()); die();
 			$evaluationHeader->evaluationName = $form->model->evaluationName;
 			$evaluationHeader->frameworkId = $form->model->frameworkId;
@@ -236,7 +223,7 @@ class EvaluationController extends Controller {
 				}
 			}
 			//update the session variable for design
-			$modelDesign = NewDesign::model()->findByPk($form->model->frameworkId);
+			$modelDesign = FrameworkContext::model()->findByPk($form->model->frameworkId);
 			if (!empty($modelDesign)) {
 				Yii::app()->session->add('surDesign', array(
 					'id' => $modelDesign->frameworkId,
@@ -360,7 +347,7 @@ class EvaluationController extends Controller {
 			$elements['showErrorSummary'] = true;
 			$elements['errorSummaryHeader'] = Yii::app()->params['headerErrorSummary'];
 			$elements['errorSummaryFooter'] = Yii::app()->params['footerErrorSummary'];
-			$elements['activeForm']['id'] = "EvaluationForm";
+			$elements['activeForm']['id'] = "Dynamic";
 			$elements['activeForm']['enableClientValidation'] = true;
 			//$elements['activeForm']['enableAjaxValidation'] = false;
 			$elements['activeForm']['class'] = 'CActiveForm';
@@ -382,7 +369,7 @@ class EvaluationController extends Controller {
 				'required' => true,
 				'type' => 'dropdownlist'
 			);
-			$designData = NewDesign::model()->findAll(array(
+			$designData = FrameworkContext::model()->findAll(array(
 				//'select' => 'pageId, pageName',
 				'condition' => 'userId=:userId',
 				'params' => array(

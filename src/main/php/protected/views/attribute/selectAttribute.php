@@ -27,8 +27,8 @@ $(function(){
 					// redirect the form if success
 					var checkSuccess = /successfully/i;
 					if (checkSuccess.test(data)) {
-					// redirect to design/index
-						window.location.href = "'. CController::createUrl("design/index") . '"
+					// redirect to context/list
+						window.location.href = "'. CController::createUrl("context/list") . '"
 					}
 				}'
 

@@ -7,6 +7,7 @@
 		// array of css include paths with media types
 		$cssArray = array(
 			$baseUrl . "/css/reset-fonts-grids.css" => "noMedia",
+			$baseUrl . "/css/themes/risksurTheme/jquery-ui-1.9.2.custom.min.css" => "all",
 			$baseUrl . "/css/ttstylelogin.css" => "noMedia",
 		);
 		// add the theme to the cssArray

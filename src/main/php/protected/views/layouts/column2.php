@@ -3,42 +3,39 @@
 <div class="span-5 last">
 	<div id="sidebar">
 		<?php
+			$currentView = Yii::app()->controller->getAction()->getId();
+			if(Yii::app()->controller->id == 'context') {
+				$this->menu = array(
+					array('label' => Yii::t("translation", "New Surveillance Context"), 'url' => array('create'),
+						'active' => strstr('create', $currentView)),
+					array('label' => Yii::t("translation", "List Existing Contexts"), 'url' => array('list'),
+						'active' => strstr('list', $currentView)),
+					array('label' => Yii::t("translation", "List Components"), 'url' => array('design/listComponents'), 'itemOptions' => array (
+						'id' => 'showComponents'
+					)),
+				);
+			}
 			// Setup Design controller side menus
 			if (Yii::app()->controller->id == 'design') {
-				$currentView = Yii::app()->controller->getAction()->getId();
-				if (empty(Yii::app()->session['surDesign'])) {	
-					$this->menu = array(
-						array('label' => Yii::t("translation", "New Surveillance Design"), 'url' => array('createDesign'), 
-							'active' => strstr('createDesign', $currentView)),
-						array('label' => Yii::t("translation", "List Existing Designs"), 'url' => array('index'), 
-							'active' => strstr('index', $currentView)),
-					);
-				} else {
-					$this->menu = array(
-						array('label' => Yii::t("translation", "New Surveillance Design"), 'url' => array('createDesign'),
-							'active' => strstr('createDesign', $currentView)
-						),
-						array('label' => Yii::t("translation", "List Existing Designs"), 'url' => array('index'),
-							'active' => strstr('index', $currentView)
-						),
-						array('label' => Yii::t("translation", "Add Component"), 'url' => array('addComponent'), 'itemOptions' => array (
-							'id' => 'addComponent'
-							),
-							'active' => strstr('addComponent', $currentView),
-						),
-						array('label' => Yii::t("translation", "Add Multiple Components"), 'url' => array('addMultipleComponents'), 'itemOptions' => array ( 
-							'id' => 'addMultipleComponents'
-							),
-							'active' => strstr('addMultipleComponents', $currentView),
-						),
-						array('label' => Yii::t("translation", "List Components"), 'url' => array('listComponents'), 'itemOptions' => array ( 
-							'id' => 'showComponents'
-							),
-							'active' => strstr('listComponents', $currentView),
-						),
-						//array('label'=>'Manage SurFormDetails', 'url'=>array('admin')),
-					);
-				}
+
+				$this->menu = array(
+					array('label' => Yii::t("translation", "Add Component"), 'url' => array('addComponent'), 'itemOptions' => array (
+						'id' => 'addComponent'
+					),
+						'active' => strstr('addComponent', $currentView),
+					),
+					array('label' => Yii::t("translation", "Add Multiple Components"), 'url' => array('addMultipleComponents'), 'itemOptions' => array (
+						'id' => 'addMultipleComponents'
+					),
+						'active' => strstr('addMultipleComponents', $currentView),
+					),
+					array('label' => Yii::t("translation", "List Components"), 'url' => array('listComponents'), 'itemOptions' => array (
+						'id' => 'showComponents'
+					),
+						'active' => strstr('listComponents', $currentView),
+					),
+					//array('label'=>'Manage SurFormDetails', 'url'=>array('admin')),
+				);
 			}
 			//Evaluation controller side menus
 

@@ -21,19 +21,7 @@ class OptionsController extends Controller {
 	 */
 	public $layout = '//layouts/column2';
 
-	/**
-	 * filters 
-	 * 
-	 * @access public
-	 * @return void
-	 */
-	public function filters() {
-		return array(
-			array(
-				'application.filters.RbacFilter',
-			),
-		);
-	}
+
 	/**
 	 * init 
 	 * 

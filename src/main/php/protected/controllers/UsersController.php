@@ -20,19 +20,6 @@ class UsersController extends Controller {
 	const LOG_CAT = "ctrl.OptionsController";
 
 	/**
-	 * filters
-	 *
-	 * @access public
-	 * @return void
-	 */
-	public function filters() {
-		return array(
-			array(
-				'application.filters.RbacFilter',
-			),
-		);
-	}
-	/**
 	 * Creates a new model.
 	 * If creation is successful, the browser will be redirected to the 'index' page.
 	 */

@@ -27,7 +27,7 @@ class EvaluationHeader extends CActiveRecord {
 	 * tableName 
 	 * 
 	 * @access public
-	 * @return void
+	 * @return string
 	 */
 	public function tableName() {
 		return 'evaluationHeader';
@@ -37,7 +37,7 @@ class EvaluationHeader extends CActiveRecord {
 	 * primaryKey 
 	 * 
 	 * @access public
-	 * @return void
+	 * @return string
 	 */
 	public function primaryKey() {
 		return 'evalId';
@@ -46,7 +46,7 @@ class EvaluationHeader extends CActiveRecord {
 	 * rules 
 	 * 
 	 * @access public
-	 * @return void
+	 * @return array
 	 */
 	public function rules() {
 		return array(
@@ -67,11 +67,11 @@ class EvaluationHeader extends CActiveRecord {
 	 * relations 
 	 * 
 	 * @access public
-	 * @return void
+	 * @return array
 	 */
 	public function relations() {
 		return array(
-			'designFrameworks' => array(self::BELONGS_TO, 'NewDesign', 'frameworkId'),
+			'designFrameworks' => array(self::BELONGS_TO, 'FrameworkContext', 'frameworkId'),
 			'evalDetails' => array(self::HAS_MANY, 'EvaluationDetails', 'evalId')
 		);
 	}

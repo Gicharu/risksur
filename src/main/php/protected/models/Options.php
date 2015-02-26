@@ -11,12 +11,12 @@
  */
 class Options extends CActiveRecord {
 	/**
-	 * model 
-	 * 
-	 * @param mixed $className 
+	 * model
+	 *
+	 * @param mixed $className
 	 * @static
 	 * @access public
-	 * @return void
+	 * @return static
 	 */
 	public static function model($className = __CLASS__) {
 		return parent::model($className);
@@ -25,7 +25,7 @@ class Options extends CActiveRecord {
 	 * tableName 
 	 * 
 	 * @access public
-	 * @return void
+	 * @return array
 	 */
 	public function tableName() {
 		return 'options';
@@ -35,7 +35,7 @@ class Options extends CActiveRecord {
 	 * primaryKey 
 	 * 
 	 * @access public
-	 * @return void
+	 * @return array
 	 */
 	public function primaryKey() {
 		return 'optionId';
@@ -45,7 +45,7 @@ class Options extends CActiveRecord {
 	 * rules 
 	 * 
 	 * @access public
-	 * @return void
+	 * @return array
 	 */
 	public function rules() {
 		return array(
@@ -60,12 +60,23 @@ class Options extends CActiveRecord {
 	 * attributeLabels 
 	 * 
 	 * @access public
-	 * @return void
+	 * @return array
 	 */
 	public function attributeLabels() {
 		return array(
 			'label' => Yii::t('translation', 'Input Name'),
 			'elementId' => Yii::t('translation', 'Option Name')
 		);
+	}
+
+	public function getContextFieldOptions($contextInputId) {
+		$optionsRs = $this->findAll('frameworkfieldId=' . $contextInputId);
+		$options = array();
+		if(!empty($optionsRs)) {
+			foreach($optionsRs as $option) {
+				$options[$option->val] = $option->label;
+			}
+		}
+		return $options;
 	}
 }

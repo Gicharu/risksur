@@ -34,6 +34,19 @@ abstract class Controller extends CController {
 	public $breadcrumbs = array();
 
 	/**
+	 * filters
+	 * @return array
+	 */
+	public function filters() {
+		Yii::log("filters called", "trace", self::LOG_CAT);
+		return array(
+			array(
+				'application.filters.RbacFilter',
+			),
+		);
+	}
+
+	/**
 	 * renderPartial 
 	 * 
 	 * @param mixed $view 
