@@ -8,6 +8,7 @@
  * @copyright Tracetracker
  * @author James Njoroge <james@tracetracker.com>
  * @license Tracetracker {@link http://www.tracetracker.com}
+ * @SuppressWarnings checkUnusedVariables
  */
 class FrameworkFieldData extends CActiveRecord {
 
