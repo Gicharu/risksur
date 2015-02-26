@@ -14,6 +14,7 @@
 	class DynamicFormDetails extends CActiveRecord {
 		private $_dynamicData = array();
 		public $_dynamicFields = array();
+		public $_dynamicLabels = array();
 		protected  $_tableName;
 		protected $_md;
 
@@ -131,19 +132,17 @@
 			return parent::model($className);
 		}
 
-		/**
-		 * attributeLabels
-		 *
-		 * @access public
-		 * @return void
-		 */
-		//public function attributeLabels() {
-		//$attributeLabels = array();
-		//foreach ($this->elements as $e) {
-		//if (!empty($e->label)) {
-		//$attributeLabels[$e->inputName] = $e->label;
-		//}
-		//}
-		//return $attributeLabels;
-		//}
+	/**
+	 * attributeLabels 
+	 * 
+	 * @access public
+	 * @return void
+	 */
+	public function attributeLabels() {
+		$attributeLabels = array();
+		if (!empty ($this->_dynamicLabels)) {
+			$attributeLabels = $this->_dynamicLabels;
+		}
+		return $attributeLabels;
+	}
 	}
