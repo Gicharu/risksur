@@ -1,6 +1,6 @@
 <?php
 	/**
-	 * SurveillanceContextController
+	 * ContextController
 	 *
 	 * @package
 	 * @author    James Njoroge <james@tracetracker.com>
@@ -15,18 +15,6 @@
 		// use 2 column layout
 		public $layout = '//layouts/column2';
 
-		/**
-		 * filters
-		 * @return array
-		 */
-//		public function filters() {
-//			Yii::log("filters called", "trace", self::LOG_CAT);
-//			return array(
-//				array(
-//					'application.filters.RbacFilter',
-//				),
-//			);
-//		}
 		/**
 		 * actionIndex
 		 *
@@ -203,15 +191,24 @@
 			$context = new FrameworkContext();
 			$dForm = new DynamicFormDetails('create', 'frameworkFields');
 
-			$elements = self::getDefaultElements();
+			$elements = self::getDefaultElements(false);
 			$elements['elements']['context']['elements'] = self::getElements($context, array('name', 'description'));
 
 			$elements['buttons'] = self::getButtons(array(
 				'name' => 'createContext',
 				'label' => 'Create'
 			));
+			$errorArray = array(
+				'showErrors' => true,
+				'showErrorSummary' => true,
+				'errorSummaryHeader' => Yii::app()->params['headerErrorSummary'],
+				'errorSummaryFooter' => Yii::app()->params['footerErrorSummary'],
+			);
+			
 			$elements['elements']['context']['type'] = 'form';
 			$elements['elements']['contextFields']['type'] = 'form';
+			$elements['elements']['context'] = array_merge($elements['elements']['context'], $errorArray);
+			$elements['elements']['contextFields'] = array_merge($elements['elements']['contextFields'], $errorArray);
 			$contextFields = $dForm->findAll();
 			$dynamicDataAttributes = array();
 			foreach($contextFields as $field) {
@@ -299,17 +296,17 @@
 			$modelData = array();
 			$dynamicDataAttributes = array();
 			$elements['elements']['context']['type'] = 'form';
-			$elements['elements']['contextDetails']['type'] = 'form';
+			$elements['elements']['contextFields']['type'] = 'form';
 			$fieldDataMap = array();
 			foreach($contextFields as $field) {
 				$dynamicDataAttributes[$field->inputName . '-' . $field->id] = 1;
-				$elements['elements']['contextDetails']['elements'][$field->inputName . '-' . $field->id] = array(
+				$elements['elements']['contextFields']['elements'][$field->inputName . '-' . $field->id] = array(
 					'label' => isset($field->label) ? $field->label : $dForm->generateAttributeLabel($field->inputName),
 					'required' => $field->required,
 					'type' => $field->inputType
 				);
 				if($field->inputType == 'dropdownlist') {
-					$elements['elements']['contextDetails']['elements'][$field->inputName . '-' . $field->id]['items'] =
+					$elements['elements']['contextFields']['elements'][$field->inputName . '-' . $field->id]['items'] =
 						Options::model()->getContextFieldOptions($field->id);
 				}
 				foreach($frameworkFieldData as $fieldValue) {
@@ -338,7 +335,7 @@
 			$dForm->attributes = $modelData;
 			$form = new CForm($elements);
 			$form['context']->model = $model;
-			$form['contextDetails']->model = $dForm;
+			$form['contextFields']->model = $dForm;
 
 			//var_dump($form->validate()); die('here');
 			if ($form->submitted('updateContext')) {
@@ -454,13 +451,16 @@
 			return $modelElements;
 		}
 
-		public static function getDefaultElements() {
-			return array(
+		public static function getDefaultElements($errorDisplay = true) {
+			$errorParams = array(
 				'showErrorSummary' => true,
 				'showErrors' => true,
 				'errorSummaryHeader' => Yii::app()->params['headerErrorSummary'],
 				'errorSummaryFooter' => Yii::app()->params['footerErrorSummary'],
+			);
+			$defaultParams =	array(
 				'activeForm' => array(
+					'id' => 'DynamicForm',
 					'class' => 'CActiveForm',
 					'enableClientValidation' => true,
 					'clientOptions' => array(
@@ -468,6 +468,7 @@
 					)
 				)
 			);
+			return $errorDisplay ? array_merge($errorParams, $defaultParams) : $defaultParams;
 		}
 
 		public static function getButtons($buttonName = array("name" => "save", "label" => "Save"), $url = 'context/list') {
