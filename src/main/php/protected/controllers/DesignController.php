@@ -134,6 +134,7 @@
 				$elements = $returnArray['elements'];
 				$model = new DynamicForm();
 				$model->_dynamicFields = $returnArray['dynamicDataAttributes'];
+				$model->_dynamicLabels = $returnArray['dynamicLabels'];
 				// generate the components form
 				$form = new CForm($elements, $model);
 				//validate and save the component data
@@ -341,6 +342,7 @@
 			$elements = array();
 			$attributeArray = array();
 			$dynamicDataAttributes = array();
+			$dynamicLabels = array();
 			if (!empty(Yii::app()->session['surDesign'])) {
 					$getFormCondition = 't.formId=:formId';
 					$getFormParams = array(':formId' => 1);
@@ -382,6 +384,7 @@
 				$inputType = 'text';
 				// add componentName form element
 				$dynamicDataAttributes['componentName'] = 1;
+				$dynamicLabels['componentName'] = "Component Name";
 				$elements['elements']['componentName'] = array(
 					'label' => "Component Name",
 					'required' => true,
@@ -396,6 +399,7 @@
 				foreach ($components as $valu) {
 					//set the model attribute array
 					$dynamicDataAttributes[$valu->inputName . "-" . $valu->subFormId] = 1;
+					$dynamicLabels[$valu->inputName . "-" . $valu->subFormId] = $valu->label;
 					//update the element type
 					if ($valu->inputType == 'int') {
 						$inputType = 'text';
@@ -472,7 +476,7 @@
 					),
 				);
 			}
-			$returnArray = array('elements' => $elements, 'dynamicDataAttributes' => $dynamicDataAttributes);
+			$returnArray = array('elements' => $elements, 'dynamicDataAttributes' => $dynamicDataAttributes, 'dynamicLabels' => $dynamicLabels);
 			return $returnArray;
 		}
 
@@ -517,6 +521,7 @@
 				$elements = $returnArray['elements'];
 				//$model = new ComponentsForm;
 				$model->_dynamicFields = $returnArray['dynamicDataAttributes'];
+				$model->_dynamicLabels = $returnArray['dynamicLabels'];
 
 				// update the model with the data values and add id
 				foreach ($fetchComponentData as $dat) {

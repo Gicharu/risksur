@@ -14,6 +14,7 @@
 class DynamicForm extends CFormModel {
 	private $_dynamicData = array();
 	public $_dynamicFields = array(); 
+	public $_dynamicLabels = array();
 	/**
 	 * attributeNames 
 	 * 
@@ -85,13 +86,17 @@ class DynamicForm extends CFormModel {
 	 * @access public
 	 * @return void
 	 */
-	//public function attributeLabels() {
-		//$attributeLabels = array();
-		//foreach ($this->elements as $e) {
-			//if (!empty($e->label)) {
-				//$attributeLabels[$e->inputName] = $e->label;
-			//}
+	public function attributeLabels() {
+		$attributeLabels = array();
+		if (!empty ($this->_dynamicLabels)) {
+			$attributeLabels = $this->_dynamicLabels;
+		}
+		//print_r($this->_dynamicLabels); die();
+		//foreach ($this->_dynamicLabels as $key => $val) {
+			////if (!empty($e->label)) {
+				//$attributeLabels[$key] = $val;
+				////}
 		//}
-		//return $attributeLabels;
-	//}
+		return $attributeLabels;
+	}
 }
