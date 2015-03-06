@@ -73,7 +73,9 @@
 
 
 		/**
-		 * actionlist
+		 * actionlist 
+		 * 
+		 * @access public
 		 * @return void
 		 */
 		public function actionlist() {
@@ -189,13 +191,16 @@
 		}
 
 		/**
-		 * actionCreate
+		 * actionCreate 
+		 * 
+		 * @access public
 		 * @return void
 		 */
 		public function actionCreate() {
 			Yii::log("actionCreate ContextController called", "trace", self::LOG_CAT);
 			$context = new FrameworkContext();
 			$dForm = new DynamicFormDetails('create', 'frameworkFields');
+			$dynamicLabels = array();
 
 			$elements = self::getDefaultElements(false);
 			$elements['elements']['context']['elements'] = self::getElements($context, array('name', 'description'));
@@ -219,6 +224,7 @@
 			$dynamicDataAttributes = array();
 			foreach ($contextFields as $field) {
 				$dynamicDataAttributes[$field->inputName . '-' . $field->id] = $field->inputName;
+				$dynamicLabels[$field->inputName . '-' . $field->id] = isset($field->label) ? $field->label : $dForm->generateAttributeLabel($field->inputName);
 				$elements['elements']['contextFields']['elements'][$field->inputName . '-' . $field->id] = array(
 					'label' => isset($field->label) ? $field->label : $dForm->generateAttributeLabel($field->inputName),
 					'required' => $field->required,
@@ -232,6 +238,7 @@
 			}
 //			print_r($elements); die;
 			$dForm->_dynamicFields = $dynamicDataAttributes;
+			$dForm->_dynamicLabels = $dynamicLabels;
 			$form = new CForm($elements);
 			$form['context']->model = $context;
 			$form['contextFields']->model = $dForm;
@@ -273,13 +280,16 @@
 
 
 		/**
-		 * actionUpdate
+		 * actionUpdate 
+		 * 
+		 * @access public
 		 * @return void
 		 */
 		public function actionUpdate() {
 			Yii::log("actionUpdate ContextController called", "trace", self::LOG_CAT);
 			//$model = new FrameworkContext();
 			$dForm = new DynamicFormDetails('update', 'frameworkFields');
+			$dynamicLabels = array();
 
 			//print_r($_POST); die;
 //			$dataArray = array();
@@ -310,6 +320,7 @@
 			$fieldDataMap = array();
 			foreach ($contextFields as $field) {
 				$dynamicDataAttributes[$field->inputName . '-' . $field->id] = 1;
+				$dynamicLabels[$field->inputName . '-' . $field->id] = isset($field->label) ? $field->label : $dForm->generateAttributeLabel($field->inputName);
 				$elements['elements']['contextFields']['elements'][$field->inputName . '-' . $field->id] = array(
 					'label' => isset($field->label) ? $field->label : $dForm->generateAttributeLabel($field->inputName),
 					'required' => $field->required,
@@ -342,6 +353,7 @@
 			);
 			//$model = new DynamicForm();
 			$dForm->_dynamicFields = $dynamicDataAttributes;
+			$dForm->_dynamicLabels = $dynamicLabels;
 			$dForm->attributes = $modelData;
 			$form = new CForm($elements);
 			$form['context']->model = $model;
@@ -412,7 +424,9 @@
 
 
 		/**
-		 * actionDelete
+		 * actionDelete 
+		 * 
+		 * @access public
 		 * @return void
 		 */
 		public function actionDelete() {
@@ -466,8 +480,12 @@
 		}
 
 		/**
-		 * @param bool $errorDisplay
-		 * @return array
+		 * getDefaultElements 
+		 * 
+		 * @param mixed $errorDisplay 
+		 * @static
+		 * @access public
+		 * @return void
 		 */
 		public static function getDefaultElements($errorDisplay = true) {
 			$errorParams = array(
@@ -490,9 +508,13 @@
 		}
 
 		/**
-		 * @param array $buttonName
-		 * @param string $url
-		 * @return array
+		 * getButtons 
+		 * 
+		 * @param array $buttonName 
+		 * @param string $url 
+		 * @static
+		 * @access public
+		 * @return void
 		 */
 		public static function getButtons($buttonName = array("name" => "save", "label" => "Save"), $url = 'context/list') {
 			return array(
@@ -509,8 +531,11 @@
 		}
 
 		/**
-		 * performAjaxValidation
-		 * @param $model
+		 * performAjaxValidation 
+		 * 
+		 * @param mixed $model 
+		 * @access protected
+		 * @return void
 		 */
 		protected function performAjaxValidation($model) {
 			if (isset($_POST['ajax']) && $_POST['ajax'] === 'newDesignForm') {
