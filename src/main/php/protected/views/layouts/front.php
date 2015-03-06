@@ -24,25 +24,6 @@
 			"/libraries/jquery-ui-1.9.1/jquery-ui-1.9.1.custom.min.js",
 		);
 
-		/*USE http_negotiate_language TO GET THE USER'S LOCALE AND USE IT FOR THE APP*/
-		$langs = array(
-				'en',
-				'en-us',
-				'en-gb',
-				'bs',
-				'bs_BA',
-		);
-
-		$locale = http_negotiate_language($langs, $result);
-		$paginationLocaleFile = 'paginationLocales' . DIRECTORY_SEPARATOR . $locale . '.txt';
-		Yii::app()->setLanguage($locale);
-		
-		if(file_exists($paginationLocaleFile)) {
-			Yii::app()->session->add('locale', $locale);
-		} else {
-			Yii::app()->session->add('locale', 'en');
-		}
-
 	?>
 	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 	<meta charset="UTF-8">
