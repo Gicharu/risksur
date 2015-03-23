@@ -6,9 +6,9 @@
 			$currentView = Yii::app()->controller->getAction()->getId();
 			if(Yii::app()->controller->id == 'context') {
 				$this->menu = array(
-					array('label' => Yii::t("translation", "New Surveillance Context"), 'url' => array('create'),
+					array('label' => Yii::t("translation", "New Surveillance System"), 'url' => array('create'),
 						'active' => strstr('create', $currentView)),
-					array('label' => Yii::t("translation", "List Existing Contexts"), 'url' => array('list'),
+					array('label' => Yii::t("translation", "List Existing Systems"), 'url' => array('list'),
 						'active' => strstr('list', $currentView)),
 					array('label' => Yii::t("translation", "List Components"), 'url' => array('design/listComponents'), 'itemOptions' => array (
 						'id' => 'showComponents'

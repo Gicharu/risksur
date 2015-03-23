@@ -70,14 +70,21 @@ class DynamicForm extends CFormModel {
 	 */
 	public function rules() {
 		$required = array();
+		$unique = array();
 		foreach ($this->_dynamicFields as $attr => $val) {
-			if ($val) {
+			if ($val === 1) {
 				$required[] = $attr;
 			}
+			if ($val === 2) {
+				$required[] = $attr;
+				$unique[] = $attr;
+			}
+
 		}
-		return array(
-			array(implode(', ', $required), 'required'),
-		);
+		$rules[] = array(implode(', ', $required), 'required');
+		$rules[] = array(implode(', ', $unique), 'unique');
+		//print_r(array_filter($rules)); die;
+		return array_filter($rules);
 	}
 
 	/**

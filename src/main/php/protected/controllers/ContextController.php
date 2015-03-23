@@ -298,12 +298,12 @@
 				//fetch the form data
 				$model = FrameworkContext::model()->findByPk($_GET['contextId']);
 				if ($model === null) {
-					Yii::app()->user->setFlash('error', Yii::t("translation", "The selected context does not exist"));
+					Yii::app()->user->setFlash('error', Yii::t("translation", "The selected system does not exist"));
 					$this->redirect(array('context/list'));
 					return;
 				}
 			} else {
-				Yii::app()->user->setFlash('error', Yii::t("translation", "Please select a context before you attempt to update it"));
+				Yii::app()->user->setFlash('error', Yii::t("translation", "Please select a surveillance system before you attempt to update it"));
 				$this->redirect(array('context/list'));
 			}
 
@@ -436,11 +436,11 @@
 				if (!$record->delete()) {
 					Yii::log("Error deleting context: " . $_POST['delId'], "warning", self::LOG_CAT);
 					//echo $errorMessage;
-					echo Yii::t("translation", "A problem occurred when deleting the context ") . $_POST['delId'];
+					echo Yii::t("translation", "A problem occurred when deleting the system ") . $_POST['delId'];
 				} else {
 					// remove the default selected design from session
 					unset($_SESSION['surDesign']);
-					echo Yii::t("translation", "The context ") . Yii::t("translation", " has been successfully deleted");
+					echo Yii::t("translation", "The system ") . Yii::t("translation", " has been successfully deleted");
 				}
 			}
 		}
@@ -514,7 +514,7 @@
 		 * @param string $url 
 		 * @static
 		 * @access public
-		 * @return void
+		 * @return array
 		 */
 		public static function getButtons($buttonName = array("name" => "save", "label" => "Save"), $url = 'context/list') {
 			return array(

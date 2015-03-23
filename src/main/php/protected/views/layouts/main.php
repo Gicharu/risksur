@@ -225,14 +225,14 @@ if (!Yii::app()->user->isGuest) {
 			</li>
 			<li>
 <?php
-echo CHtml::htmlButton(Yii::t('translation', 'User Preferences'), array(
-		'submit' => array(
-			'admin/preferences'
-		),
-		'type' => 'button',
-		'id' => 'btnUserPreferences'
-	)
-);
+//echo CHtml::htmlButton(Yii::t('translation', 'User Preferences'), array(
+//		'submit' => array(
+//			'admin/preferences'
+//		),
+//		'type' => 'button',
+//		'id' => 'btnUserPreferences'
+//	)
+//);
 ?>				
 
 			</li>
@@ -269,14 +269,13 @@ $msg = 0;
 	}
 	?>
 
-	<div id="header" 
-	style="background-image:url(<?php echo $baseUrl;?>/<?php echo $storySettings->backgroundpath; ?>)">
-	<div id="storyLogo">
-		<a href='<?php echo $baseUrl; ?>/index.php/context/list'>
-			<img src="<?php echo $baseUrl; ?>/<?php echo $storySettings->logopath;?>" 
-				alt="link to landing page" />
-		</a>
-	</div>
+	<div id="header">
+		<div id="logo">
+			<a href='<?php echo $baseUrl; ?>/index.php/context/list'>
+				<img src="<?php echo $baseUrl; ?>/<?php echo $storySettings->logopath;?>"
+					 alt="link to landing page" />
+			</a>
+		</div>
 	<div id="designName">
 	<?php
 		$activeDesignAction = 'Select';
@@ -285,13 +284,13 @@ $msg = 0;
 			$activeDesignName = Yii::app()->session['surDesign']['name'] . ' - ';
 			$activeDesignAction = 'Change';
 		}
-		echo "Active Context: $activeDesignName <a href='" . Yii::app()->createUrl("context/list") . "'>$activeDesignAction</a>";
+		echo "Selected Surveillance System: $activeDesignName <a href='" . Yii::app()->createUrl("context/list") . "'>$activeDesignAction</a>";
 	?>
 	</div>
 	<div id="evalName">
 	<?php
 		if (!empty(Yii::app()->session['evaContext']) && Yii::app()->controller->id == 'evaluation') {
-			echo "Active Evaluation Context: " . Yii::app()->session['evaContext']['name'];
+			echo "Selected Evaluation Context: " . Yii::app()->session['evaContext']['name'];
 		}
 	?>
 	</div>
@@ -304,7 +303,7 @@ $msg = 0;
 				$activeAttributeName = Yii::app()->session['performanceAttribute']['name'] . ' - ';
 				$activeAttributeAction = 'Change';
 			}
-			echo "Active Performance Attribute: $activeAttributeName <a href='" . Yii::app()->createUrl("attribute/selectAttribute") . "'>$activeAttributeAction</a>";
+			echo "Selected Performance Attribute: $activeAttributeName <a href='" . Yii::app()->createUrl("attribute/selectAttribute") . "'>$activeAttributeAction</a>";
 		}
 	?>
 	</div>

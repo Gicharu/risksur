@@ -498,16 +498,17 @@ body {
 }
 #header {
 	/*background-image: url(../images/headerBackground.png);*/
-	background-repeat:no-repeat;
-	height:70px;
+	/*background-repeat:no-repeat;*/
+	height: 5em;
 	margin-top: -0.25em;
+    background-color: #F3DCB8;
 }
-#storyLogo {
-	padding-left: 4px;
-	padding-top: 4px;
+#logo {
+	/*padding-left: 4px;*/
+	/*padding-top: 4px;*/
 	float:left;
 }
-#storyLogo img {
+#logo img {
 	height:60px;
 }
 #dashboardOptions {
