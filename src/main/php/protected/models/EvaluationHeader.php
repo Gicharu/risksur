@@ -10,7 +10,7 @@
  * @license Tracetracker {@link http://www.tracetracker.com}
  */
 class EvaluationHeader extends CActiveRecord {
-
+	public $evaluationName, $evaluationDescription, $frameworkId, $userId, $evalId;
 	/**
 	 * model 
 	 * 
