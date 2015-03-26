@@ -8,6 +8,7 @@
  * @copyright Tracetracker
  * @author Chirag Doshi <chirag@tracetracker.com> 
  * @license Tracetracker {@link http://www.tracetracker.com}
+ * @SuppressWarnings checkUnusedVariables
  */
 class EvaluationHeader extends CActiveRecord {
 	public $evaluationName, $evaluationDescription, $frameworkId, $userId, $evalId;
