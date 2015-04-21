@@ -5,7 +5,8 @@
 	$headerTd = "";
 	$cols = count($formHeader->getElements()) + 1;
 	foreach ($formHeader->getElements() as $element) {
-		$headerTd .= "<td>" . CHtml::label($element->label, false) . "</td>";
+		//$headerTd .= "<td>" . CHtml::label($element->label, false) . "</td>";
+        $headerTd .= '<td>' . CHtml::activeLabelEx($form->getModel(), $element->name) . '</td>';
 	}
 
 $headerTd .= "<td width='3%'>" . CHtml::htmlButton(Yii::t('translation', 'Copy First Row'), array(
@@ -41,6 +42,18 @@ $(function() {
 		},
 		text:false
 	});
+    var $inputs = $('#DynamicForm :input');
+    $inputs.each(function() {
+        if($(this).hasClass('error')) {
+            $('<div class="errorMessage">This field is required</div>').appendTo($(this).parent());
+        }
+        $(this).on('blur', function() {
+            if(this.value !== '' && $(this).hasClass('error')) {
+                $(this).removeClass('error');
+                $(this).next().remove();
+            }
+        });
+    });
 });
 </script>
 <div class="form">
@@ -50,10 +63,7 @@ $(function() {
 		'elements' => $elements,
 		'containerTagName' => 'table',
 		'headerTagName' => 'thead',
-		'header' =>'
-			<tr>' . $headerTd . '
-			</tr>
-		',
+		'header' =>'<tr>' . $headerTd . '</tr>',
 		'inputContainerTagName' => 'tbody',
 		'inputTagName' => 'tr',
 		'inputView' => '_tabularInputAsTable',

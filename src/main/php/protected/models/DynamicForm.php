@@ -106,4 +106,5 @@ class DynamicForm extends CFormModel {
 		//}
 		return $attributeLabels;
 	}
+
 }

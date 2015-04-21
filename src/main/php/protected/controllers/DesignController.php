@@ -52,7 +52,7 @@
 						$dataArray['selectedComponent'][$dat['label']] = $dat['optionValue'];
 					} else {
 						$dataArray['selectedComponent'][$dat['label']] = $dat['value'];
-					};
+					}
 					// add the component name to the array as well but just once
 					if (empty($dataArray['selectedComponent']['Component Name'])) {
 						$dataArray['selectedComponent']['Component Name'] = $dat['componentName'];
@@ -205,7 +205,7 @@
 				$elements = $returnArray['elements'];
 				$model = new DynamicForm();
 				$model->_dynamicFields = $returnArray['dynamicDataAttributes'];
-
+                $model->_dynamicLabels = $returnArray['dynamicLabels'];
 				// generate the components form
 				$form = new CForm($elements, $model);
 				$formHeader = new CForm($elements, $model);
@@ -421,6 +421,7 @@
 						'label' => $valu->label,
 						'required' => $valu->required,
 						'type' => $inputType,
+//                        'layout' => '{input}{error}',
 						'class' => $hightlightClass
 					);
 					// hide the label for multiple form layout
