@@ -205,7 +205,7 @@
 				$elements = $returnArray['elements'];
 				$model = new DynamicForm();
 				$model->_dynamicFields = $returnArray['dynamicDataAttributes'];
-                $model->_dynamicLabels = $returnArray['dynamicLabels'];
+				$model->_dynamicLabels = $returnArray['dynamicLabels'];
 				// generate the components form
 				$form = new CForm($elements, $model);
 				$formHeader = new CForm($elements, $model);
