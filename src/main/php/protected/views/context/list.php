@@ -58,8 +58,8 @@ $(function(){
 		"aoColumns": [
 		{"mDataProp": "name",  "bVisible": true, sClass: "showDetails clickable underline"},
 		{"mDataProp": "description", "bVisible": true},
-		{"mDataProp": "editButton", "bSortable": false },
-		{"mData": "deleteButton", "bSortable": false },
+		{"mDataProp": "editButton", "bSortable": false, sClass: "editContext" },
+		{"mData": "deleteButton", "bSortable": false, sClass: "delContext" },
 		],
 		// update the buttons stying after the table data is loaded
 		"fnDrawCallback": function() {
@@ -75,25 +75,46 @@ $(function(){
 		"aLengthMenu": [[10, 25, 50, 75, 100], [10, 25, 50, 75, 100]]
 	});
 
-	// click event to show context details
-//	$('.showDetails').die('click').live('click', function() {
-	$('#surveillanceList').on('click','.showDetails', function() {
-				var aPos = slist.fnGetPosition(this); /* Get current  row pos */
-				//console.log(aPos);
-				var aData = slist.fnGetData(aPos[0]); /* Get the full row     */
-				//console.log(aData);
-				var frameworkId = aData['frameworkId'];
-		window.location.href = '<?php echo $this->createUrl("context/view"); ?>' + "?contextId=" + frameworkId;
-	});
-});
+	var requestHandler = function(event) {
 
-	deleteConfirm = function(confirmMsg, deleteVal) {
-	$('#deleteBox').html("<p>Are you sure you want to delete '" + confirmMsg + "' </p>");
-	$("#deleteBox").dialog('option', 'buttons', {
-		"Confirm" : function() {
-			// console.log(confirmMsg + ":" + deleteVal);
+		var aPos;
+		 /* Get current  row pos */
+		if(typeof event.data.parent !== 'undefined') {
+			aPos = slist.fnGetPosition(event.target);
+		} else {
+			aPos = slist.fnGetPosition($(event.target).parent()[0]);
+		}
+//		console.log(aPos);
+		var aData = slist.fnGetData(aPos[0]); /* Get the full row     */
+		//console.log(aData);
+		var frameworkId = aData['frameworkId'];
+		var name = aData['name'];
+		switch(event.data.action) {
+			case "edit":
+				window.location.href = '<?php echo $this->createUrl("context/update"); ?>' +
+				"/contextId/" + frameworkId;
+				break;
+			case 'delete':
+				deleteConfirm(name, frameworkId);
+				break;
+			default:
+				window.location.href = '<?php echo $this->createUrl("context/view"); ?>' +
+				"/contextId/" + frameworkId;
+		}
+
+	};
+	$('#surveillanceList')
+		.on('click','.showDetails', { action: 'view', parent: false }, requestHandler)
+		.on('click', '.editContext .bedit', { action: 'edit' }, requestHandler)
+		.on('click', '.delContext', { action: 'delete' }, requestHandler);
+
+	var deleteConfirm = function(confirmMsg, deleteVal) {
+		$('body #deleteBox').html("<p>Are you sure you want to delete '" + confirmMsg + "' </p>");
+		$("body #deleteBox").dialog('option', 'buttons', {
+			"Confirm" : function() {
+				// console.log(confirmMsg + ":" + deleteVal);
 				$(this).dialog("close");
-				  var opt = {'loadMsg': 'Processing delete context'};
+				var opt = {'loadMsg': 'Processing delete context'};
 				$("#listSurveilance").showLoading(opt);
 				$.ajax({type: 'POST',
 					url: <?php echo "'" . $this->createUrl('context/delete') . "'"; ?>,
@@ -117,20 +138,23 @@ $(function(){
 						slist.fnReloadAjax("index/getContext/1");
 						$("#listSurveilance").hideLoading();
 					},
-						error: function(data){
-							$("#ajaxFlashMsg").html("Error occured while deleting data");
-							$("#ajaxFlashMsgWrapper").attr('class', 'flash-error').show();
-							//console.log("error occured while posting data" + data);
-							$("#listSurveilance").hideLoading();
-						},
-							dataType: "text"
+					error: function(data){
+						$("#ajaxFlashMsg").html("Error occured while deleting data");
+						$("#ajaxFlashMsgWrapper").attr('class', 'flash-error').show();
+						//console.log("error occured while posting data" + data);
+						$("#listSurveilance").hideLoading();
+					},
+					dataType: "text"
 				});
-		},
+			},
 			"Cancel" : function() {
 				$(this).dialog("close");
 			}
-	});
-}
+		});
+		$("#deleteBox").dialog("open");
+	}
+});
+
 	</script>
 
 <div id="listSurveilance" width="100%">

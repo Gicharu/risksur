@@ -117,17 +117,8 @@
 			// format datatable data
 			foreach ($surveillanceList as $sur) {
 				//if (Yii::app()->user->name != $valu['userName']) {
-				$editButton = "<button id='editComponent" . $sur->frameworkId .
-					"' type='button' class='bedit' onclick=\"window.location.href ='" .
-					$this->createUrl('context/update/', array(
-							'contextId' => $sur->frameworkId
-						)
-					) .
-					"'\">Edit</button>";
-				$deleteButton = "<button id='deleteDesign" . $sur->frameworkId .
-					"' type='button' class='bdelete' onclick=\"$('#deleteBox').dialog('open');" .
-					"deleteConfirm('" . $sur->name . "', '" .
-					$sur->frameworkId . "')\">Remove</button>";
+				$editButton = '<button type="button" class="bedit">Edit</button>';
+				$deleteButton = '<button type="button" class="bdelete">Remove</button>';
 				//}
 				$surveillanceListArray[] = array(
 					'frameworkId' => $sur->frameworkId,

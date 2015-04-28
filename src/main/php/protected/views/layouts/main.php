@@ -68,30 +68,30 @@
 	<script type="text/javascript">
 
 //function to add call deletebox 
-function deleteConfirm(formName,confValue){
-	$('#deleteBox').html("<p><?php echo Yii::t('translation', 'Are you sure you want to delete')?> '" + confValue + "' </p>");
-
-	$("#deleteBox").dialog('option', 'buttons', {
-		"Confirm" : function() {
-			$('form#' + formName).submit();
-		},
-			"Cancel" : function() {
-				$(this).dialog("close");
-			}
-	});
-}
-function disableConfirm(formName,confValue){
-	$('#deleteBox').html("<p><?php echo Yii::t('translation', 'Are you sure you want to delete')?> '" + confValue + "' </p>");
-
-	$("#deleteBox").dialog('option', 'buttons', {
-		"Confirm" : function() {
-			$('form#' + formName).submit();
-		},
-			"Cancel" : function() {
-				$(this).dialog("close");
-			}
-	});
-}
+//function deleteConfirm(formName,confValue){
+//	$('#deleteBox').html("<p><?php //echo Yii::t('translation', 'Are you sure you want to delete')?>// '" + confValue + "' </p>");
+//
+//	$("#deleteBox").dialog('option', 'buttons', {
+//		"Confirm" : function() {
+//			$('form#' + formName).submit();
+//		},
+//			"Cancel" : function() {
+//				$(this).dialog("close");
+//			}
+//	});
+//}
+//function disableConfirm(formName,confValue){
+//	$('#deleteBox').html("<p><?php //echo Yii::t('translation', 'Are you sure you want to delete')?>// '" + confValue + "' </p>");
+//
+//	$("#deleteBox").dialog('option', 'buttons', {
+//		"Confirm" : function() {
+//			$('form#' + formName).submit();
+//		},
+//			"Cancel" : function() {
+//				$(this).dialog("close");
+//			}
+//	});
+//}
 // new design function
 function addNewDesign() {
 	var data=$("#newDesignForm").serialize();
@@ -142,9 +142,6 @@ $(function(){
 	$(".dateinput")
 		.addClass(
 			"ui-inputfield ui-widget ui-state-default ui-corner-all hasDatepicker");
-	$('#btnAdminVerify').on('click', function() {
-		window.location.href = '<?php echo CController::createUrl("admin/verify"); ?>';
-	});
 
 <?php
 	//print_r(Yii::app()->user->isGuest);
@@ -191,17 +188,13 @@ function MM_openBrWindow(theURL,winName,features) { //v2.0
 </head>
 
 <body>
-<div id="deleteBox" title="Delete Confirmation">
+<div id="deleteBox" title="Delete Confirmation" style="display:none">
 	<p><?php echo Yii::t("translation", "Delete")?></p>
-</div> 
-	<div id="sendBox" title="Confirm Status Change">
+</div>
+<div id="sendBox" title="Confirm Status Change">
 	<p><?php echo Yii::t("translation", "Disable")?></p>
 </div>
-<!-- ALSO THIS IS NOT REQUIRED
-<div id="sendBox" title="Send Password Confirmation">
-	<p>Send</p>
-</div> 
--->
+
 <div id="doc3">
 <!--<div class="container" id="page">-->
 <?php
@@ -223,43 +216,9 @@ if (!Yii::app()->user->isGuest) {
 	));
 ?>
 			</li>
-			<li>
-<?php
-//echo CHtml::htmlButton(Yii::t('translation', 'User Preferences'), array(
-//		'submit' => array(
-//			'admin/preferences'
-//		),
-//		'type' => 'button',
-//		'id' => 'btnUserPreferences'
-//	)
-//);
-?>				
 
-			</li>
-			<li>
-<?php
-$msg = 0;
-//echo (Yii::app()->rbac->checkAccess("admin", "verify", Yii::app()->user->name, $msg)) ? CHtml::htmlButton(Yii::t('translation', 'Verify Modules'), array(
-		//'type' => 'button',
-		//'id' => 'btnAdminVerify'
-	//)) : "";
 
-?>
-			</li>
-			<li>
-<?php
 
-//echo (Yii::app()->rbac->checkAccess("admin", "upgrade", Yii::app()->user->name, $msg)) ? 
-//CHtml::htmlButton(Yii::t('translation', 'Upgrade Configuration'), array(
-		//'submit' => array(
-			//'admin/upgrade'
-		//),
-		//'type' => 'button',
-		//'id' => 'btnUpgradeConfig'
-	//)) : "";
-
-?>
-			</li>
 			<li id="userName">
 				<div title="<?php echo Yii::app()->user->name;?>"><?php echo Yii::app()->user->name;?></div>
 			</li>
