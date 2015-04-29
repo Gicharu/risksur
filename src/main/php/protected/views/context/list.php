@@ -1,6 +1,6 @@
 <script type="text/javascript">
 $(function(){
-	slist = $("<?php echo '#surveillanceList'; ?>").dataTable({
+	slist = $("#surveillanceList").dataTable({
 		"sDom": '<"H"rlTf>t<"F"ip>',
 		"oTableTools": {
 		"sSwfPath": "<?php echo Yii::app()->request->baseUrl; ?>/js/copy_csv_xls_pdf.swf",

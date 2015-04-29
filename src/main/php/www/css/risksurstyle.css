@@ -1481,5 +1481,13 @@ tr.tabular-input td input, tr.tabular-input td textarea, tr.tabular-input td sel
 	    width: 75% !important;
 	}
 }
-
+div.contentLeft, div.contentRight {
+    float: left;
+}
+div.contentLeft {
+    width: 40%;
+}
+div.contentRight {
+    width: 50%;
+}
 

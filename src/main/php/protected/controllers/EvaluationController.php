@@ -12,7 +12,15 @@
 class EvaluationController extends Controller {
 	const LOG_CAT = "ctrl.EvaluationController";
 	public $layout = '//layouts/column2';
+	private $frameworkId;
 
+	/**
+	 * init
+	 */
+	public function init() {
+		$this->frameworkId = isset(Yii::app()->session['surDesign']['id']) ?
+			Yii::app()->session['surDesign']['id'] : null;
+	}
 	/**
 	 * actionIndex 
 	 * 
@@ -183,19 +191,25 @@ class EvaluationController extends Controller {
 	 */
 	public function actionAddEvaContext() {
 		Yii::log("actionAddEvaContext called", "trace", self::LOG_CAT);
+		if (empty(Yii::app()->session['surDesign'])) {
+			Yii::log('No surveillance system selected! redirecting to evaluation/index', 'trace', self::LOG_CAT);
+			Yii::app()->user->setFlash('notice', 'Please select a surveillance system first');
+			return $this->redirect(array('index'));
+
+		}
 		$evaluationHeader = new EvaluationHeader('create');
 		$evaluationDetails = new EvaluationDetails;
+		$this->frameworkId = Yii::app()->session['surDesign']['id'];
 		$dataArray = array();
 		$dataArray['formType'] = 'Create';
 
-		$returnArray = self::getElementsAndDynamicAttributes(array("frameworkId" => '2'));
-		$elements = $returnArray['elements'];
 		$model = new DynamicForm();
+		//print_r(FrameworkContext::model()->getFrameworkSummary($this->frameworkId)); die;
+		$returnArray = self::getElementsAndDynamicAttributes(array("frameworkId" => $this->frameworkId));
+		$elements = $returnArray['elements'];
 		//print_r($returnArray); die();
 		$model->_dynamicFields = $returnArray['dynamicDataAttributes'];
-		if (!empty(Yii::app()->session['surDesign'])) {
-			$model->frameworkId = Yii::app()->session['surDesign']['id'];
-		}
+		$model->frameworkId = Yii::app()->session['surDesign']['id'];
 		// generate the elements form
 		$form = new CForm($elements, $model);
 		//validate and save the evaluation data
@@ -256,6 +270,50 @@ class EvaluationController extends Controller {
 			'dataArray' => $dataArray,
 			'form' => $form
 		));
+	}
+
+	/**
+	 * @internal param $frameworkId
+	 * @return string
+	 */
+	public function actionGetSurveillanceSummary() {
+		$surveilanceRs = Yii::app()->db->createCommand()
+			->select('ff.inputName, ffd.value')
+			->from('frameworkHeader fh')
+			->join('frameworkFieldData ffd', 'fh.frameworkId=ffd.frameworkId')
+			->join('frameworkFields ff', 'ffd.frameworkFieldId=ff.Id')
+			->where('fh.frameworkId=:id', array(':id' => $this->frameworkId))
+			->queryAll();
+
+		$componentsRs = Yii::app()->db->createcommand()
+			->select('ch.componentName, cd.value, sfd.inputName')
+			->from('componentHead ch')
+			->join('componentDetails cd', 'ch.componentId=cd.componentId')
+			->join('surFormDetails sfd', 'cd.subFormId=sfd.subFormId')
+			->where('ch.frameworkId=:id', array(':id' => $this->frameworkId))
+			->queryAll();
+		$components = array();
+		foreach($componentsRs as $component) {
+			if (!isset($components[$component['componentName']])) {
+				$components[$component['componentName']] = '<li><b>' .
+					$component['componentName'] . '</b></li>';
+				$components[$component['componentName']] .= '<li>' . $component['inputName'] . ': '.
+					$component['value'] . '</li>';
+				continue;
+			}
+			$components[$component['componentName']] .= '<li>' . $component['inputName'] . ': '.
+				$component['value'] . '</li>';
+
+		}
+			//print_r(array('inputName' => 'Component', 'value' => array_values($components))); die;
+		array_push($surveilanceRs, array(
+			'inputName' => 'Components',
+			'value' => array_values($components)));
+//print_r(json_encode(array("aaData" => $surveilanceRs))); die;
+		echo json_encode(array("aaData" => $surveilanceRs));
+		return;
+
+
 	}
 
 		/**
@@ -345,7 +403,7 @@ class EvaluationController extends Controller {
 	 * 
 	 * @param array $componentData 
 	 * @access public
-	 * @return void
+	 * @return array
 	 */
 	public function getElementsAndDynamicAttributes($componentData = array()) {
 		$elements = array();
