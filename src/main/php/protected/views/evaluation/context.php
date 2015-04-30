@@ -19,12 +19,17 @@
 					"sPaginationType": "buttons_input",
 					"iDisplayLength": 10,
 					"bLengthChange": false,
-					"bFilter": false
-				})
-			})
+					"bFilter": false,
+					"oLanguage": {
+						"sZeroRecords": "No surveillance system summary available"
+					}
+				});
+			});
 		</script>
 	</div>
 	<div class="contentRight">
+		<div class="ui-widget-header ui-widget-content ui-corner-all widgetHead">
+			Summary of the surveillance system</div>
 		<table id="surSummary" cellspacing="0" width="100%">
 			<thead>
 			<tr>

@@ -191,15 +191,15 @@ class EvaluationController extends Controller {
 	 */
 	public function actionAddEvaContext() {
 		Yii::log("actionAddEvaContext called", "trace", self::LOG_CAT);
-		if (empty(Yii::app()->session['surDesign'])) {
-			Yii::log('No surveillance system selected! redirecting to evaluation/index', 'trace', self::LOG_CAT);
+		if (is_null($this->frameworkId)) {
+			Yii::log('No surveillance system selected! redirecting to context/list', 'trace', self::LOG_CAT);
 			Yii::app()->user->setFlash('notice', 'Please select a surveillance system first');
-			return $this->redirect(array('index'));
+			return $this->redirect(array('context/list'));
 
 		}
 		$evaluationHeader = new EvaluationHeader('create');
 		$evaluationDetails = new EvaluationDetails;
-		$this->frameworkId = Yii::app()->session['surDesign']['id'];
+		//$this->frameworkId = Yii::app()->session['surDesign']['id'];
 		$dataArray = array();
 		$dataArray['formType'] = 'Create';
 
@@ -209,11 +209,12 @@ class EvaluationController extends Controller {
 		$elements = $returnArray['elements'];
 		//print_r($returnArray); die();
 		$model->_dynamicFields = $returnArray['dynamicDataAttributes'];
-		$model->frameworkId = Yii::app()->session['surDesign']['id'];
+		$model->frameworkId = $this->frameworkId;
 		// generate the elements form
 		$form = new CForm($elements, $model);
 		//validate and save the evaluation data
-		//print_r($form->model); die();
+		//print_r($form->elements['frameworkId']); die();
+		$form->elements['frameworkId']->options = array($this->frameworkId => array('selected' => true));
 		if ($form->submitted('DynamicForm') && $form->validate()) {
 			$evaluationHeader->evaluationName = $form->model->evaluationName;
 			$evaluationHeader->frameworkId = $form->model->frameworkId;
@@ -293,22 +294,25 @@ class EvaluationController extends Controller {
 			->where('ch.frameworkId=:id', array(':id' => $this->frameworkId))
 			->queryAll();
 		$components = array();
-		foreach($componentsRs as $component) {
-			if (!isset($components[$component['componentName']])) {
-				$components[$component['componentName']] = '<li><b>' .
-					$component['componentName'] . '</b></li>';
+		if(!empty($componentsRs)) {
+			foreach($componentsRs as $component) {
+				if (!isset($components[$component['componentName']])) {
+					$components[$component['componentName']] = '<li><b>' .
+						$component['componentName'] . '</b></li>';
+					$components[$component['componentName']] .= '<li>' . $component['inputName'] . ': '.
+						$component['value'] . '</li>';
+					continue;
+				}
 				$components[$component['componentName']] .= '<li>' . $component['inputName'] . ': '.
 					$component['value'] . '</li>';
-				continue;
+
 			}
-			$components[$component['componentName']] .= '<li>' . $component['inputName'] . ': '.
-				$component['value'] . '</li>';
+			array_push($surveilanceRs, array(
+				'inputName' => 'Components',
+				'value' => array_values($components)));
 
 		}
 			//print_r(array('inputName' => 'Component', 'value' => array_values($components))); die;
-		array_push($surveilanceRs, array(
-			'inputName' => 'Components',
-			'value' => array_values($components)));
 //print_r(json_encode(array("aaData" => $surveilanceRs))); die;
 		echo json_encode(array("aaData" => $surveilanceRs));
 		return;

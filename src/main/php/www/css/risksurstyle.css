@@ -1490,4 +1490,8 @@ div.contentLeft {
 div.contentRight {
     width: 50%;
 }
-
+div.widgetHead {
+    font-size: large;
+    margin-bottom: 0.3em;
+    text-align: center;
+}
