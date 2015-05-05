@@ -182,7 +182,39 @@ class EvaluationController extends Controller {
 		echo json_encode(array());
 	}
 
+	/**
+	 * @return string
+	 */
+	public function actionSelectEvaQuestion() {
+		return $this->render('selectEvaQuestion');
+	}
 
+	public function actionEvalQuestionList() {
+		$this->pageTitle = 'Select evaluation question';
+		if(!empty($_POST)) {
+			print_r($_POST); die;
+		}
+		$model = new EvaluationQuestion();
+		$questionsRs =$model->findAll('parentQuestion is null');
+		$elements = ContextController::getDefaultElements();
+		$elements['title'] = '<h3>Evaluation question pick list </h3>';
+		$elements['elements'] = array(
+			'question' => array(
+				'type' => 'radiolist',
+				'separator' => '<br>',
+				'labelOptions'=>array('style'=>'display:inline'),
+				'style' => 'width:0.2em;',
+				'template'=>'<span class="rb">{input} {label}</span>',
+				'items' => CHtml::listData($questionsRs, 'evalQuestionId', 'question')
+			)
+		);
+		$elements['buttons'] = ContextController::getButtons(array("name" => "save", "label" => 'Next'),
+			'evaluation/evalQuestionList');
+		unset($elements['buttons']['cancel']);
+		$form = new CForm($elements, $model);
+//		print_r($form['question']); die;
+		$this->render('evaQuestionList', array('form' => $form));
+	}
 	/**
 	 * actionAddEvaContext 
 	 * 
