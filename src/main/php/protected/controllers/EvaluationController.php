@@ -191,8 +191,10 @@ class EvaluationController extends Controller {
 
 	public function actionEvalQuestionList() {
 		$this->pageTitle = 'Select evaluation question';
-		if(!empty($_POST)) {
-			print_r($_POST); die;
+		if(!empty($_POST['EvaluationQuestion']['question'])) {
+			Yii::app()->session['evalQuestion'] = $_POST['EvaluationQuestion']['question'];
+			//print_r(Yii::app()->session['evalQuestion']); die;
+			return $this->redirect('econEval');
 		}
 		$model = new EvaluationQuestion();
 		$questionsRs =$model->findAll('parentQuestion is null');

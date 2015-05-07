@@ -476,7 +476,7 @@
 		 * @param mixed $errorDisplay 
 		 * @static
 		 * @access public
-		 * @return void
+		 * @return array
 		 */
 		public static function getDefaultElements($errorDisplay = true) {
 			$errorParams = array(
