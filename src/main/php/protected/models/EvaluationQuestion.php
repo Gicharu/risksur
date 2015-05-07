@@ -38,7 +38,7 @@ class EvaluationQuestion extends CActiveRecord {
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
-			'evalQuestionOptions' => array(self::HAS_MANY, 'EvalQuestionOptions', 'evalQuestionId'),
+			'evalQuestionAnswers' => array(self::HAS_MANY, 'EvalQuestionAnswers', 'evalQuestionId'),
 		);
 	}
 

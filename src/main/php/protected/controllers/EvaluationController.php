@@ -21,6 +21,28 @@ class EvaluationController extends Controller {
 		$this->frameworkId = isset(Yii::app()->session['surDesign']['id']) ?
 			Yii::app()->session['surDesign']['id'] : null;
 	}
+
+	/**
+	 * @param CAction $action
+	 * @return bool
+	 */
+//	public function beforeAction($action) {
+//		$this->attachBehavior('wizard', array(
+//			'class' => 'application.extensions.WizardBehavior.WizardBehavior',
+//			'steps'=>array('Select question wizard'),
+//			'events'=>array(
+//				'onStart'=>'wizardStart',
+//				'onProcessStep'=>'evaWizardProcessStep',
+//				'onFinished'=>'wizardFinished',
+//				'onInvalidStep'=>'evaQuestionWizard',
+//				'onSaveDraft'=>'wizardSaveDraft'
+//			),
+//			'menuLastItem'=>'Select Question'
+//			)
+//		);
+//		//print_r($action); die;
+//		return parent::beforeAction($action);
+//	}
 	/**
 	 * actionIndex 
 	 * 
@@ -186,11 +208,12 @@ class EvaluationController extends Controller {
 	 * @return string
 	 */
 	public function actionSelectEvaQuestion() {
+		$this->setPageTitle('Select evaluation question');
 		return $this->render('selectEvaQuestion');
 	}
 
 	public function actionEvalQuestionList() {
-		$this->pageTitle = 'Select evaluation question';
+		$this->setPageTitle('Select evaluation question');
 		if(!empty($_POST['EvaluationQuestion']['question'])) {
 			Yii::app()->session['evalQuestion'] = $_POST['EvaluationQuestion']['question'];
 			//print_r(Yii::app()->session['evalQuestion']); die;
@@ -216,6 +239,84 @@ class EvaluationController extends Controller {
 		$form = new CForm($elements, $model);
 //		print_r($form['question']); die;
 		$this->render('evaQuestionList', array('form' => $form));
+	}
+
+	public function actionEvaQuestionWizard() {
+		$model = new EvaluationQuestion();
+		$elements = ContextController::getDefaultElements();
+		if(empty($_POST['EvaluationQuestion'])) {
+			$questions = $model->with('evalQuestionAnswers')->findAll("flag='primary'");
+			//print_r($questions[0]['evalQuestionAnswers']); die;
+
+		} else {
+			//print_r($_POST); die;
+			$questionId = $_POST['EvaluationQuestion']['question'];
+			$questions = $model->with('evalQuestionAnswers')->findAllByPk($questionId);
+			//print_r($questions); die;
+		}
+		$elements['elements'] = array(
+			'<h3>' . $questions[0]->question . '</h3>',
+			'question' => array(
+				'type' => 'radiolist',
+				'style' => 'width:0.2em;',
+				'labelOptions' => array('style' => 'display:inline'),
+				'items' => CHtml::listData($questions[0]['evalQuestionAnswers'], 'nextQuestion', 'optionName')
+			)
+		);
+		$elements['buttons'] = array(
+			'back' => array(
+				'type'    => 'button',
+				'label'   => 'Back',
+				'onClick' => 'history.go(-1)',
+				//'class' => 'ui-button ui-arrowthick-1-w'
+			),
+			'submit' => array(
+				'type'  => 'submit',
+				'label' => 'Next',
+				//'class' => 'ui-button ui-arrowthick-1-e'
+
+		)
+		);
+		$form = new CForm($elements, $model);
+
+		// Note that we also allow sumission via the Save button
+//		if ($form->submitted() && $form->validate()) {
+//
+//		} else {
+//		}
+		$this->render('evalQuestion', compact('form'));
+	}
+
+	public function wizardStart($event) {
+		$event->handled = true;
+	}
+
+	public function evaWizardProcessStep($event) {
+		//print_r($_POST); die;
+
+
+		$form = new CForm($elements, $model);
+
+		// Note that we also allow sumission via the Save button
+		if (($form->submitted() || $form->submitted('save_draft')) && $form->validate()) {
+			$event->sender->save($model->attributes);
+			$event->handled = true;
+		} else {
+			$this->render('evalQuestion', compact('event', 'form'));
+		}
+	}
+
+	public function wizardFinished($event) {
+		if ($event->step === true) {
+//			$this->render('wizardComplete', compact('event'));
+			$this->redirect('evalQuestionList');
+		} else {
+			$this->redirect('evalQuestionList');
+//			$this->render('wizardComplete', compact('event'));
+		}
+
+		$event->sender->reset();
+		Yii::app()->end();
 	}
 	/**
 	 * actionAddEvaContext 
