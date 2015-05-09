@@ -14,7 +14,6 @@
 		$(".rb:odd").each(function(){
 			$(this).addClass('odd');
 		});
-		$('.rb label').css('margin', '6em 0.2em');
 	});
 </script>
 <div class="form">
