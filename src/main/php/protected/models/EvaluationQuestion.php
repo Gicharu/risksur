@@ -86,4 +86,19 @@ class EvaluationQuestion extends CActiveRecord {
 	public static function model($className = __CLASS__) {
 		return parent::model($className);
 	}
+
+	/**
+	 * @param $model
+	 * @return array
+	 */
+	public function getItems($model) {
+		$items = array();
+		foreach($model as $item) {
+			if(empty($item->url)) {
+				$items[$item->nextQuestion] = $item->optionName;
+			}
+		}
+		//print_r($items); die;
+		return $items;
+	}
 }

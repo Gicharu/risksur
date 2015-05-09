@@ -212,7 +212,7 @@ class EvaluationController extends Controller {
 		return $this->render('selectEvaQuestion');
 	}
 
-	public function actionEvalQuestionList() {
+	public function actionEvalQuestionList($questionId = '') {
 		$this->setPageTitle('Select evaluation question');
 		if(!empty($_POST['EvaluationQuestion']['question'])) {
 			Yii::app()->session['evalQuestion'] = $_POST['EvaluationQuestion']['question'];
@@ -220,7 +220,7 @@ class EvaluationController extends Controller {
 			return $this->redirect('econEval');
 		}
 		$model = new EvaluationQuestion();
-		$questionsRs =$model->findAll('parentQuestion is null');
+		$questionsRs = $model->findAll('parentQuestion is null');
 		$elements = ContextController::getDefaultElements();
 		$elements['title'] = '<h3>Evaluation question pick list </h3>';
 		$elements['elements'] = array(
@@ -236,14 +236,19 @@ class EvaluationController extends Controller {
 		$elements['buttons'] = ContextController::getButtons(array("name" => "save", "label" => 'Next'),
 			'evaluation/evalQuestionList');
 		unset($elements['buttons']['cancel']);
+		if(!empty($questionId)) {
+			$model->question = $questionId;
+		}
 		$form = new CForm($elements, $model);
 //		print_r($form['question']); die;
 		$this->render('evaQuestionList', array('form' => $form));
 	}
 
 	public function actionEvaQuestionWizard() {
+		$this->setPageTitle('Evaluation question wizard');
 		$model = new EvaluationQuestion();
 		$elements = ContextController::getDefaultElements();
+		$questionId = '';
 		if(empty($_POST['EvaluationQuestion'])) {
 			$questions = $model->with('evalQuestionAnswers')->findAll("flag='primary'");
 			//print_r($questions[0]['evalQuestionAnswers']); die;
@@ -254,15 +259,31 @@ class EvaluationController extends Controller {
 			$questions = $model->with('evalQuestionAnswers')->findAllByPk($questionId);
 			//print_r($questions); die;
 		}
+		if(!empty($questions[0]->flag) && 'final' == $questions[0]->flag) {
+			Yii::app()->user->setFlash('success', 'A question has been selected as per your previous choices');
+			$this->redirect(array('evaluation/evalQuestionList', 'questionId' => $questionId));
+		}
+		$link = '';
+		//var_dump($questions[0]['evalQuestionAnswers'], 'fdsf'); //die;
+		foreach($questions[0]['evalQuestionAnswers'] as $answerKey => $answer) {
+			if(!empty($answer->url)) {
+				$link = CHtml::link($answer->optionName, $this->createUrl($answer->url));
+				//$questions[0]['evalQuestionAnswers'][$answerKey]->unsetAttributes();
+			}
+		}
 		$elements['elements'] = array(
 			'<h3>' . $questions[0]->question . '</h3>',
 			'question' => array(
 				'type' => 'radiolist',
 				'style' => 'width:0.2em;',
 				'labelOptions' => array('style' => 'display:inline'),
-				'items' => CHtml::listData($questions[0]['evalQuestionAnswers'], 'nextQuestion', 'optionName')
+				'items' => $model->getItems($questions[0]['evalQuestionAnswers'])
 			)
 		);
+		if(!empty($link)) {
+			array_push($elements['elements'], $link);
+		}
+		//print_r($questions[0]['evalQuestionAnswers']); die('pooop');
 		$elements['buttons'] = array(
 			'back' => array(
 				'type'    => 'button',
@@ -275,7 +296,7 @@ class EvaluationController extends Controller {
 				'label' => 'Next',
 				//'class' => 'ui-button ui-arrowthick-1-e'
 
-		)
+			)
 		);
 		$form = new CForm($elements, $model);
 
