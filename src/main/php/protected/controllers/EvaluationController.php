@@ -22,27 +22,7 @@ class EvaluationController extends Controller {
 			Yii::app()->session['surDesign']['id'] : null;
 	}
 
-	/**
-	 * @param CAction $action
-	 * @return bool
-	 */
-//	public function beforeAction($action) {
-//		$this->attachBehavior('wizard', array(
-//			'class' => 'application.extensions.WizardBehavior.WizardBehavior',
-//			'steps'=>array('Select question wizard'),
-//			'events'=>array(
-//				'onStart'=>'wizardStart',
-//				'onProcessStep'=>'evaWizardProcessStep',
-//				'onFinished'=>'wizardFinished',
-//				'onInvalidStep'=>'evaQuestionWizard',
-//				'onSaveDraft'=>'wizardSaveDraft'
-//			),
-//			'menuLastItem'=>'Select Question'
-//			)
-//		);
-//		//print_r($action); die;
-//		return parent::beforeAction($action);
-//	}
+	
 	/**
 	 * actionIndex 
 	 * 
@@ -308,37 +288,7 @@ class EvaluationController extends Controller {
 		$this->render('evalQuestion', compact('form'));
 	}
 
-	public function wizardStart($event) {
-		$event->handled = true;
-	}
 
-	public function evaWizardProcessStep($event) {
-		//print_r($_POST); die;
-
-
-		$form = new CForm($elements, $model);
-
-		// Note that we also allow sumission via the Save button
-		if (($form->submitted() || $form->submitted('save_draft')) && $form->validate()) {
-			$event->sender->save($model->attributes);
-			$event->handled = true;
-		} else {
-			$this->render('evalQuestion', compact('event', 'form'));
-		}
-	}
-
-	public function wizardFinished($event) {
-		if ($event->step === true) {
-//			$this->render('wizardComplete', compact('event'));
-			$this->redirect('evalQuestionList');
-		} else {
-			$this->redirect('evalQuestionList');
-//			$this->render('wizardComplete', compact('event'));
-		}
-
-		$event->sender->reset();
-		Yii::app()->end();
-	}
 	/**
 	 * actionAddEvaContext 
 	 * 
