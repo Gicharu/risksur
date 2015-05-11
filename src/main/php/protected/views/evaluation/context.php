@@ -2,9 +2,7 @@
 	<h3><?php echo $dataArray['formType']; ?> Evaluation Context</h3>
 	<div class="contentLeft">
 		<div class="form">
-			<?php
-			echo $form->render();
-			?>
+			<?= $form->render(); ?>
 		</div>
 		<script type="text/javascript">
 			$(document).ready(function() {
