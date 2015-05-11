@@ -327,28 +327,22 @@ class EvaluationController extends Controller {
 			->join('surFormDetails sfd', 'cd.subFormId=sfd.subFormId')
 			->where('ch.frameworkId=:id', array(':id' => $this->frameworkId))
 			->queryAll();
-		$components = array();
+		$components = '<ul>';
 		if(!empty($componentsRs)) {
 			foreach($componentsRs as $component) {
-				if (!isset($components[$component['componentName']])) {
-					$components[$component['componentName']] = '<li><b>' .
-						$component['componentName'] . '</b></li>';
-					$components[$component['componentName']] .= '<li>' . $component['inputName'] . ': '.
-						$component['value'] . '</li>';
-					continue;
-				}
-				$components[$component['componentName']] .= '<li>' . $component['inputName'] . ': '.
+				$components .= '<li><b>' . $component['inputName'] . '</b>: '.
 					$component['value'] . '</li>';
-
 			}
+			//print_r($components); die;
 			array_push($surveilanceRs, array(
 				'inputName' => 'Components',
-				'value' => array_values($components)));
+				'value' => $components));
 
 		}
+		$components .= '</ul>';
 			//print_r(array('inputName' => 'Component', 'value' => array_values($components))); die;
 //print_r(json_encode(array("aaData" => $surveilanceRs))); die;
-		echo json_encode(array("aaData" => $surveilanceRs));
+		echo json_encode(array("aaData" => $surveilanceRs), JSON_UNESCAPED_SLASHES);
 		return;
 
 

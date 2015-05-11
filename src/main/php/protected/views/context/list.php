@@ -91,14 +91,14 @@ $(function(){
 		var name = aData['name'];
 		switch(event.data.action) {
 			case "edit":
-				window.location.href = '<?php echo $this->createUrl("context/update"); ?>' +
+				window.location.href = '<?php echo $this->createUrl("update"); ?>' +
 				"/contextId/" + frameworkId;
 				break;
 			case 'delete':
 				deleteConfirm(name, frameworkId);
 				break;
 			default:
-				window.location.href = '<?php echo $this->createUrl("context/view"); ?>' +
+				window.location.href = '<?php echo $this->createUrl("view"); ?>' +
 				"/contextId/" + frameworkId;
 		}
 

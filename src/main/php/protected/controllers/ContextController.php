@@ -288,7 +288,8 @@
 			if (isset($_GET['contextId'])) {
 				//fetch the form data
 				$model = FrameworkContext::model()->findByPk($_GET['contextId']);
-				if ($model === null) {
+				//print_r($model); die;
+				if (!$model->frameworkId) {
 					Yii::app()->user->setFlash('error', Yii::t("translation", "The selected system does not exist"));
 					$this->redirect(array('context/list'));
 					return;
@@ -395,7 +396,7 @@
 
 					if (!$error) {
 						Yii::app()->user->setFlash('success', 'Surveillance context updated successfully');
-						$this->redirect('list');
+						$this->redirect(array('context/list'));
 						return;
 					}
 					//$frameworkFieldDataModel->setIsNewRecord(true);
