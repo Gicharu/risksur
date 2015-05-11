@@ -166,6 +166,7 @@ class EvaluationController extends Controller {
 
 	public function actionEvaMethods() {
 		Yii::log("actionEvaMethods called", "trace", self::LOG_CAT);
+		$this->setPageTitle(Yii::app()->name . ' - Economic evaluation methods');
 		$dataProvider = new CActiveDataProvider('EvaMethods');
 		//print_r($dataProvider->getData()); die;
 		$this->render('evaMethods', array('dataProvider' => $dataProvider));
