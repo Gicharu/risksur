@@ -1495,3 +1495,16 @@ div.widgetHead {
     margin-bottom: 0.3em;
     text-align: center;
 }
+span.rb {
+    display: inline-block;
+    line-height: 2.2em;
+    width: 100%;
+}
+span.rb input {
+    float: left;
+}
+span.rb label {
+    display:inline-block;
+    float: left;
+    width: 80%;
+}

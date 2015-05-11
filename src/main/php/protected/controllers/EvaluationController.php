@@ -21,6 +21,8 @@ class EvaluationController extends Controller {
 		$this->frameworkId = isset(Yii::app()->session['surDesign']['id']) ?
 			Yii::app()->session['surDesign']['id'] : null;
 	}
+
+	
 	/**
 	 * actionIndex 
 	 * 
@@ -186,25 +188,26 @@ class EvaluationController extends Controller {
 	 * @return string
 	 */
 	public function actionSelectEvaQuestion() {
+		$this->setPageTitle('Select evaluation question');
 		return $this->render('selectEvaQuestion');
 	}
 
-	public function actionEvalQuestionList() {
-		$this->pageTitle = 'Select evaluation question';
+	public function actionEvalQuestionList($questionId = '') {
+		$this->setPageTitle('Select evaluation question');
 		if(!empty($_POST['EvaluationQuestion']['question'])) {
 			Yii::app()->session['evalQuestion'] = $_POST['EvaluationQuestion']['question'];
 			//print_r(Yii::app()->session['evalQuestion']); die;
 			return $this->redirect('econEval');
 		}
 		$model = new EvaluationQuestion();
-		$questionsRs =$model->findAll('parentQuestion is null');
+		$questionsRs = $model->findAll('parentQuestion is null');
 		$elements = ContextController::getDefaultElements();
 		$elements['title'] = '<h3>Evaluation question pick list </h3>';
 		$elements['elements'] = array(
 			'question' => array(
 				'type' => 'radiolist',
 				'separator' => '<br>',
-				'labelOptions'=>array('style'=>'display:inline'),
+				//'labelOptions'=>array('style'=>'display:inline-block'),
 				'style' => 'width:0.2em;',
 				'template'=>'<span class="rb">{input} {label}</span>',
 				'items' => CHtml::listData($questionsRs, 'evalQuestionId', 'question')
@@ -213,10 +216,79 @@ class EvaluationController extends Controller {
 		$elements['buttons'] = ContextController::getButtons(array("name" => "save", "label" => 'Next'),
 			'evaluation/evalQuestionList');
 		unset($elements['buttons']['cancel']);
+		if(!empty($questionId)) {
+			$model->question = $questionId;
+		}
 		$form = new CForm($elements, $model);
 //		print_r($form['question']); die;
 		$this->render('evaQuestionList', array('form' => $form));
 	}
+
+	public function actionEvaQuestionWizard() {
+		$this->setPageTitle('Evaluation question wizard');
+		$model = new EvaluationQuestion();
+		$elements = ContextController::getDefaultElements();
+		$questionId = '';
+		if(empty($_POST['EvaluationQuestion'])) {
+			$questions = $model->with('evalQuestionAnswers')->findAll("flag='primary'");
+			//print_r($questions[0]['evalQuestionAnswers']); die;
+
+		} else {
+			//print_r($_POST); die;
+			$questionId = $_POST['EvaluationQuestion']['question'];
+			$questions = $model->with('evalQuestionAnswers')->findAllByPk($questionId);
+			//print_r($questions); die;
+		}
+		if(!empty($questions[0]->flag) && 'final' == $questions[0]->flag) {
+			Yii::app()->user->setFlash('success', 'A question has been selected as per your previous choices');
+			$this->redirect(array('evaluation/evalQuestionList', 'questionId' => $questionId));
+		}
+		$link = '';
+		//var_dump($questions[0]['evalQuestionAnswers'], 'fdsf'); //die;
+		foreach($questions[0]['evalQuestionAnswers'] as $answerKey => $answer) {
+			if(!empty($answer->url)) {
+				$link = CHtml::link($answer->optionName, $this->createUrl($answer->url));
+				//$questions[0]['evalQuestionAnswers'][$answerKey]->unsetAttributes();
+			}
+		}
+		$elements['elements'] = array(
+			'<h3>' . $questions[0]->question . '</h3>',
+			'question' => array(
+				'type' => 'radiolist',
+				'style' => 'width:0.2em;',
+				'labelOptions' => array('style' => 'display:inline'),
+				'items' => $model->getItems($questions[0]['evalQuestionAnswers'])
+			)
+		);
+		if(!empty($link)) {
+			array_push($elements['elements'], $link);
+		}
+		//print_r($questions[0]['evalQuestionAnswers']); die('pooop');
+		$elements['buttons'] = array(
+			'back' => array(
+				'type'    => 'button',
+				'label'   => 'Back',
+				'onClick' => 'history.go(-1)',
+				//'class' => 'ui-button ui-arrowthick-1-w'
+			),
+			'submit' => array(
+				'type'  => 'submit',
+				'label' => 'Next',
+				//'class' => 'ui-button ui-arrowthick-1-e'
+
+			)
+		);
+		$form = new CForm($elements, $model);
+
+		// Note that we also allow sumission via the Save button
+//		if ($form->submitted() && $form->validate()) {
+//
+//		} else {
+//		}
+		$this->render('evalQuestion', compact('form'));
+	}
+
+
 	/**
 	 * actionAddEvaContext 
 	 * 

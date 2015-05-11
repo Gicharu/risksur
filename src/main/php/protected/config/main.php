@@ -77,22 +77,22 @@ return CMap::mergeArray($configArray, array(
 		'application.extensions.TSettingsIni.*',
 		'application.extensions.TTMailer.*',
 		'application.extensions.Encryption.*',
-		//'application.extensions.LightOpenIdYii.*',
+//		'application.extensions.WizardBehaviour.*',
 		//'application.extensions.TKmlResource.*',
 		/*'application.extensions.timeout-dialog.*',*/
 		'application.controllers.*',
 	),
 	'modules' => array(
 		// uncomment the following to enable the Gii tool
-		 'gii' => array(
-		 	'class' => 'system.gii.GiiModule',
-		 	'password' => 'cdosh!',
-		 	// If removed, Gii defaults to localhost only. Edit carefully to taste.
-		 	'ipFilters' => array(
-		 		'127.0.0.1',
-		 		'::1'
-		 	),
-		 ),
+//		 'gii' => array(
+//		 	'class' => 'system.gii.GiiModule',
+//		 	'password' => 'cdosh!',
+//		 	// If removed, Gii defaults to localhost only. Edit carefully to taste.
+//		 	'ipFilters' => array(
+//		 		'127.0.0.1',
+//		 		'::1'
+//		 	),
+//		 ),
 	),
 	// application components
 	'components' => array(
