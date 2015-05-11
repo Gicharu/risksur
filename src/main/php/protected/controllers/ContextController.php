@@ -117,17 +117,8 @@
 			// format datatable data
 			foreach ($surveillanceList as $sur) {
 				//if (Yii::app()->user->name != $valu['userName']) {
-				$editButton = "<button id='editComponent" . $sur->frameworkId .
-					"' type='button' class='bedit' onclick=\"window.location.href ='" .
-					$this->createUrl('context/update/', array(
-							'contextId' => $sur->frameworkId
-						)
-					) .
-					"'\">Edit</button>";
-				$deleteButton = "<button id='deleteDesign" . $sur->frameworkId .
-					"' type='button' class='bdelete' onclick=\"$('#deleteBox').dialog('open');" .
-					"deleteConfirm('" . $sur->name . "', '" .
-					$sur->frameworkId . "')\">Remove</button>";
+				$editButton = '<button type="button" class="bedit">Edit</button>';
+				$deleteButton = '<button type="button" class="bdelete">Remove</button>';
 				//}
 				$surveillanceListArray[] = array(
 					'frameworkId' => $sur->frameworkId,
@@ -297,7 +288,8 @@
 			if (isset($_GET['contextId'])) {
 				//fetch the form data
 				$model = FrameworkContext::model()->findByPk($_GET['contextId']);
-				if ($model === null) {
+				//print_r($model); die;
+				if (!$model->frameworkId) {
 					Yii::app()->user->setFlash('error', Yii::t("translation", "The selected system does not exist"));
 					$this->redirect(array('context/list'));
 					return;
@@ -404,7 +396,7 @@
 
 					if (!$error) {
 						Yii::app()->user->setFlash('success', 'Surveillance context updated successfully');
-						$this->redirect('list');
+						$this->redirect(array('context/list'));
 						return;
 					}
 					//$frameworkFieldDataModel->setIsNewRecord(true);
@@ -485,7 +477,7 @@
 		 * @param mixed $errorDisplay 
 		 * @static
 		 * @access public
-		 * @return void
+		 * @return array
 		 */
 		public static function getDefaultElements($errorDisplay = true) {
 			$errorParams = array(

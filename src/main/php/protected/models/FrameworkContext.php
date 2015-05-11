@@ -86,4 +86,5 @@ class FrameworkContext extends CActiveRecord {
 			'description' => Yii::t('translation', 'Description of context'),
 		);
 	}
+
 }
