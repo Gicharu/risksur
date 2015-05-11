@@ -27,8 +27,8 @@ class EvalQuestionAnswers extends CActiveRecord {
 			array('evalQuestionId, optionName', 'required'),
 			array('evalQuestionId', 'length', 'max' => 11),
 			// The following rule is used by search().
-			// @todo Please remove those attributes that should not be searched.
-			array('id, evalQuestionId, optionName', 'safe', 'on' => 'search'),
+			// Please remove those attributes that should not be searched.
+			//array('id, evalQuestionId, optionName', 'safe', 'on' => 'search'),
 		);
 	}
 

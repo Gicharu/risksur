@@ -1,12 +1,12 @@
 <?php
+
 /**
- * EvaluationController 
- * 
+ * EvaluationController
  * @uses Controller
- * @package 
+ * @package
  * @version $id$
  * @copyright Tracetracker
- * @author Chirag Doshi <chirag@tracetracker.com> 
+ * @author Chirag Doshi <chirag@tracetracker.com>
  * @license Tracetracker {@link http://www.tracetracker.com}
  */
 class EvaluationController extends Controller {
@@ -22,66 +22,64 @@ class EvaluationController extends Controller {
 			Yii::app()->session['surDesign']['id'] : null;
 	}
 
-	
+
 	/**
-	 * actionIndex 
-	 * 
+	 * actionIndex
 	 * @access public
 	 * @return void
 	 */
 	public function actionIndex() {
 		Yii::log("actionIndex EvaluationController called", "trace", self::LOG_CAT);
 
-			$model = new EvaluationHeader;
-			$dataArray = array();
-			$dataArray['dtHeader'] = "Evaluation List";
-			$dataArray['evalList'] = json_encode(array());
+		$model = new EvaluationHeader;
+		$dataArray = array();
+		$dataArray['dtHeader'] = "Evaluation List";
+		$dataArray['evalList'] = json_encode(array());
 
-			// get list of evaluation
-			$evalList = EvaluationHeader::model()->with("designFrameworks")->findAll(array(
-				'condition' => 't.userId=:userId',
-				'params' => array(
-					':userId' => Yii::app()->user->id,
-				),
-			));
-			//print_r($evalList); die();
-			$evalListArray = array();
-			// format datatable data
-			foreach ($evalList as $eval) {
-				$deleteButton = "";
-				//if (Yii::app()->user->name != $valu['userName']) {
-				$deleteButton = "<button id='deleteDesign" . $eval->evalId .
-					"' type='button' class='bdelete' onclick=\"$('#deleteBox').dialog('open');" .
-					"deleteConfirm('" . $eval->evaluationName . "', '" .
-					$eval->evalId . "')\">Remove</button>";
-				//}
-				$evalListArray[] = array(
-					'evalId' => $eval->evalId,
-					'name' => $eval->evaluationName,
-					'userId' => $eval->userId,
-					'description' => $eval->evaluationDescription,
-					'design' => $eval->frameworkId,
-					'frameworkName' => $eval->designFrameworks->name,
-					//'frameworkName' => $eval->frameworkId,
-					'deleteButton' => $deleteButton
-				);
-			}
-			$dataArray['evalList'] = json_encode($evalListArray);
+		// get list of evaluation
+		$evalList = EvaluationHeader::model()->with("designFrameworks")->findAll(array(
+			'condition' => 't.userId=:userId',
+			'params'    => array(
+				':userId' => Yii::app()->user->id,
+			),
+		));
+		//print_r($evalList); die();
+		$evalListArray = array();
+		// format datatable data
+		foreach ($evalList as $eval) {
+			$deleteButton = "";
+			//if (Yii::app()->user->name != $valu['userName']) {
+			$deleteButton = "<button id='deleteDesign" . $eval->evalId .
+				"' type='button' class='bdelete' onclick=\"$('#deleteBox').dialog('open');" .
+				"deleteConfirm('" . $eval->evaluationName . "', '" .
+				$eval->evalId . "')\">Remove</button>";
+			//}
+			$evalListArray[] = array(
+				'evalId'        => $eval->evalId,
+				'name'          => $eval->evaluationName,
+				'userId'        => $eval->userId,
+				'description'   => $eval->evaluationDescription,
+				'design'        => $eval->frameworkId,
+				'frameworkName' => $eval->designFrameworks->name,
+				//'frameworkName' => $eval->frameworkId,
+				'deleteButton'  => $deleteButton
+			);
+		}
+		$dataArray['evalList'] = json_encode($evalListArray);
 
-			if (!empty($_GET['getEval'])) {
-				$jsonData = json_encode(array("aaData" => $evalListArray));
-				echo $jsonData;
-				return;
-			}
-			$this->render('index', array(
-				'model' => $model,
-				'dataArray' => $dataArray
-			));
+		if (!empty($_GET['getEval'])) {
+			$jsonData = json_encode(array("aaData" => $evalListArray));
+			echo $jsonData;
+			return;
+		}
+		$this->render('index', array(
+			'model'     => $model,
+			'dataArray' => $dataArray
+		));
 	}
 
 	/**
-	 * actionEvaToolPage 
-	 * 
+	 * actionEvaToolPage
 	 * @access public
 	 * @return void
 	 */
@@ -94,10 +92,10 @@ class EvaluationController extends Controller {
 		// check if the user has roles 1 or 2 - admin roles
 		$userRoles = UsersHasRoles::model()->findAll(array(
 			'condition' => 't.users_id = :users_id AND (t.roles_id = :roleA OR t.roles_id = :roleB)',
-			'params' => array(
+			'params'    => array(
 				':users_id' => $userId,
-				':roleA' => 1,
-				':roleB' => 2
+				':roleA'    => 1,
+				':roleB'    => 2
 			),
 		));
 		$editButton = false;
@@ -110,15 +108,14 @@ class EvaluationController extends Controller {
 		}
 
 		$this->render('evaPage', array(
-			'model' => $model,
+			'model'      => $model,
 			'editButton' => $editButton,
-			'editPage' => $editPage
+			'editPage'   => $editPage
 		));
 	}
 
 	/**
-	 * actionEvaConcept 
-	 * 
+	 * actionEvaConcept
 	 * @access public
 	 * @return void
 	 */
@@ -131,10 +128,10 @@ class EvaluationController extends Controller {
 		// check if the user has roles 1 or 2 - admin roles
 		$userRoles = UsersHasRoles::model()->findAll(array(
 			'condition' => 't.users_id = :users_id AND (t.roles_id = :roleA OR t.roles_id = :roleB)',
-			'params' => array(
+			'params'    => array(
 				':users_id' => $userId,
-				':roleA' => 1,
-				':roleB' => 2
+				':roleA'    => 1,
+				':roleB'    => 2
 			),
 		));
 		$editButton = false;
@@ -146,15 +143,14 @@ class EvaluationController extends Controller {
 			$editPage = true;
 		}
 		$this->render('evaConcept', array(
-			'model' => $model,
+			'model'      => $model,
 			'editButton' => $editButton,
-			'editPage' => $editPage
+			'editPage'   => $editPage
 		));
 	}
 
 	/**
-	 * actionSaveEvaPage 
-	 * 
+	 * actionSaveEvaPage
 	 * @access public
 	 * @return void
 	 */
@@ -169,8 +165,7 @@ class EvaluationController extends Controller {
 	}
 
 	/**
-	 * actionSaveEvaConcept 
-	 * 
+	 * actionSaveEvaConcept
 	 * @access public
 	 * @return void
 	 */
@@ -192,12 +187,17 @@ class EvaluationController extends Controller {
 		return $this->render('selectEvaQuestion');
 	}
 
+	/**
+	 * actionEvalQuestionList
+	 * @param string $questionId
+	 */
 	public function actionEvalQuestionList($questionId = '') {
 		$this->setPageTitle('Select evaluation question');
-		if(!empty($_POST['EvaluationQuestion']['question'])) {
+		if (!empty($_POST['EvaluationQuestion']['question'])) {
 			Yii::app()->session['evalQuestion'] = $_POST['EvaluationQuestion']['question'];
 			//print_r(Yii::app()->session['evalQuestion']); die;
-			return $this->redirect('econEval');
+			$this->redirect('econEval');
+			return;
 		}
 		$model = new EvaluationQuestion();
 		$questionsRs = $model->findAll('parentQuestion is null');
@@ -205,18 +205,18 @@ class EvaluationController extends Controller {
 		$elements['title'] = '<h3>Evaluation question pick list </h3>';
 		$elements['elements'] = array(
 			'question' => array(
-				'type' => 'radiolist',
+				'type'      => 'radiolist',
 				'separator' => '<br>',
 				//'labelOptions'=>array('style'=>'display:inline-block'),
-				'style' => 'width:0.2em;',
-				'template'=>'<span class="rb">{input} {label}</span>',
-				'items' => CHtml::listData($questionsRs, 'evalQuestionId', 'question')
+				'style'     => 'width:0.2em;',
+				'template'  => '<span class="rb">{input} {label}</span>',
+				'items'     => CHtml::listData($questionsRs, 'evalQuestionId', 'question')
 			)
 		);
 		$elements['buttons'] = ContextController::getButtons(array("name" => "save", "label" => 'Next'),
 			'evaluation/evalQuestionList');
 		unset($elements['buttons']['cancel']);
-		if(!empty($questionId)) {
+		if (!empty($questionId)) {
 			$model->question = $questionId;
 		}
 		$form = new CForm($elements, $model);
@@ -224,12 +224,15 @@ class EvaluationController extends Controller {
 		$this->render('evaQuestionList', array('form' => $form));
 	}
 
+	/**
+	 * actionEvaQuestionWizard
+	 */
 	public function actionEvaQuestionWizard() {
 		$this->setPageTitle('Evaluation question wizard');
 		$model = new EvaluationQuestion();
 		$elements = ContextController::getDefaultElements();
 		$questionId = '';
-		if(empty($_POST['EvaluationQuestion'])) {
+		if (empty($_POST['EvaluationQuestion'])) {
 			$questions = $model->with('evalQuestionAnswers')->findAll("flag='primary'");
 			//print_r($questions[0]['evalQuestionAnswers']); die;
 
@@ -239,14 +242,14 @@ class EvaluationController extends Controller {
 			$questions = $model->with('evalQuestionAnswers')->findAllByPk($questionId);
 			//print_r($questions); die;
 		}
-		if(!empty($questions[0]->flag) && 'final' == $questions[0]->flag) {
+		if (!empty($questions[0]->flag) && 'final' == $questions[0]->flag) {
 			Yii::app()->user->setFlash('success', 'A question has been selected as per your previous choices');
 			$this->redirect(array('evaluation/evalQuestionList', 'questionId' => $questionId));
 		}
 		$link = '';
 		//var_dump($questions[0]['evalQuestionAnswers'], 'fdsf'); //die;
-		foreach($questions[0]['evalQuestionAnswers'] as $answerKey => $answer) {
-			if(!empty($answer->url)) {
+		foreach ($questions[0]['evalQuestionAnswers'] as $answerKey => $answer) {
+			if (!empty($answer->url)) {
 				$link = CHtml::link($answer->optionName, $this->createUrl($answer->url));
 				//$questions[0]['evalQuestionAnswers'][$answerKey]->unsetAttributes();
 			}
@@ -254,18 +257,18 @@ class EvaluationController extends Controller {
 		$elements['elements'] = array(
 			'<h3>' . $questions[0]->question . '</h3>',
 			'question' => array(
-				'type' => 'radiolist',
-				'style' => 'width:0.2em;',
+				'type'         => 'radiolist',
+				'style'        => 'width:0.2em;',
 				'labelOptions' => array('style' => 'display:inline'),
-				'items' => $model->getItems($questions[0]['evalQuestionAnswers'])
+				'items'        => $model->getItems($questions[0]['evalQuestionAnswers'])
 			)
 		);
-		if(!empty($link)) {
+		if (!empty($link)) {
 			array_push($elements['elements'], $link);
 		}
 		//print_r($questions[0]['evalQuestionAnswers']); die('pooop');
 		$elements['buttons'] = array(
-			'back' => array(
+			'back'   => array(
 				'type'    => 'button',
 				'label'   => 'Back',
 				'onClick' => 'history.go(-1)',
@@ -290,8 +293,7 @@ class EvaluationController extends Controller {
 
 
 	/**
-	 * actionAddEvaContext 
-	 * 
+	 * actionAddEvaContext
 	 * @access public
 	 * @return bool
 	 */
@@ -326,15 +328,15 @@ class EvaluationController extends Controller {
 			$evaluationHeader->frameworkId = $form->model->frameworkId;
 			$evaluationHeader->userId = Yii::app()->user->id;
 			//save the componentHead values
-			if(!$evaluationHeader->validate()) {
+			if (!$evaluationHeader->validate()) {
 //				print_r($evaluationHeader->getErrors());
 //				var_dump($form); die;
 				Yii::app()->user->setFlash("notice", "The evaluation name must be unique.");
 				//return $this->redirect('addEvaContext');
 				return $this->render('context', array(
-					'model' => $model,
+					'model'     => $model,
 					'dataArray' => $dataArray,
-					'form' => $form
+					'form'      => $form
 				));
 			}
 			$evaluationHeader->save();
@@ -358,14 +360,14 @@ class EvaluationController extends Controller {
 			$modelDesign = FrameworkContext::model()->findByPk($form->model->frameworkId);
 			if (!empty($modelDesign)) {
 				Yii::app()->session->add('surDesign', array(
-					'id' => $modelDesign->frameworkId,
+					'id'   => $modelDesign->frameworkId,
 					'name' => $modelDesign->name
 					//'goalId' => $modelDesign->goalId
 				));
 			}
 			//print_r($evaluationHeader); die;
 			Yii::app()->session->add('evaContext', array(
-				'id' => $evaluationHeader->evalId,
+				'id'   => $evaluationHeader->evalId,
 				'name' => $evaluationHeader->evaluationName,
 			));
 			Yii::app()->user->setFlash('success', Yii::t("translation", "Evaluation successfully created"));
@@ -373,9 +375,9 @@ class EvaluationController extends Controller {
 		}
 
 		$this->render('context', array(
-			'model' => $model,
+			'model'     => $model,
 			'dataArray' => $dataArray,
-			'form' => $form
+			'form'      => $form
 		));
 	}
 
@@ -400,19 +402,19 @@ class EvaluationController extends Controller {
 			->where('ch.frameworkId=:id', array(':id' => $this->frameworkId))
 			->queryAll();
 		$components = '<ul>';
-		if(!empty($componentsRs)) {
-			foreach($componentsRs as $component) {
-				$components .= '<li><b>' . $component['inputName'] . '</b>: '.
+		if (!empty($componentsRs)) {
+			foreach ($componentsRs as $component) {
+				$components .= '<li><b>' . $component['inputName'] . '</b>: ' .
 					$component['value'] . '</li>';
 			}
 			//print_r($components); die;
 			array_push($surveilanceRs, array(
 				'inputName' => 'Components',
-				'value' => $components));
+				'value'     => $components));
 
 		}
 		$components .= '</ul>';
-			//print_r(array('inputName' => 'Component', 'value' => array_values($components))); die;
+		//print_r(array('inputName' => 'Component', 'value' => array_values($components))); die;
 //print_r(json_encode(array("aaData" => $surveilanceRs))); die;
 		echo json_encode(array("aaData" => $surveilanceRs), JSON_UNESCAPED_SLASHES);
 		return;
@@ -420,71 +422,69 @@ class EvaluationController extends Controller {
 
 	}
 
-		/**
-		 * actionShowEval 
-		 * 
-		 * @access public
-		 * @return void
-		 */
-		public function actionShowEval() {
-			Yii::log("actionShowEval called", "trace", self::LOG_CAT);
-			$model = new EvaluationHeader;
-			$dataArray = array();
-			if (isset($_GET['evalId'])) {
-				$selectedEval = Yii::app()->db->createCommand()
-					->select(' h.evalId,
+	/**
+	 * actionShowEval
+	 * @access public
+	 * @return void
+	 */
+	public function actionShowEval() {
+		Yii::log("actionShowEval called", "trace", self::LOG_CAT);
+		$model = new EvaluationHeader;
+		$dataArray = array();
+		if (isset($_GET['evalId'])) {
+			$selectedEval = Yii::app()->db->createCommand()
+				->select(' h.evalId,
 						h.evaluationName,
 						fh.frameworkId,
 						fh.name,
 						ee.label,
 						ed.value'
-					)
-					->from('evaluationHeader h')
-					->join('frameworkHeader fh', 'h.frameworkId = fh.frameworkId')
-					->join('evaluationDetails ed', 'ed.evalId = h.evalId')
-					->join('evalElements ee', 'ee.evalElementsId = ed.evalElementsId')
-					->where('h.evalId =' . $_GET['evalId'])
-					->queryAll();
-					// prepare the array for the view
-					foreach ($selectedEval as $dat) {
-						if (empty($dataArray['selectedEval']['Evaluation Name'])) {
-							$dataArray['selectedEval']['Evaluation Name'] = $dat['evaluationName'];
-						}
-						if (empty($dataArray['selectedEval']['Design Context'])) {
-							$dataArray['selectedEval']['Design Context'] = $dat['name'];
-						}
-						$dataArray['selectedEval'][$dat['label']] = $dat['value'];
-					}
-				//$dataArray['selectedEval'] = $selectedEval[0];
-				//add the surveilance design to the session
-				if (count($selectedEval) >= 1) {
-					Yii::app()->session->add('evaContext', array(
-						'id' => $_GET['evalId'],
-						'name' => $selectedEval[0]['evaluationName'],
-					));
-
-					//update the session variable for design
-					Yii::app()->session->add('surDesign', array(
-						'id' => $selectedEval[0]['frameworkId'],
-						'name' => $selectedEval[0]['name']
-						//'goalId' => $selectedEval[0]['goalId']
-					));
-				} else {
-					Yii::app()->session->remove('evaContext');
+				)
+				->from('evaluationHeader h')
+				->join('frameworkHeader fh', 'h.frameworkId = fh.frameworkId')
+				->join('evaluationDetails ed', 'ed.evalId = h.evalId')
+				->join('evalElements ee', 'ee.evalElementsId = ed.evalElementsId')
+				->where('h.evalId =' . $_GET['evalId'])
+				->queryAll();
+			// prepare the array for the view
+			foreach ($selectedEval as $dat) {
+				if (empty($dataArray['selectedEval']['Evaluation Name'])) {
+					$dataArray['selectedEval']['Evaluation Name'] = $dat['evaluationName'];
 				}
-				//print_r($selectedEval);
-				//print_r($_SESSION);
+				if (empty($dataArray['selectedEval']['Design Context'])) {
+					$dataArray['selectedEval']['Design Context'] = $dat['name'];
+				}
+				$dataArray['selectedEval'][$dat['label']] = $dat['value'];
 			}
+			//$dataArray['selectedEval'] = $selectedEval[0];
+			//add the surveilance design to the session
+			if (count($selectedEval) >= 1) {
+				Yii::app()->session->add('evaContext', array(
+					'id'   => $_GET['evalId'],
+					'name' => $selectedEval[0]['evaluationName'],
+				));
 
-			$this->render('showEval', array(
-				'model' => $model,
-				'dataArray' => $dataArray
-			));
+				//update the session variable for design
+				Yii::app()->session->add('surDesign', array(
+					'id'   => $selectedEval[0]['frameworkId'],
+					'name' => $selectedEval[0]['name']
+					//'goalId' => $selectedEval[0]['goalId']
+				));
+			} else {
+				Yii::app()->session->remove('evaContext');
+			}
+			//print_r($selectedEval);
+			//print_r($_SESSION);
 		}
 
+		$this->render('showEval', array(
+			'model'     => $model,
+			'dataArray' => $dataArray
+		));
+	}
+
 	/**
-	 * actionDeleteEval 
-	 * 
+	 * actionDeleteEval
 	 * @access public
 	 * @return void
 	 */
@@ -503,9 +503,8 @@ class EvaluationController extends Controller {
 	}
 
 	/**
-	 * getElementsAndDynamicAttributes 
-	 * 
-	 * @param array $componentData 
+	 * getElementsAndDynamicAttributes
+	 * @param array $componentData
 	 * @access public
 	 * @return array
 	 */
@@ -535,21 +534,21 @@ class EvaluationController extends Controller {
 		// add evaluationName form element
 		$dynamicDataAttributes['evaluationName'] = 1;
 		$elements['elements']['evaluationName'] = array(
-			'label' => "Evaluation Name",
+			'label'    => "Evaluation Name",
 			'required' => true,
-			'type' => 'text',
+			'type'     => 'text',
 		);
 
 		$dynamicDataAttributes['frameworkId'] = 1;
 		$elements['elements']['frameworkId'] = array(
-			'label' => "Design Framework",
+			'label'    => "Design Framework",
 			'required' => true,
-			'type' => 'dropdownlist'
+			'type'     => 'dropdownlist'
 		);
 		$designData = FrameworkContext::model()->findAll(array(
 			//'select' => 'pageId, pageName',
 			'condition' => 'userId=:userId',
-			'params' => array(
+			'params'    => array(
 				':userId' => Yii::app()->user->id,
 			),
 		));
@@ -583,23 +582,23 @@ class EvaluationController extends Controller {
 			$attributeId = $valu->inputName . "-" . $valu->evalElementsId;
 			// add the elements to the CForm array
 			$elements['elements'][$attributeId] = array(
-				'label' => $valu->label,
+				'label'    => $valu->label,
 				'required' => $valu->required,
-				'type' => $inputType,
-				'class' => $hightlightClass
+				'type'     => $inputType,
+				'class'    => $hightlightClass
 			);
 			// Add an image icon that will be displayed on the ui to show more infor
 			$button = CHtml::image('', '', array(
-				'id' => 'moreInfoButton' . $valu->evalElementsId,
-				'style' => 'cursor:pointer',
-				'class' => 'ui-icon ui-icon-info',
-				'title' => 'More Information',
+				'id'      => 'moreInfoButton' . $valu->evalElementsId,
+				'style'   => 'cursor:pointer',
+				'class'   => 'ui-icon ui-icon-info',
+				'title'   => 'More Information',
 				'onClick' => '$("#moreInfoDialog").html($("#popupData' . $valu->evalElementsId . '").html());$("#moreInfoDialog").dialog("open")'
 			));
 			// Add the image icon and information to the layout/ui
 			if (!empty($valu->moreInfo) && !empty($valu->url) && !empty($valu->description)) {
 				$elements['elements'][$attributeId]['layout'] = '{label}<div class="componentImagePopup">' . $button .
-					'</div>{hint} {input}' . '<div id="popupData' . $valu->evalElementsId .'" style="display:none">'. $valu->moreInfo.'</div>' .
+					'</div>{hint} {input}' . '<div id="popupData' . $valu->evalElementsId . '" style="display:none">' . $valu->moreInfo . '</div>' .
 					'<div class="componentDataPopup">' . $valu->description .
 					' <br/> <a href=' . $valu->url . ' target=_blank>' . $valu->url . '</a></div> {error}';
 			}
@@ -620,7 +619,7 @@ class EvaluationController extends Controller {
 			if ($inputType == 'dropdownlist') {
 				$data = Options::model()->findAll(array(
 					'condition' => 'elementId=:elementId',
-					'params' => array(
+					'params'    => array(
 						':elementId' => $valu->evalElementsId
 					),
 				));
@@ -635,16 +634,16 @@ class EvaluationController extends Controller {
 		}
 		$elements['buttons'] = array(
 			'newComponent' => array(
-				'type' => 'submit',
+				'type'  => 'submit',
 				'label' => 'Create Evaluation',
 			),
 		);
 		$returnArray = array('elements' => $elements, 'dynamicDataAttributes' => $dynamicDataAttributes);
 		return $returnArray;
 	}
+
 	/**
-	 * actionImageUpload 
-	 * 
+	 * actionImageUpload
 	 * @access public
 	 * @return void
 	 */
@@ -654,37 +653,37 @@ class EvaluationController extends Controller {
 		$_FILES['file']['type'] = strtolower($_FILES['file']['type']);
 
 		if ($_FILES['file']['type'] == 'image/png'
-		|| $_FILES['file']['type'] == 'image/jpg'
-		|| $_FILES['file']['type'] == 'image/gif'
-		|| $_FILES['file']['type'] == 'image/jpeg'
-		|| $_FILES['file']['type'] == 'image/pjpeg') {
+			|| $_FILES['file']['type'] == 'image/jpg'
+			|| $_FILES['file']['type'] == 'image/gif'
+			|| $_FILES['file']['type'] == 'image/jpeg'
+			|| $_FILES['file']['type'] == 'image/pjpeg'
+		) {
 			// setting file's mysterious name
-			$filename = md5(date('YmdHis')).'.jpg';
-			$file = $dir.$filename;
+			$filename = md5(date('YmdHis')) . '.jpg';
+			$file = $dir . $filename;
 
 			// copying
 			move_uploaded_file($_FILES['file']['tmp_name'], $file);
 
 			// displaying file
 			$array = array(
-				'filelink' => Yii::app()->request->baseUrl . '/images/customImageUpload/'.$filename
+				'filelink' => Yii::app()->request->baseUrl . '/images/customImageUpload/' . $filename
 			);
 			echo stripslashes(json_encode($array));
 
 		}
 	}
 
-/**
- * clearTags 
- * 
- * @param mixed $str 
- * @access public
- * @return void
- */
-function clearTags($str) {
-	return strip_tags($str, '<code><span><div><label><a><br><p><b><i><del><strike><u><img><video><audio><iframe>' . 
-	'<object><embed><param><blockquote><mark><cite><small><ul><ol><li><hr><dl><dt><dd><sup><sub>' . 
-	'<big><pre><code><figure><figcaption><strong><em><table><tr><td><th><tbody><thead><tfoot><h1><h2><h3><h4><h5><h6>');
-}
+	/**
+	 * clearTags
+	 * @param mixed $str
+	 * @access public
+	 * @return void
+	 */
+	function clearTags($str) {
+		return strip_tags($str, '<code><span><div><label><a><br><p><b><i><del><strike><u><img><video><audio><iframe>' .
+			'<object><embed><param><blockquote><mark><cite><small><ul><ol><li><hr><dl><dt><dd><sup><sub>' .
+			'<big><pre><code><figure><figcaption><strong><em><table><tr><td><th><tbody><thead><tfoot><h1><h2><h3><h4><h5><h6>');
+	}
 
 }
