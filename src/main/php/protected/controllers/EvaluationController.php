@@ -164,6 +164,13 @@ class EvaluationController extends Controller {
 		echo json_encode(array());
 	}
 
+	public function actionEvaMethods() {
+		Yii::log("actionEvaMethods called", "trace", self::LOG_CAT);
+		$dataProvider = new CActiveDataProvider('EvaMethods');
+		//print_r($dataProvider->getData()); die;
+		$this->render('evaMethods', array('dataProvider' => $dataProvider));
+	}
+
 	/**
 	 * actionSaveEvaConcept
 	 * @access public
