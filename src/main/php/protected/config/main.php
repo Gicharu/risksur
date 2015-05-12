@@ -73,7 +73,7 @@ return CMap::mergeArray($configArray, array(
 		'application.components.*',
 		'application.extensions.EActiveResource.*',
 		'application.extensions.TLogResource.*',
-		//'application.extensions.EpitoolsFunctions.*',
+		'application.extensions.ModelToArray.*',
 		'application.extensions.TSettingsIni.*',
 		'application.extensions.TTMailer.*',
 		'application.extensions.Encryption.*',
@@ -131,6 +131,7 @@ return CMap::mergeArray($configArray, array(
 			'rules' => array(
 				'<controller:\w+>/<id:\d+>' => '<controller>/view',
 				'<controller:\w+>/<action:\w+>/<id:\d+>' => '<controller>/<action>',
+				//'<controller:\w+>/<action:\w+>/<ajax:\d+>' => '<controller>/<action>',
 				'<controller:\w+>/<action:\w+>' => '<controller>/<action>',
 			),
 		),

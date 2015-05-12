@@ -216,4 +216,109 @@ class AdminController extends Controller {
 			}
 		}
 	}
+
+	/**
+	 * @param bool $ajax
+	 */
+	public function actionListEvaMethods($ajax = false) {
+		Yii::log("actionListEvaMethods called", "trace", self::LOG_CAT);
+		$this->setPageTitle(Yii::app()->name . ' - List Evaluation Methods');
+		$dataProvider = new CActiveDataProvider('EvaMethods');
+		//print_r(ModelToArray::convertModelToArray($dataProvider->getData())); die;
+		if($ajax) {
+			$data = array('aaData' => ModelToArray::convertModelToArray($dataProvider->getData()));
+			echo json_encode($data, JSON_UNESCAPED_SLASHES);
+			return;
+		}
+		$this->render('evaMethods/list', array('dataProvider' => $dataProvider));
+	}
+
+	/**
+	 * @param $evaMethodId
+	 */
+	public function actionDeleteEvaMethod($evaMethodId) {
+		Yii::log("actionDeleteEvaMethod called", "trace", self::LOG_CAT);
+		if(EvaMethods::model()->deleteByPk($evaMethodId) > 0) {
+			echo 'Economic evaluation method successfully deleted';
+			return;
+		}
+			echo 'An error occurred when deleting the economic evaluation method, ' .
+				'please try again or contact your administrator if the problem persists';
+		return;
+
+	}
+
+	/**
+	 * actionAddEvaMethod
+	 */
+	public function actionAddEvaMethod() {
+		Yii::log("actionAddEvaMethod called", "trace", self::LOG_CAT);
+		$config = self::getEvaMethodsFormConfig();
+		$buttonParam = array('name' => 'add', 'label' => 'Add');
+		$config['buttons'] = ContextController::getButtons($buttonParam, 'admin/listEvaMethods');
+		unset($config['buttons']['cancel']);
+		$model = new EvaMethods();
+		$form = new CForm($config, $model);
+		if($form->submitted('add') && $form->validate()) {
+			$model = $form->model;
+			if($model->save(false)) {
+				Yii::app()->user->setFlash('success', 'Economic evaluation method add successfully');
+				$this->redirect(array('admin/listEvaMethods'));
+			}
+			Yii::app()->user->setFlash('error',
+				'An error occurred while saving, please try again or contact your administrator if the problem persists');
+		}
+		//var_dump($model, $form); die;
+		$this->render('evaMethods/add', array('form' => $form));
+
+	}
+
+	/**
+	 * @param $id
+	 */
+	public function actionUpdateEvaMethod($id) {
+		Yii::log("actionUpdateEvaMethod called", "trace", self::LOG_CAT);
+		$config = self::getEvaMethodsFormConfig();
+		$buttonParam = array('name' => 'update', 'label' => 'Update');
+		$config['buttons'] = ContextController::getButtons($buttonParam, 'admin/listEvaMethods');
+		$model = EvaMethods::model()->findByPk($id);
+		if(is_null($model)) {
+			Yii::app()->user->setFlash('notice','That economic evaluation method does not exist.');
+			$this->redirect(array('admin/listEvaMethods'));
+			return;
+		}
+		unset($config['buttons']['cancel']);
+		$form = new CForm($config, $model);
+		if($form->submitted('update') && $form->validate()) {
+			$model = $form->model;
+			if($model->save(false)) {
+				Yii::app()->user->setFlash('success', 'Economic evaluation method updated successfully');
+				$this->redirect(array('admin/listEvaMethods'));
+			}
+			Yii::app()->user->setFlash('error',
+				'An error occurred while updating, please try again or contact ' .
+				'your administrator if the problem persists');
+		}
+		$this->render('evaMethods/update', array('form' => $form));
+
+	}
+
+	/**
+	 * @return array
+	 */
+	private function getEvaMethodsFormConfig() {
+		$elements = ContextController::getDefaultElements();
+		$elements['elements'] = array(
+			'buttonName' => array(
+				'type' => 'text'
+			),
+			'link' => array(
+				'type' => 'text'
+			),
+			'description' => array(
+				'type' => 'text'
+			)
+		);
+		return $elements;
+	}
 }

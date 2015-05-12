@@ -24,7 +24,8 @@ class EvaMethods extends CActiveRecord {
 		// will receive user inputs.
 		return array(
 			array('buttonName, link', 'required'),
-			array('description', 'safe'),
+			array('link', 'url'),
+			array('description', 'safe')
 			// The following rule is used by search().
 
 		);
@@ -45,8 +46,8 @@ class EvaMethods extends CActiveRecord {
 	public function attributeLabels() {
 		return array(
 			'id'          => 'ID',
-			'buttonName'  => 'Button Name',
-			'link'        => 'Link',
+			'buttonName'  => 'Button Label',
+			'link'        => 'Method Link',
 			'description' => 'Description',
 		);
 	}
