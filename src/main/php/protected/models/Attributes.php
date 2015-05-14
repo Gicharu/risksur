@@ -8,15 +8,13 @@
  * @copyright Tracetracker
  * @author Eric Thuku <eric@tracetracker.com> 
  * @license Tracetracker {@link http://www.tracetracker.com}
+ * @SuppressWarnings checkUnusedVariables
  */
 class Attributes extends CActiveRecord {
+	//public $name, $descritption, $attributeId;
 	/**
-	 * model 
-	 * 
-	 * @param mixed $className 
-	 * @static
-	 * @access public
-	 * @return void
+	 * @param string $className
+	 * @return static
 	 */
 	public static function model($className = __CLASS__) {
 		return parent::model($className);
@@ -25,17 +23,17 @@ class Attributes extends CActiveRecord {
 	 * tableName 
 	 * 
 	 * @access public
-	 * @return void
+	 * @return string
 	 */
 	public function tableName() {
-		return 'perfAttributes';
+		return 'evaAttributes';
 	}
 
 	/**
 	 * primaryKey 
 	 * 
 	 * @access public
-	 * @return void
+	 * @return string
 	 */
 	public function primaryKey() {
 		return 'attributeId';
@@ -45,30 +43,43 @@ class Attributes extends CActiveRecord {
 	 * rules 
 	 * 
 	 * @access public
-	 * @return void
+	 * @return array
 	 */
 	public function rules() {
 		return array(
 			array(
-				'name, description',
+				'name, description, attributeType',
 				'required'
 			),
 			array(
-				'name', 'unique', 'on' => 'create'
+				'name', 'unique'
 			)
 		);
 	}
 
 	/**
+	 * relations
+	 *
+	 * @access public
+	 * @return array
+	 */
+	public function relations() {
+		return array(
+			'attributeRelation' => array( self::HAS_MANY, 'AttributeFormRelation', 'attributeId' ),
+			'evaAttributeTypes' => array( self::BELONGS_TO, 'EvaAttributeTypes', 'attributeType' )
+		);
+	}
+	/**
 	 * attributeLabels 
 	 * 
 	 * @access public
-	 * @return void
+	 * @return array
 	 */
 	public function attributeLabels() {
 		return array(
 			'name' => Yii::t('translation', 'Name'),
-			'description' => Yii::t('translation', 'Description')
+			'description' => Yii::t('translation', 'Description'),
+			'attributeType' => Yii::t('translation', 'Category')
 		);
 	}
 }

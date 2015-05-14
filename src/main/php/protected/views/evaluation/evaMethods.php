@@ -1,6 +1,6 @@
 <script type="text/javascript">
 	$(function(){
-		$("table tr td a.buttonLink").button().css('width', '14em');
+		$("table.items tr td a.buttonLink").button();
 	});
 </script>
 <?php

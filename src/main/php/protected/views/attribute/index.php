@@ -30,7 +30,7 @@ $(function(){
 						},
 						"sButtonText": "PDF",
 						"fnClick":  function( nButton, oConfig, flash ) {
-								flash.setFileName( "Object Listing_" + getTitle() + ".pdf" );
+								flash.setFileName( "Attributes_List_" + getTitle() + ".pdf" );
 								this.fnSetText( flash,
 									"title:"+ this.fnGetTitle(oConfig) +"\n"+
 									"message:"+ oConfig.sPdfMessage +"\n"+
@@ -50,7 +50,7 @@ $(function(){
 							page: 'current'
 						},
 						"fnClick": function ( nButton, oConfig, oFlash ) {
-						oFlash.setFileName( "Object Listing_" + getTitle() + ".csv" );
+						oFlash.setFileName( "Attributes_List_" + getTitle() + ".csv" );
 							this.fnSetText( oFlash,	"" + this.fnGetTableData(oConfig)
 							);
 						},

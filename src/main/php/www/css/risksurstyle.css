@@ -1157,84 +1157,7 @@ float: left;
 .ms-container {
 	width: 42em;
 }
-/* full screen icon */
-.leaflet-control-fullscreen {
-	background-image: url(../images/icon-fullscreen.png) !important;
-}
-/* leaflet legend */
-.infoMap {
-	padding: 6px 8px;
-	font: 10px/12px Arial, Helvetica, sans-serif;
-	background: white;
-	background: rgba(255,255,255,0.8);
-	box-shadow: 0 0 15px rgba(0,0,0,0.2);
-	border-radius: 5px;
-}
-.infoMap h4 {
-	margin: 0 0 5px;
-	color: #777;
-}
-.legendMap {
-	line-height: 10px;
-	color: #555;
-}
-.legendMap i {
-	border-radius: 50%;
-	behavior: url(PIE.htc); /* remove if you don't care about IE8 */
-	width: 10px;
-	height: 10px;
-	float: left;
-	margin-right: 5px;
-	opacity: 0.7;
-	border: 2px solid black;
 
-}
-
-span.iconBox {
-	width: 18px;
-	height: 18px;
-	float: left;
-	margin-right: 5px;
-	margin-bottom: 2px;
-}
-
-/* Button wrappers for graph/map */
-div.buttonWrapLeft {
-	float: left;
-	clear: right;
-}
-.buttonWrapRight {
-	float: right;
-}
-.selectedOrigin {
-	padding: 0.5em;
-	margin: auto;
-	font-weight: bold;
-	clear: both;
-	float: left;
-	height: 15px;
-}
-.btnMoreInfor {
-	float: right;
-	clear: right;
-	display: inline;
-}
-.returnToSearch {
-	float: left;
-}
-.graphWrapper {
-	display: none;
-}
-.widgetPanel {
-	padding: 2px;
-}
-.ui-buttonset {
-	margin-right: 5px;
-}
-
-.ui-buttonset {
-	margin-right: 5px;
-}
 
 /*jquery ui menu horizontal*/
 .ui-menu { 
@@ -1507,4 +1430,33 @@ span.rb label {
     display:inline-block;
     float: left;
     width: 80%;
+}
+table.items tbody tr td a:visited {
+    color: #ffffff;
+    background: url("themes/risksurTheme/images/ui-bg_flat_20_333333_40x100.png") repeat-x scroll 50% 50% #333333 !important;
+    border: 1px solid #333333;
+}
+table.items tr td a.buttonLink {
+    width: 14em;
+}
+
+div.attrHead, div.attrHead .header {
+    float: left;
+    width: 25%;
+    margin: 0 1em 0 1em;
+
+}
+div.attrHead .header {
+    font-weight: bold;
+    font-size: medium;
+
+}
+div.attrHead button {
+    float: left;
+    clear: left;
+    margin-top: 0.5em;
+}
+div.attrHead a, div.attrHead button span {
+    width: 17em;
+
 }
