@@ -11,7 +11,7 @@
  * @license Tracetracker {@link http://www.tracetracker.com}
  */
 class AdminController extends Controller {
-	public $page;
+	//public $page;
 	private	$configuration;
 	const LOG_CAT = "ctrl.AdminController";
 
@@ -219,6 +219,7 @@ class AdminController extends Controller {
 
 	/**
 	 * @param bool $ajax
+	 * @return void
 	 */
 	public function actionListEvaMethods($ajax = false) {
 		Yii::log("actionListEvaMethods called", "trace", self::LOG_CAT);
@@ -275,6 +276,7 @@ class AdminController extends Controller {
 
 	/**
 	 * @param $id
+	 * @return void
 	 */
 	public function actionUpdateEvaMethod($id) {
 		Yii::log("actionUpdateEvaMethod called", "trace", self::LOG_CAT);
@@ -283,7 +285,7 @@ class AdminController extends Controller {
 		$config['buttons'] = ContextController::getButtons($buttonParam, 'admin/listEvaMethods');
 		$model = EvaMethods::model()->findByPk($id);
 		if(is_null($model)) {
-			Yii::app()->user->setFlash('notice','That economic evaluation method does not exist.');
+			Yii::app()->user->setFlash('notice', 'That economic evaluation method does not exist.');
 			$this->redirect(array('admin/listEvaMethods'));
 			return;
 		}

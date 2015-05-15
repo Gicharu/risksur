@@ -164,6 +164,9 @@ class EvaluationController extends Controller {
 		echo json_encode(array());
 	}
 
+	/**
+	 * actionEvaMethods
+	 */
 	public function actionEvaMethods() {
 		Yii::log("actionEvaMethods called", "trace", self::LOG_CAT);
 		$this->setPageTitle(Yii::app()->name . ' - Economic evaluation methods');
@@ -295,6 +298,7 @@ class EvaluationController extends Controller {
 
 	/**
 	 * @param int $descId
+	 * @return void
 	 */
 	public function actionEvaAttributes($descId = 0) {
 		Yii::log("actionEvaAttributes called", "trace", self::LOG_CAT);
@@ -318,7 +322,8 @@ class EvaluationController extends Controller {
 		$evaAttributes = CHtml::listData(Attributes::model()
 			->with('evaAttributeTypes')
 			->findAll(), 'attributeId', 'name', function($attribute) {
-			return $attribute->evaAttributeTypes->name;}); //die;
+			return $attribute->evaAttributeTypes->name;
+		}); //die;
 
 		$tableColumns = CHtml::listData(EvaAttributeTypes::model()->findAll(), 'id', 'name');
 		$this->render('evaAttributes', array(
