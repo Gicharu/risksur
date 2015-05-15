@@ -293,12 +293,26 @@ class EvaluationController extends Controller {
 		$this->render('evalQuestion', compact('form'));
 	}
 
+	/**
+	 * @param int $descId
+	 */
 	public function actionEvaAttributes($descId = 0) {
 		Yii::log("actionEvaAttributes called", "trace", self::LOG_CAT);
 		if($descId > 0) {
 			$description = Attributes::model()->findByPk($descId, array('select' => 'description'));
 			//print_r($description); die;
-			echo json_encode(array('description' => "<p>$description->description</p>"));
+			// The Regular Expression filter
+			$regExUrl = '/(http|https|ftp|ftps)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?/';
+			$attrDescription = $description->description;
+			// Check if there is a url in the text
+			if (preg_match($regExUrl, $description->description, $url)) {
+
+				// make the urls hyper links
+				$attrDescription = preg_replace($regExUrl, "<a href=\"{$url[0]}\" target=\"_blank\">{$url[0]}</a>",
+					$description->description);
+
+			}
+			echo json_encode(array('description' => "<p>$attrDescription</p>"));
 			return;
 		}
 		$evaAttributes = CHtml::listData(Attributes::model()

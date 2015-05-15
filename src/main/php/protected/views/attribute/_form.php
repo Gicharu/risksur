@@ -30,7 +30,7 @@ echo $form->errorSummary(array($model), Yii::app()->params['headerErrorSummary']
 	</div>
 	<div class="row">
 		<?php echo $form->labelEx($model, 'description'); ?>
-		<?php echo $form->textArea($model, 'description'); ?>
+		<?php echo $form->textArea($model, 'description', array('rows' => 25, 'cols' => 70)); ?>
 		<?php echo $form->error($model, 'description'); ?>
 	</div>
 	<div class="row buttons">
