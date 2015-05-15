@@ -164,6 +164,14 @@ class EvaluationController extends Controller {
 		echo json_encode(array());
 	}
 
+	public function actionEvaMethods() {
+		Yii::log("actionEvaMethods called", "trace", self::LOG_CAT);
+		$this->setPageTitle(Yii::app()->name . ' - Economic evaluation methods');
+		$dataProvider = new CActiveDataProvider('EvaMethods');
+		//print_r($dataProvider->getData()); die;
+		$this->render('evaMethods', array('dataProvider' => $dataProvider));
+	}
+
 	/**
 	 * actionSaveEvaConcept
 	 * @access public
@@ -282,15 +290,43 @@ class EvaluationController extends Controller {
 			)
 		);
 		$form = new CForm($elements, $model);
-
-		// Note that we also allow sumission via the Save button
-//		if ($form->submitted() && $form->validate()) {
-//
-//		} else {
-//		}
 		$this->render('evalQuestion', compact('form'));
 	}
 
+	/**
+	 * @param int $descId
+	 */
+	public function actionEvaAttributes($descId = 0) {
+		Yii::log("actionEvaAttributes called", "trace", self::LOG_CAT);
+		if($descId > 0) {
+			$description = Attributes::model()->findByPk($descId, array('select' => 'description'));
+			//print_r($description); die;
+			// The Regular Expression filter
+			$regExUrl = '/(http|https|ftp|ftps)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?/';
+			$attrDescription = $description->description;
+			// Check if there is a url in the text
+			if (preg_match($regExUrl, $description->description, $url)) {
+
+				// make the urls hyper links
+				$attrDescription = preg_replace($regExUrl, "<a href=\"{$url[0]}\" target=\"_blank\">{$url[0]}</a>",
+					$description->description);
+
+			}
+			echo json_encode(array('description' => "<p>$attrDescription</p>"));
+			return;
+		}
+		$evaAttributes = CHtml::listData(Attributes::model()
+			->with('evaAttributeTypes')
+			->findAll(), 'attributeId', 'name', function($attribute) {
+			return $attribute->evaAttributeTypes->name;}); //die;
+
+		$tableColumns = CHtml::listData(EvaAttributeTypes::model()->findAll(), 'id', 'name');
+		$this->render('evaAttributes', array(
+			'tableColumns' => $tableColumns,
+			'evaAttributes' => $evaAttributes
+		));
+
+	}
 
 	/**
 	 * actionAddEvaContext
@@ -429,7 +465,7 @@ class EvaluationController extends Controller {
 	 */
 	public function actionShowEval() {
 		Yii::log("actionShowEval called", "trace", self::LOG_CAT);
-		$model = new EvaluationHeader;
+		$model = new EvaluationHeader();
 		$dataArray = array();
 		if (isset($_GET['evalId'])) {
 			$selectedEval = Yii::app()->db->createCommand()
@@ -678,12 +714,12 @@ class EvaluationController extends Controller {
 	 * clearTags
 	 * @param mixed $str
 	 * @access public
-	 * @return void
+	 * @return string
 	 */
 	function clearTags($str) {
 		return strip_tags($str, '<code><span><div><label><a><br><p><b><i><del><strike><u><img><video><audio><iframe>' .
-			'<object><embed><param><blockquote><mark><cite><small><ul><ol><li><hr><dl><dt><dd><sup><sub>' .
-			'<big><pre><code><figure><figcaption><strong><em><table><tr><td><th><tbody><thead><tfoot><h1><h2><h3><h4><h5><h6>');
+			'<object><embed><param><blockquote><mark><cite><small><ul><ol><li><hr><dl><dt><dd><sup><sub><big><pre>' .
+			'<code><figure><figcaption><strong><em><table><tr><td><th><tbody><thead><tfoot><h1><h2><h3><h4><h5><h6>');
 	}
 
 }

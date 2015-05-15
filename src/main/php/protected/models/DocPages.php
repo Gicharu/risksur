@@ -16,7 +16,7 @@ class DocPages extends CActiveRecord {
 	 * @param mixed $className 
 	 * @static
 	 * @access public
-	 * @return void
+	 * @return static
 	 */
 	public static function model($className = __CLASS__) {
 		return parent::model($className);
@@ -25,7 +25,7 @@ class DocPages extends CActiveRecord {
 	 * tableName 
 	 * 
 	 * @access public
-	 * @return void
+	 * @return string
 	 */
 	public function tableName() {
 		return 'docPages';
@@ -35,7 +35,7 @@ class DocPages extends CActiveRecord {
 	 * primaryKey 
 	 * 
 	 * @access public
-	 * @return void
+	 * @return string
 	 */
 	public function primaryKey() {
 		return 'docId';
@@ -45,7 +45,7 @@ class DocPages extends CActiveRecord {
 	 * rules 
 	 * 
 	 * @access public
-	 * @return void
+	 * @return array
 	 */
 	public function rules() {
 		return array(

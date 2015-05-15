@@ -17,7 +17,7 @@ class AttributeFormRelation extends CActiveRecord {
 	 * @param mixed $className 
 	 * @static
 	 * @access public
-	 * @return void
+	 * @return static
 	 */
 	public static function model($className = __CLASS__) {
 		return parent::model($className);
@@ -27,7 +27,7 @@ class AttributeFormRelation extends CActiveRecord {
 	 * tableName 
 	 * 
 	 * @access public
-	 * @return void
+	 * @return string
 	 */
 	public function tableName() {
 		return 'attributeFormRelation';
@@ -37,7 +37,7 @@ class AttributeFormRelation extends CActiveRecord {
 	 * rules 
 	 * 
 	 * @access public
-	 * @return void
+	 * @return array
 	 */
 	public function rules() {
 		return array(
@@ -52,7 +52,7 @@ class AttributeFormRelation extends CActiveRecord {
 	 * attributeLabels 
 	 * 
 	 * @access public
-	 * @return void
+	 * @return array
 	 */
 	public function attributeLabels() {
 		return array(
