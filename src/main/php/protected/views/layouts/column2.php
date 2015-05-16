@@ -1,5 +1,11 @@
 <?php $this->beginContent('//layouts/main'); ?>
 <!--<div class="container">-->
+<script type="text/javascript">
+	$(function(){
+		$('ul.operations').menu();
+
+	});
+</script>
 <div class="span-5 last">
 	<div id="sidebar">
 		<?php
@@ -76,8 +82,9 @@
 		//        ));
 		$this->beginWidget('zii.widgets.CMenu', array(
 			'items'          => $this->menu,
-			'activeCssClass' => 'active',
+			'activeCssClass' => 'ui-state-active',
 			'htmlOptions'    => array(
+//				'class' => 'operations'
 				'class' => 'operations'
 			),
 		));

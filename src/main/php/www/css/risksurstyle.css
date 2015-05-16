@@ -100,26 +100,26 @@ font-size:90%;
 /* END-print.css */
 
 /*jquery.menubar.css*/
-.ui-menu-bar .ui-top-menu .ui-menu-item {
+#mainmenu .ui-menu-bar .ui-top-menu .ui-menu-item {
 	width: 100%;
 	float: left;
 	clear: both;
 }
-.ui-menu-bar .ui-menu-nav {
+#mainmenu .ui-menu-bar .ui-menu-nav {
 	padding: 0.25em;
 }
-.ui-menu-bar .ui-menu-item,.ui-menu-title label {
+#mainmenu .ui-menu-bar .ui-menu-item,.ui-menu-title label {
 	cursor: pointer;
 }
-.ui-menu-bar .ui-top-menu label {
+#mainmenu .ui-menu-bar .ui-top-menu label {
 	padding-top: 0.25em;
 	padding-bottom: 0.25em;
 }
-.ui-menu-bar .ui-menu-title label {
+#mainmenu .ui-menu-bar .ui-menu-title label {
 	padding: .2em 1em;
 	display: inline-block;
 }
-.ui-menu-bar .ui-menu-title {
+#mainmenu .ui-menu-bar .ui-menu-title {
 	display: inline-block;
 	margin-right: .1em;
 	text-decoration: none !important;
@@ -128,10 +128,10 @@ font-size:90%;
 	line-height: 1.4em;
 	font-size: 1em;
 }
-.ui-menu-bar .ui-menu-title+.ui-menu-title {
+#mainmenu .ui-menu-bar .ui-menu-title+.ui-menu-title {
 	margin-left: 0.5em;
 }
-.ui-menu-bar .ui-top-menu{
+#mainmenu .ui-menu-bar .ui-top-menu{
 	-moz-box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.25);
 	-webkit-box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.25);
 	box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.25);
@@ -569,7 +569,7 @@ body {
 .selected li, .available li {
 	padding: 4px;
 }
-.ui-menu-bar .ui-menu-title label {
+#mainmenu .ui-menu-bar .ui-menu-title label {
 	padding-bottom: 0.2em;
 }
 .widgetheader {
@@ -1001,21 +1001,7 @@ td.group {
 	/*position: relative !important;*/
 	/*z-index: 500;*/
 }
-.paginate_disabled_first {
-	background-image: url('../images/first_disabled.jpg');
-}
 
-.paginate_enabled_first {
-	background-image: url('../images/first_enabled.jpg');
-}
-
-.paginate_disabled_last {
-	background-image: url('../images/last_disabled.jpg');
-}
-
-.paginate_enabled_last {
-	background-image: url('../images/last_enabled.jpg');
-}
 .DTTT_container {
 	padding-right: 0.5em;
 	padding-top: 0.2em;
@@ -1163,46 +1149,47 @@ float: left;
 .ui-menu { 
     overflow: hidden;
 }
-.ui-menu .ui-menu {
+#mainmenu .ui-menu .ui-menu {
     overflow: visible !important;
 }
-.ui-menu > li { 
+#mainmenu .ui-menu > li {
     float: left;
     display: block;
     width: auto !important;
 }
-.ui-menu ul li {
+#mainmenu .ui-menu ul li {
     display:block;
     float:none;
+
 }
-.ui-menu ul li ul {
+#mainmenu .ui-menu ul li ul {
     left:120px !important;
     width:100%;
 }
-.ui-menu ul li ul li {
+#mainmenu .ui-menu ul li ul li {
     width:auto;
 }
-.ui-menu ul li ul li a {
+#mainmenu .ui-menu ul li ul li a {
     float:left;
 }
-.ui-menu > li {
+#mainmenu .ui-menu > li {
     margin: 5px 5px !important;
     padding: 0 0 !important;
 }
-.ui-menu > li > a { 
+#mainmenu .ui-menu > li > a {
     float: left;
     display: block;
     clear: both;
     overflow: hidden;
 }
-.ui-menu .ui-menu-icon { 
+#mainmenu .ui-menu .ui-menu-icon {
     margin-top: 0.3em !important;
 }
-.ui-menu .ui-menu .ui-menu li { 
+#mainmenu .ui-menu .ui-menu .ui-menu li {
     float: left;
     display: block;
 }
-.ui-menu li ul {
+#mainmenu .ui-menu li ul {
     z-index: 10;
 }
 /* button list menu */
@@ -1247,106 +1234,93 @@ float: left;
     width: 99%;
 }
 
-.operations {
-	/*background-color: #888;*/
-	width: 90%;
-	padding: 1em !important;
-}
 
 /* Start Style the Sidebar Menu */
-ul.operations, ul.operations ul {
-  list-style-type:none;
-  margin: 0;
-  padding: 0;
+/*ul.operations {*/
+  /*list-style-type:none;*/
+  /*margin: 0;*/
+  /*padding: 0;*/
   /*width: 90%;*/
-}
-
-ul.operations a {
-  display: block;
-  text-decoration: none;	
-}
-
+/*}*/
 ul.operations li {
-  margin-top: 1px;
+    border-bottom: 1px solid #000000;
 }
 
 ul.operations li a {
-	background: #333;
-  color: #fff;	
-  padding: 0.5em;
+    height: auto;
 }
 
-ul.operations li a:hover {
-  background: #00498F;
-  color: #fff;
-}
+/*ul.operations li a:hover {*/
+  /*background: #00498F;*/
+  /*color: #fff;*/
+/*}*/
 
-ul.operations li ul li a {
+/*ul.operations li ul li a {*/
 	/*background: #e0e0e0;*/
-	background: #A0A0A0 ;
-  color: #000;
-  padding-left: 20px;
-  text-align: left;
-}
+	/*background: #A0A0A0 ;*/
+  /*color: #000;*/
+  /*padding-left: 20px;*/
+  /*text-align: left;*/
+/*}*/
 
-ul.operations li ul li a:hover {
-  background: #00498F;
-  color: #fff;
+/*ul.operations li ul li a:hover {*/
+  /*background: #00498F;*/
+  /*color: #fff;*/
 
-  border-left: 5px #333 solid;
-  padding-left: 15px;
-}
+  /*border-left: 5px #333 solid;*/
+  /*padding-left: 15px;*/
+/*}*/
 
-ul.operations li ul li li a {
-  background: #e0e0e0;
-  color: #000;
-  padding-left: 25px;
-}
+/*ul.operations li ul li li a {*/
+  /*background: #e0e0e0;*/
+  /*color: #000;*/
+  /*padding-left: 25px;*/
+/*}*/
 
-ul.operations li ul li li a:hover {
-  background: #00498F;
-  border-left: 5px #000 solid;
-  padding-left: 20px;
-}
+/*ul.operations li ul li li a:hover {*/
+  /*background: #00498F;*/
+  /*border-left: 5px #000 solid;*/
+  /*padding-left: 20px;*/
+/*}*/
 
-ul.operations li ul li li li a {
-  background: #e0e0e0;
-  color: #000;
-  padding-left: 30px;
-}
+/*ul.operations li ul li li li a {*/
+  /*background: #e0e0e0;*/
+  /*color: #000;*/
+  /*padding-left: 30px;*/
+/*}*/
 
-ul.operations li ul li li li a:hover {
-  background: #ccc;
-  border-left: 5px #000 solid;
-  padding-left: 25px;
-}
+/*ul.operations li ul li li li a:hover {*/
+  /*background: #ccc;*/
+  /*border-left: 5px #000 solid;*/
+  /*padding-left: 25px;*/
+/*}*/
 
-ul.operations li.active >a,
-ul.operations li.selected >a,
-ul.operations li.current_page_item > a,
-ul.operations li.current-menu-ancestor > a,
-ul.operations li.current-menu-item > a,
-ul.operations li.current-menu-parent > a {
-	background: #00498F;
+/*ul.operations li.active >a,*/
+/*ul.operations li.selected >a,*/
+/*ul.operations li.current_page_item > a,*/
+/*ul.operations li.current-menu-ancestor > a,*/
+/*ul.operations li.current-menu-item > a,*/
+/*ul.operations li.current-menu-parent > a {*/
+	/*background: #00498F;*/
 	/*border-left: 5px #000 solid;*/
-	color: #000;
-}
+	/*color: #000;*/
+/*}*/
 
-ul.operations li.current-menu-parent > a {
-	background: #ddd;
-	color: #000;
-}
+/*ul.operations li.current-menu-parent > a {*/
+	/*background: #ddd;*/
+	/*color: #000;*/
+/*}*/
 
-* html ul.operations li.active a,
-* html ul.operations li.selected a,
-* html ul.operations li.current_page_item a,
-* html ul.operations li.current-menu-ancestor a,
-* html ul.operations ul li.current-menu-item a,
-* html ul.operations ul li.current-menu-parent a,
-* html ul.operations ul li a:hover {
-	background: #aaa;
-	color: #000;
-}
+/** html ul.operations li.active a,*/
+/** html ul.operations li.selected a,*/
+/** html ul.operations li.current_page_item a,*/
+/** html ul.operations li.current-menu-ancestor a,*/
+/** html ul.operations ul li.current-menu-item a,*/
+/** html ul.operations ul li.current-menu-parent a,*/
+/** html ul.operations ul li a:hover {*/
+	/*background: #aaa;*/
+	/*color: #000;*/
+/*}*/
 /* End Style the Sidebar Menu */
 
 /*.container, #content{*/
@@ -1356,10 +1330,7 @@ ul.operations li.current-menu-parent > a {
 .ui-menu-item ul {
 	z-index: 100;
 }
-.activeMnu {
-	background: #00498F;
 
-}
 .attributeHighlight {
 	background-color:#FFFF84;
 	font-weight: bold;
@@ -1442,9 +1413,9 @@ table.items tr td a.buttonLink {
 
 div.attrHead, div.attrHead .header {
     float: left;
-    width: 25%;
-    margin: 0 1em 0 1em;
-
+    width: 20%;
+    margin: 0 1em;
+    min-width: 20em;
 }
 div.attrHead .header {
     font-weight: bold;
@@ -1455,8 +1426,9 @@ div.attrHead button {
     float: left;
     clear: left;
     margin-top: 0.5em;
+    width: 15em;
 }
 div.attrHead a, div.attrHead button span {
-    width: 17em;
+    width: 13em;
 
 }

@@ -100,10 +100,6 @@ CHtml::$afterRequiredLabel = '';
 					<a href="<?php echo $url ?>" ><?php echo Yii::t("translation", "Forgot your Password");?></a>
 				</li>
 				<li>
-					<a href='<?php echo Yii::app()->request->baseUrl; ?>/index.php/site/login/openId/1'>
-						<?php echo Yii::t("translation", "Or login using your Google account");?></a>
-				</li>
-				<li>
 					<a href='<?php echo Yii::app()->request->baseUrl; ?>/index.php/site/registerUser'>
 						<?php echo Yii::t("translation", "Register");?></a>
 				</li>
