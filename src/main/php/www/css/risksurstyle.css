@@ -407,6 +407,17 @@ table {
 .selected li, .available li {
 	cursor: pointer;
 }
+.ui-widget-content a {
+    color: #003B78;
+}
+li.ui-widget-content a:hover, li.ui-state-active a:hover {
+    /*color: #FA9D00;*/
+    color: #003B78;
+    background-color: #FA9D00;
+}
+li.ui-state-active a {
+    background-color: #003B78;
+}
 /*h1 {*/
 /*display: none;*/
 /*}*/
