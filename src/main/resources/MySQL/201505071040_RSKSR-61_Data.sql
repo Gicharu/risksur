@@ -363,7 +363,7 @@ VALUES
     17,
     'Re-design',
     NULL,
-    'design/listComponent'
+    'design/listComponents'
   ),
   (
     44,
