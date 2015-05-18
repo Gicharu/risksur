@@ -219,7 +219,7 @@ class EvaluationController extends Controller {
 				'type'      => 'radiolist',
 				'separator' => '<br>',
 				//'labelOptions'=>array('style'=>'display:inline-block'),
-				'style'     => 'width:0.2em;',
+				'style'     => 'width:1em;',
 				'template'  => '<span class="rb">{input} {label}</span>',
 				'items'     => CHtml::listData($questionsRs, 'evalQuestionId', 'question')
 			)
@@ -269,7 +269,7 @@ class EvaluationController extends Controller {
 			'<h3>' . $questions[0]->question . '</h3>',
 			'question' => array(
 				'type'         => 'radiolist',
-				'style'        => 'width:0.2em;',
+				'style'        => 'width:1em;',
 				'labelOptions' => array('style' => 'display:inline'),
 				'items'        => $model->getItems($questions[0]['evalQuestionAnswers'])
 			)
