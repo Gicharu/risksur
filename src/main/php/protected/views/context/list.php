@@ -1,4 +1,5 @@
 <script type="text/javascript">
+	var slist;
 $(function(){
 	slist = $("#surveillanceList").dataTable({
 		"sDom": '<"H"rlTf>t<"F"ip>',
@@ -79,14 +80,18 @@ $(function(){
 
 		var aPos;
 		 /* Get current  row pos */
+		aPos = slist.fnGetPosition($(event.target).parent().parent()[0]);
+//		aPos = slist.fnGetPosition($(event.target).parent()[0]);
 		if(typeof event.data.parent !== 'undefined') {
 			aPos = slist.fnGetPosition(event.target);
-		} else {
-			aPos = slist.fnGetPosition($(event.target).parent()[0]);
 		}
-//		console.log(aPos);
-		var aData = slist.fnGetData(aPos[0]); /* Get the full row     */
-		//console.log(aData);
+		var aPosFinal;
+		if(typeof aPos === 'object') {
+			aPosFinal = aPos[0];
+		} else {
+			aPosFinal = aPos;
+		}
+		var aData = slist.fnGetData(aPosFinal); /* Get the full row     */
 		var frameworkId = aData['frameworkId'];
 		var name = aData['name'];
 		switch(event.data.action) {
@@ -109,8 +114,8 @@ $(function(){
 		.on('click', '.delContext', { action: 'delete' }, requestHandler);
 
 	var deleteConfirm = function(confirmMsg, deleteVal) {
-		$('body #deleteBox').html("<p>Are you sure you want to delete '" + confirmMsg + "' </p>");
-		$("body #deleteBox").dialog('option', 'buttons', {
+		$('body #deleteBox').html("<p>Are you sure you want to delete '" + confirmMsg + "' </p>")
+			.dialog('option', 'buttons', {
 			"Confirm" : function() {
 				// console.log(confirmMsg + ":" + deleteVal);
 				$(this).dialog("close");
@@ -124,8 +129,8 @@ $(function(){
 						if (checkSuccess.test(data)) {
 							// add process message
 							$("#ajaxFlashMsg").html(data);
-							$("#ajaxFlashMsgWrapper").attr('class', 'flash-success').show();
-							$("#ajaxFlashMsgWrapper").animate({opacity: 1.0}, 3000).fadeOut("slow");
+							$("#ajaxFlashMsgWrapper").attr('class', 'flash-success').show()
+								.animate({opacity: 1.0}, 3000).fadeOut("slow");
 							// remove the elements of selected context
 							$('#designName').hide();
 							$('#addComponent').hide();
