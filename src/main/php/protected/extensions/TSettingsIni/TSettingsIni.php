@@ -29,11 +29,9 @@ class TSettingsIni extends CApplicationComponent {
 		$this->settings->version = "RISKSUR";
 	}
 
+
 	/**
-	 * getSettings 
-	 * 
-	 * @access public
-	 * @return void
+	 * @return mixed
 	 */
 	public function getSettings() {
 		Yii::log("getSettings called", "trace", self::LOG_CAT);
@@ -154,13 +152,11 @@ class TSettingsIni extends CApplicationComponent {
 		return $this->settings;
 	}
 	
+
 	/**
-	 * generate 
-	 * 
-	 * @param mixed $userName 
-	 * @param mixed $password 
-	 * @access public
-	 * @return void
+	 * @param $userName
+	 * @param $password
+	 * @return string
 	 */
 	public function generate($userName, $password) {
 		$hashsalt = "{" . $userName . "}";
@@ -169,142 +165,6 @@ class TSettingsIni extends CApplicationComponent {
 		return $ssha;
 	}
 
-	/**
-	 * getConfigXmlFile 
-	 * 
-	 * @access public
-	 * @return void
-	 */
-	public function getConfigXmlFile() {
-		$error = "";
-		$rootPath = str_replace('index.php', '', Yii::app()->request->scriptFile);
-		$rootPath = str_replace('snippet.php', '', $rootPath);
-		$configVariables = new IniSettings();
-		$xmlPaths = array();
-		
-		if (file_exists($rootPath . '/classes/resources/baseline_MDD_config.xml')) {
-			$configVariables->mddConfigXml = file($rootPath . '/classes/resources/baseline_MDD_config.xml');
-			Yii::log("Found baseline_MDD_config.xml in DEV", "trace", self::LOG_CAT);
-		} elseif (file_exists(Yii::app()->params['mainPath'] . '../resources/baseline_MDD_config.xml')) {
-			$configVariables->mddConfigXml = file(Yii::app()->params['mainPath'] . '../resources/baseline_MDD_config.xml');
-			Yii::log("Found baseline_MDD_config.xml in PROD", "trace", self::LOG_CAT);
-		} elseif (file_exists(Yii::app()->params['mainPath'] . '../../resources/baseline_MDD_config.xml')) {
-			$configVariables->mddConfigXml = file(Yii::app()->params['mainPath'] . '../../resources/baseline_MDD_config.xml');
-			Yii::log("Found baseline_MDD_config.xml in LOCAL", "trace", self::LOG_CAT);
-		} else {
-			$configVariables->mddConfigXml = "";
-			$error = "FATAL: Did not find baseline_MDD_config.xml";
-			Yii::log($error, "error", self::LOG_CAT);
-		}
-
-
-		if (file_exists($rootPath . '/classes/resources/baseline_config.xml')) {
-			$configVariables->baselineConfigXml = file($rootPath . '/classes/resources/baseline_config.xml');
-			Yii::log("Found baseline_config.xml in DEV", "trace", self::LOG_CAT);
-		} elseif (file_exists(Yii::app()->params['mainPath'] . '../resources/baseline_config.xml')) {
-			$configVariables->baselineConfigXml = file(Yii::app()->params['mainPath'] . '../resources/baseline_config.xml');
-			Yii::log("Found baseline_config.xml in PROD", "trace", self::LOG_CAT);
-		} elseif (file_exists(Yii::app()->params['mainPath'] . '../../resources/baseline_config.xml')) {
-			$configVariables->baselineConfigXml = file(Yii::app()->params['mainPath'] . '../../resources/baseline_config.xml');
-			Yii::log("Found baseline_config.xml in LOCAL", "trace", self::LOG_CAT);
-		} else {
-			$configVariables->baselineConfigXml = "";
-			$error = "FATAL: Did not find baseline_config.xml";
-			Yii::log($error, "error", self::LOG_CAT);
-		}
-
-
-		if (file_exists($rootPath . '/classes/resources/baseline_org_config.xml')) {
-			$configVariables->baselineOrgConfigXml = file($rootPath . '/classes/resources/baseline_org_config.xml');
-			Yii::log("Found baseline_org_config.xml in DEV", "trace", self::LOG_CAT);
-		} elseif (file_exists(Yii::app()->params['mainPath'] . '../resources/baseline_org_config.xml')) {
-			$configVariables->baselineOrgConfigXml = file(Yii::app()->params['mainPath'] . '../resources/baseline_org_config.xml');
-			Yii::log("Found baseline_org_config.xml in PROD", "trace", self::LOG_CAT);
-		} elseif (file_exists(Yii::app()->params['mainPath'] . '../../resources/baseline_org_config.xml')) {
-			$configVariables->baselineOrgConfigXml = file(Yii::app()->params['mainPath'] . '../../resources/baseline_org_config.xml');
-			Yii::log("Found baseline_org_config.xml in LOCAL", "trace", self::LOG_CAT);
-		} else {
-			$configVariables->baselineOrgConfigXml = "";
-			$error = "FATAL: Did not find baseline_org_config.xml";
-			Yii::log($error, "error", self::LOG_CAT);
-		}
-
-
-		if (file_exists($rootPath . '/classes/resources/deleted_config.xml')) {
-			$configVariables->deletedConfigXml = file($rootPath . '/classes/resources/deleted_config.xml');
-			Yii::log("Found deleted_config.xml in DEV", "trace", self::LOG_CAT);
-		} elseif (file_exists(Yii::app()->params['mainPath'] . '../resources/deleted_config.xml')) {
-			$configVariables->deletedConfigXml = file(Yii::app()->params['mainPath'] . '../resources/deleted_config.xml');
-			Yii::log("Found deleted_config.xml in PROD", "trace", self::LOG_CAT);
-		} elseif (file_exists(Yii::app()->params['mainPath'] . '../../resources/deleted_config.xml')) {
-			$configVariables->deletedConfigXml = file(Yii::app()->params['mainPath'] . '../../resources/deleted_config.xml');
-			Yii::log("Found deleted_config.xml in LOCAL", "trace", self::LOG_CAT);
-		} else {
-			$configVariables->deletedConfigXml = "";
-			$error = "FATAL: Did not find deleted_config.xml";
-			Yii::log($error, "error", self::LOG_CAT);
-		}
-
-
-		if (file_exists($rootPath . '/classes/resources/deleted_org_config.xml')) {
-			$configVariables->deletedOrgConfigXml = file($rootPath . '/classes/resources/deleted_org_config.xml');
-			Yii::log("Found deleted_org_config.xml in DEV", "trace", self::LOG_CAT);
-		} elseif (file_exists(Yii::app()->params['mainPath'] . '../resources/deleted_org_config.xml')) {
-			$configVariables->deletedOrgConfigXml = file(Yii::app()->params['mainPath'] . '../resources/deleted_org_config.xml');
-			Yii::log("Found deleted_org_config.xml in PROD", "trace", self::LOG_CAT);
-		} elseif (file_exists(Yii::app()->params['mainPath'] . '../../resources/deleted_org_config.xml')) {
-			$configVariables->deletedOrgConfigXml = file(Yii::app()->params['mainPath'] . '../../resources/deleted_org_config.xml');
-			Yii::log("Found deleted_org_config.xml in LOCAL", "trace", self::LOG_CAT);
-		} else {
-			$configVariables->deletedOrgConfigXml = "";
-			$error = "FATAL: Did not find deleted_org_config.xml";
-			Yii::log($error, "error", self::LOG_CAT);
-		}
-
-
-		if (file_exists($rootPath . '/classes/resources/deleted_node_config.xml')) {
-			$configVariables->deletedNodeConfigXml = file($rootPath . '/classes/resources/deleted_node_config.xml');
-			Yii::log("Found deleted_node_config.xml in DEV", "trace", self::LOG_CAT);
-		} elseif (file_exists(Yii::app()->params['mainPath'] . '../resources/deleted_node_config.xml')) {
-			$configVariables->deletedNodeConfigXml = file(Yii::app()->params['mainPath'] . '../resources/deleted_node_config.xml');
-			Yii::log("Found deleted_node_config.xml in PROD", "trace", self::LOG_CAT);
-		} elseif (file_exists(Yii::app()->params['mainPath'] . '../../resources/deleted_node_config.xml')) {
-			$configVariables->deletedNodeConfigXml = file(Yii::app()->params['mainPath'] . '../../resources/deleted_node_config.xml');
-			Yii::log("Found deleted_node_config.xml in LOCAL", "trace", self::LOG_CAT);
-		} else {
-			$configVariables->deletedNodeConfigXml = "";
-			$error = "FATAL: Did not find deleted_node_config.xml";
-			Yii::log($error, "error", self::LOG_CAT);
-		}
-
-
-		if (file_exists($rootPath . '/classes/resources/baseline_node_config.xml')) {
-			$configVariables->baselineNodeConfigXml = file($rootPath . '/classes/resources/baseline_node_config.xml');
-			Yii::log("Found baseline_node_config.xml in DEV", "trace", self::LOG_CAT);
-		} elseif (file_exists(Yii::app()->params['mainPath'] . '../resources/baseline_node_config.xml')) {
-			$configVariables->baselineNodeConfigXml = file(Yii::app()->params['mainPath'] . '../resources/baseline_node_config.xml');
-			Yii::log("Found baseline_node_config.xml in PROD", "trace", self::LOG_CAT);
-		} elseif (file_exists(Yii::app()->params['mainPath'] . '../../resources/baseline_node_config.xml')) {
-			$configVariables->baselineNodeConfigXml = file(Yii::app()->params['mainPath'] . '../../resources/baseline_node_config.xml');
-			Yii::log("Found baseline_node_config.xml in LOCAL", "trace", self::LOG_CAT);
-		} else {
-			$configVariables->baselineNodeConfigXml = "";
-			$error = "FATAL: Did not find baseline_node_config.xml";
-			Yii::log($error, "error", self::LOG_CAT);
-		}
-
-		$xmlPaths['mdd'] = $configVariables->mddConfigXml;
-		$xmlPaths['baseline'] = $configVariables->baselineConfigXml;
-		$xmlPaths['baselineOrg'] = $configVariables->baselineOrgConfigXml;
-		$xmlPaths['deleted'] = $configVariables->deletedConfigXml;
-		$xmlPaths['deletedOrg'] = $configVariables->deletedOrgConfigXml;
-		$xmlPaths['deletedNodeConfig'] = $configVariables->deletedNodeConfigXml;
-		$xmlPaths['baselineNode'] = $configVariables->baselineNodeConfigXml;
-		$xmlPaths['temporaryFilePath'] = $configVariables->temporaryFilePath;
-
-	return $xmlPaths;
-
-	}
 	/**
 	 * processJavaScriptIncludes 
 	 * 
@@ -430,4 +290,3 @@ class IniSettings {
 
 	public $maxPageSizeObjectQuery;
 }
-?>
