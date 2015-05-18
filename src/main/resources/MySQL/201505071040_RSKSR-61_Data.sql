@@ -368,7 +368,7 @@ VALUES
   (
     44,
     17,
-    'Evaluate how well surveillance is performnig',
+    'Evaluate how well surveillance is performing',
     42,
     NULL
   ),

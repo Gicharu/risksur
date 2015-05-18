@@ -15,7 +15,7 @@ CREATE TABLE `evalQuestionAnswers` (
   `evalQuestionId` int(11) unsigned NOT NULL,
   `optionName` text NOT NULL,
   `nextQuestion` int(11) unsigned DEFAULT NULL,
-  `url` varchar(20) DEFAULT NULL,
+  `url` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `fk_evalQuestion` (`evalQuestionId`),
   KEY `fk_nextQuestion` (`nextQuestion`),
