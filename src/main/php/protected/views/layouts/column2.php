@@ -24,13 +24,13 @@
 		if (Yii::app()->controller->id == 'design') {
 
 			$this->menu = array(
-				array('label'       => Yii::t("translation", "Add Component"), 'url' => array('addComponent'),
+				array('label'       => Yii::t("translation", "Design Component"), 'url' => array('addComponent'),
 					'itemOptions' => array(
 						'id' => 'addComponent'
 					),
 					'active' => strstr('addComponent', $currentView),
 				),
-				array('label'  => Yii::t("translation", "Add Multiple Components"),
+				array('label'  => Yii::t("translation", "Add Components"),
 					'url' => array('addMultipleComponents'), 'itemOptions' => array(
 					'id' => 'addMultipleComponents'
 				),
