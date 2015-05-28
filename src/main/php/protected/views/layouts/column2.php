@@ -65,9 +65,9 @@
 				array('label' => Yii::t("translation", "Select Evaluation Question"),
 					'url'   => array("$currentController/selectEvaQuestion")),
 				array('label' => Yii::t("translation", "Evaluation attributes and economic criteria"),
-					'url'   => array("$currentController/index"), 'items' => array(
+					'url' => '#', 'items' => array(
 						array('label' => Yii::t("translation", "Economic evaluation"),
-							'url'   => array("$currentController/index")),
+							'url'   => array("$currentController/econEval")),
 						array('label' => Yii::t("translation", "Epidemiological assessment"),
 							'url'   => array("$currentController/index")),
 						array('label' => 'Final list of attributes', 'url' => array("$currentController/index"))

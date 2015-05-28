@@ -94,14 +94,14 @@ CHtml::$afterRequiredLabel = '';
 					<button id="login" name="login" onclick=";" type="submit"><?php echo Yii::t("translation", "Login");?></button>
 				</li>
 				
-				<?php $url = Yii::app()->request->baseUrl . "/index.php/site/forgotpassword";?> 
+				<?php $url = Yii::app()->createUrl("site/forgotpassword"); ?>
 				
 				<li>
-					<a href="<?php echo $url ?>" ><?php echo Yii::t("translation", "Forgot your Password");?></a>
+					<a href="<?= $url ?>" ><?php echo Yii::t("translation", "Forgot your Password"); ?></a>
 				</li>
 				<li>
-					<a href='<?php echo Yii::app()->request->baseUrl; ?>/index.php/site/registerUser'>
-						<?php echo Yii::t("translation", "Register");?></a>
+					<a href='<?= Yii::app()->createUrl("site/registerUser"); ?>'>
+						<?= Yii::t("translation", "Register");?></a>
 				</li>
 			</ul>
 		</div>

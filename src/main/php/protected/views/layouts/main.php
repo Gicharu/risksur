@@ -203,7 +203,7 @@ if (!Yii::app()->user->isGuest) {
 	<div id="top_header">
 		<ul id="login">
 			<li id="ttlogo"><a href='//www.tracetracker.com' target="_blank">
-			<img src="<?php echo $baseUrl; ?>/images/tt_logo.png" 
+			<img src="<?= Yii::app()->homeUrl; ?>/images/tt_logo.png"
 				width="129" height="16" alt="trace tracker logo" />
 			</a></li>
 			<li>

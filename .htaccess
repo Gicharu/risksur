@@ -1,9 +1,10 @@
-#Options +FollowSymLinks
-#
-#<IfModule mod_rewrite.c>
-#RewriteEngine on
-#RewriteBase /
-#RewriteCond %{REQUEST_FILENAME} !-f
-#RewriteCond %{REQUEST_FILENAME} !-d
-#RewriteRule ^(.*)\?*$ /tracii/index.php/$1 [L,QSA]
-#</IfModule>
+RewriteEngine on
+RewriteBase /risksur
+# if a directory or a file exists, use it directly
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# otherwise forward it to index.php
+RewriteRule . index.php
+#RewriteCond $1 !^(index\.php)
+#RewriteRule ^(.+)$ index.php?$1 [PT,L,QSA]

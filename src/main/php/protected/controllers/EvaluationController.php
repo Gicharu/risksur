@@ -194,6 +194,7 @@ class EvaluationController extends Controller {
 	 * @return string
 	 */
 	public function actionSelectEvaQuestion() {
+		Yii::log("actionSelectEvaQuestion called", "trace", self::LOG_CAT);
 		$this->setPageTitle('Select evaluation question');
 		return $this->render('selectEvaQuestion');
 	}
@@ -203,6 +204,7 @@ class EvaluationController extends Controller {
 	 * @param string $questionId
 	 */
 	public function actionEvalQuestionList($questionId = '') {
+		Yii::log("actionEvalQuestionList called", "trace", self::LOG_CAT);
 		$this->setPageTitle('Select evaluation question');
 		if (!empty($_POST['EvaluationQuestion']['question'])) {
 			Yii::app()->session['evalQuestion'] = $_POST['EvaluationQuestion']['question'];
@@ -235,10 +237,38 @@ class EvaluationController extends Controller {
 		$this->render('evaQuestionList', array('form' => $form));
 	}
 
+	public function actionEconEval() {
+		Yii::log("actionEconEval called", "trace", self::LOG_CAT);
+		if (empty(Yii::app()->session['surDesign'])) {
+			Yii::app()->user->setFlash('notice', 'Please select a surveillance system before proceeding');
+			$this->redirect(array('context/list'));
+			return;
+
+		}
+		if(empty(Yii::app()->session['evalQuestion'])) {
+			Yii::app()->user->setFlash('notice', 'Please select the evaluation question before proceeding');
+			$this->redirect('selectEvaQuestion');
+			return;
+		}
+		$evaQuestionId = Yii::app()->session['evalQuestion'];
+		// get list of surveillance designs
+		$componentList = ComponentHead::model()->findAll(array(
+			'select' => 'componentName',
+			'condition' => 'frameworkId=:frameworkId',
+			'params'    => array(
+				':frameworkId' => Yii::app()->session['surDesign']['id'],
+			),
+		));
+		print_r($componentList); die;
+
+
+	}
+
 	/**
 	 * actionEvaQuestionWizard
 	 */
 	public function actionEvaQuestionWizard() {
+		Yii::log("actionEvaQuestionWizard called", "trace", self::LOG_CAT);
 		$this->setPageTitle('Evaluation question wizard');
 		$model = new EvaluationQuestion();
 		$elements = ContextController::getDefaultElements();
