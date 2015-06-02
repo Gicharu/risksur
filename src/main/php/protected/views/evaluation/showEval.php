@@ -1,7 +1,7 @@
 
 <script type="text/javascript">
 $(function(){
-	$("<?php echo '#evalTable'; ?>").dataTable({
+	$("#evalTable").dataTable({
 		"bAutoWidth" : false,
 		"bJQueryUI": true,
 		"bFilter": false,

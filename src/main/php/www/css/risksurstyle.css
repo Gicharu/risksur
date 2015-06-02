@@ -1443,3 +1443,7 @@ div.attrHead a, div.attrHead button span {
     width: 13em;
 
 }
+.bold {
+    font-weight: bold;
+    font-size: medium;
+}

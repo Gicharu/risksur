@@ -17,7 +17,7 @@ class ComponentHead extends CActiveRecord {
 	 * @param mixed $className 
 	 * @static
 	 * @access public
-	 * @return void
+	 * @return static
 	 */
 	public static function model($className = __CLASS__) {
 		return parent::model($className);
@@ -27,7 +27,7 @@ class ComponentHead extends CActiveRecord {
 	 * tableName 
 	 * 
 	 * @access public
-	 * @return void
+	 * @return string
 	 */
 	public function tableName() {
 		return 'componentHead';
@@ -37,7 +37,7 @@ class ComponentHead extends CActiveRecord {
 	 * primaryKey 
 	 * 
 	 * @access public
-	 * @return void
+	 * @return string
 	 */
 	public function primaryKey() {
 		return 'componentId';
@@ -47,7 +47,7 @@ class ComponentHead extends CActiveRecord {
 	 * relations 
 	 * 
 	 * @access public
-	 * @return void
+	 * @return array
 	 */
 	public function relations() {
 		return array(

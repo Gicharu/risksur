@@ -250,7 +250,11 @@ class EvaluationController extends Controller {
 			$this->redirect('selectEvaQuestion');
 			return;
 		}
-		$evaQuestionId = Yii::app()->session['evalQuestion'];
+
+		$this->render('econEval');
+
+	}
+	public function actionGetEvaSummary() {
 		// get list of surveillance designs
 		$componentList = ComponentHead::model()->findAll(array(
 			'select' => 'componentName',
@@ -259,8 +263,34 @@ class EvaluationController extends Controller {
 				':frameworkId' => Yii::app()->session['surDesign']['id'],
 			),
 		));
-		print_r($componentList); die;
+		$tableData = array();
+		$tableData['Active Components'] = '';
+		foreach($componentList as $component) {
+			$tableData['Active Components'] .= 'Active surveillance in ' . $component['componentName'] . '<br />';
+		}
+		$evaQuestionId = Yii::app()->session['evalQuestion'];
 
+		$surQuestionWithCriteria = EvaquestionHasCriteriaAndAssessment::model()
+			->with('criteria', 'question')
+			->findAll(array(
+				'select' => 't.question_Id,t.criteria_Id',
+				'condition' => 'question_Id=:questionId',
+				'params' => array(':questionId' => $evaQuestionId)
+				)
+			);
+		$tableData['Evaluation Question'] = '';
+		$tableData['Assessment Criteria'] = '';
+		$counter = 1;
+		foreach($surQuestionWithCriteria as $questionWithCriteria) {
+			$tableData['Evaluation Question'] = $questionWithCriteria->question->question;
+			$tableData['Assessment Criteria'] .= $questionWithCriteria->criteria->criteria_name;
+			if($counter < count($surQuestionWithCriteria) ) {
+				$tableData['Assessment Criteria'] .= ' and ';
+			}
+			$counter++;
+		}
+		echo json_encode($tableData, JSON_UNESCAPED_SLASHES);
+		return;
 
 	}
 
