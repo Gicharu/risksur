@@ -12,7 +12,7 @@
 	 * @SuppressWarnings checkUnusedVariables
 	 */
 	class DynamicFormDetails extends CActiveRecord {
-		private $_dynamicData = array();
+		public $_dynamicData = array();
 		public $_dynamicFields = array();
 		public $_dynamicLabels = array();
 		protected  $_tableName;
