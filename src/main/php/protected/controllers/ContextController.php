@@ -367,7 +367,7 @@ class ContextController extends Controller {
 			}
 			//print_r($surveillanceModel->getAttributes()); die;
 			//$dForm->fieldId =
-			$dataToSave = array($event->step => $dForm->getAttributes());
+			$dataToSave = array($dForm->getAttributes());
 			if($event->sender->getCurrentStep() == 1) {
 				$dataToSave['surveillanceModel'] = $surveillanceModel->getAttributes();
 
