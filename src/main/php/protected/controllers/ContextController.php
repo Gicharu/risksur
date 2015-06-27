@@ -303,13 +303,15 @@ class ContextController extends Controller {
 		return $steps;
 	}
 	public function processSurveillance($event) {
-		$surveillanceFieldsModel = FrameworkFields::model()->findAll('sectionId=' . $event->sender->getCurrentStep());
-		$dForm = new DynamicFormDetails('create', 'frameworkFieldData');
-//		var_dump($event->sender->read($event->step));
-//		var_dump(Yii::app()->session);
+		$fieldsCriteria = new CDbCriteria();
+		$fieldsCriteria->condition = 'sectionId=' . $event->sender->getCurrentStep();
+		$fieldsCriteria->order = '`order` ASC, `parentId` ASC';
+		$surveillanceFieldsModel = FrameworkFields::model()->findAll($fieldsCriteria);
+		$dForm = new DForm('insert');
+//		print_r($_POST);
 //		die;
 
-		$elements = self::getDefaultElements(false);
+		$elements = self::getDefaultElements();
 		if($event->sender->getCurrentStep() === 1) {
 			$surveillanceModel = new FrameworkContext();
 			$surveillanceModel->userId = Yii::app()->user->id;
@@ -329,60 +331,149 @@ class ContextController extends Controller {
 		);
 
 		$elements['elements']['context']['type'] = 'form';
+		//$elements['elements']['contextFields']['elements'] = self::getDefaultElements();
 		$elements['elements']['contextFields']['type'] = 'form';
-		$elements['elements']['context'] = array_merge($elements['elements']['context'], $errorArray);
-		$elements['elements']['contextFields'] = array_merge($elements['elements']['contextFields'], $errorArray);
+//		$elements['elements']['context'] = array_merge($elements['elements']['context'], $errorArray);
+//		$elements['elements']['contextFields'] = array_merge($elements['elements']['contextFields'], $errorArray);
 		//$contextFields = $dForm->findAll();
-		$dynamicDataAttributes = array();
+		$dynamicDataRules = array();
+		$childCounter = 0;
+		$childCount = 0;
+		$parentFieldId = 0;
+		//print_r($elements); die;
+		$gridFieldIds = [];
 		foreach ($surveillanceFieldsModel as $field) {
-			$dynamicDataAttributes[$field->inputName . '-' . $field->id] = $field->inputName;
-			$dynamicLabels[$field->inputName . '-' . $field->id] = isset($field->label) ? $field->label : $dForm->generateAttributeLabel($field->inputName);
-			$elements['elements']['contextFields']['elements'][$field->inputName . '-' . $field->id] = array(
+			//if(!is_null($parentFieldId) &&
+			if($field->inputType == 'label') {
+				if($field->childCount > 0) {
+					$childCount = $field->childCount;
+					$parentFieldId = $field->id;
+					$childCounter++;
+					$elements['elements']['contextFields']['elements'][] = '<fieldset><legend>' .
+						$field->label . '</legend>';
+				} else {
+					$elements['elements']['contextFields']['elements'][] = CHtml::label($field->label, false);
+
+				}
+				continue;
+			}
+			if($field->inputType == 'grid') {
+				$elements['elements']['contextFields']['elements'][] = '<div class="row">';
+				$elements['elements']['contextFields']['elements'][] = "<fieldset><legend> $field->label </legend>";
+				$elements['elements']['contextFields']['elements'][] = self::generateGridElements($field->id, $dForm);
+				$elements['elements']['contextFields']['elements'][] = '</fieldset>';
+				$elements['elements']['contextFields']['elements'][] = '</div>';
+				$gridFieldIds[] = $field->id;
+			}
+			if($field->gridField) {
+				continue;
+			}
+			$attributeName = $field->inputName . '_' . $field->id;
+			$dForm->setPropertyName($attributeName); //$field->inputName;
+//			$dForm->$attributeName = ''; //$field->inputName;
+			$validation = $field->required ? 'required' : 'safe';
+			$dynamicDataRules[] = [$attributeName, $validation];
+			$dForm->setAttributeLabels([$attributeName => isset($field->label) ? $field->label :
+				$dForm->generateAttributeLabel($field->inputName)]);
+			$elements['elements']['contextFields']['elements'][$attributeName] = array(
 				'label'    => isset($field->label) ? $field->label : $dForm->generateAttributeLabel($field->inputName),
 				'required' => $field->required,
-				'type'     => $field->inputType
+				'type'     => $field->inputType,
+				'hint' => $field->description
 			);
 			if ($field->inputType == 'dropdownlist') {
-				$elements['elements']['contextFields']['elements'][$field->inputName . '-' . $field->id]['items'] =
+				$elements['elements']['contextFields']['elements'][$attributeName]['items'] =
 					Options::model()->getContextFieldOptions($field->id);
 			}
+			if ($field->inputType == 'checkboxlist') {
+				$elements['elements']['contextFields']['elements'][$attributeName]['items'] =
+					Options::model()->getContextFieldOptions($field->id);
+				$elements['elements']['contextFields']['elements'][$attributeName]['class'] =
+					'checkboxlist';
+				$elements['elements']['contextFields']['elements'][] = '<div class="clear"></div>';
+			}
+			if(isset($field->parentId) && $field->parentId == $parentFieldId) {
+				if ($childCount != $childCounter) {
+					//echo $childCounter . '======>' . $childCount . '<br>';
+					$childCounter++;
+				} else {
+					$elements['elements']['contextFields']['elements'][] = '</fieldset>';
+				}
+			}
 		}
-		$dForm->_dynamicFields = $dynamicDataAttributes;
-		$dForm->_dynamicLabels = $dynamicLabels;
+		//var_dump($elements['elements']['contextFields']);
+
+		//$dForm->setPropertyNames($dynamicDataAttributes);
+		//$dForm->setAttributeLabels($dynamicLabels);
+		$dForm->setRules($dynamicDataRules);
+//		print_r($elements); die;
+//		var_dump($dForm->getAttributes());
+//		die;
 		$form = new CForm($elements);
 		if($event->sender->getCurrentStep() == 1) {
 			$form['context']->model = $surveillanceModel;
 		}
 		$form['contextFields']->model = $dForm;
-//		$form = new CForm("path.to.get.{$event->step}.form.configuration",
-//			$model);
-//		if ($event->data) {
-//			$dForm->attributes = $event->data;
-//		}
-		if ($form->submitted('next') && $form->validate()) {
-			foreach($dForm->_dynamicData as $attrName => $attrVal) {
-				$fieldNameAndId = explode('-', $attrName);
-				$dForm->frameworkFieldId = $fieldNameAndId[1];
-				$dForm->value = $attrVal;
+		$fieldData = [];
+		//$form->loadData();
+		if ($form->submitted('next')) {
+			if(isset($_POST['DForm'][0])) {
+				//print_r($dForm->attributes); die;
+				// This can be refactored later
+				foreach($_POST['DForm'] as $row => $rowData ) {
+						//print_r($rowData);
+					foreach($rowData as $attrName => $attrVal) {
+						if(!empty($attrVal)) {
+							if(is_array($attrVal)) {
+								$attrVal = json_encode($attrVal);
+							}
+							$fieldNameAndId = explode('_', $attrName);
+							$fieldData[$row][$attrName]['frameworkFieldId'] = $fieldNameAndId[1];
+							$fieldData[$row][$attrName]['value'] = $attrVal;
+
+						}
+					}
+					//print_r($fieldData); die;
+				}
+			} else {
+				if($form->validate()) {
+
+					//print_r($dForm->attributes); die;
+					foreach($dForm->attributes as $attrName => $attrVal) {
+						if(!empty($attrVal)) {
+							$fieldNameAndId = explode('_', $attrName);
+							$fieldData[$fieldNameAndId[0]]['frameworkFieldId'] = $fieldNameAndId[1];
+							$val = $attrVal;
+							if(is_array($attrVal)) {
+								$val = json_encode($attrVal);
+							}
+							$fieldData[$fieldNameAndId[0]]['value'] = $val;
+						}
+					}
+
+				}
 			}
-			//print_r($surveillanceModel->getAttributes()); die;
 			//$dForm->fieldId =
-			$dataToSave = array($dForm->getAttributes());
+			//$dataToSave = array($dForm->getAttributes());
+			$dataToSave = [$fieldData];
 			if($event->sender->getCurrentStep() == 1) {
-				$dataToSave['surveillanceModel'] = $surveillanceModel->getAttributes();
+				$event->sender->save($surveillanceModel->getAttributes(), 'surveillanceModel');
 
 			}
+			//print_r($dForm); die;
 			$event->sender->save($dataToSave);
+			//print_r($_SESSION['Wizard.steps']); die;
 			$event->handled = true;
 			return true;
 		} else {
+			//print_r($gridFieldIds); die;
 			$sectionCriteria = new CDbCriteria();
 			$sectionCriteria->select = 'description';
 			$sectionCriteria->condition = 'sectionId=' . $event->sender->getCurrentStep();
 			$sectionInfo = SurveillanceSections::model()->find($sectionCriteria);
 			//print_r($sectionInfo->description); die();
 //			$this->render($event->step, compact('form'));
-			$this->render('create', compact('form', 'event', 'sectionInfo'));
+			$this->render('create', compact('form', 'event', 'sectionInfo', 'gridFieldIds'));
 
 		}
 
@@ -390,6 +481,80 @@ class ContextController extends Controller {
 
 	public function wizardStart($event) {
 		$event->handled = true;
+	}
+
+	/**
+	 * Raised when the wizard detects an invalid step
+	 * @param WizardEvent The event
+	 */
+	public function wizardInvalidStep($event) {
+		Yii::app()->getUser()->setFlash('notice', $event->step.' is not a vaild step in this wizard');
+	}
+	public function wizardFinished($event) {
+		$surveillanceDataModel = new FrameworkFieldData();
+		$frameWorkModel = new FrameworkContext();
+		$frameWorkData = $event->getData();
+		$frameWorkModel->attributes = $frameWorkData['surveillanceModel'];
+		$transaction = Yii::app()->db->beginTransaction();
+		try {
+			if ($frameWorkModel->save()) {
+				//if(true) {
+				//print_r($frameWorkData); die;
+				unset($frameWorkData['surveillanceModel']);
+				//die;
+				foreach ($frameWorkData as $step => $formData) {
+					//print_r($formData);
+					//echo "_______________________________$step";
+					foreach ($formData as $fieldData) {
+						foreach($fieldData as $fieldName => $data) {
+							//print_r($data);
+							if (isset($data['value'])) {
+								$surveillanceDataModel->setIsNewRecord(true);
+								$surveillanceDataModel->attributes = $data;
+								$surveillanceDataModel->frameworkId = $frameWorkModel->frameworkId;
+								$surveillanceDataModel->id = null;
+								//var_dump($surveillanceDataModel); die;
+								$surveillanceDataModel->save();
+							} else {
+								foreach($data as $field) {
+
+									if(isset($field['value'])) {
+										//print_r($field); die;
+										$surveillanceDataModel->setIsNewRecord(true);
+										$surveillanceDataModel->attributes = $field;
+										$surveillanceDataModel->frameworkId = $frameWorkModel->frameworkId;
+										$surveillanceDataModel->id = null;
+										$surveillanceDataModel->save();
+
+									}
+								}
+							}
+							//die;
+						}
+
+
+					}
+
+				}
+				//var_dump($surveillanceDataModel); die;
+				$transaction->commit();
+			}
+		} catch (Exception $e) {
+			$transaction->rollBack();
+			Yii::log($e->getMessage() . 'error when saving a surveillance system error code [' . $e->getCode() . ']',
+				'error', self::LOG_CAT);
+			$event->sender->reset();
+			Yii::app()->end();
+			Yii::app()->user->setFlash('error', 'There was a problem saving the surveillance system, please try ' .
+				'again or contact your administrator is the problem persists');
+			$this->redirect('create');
+
+		}
+		//die('hapa');
+
+		$this->render('finished', compact('event'));
+		$event->sender->reset();
+		Yii::app()->end();
 	}
 
 	public function actionCreate($step=null) {
@@ -583,16 +748,23 @@ class ContextController extends Controller {
 							'type' => 'text'
 						);
 
+
 					}
 
 				}
 				continue;
 			}
+
 			$modelElements[$attrName] = array(
 				'label' => $model->getAttributeLabel($attrName),
 				'required' => $model->isAttributeRequired($attrName),
 				'type' => 'text'
 			);
+
+//			if ($field->inputType == 'dropdownlist') {
+//				$elements['elements']['contextFields']['elements'][$field->inputName . '-' . $field->id]['items'] =
+//					Options::model()->getContextFieldOptions($field->id);
+//			}
 
 		}
 		return $modelElements;
@@ -615,7 +787,7 @@ class ContextController extends Controller {
 		);
 		$defaultParams = array(
 			'activeForm' => array(
-				'id' => 'DynamicForm',
+				'id' => 'DForm',
 				'class' => 'CActiveForm',
 				'enableClientValidation' => true,
 				'clientOptions' => array(
@@ -661,6 +833,75 @@ class ContextController extends Controller {
 			echo CActiveForm::validate($model);
 			Yii::app()->end();
 		}
+	}
+
+	/**
+	 * @param $fieldId
+	 * @param $dForm
+	 * @return string
+	 */
+	private function generateGridElements($fieldId, &$dForm) {
+		//$model = new DynamicFormDetails('insert', 'frameworkFieldData');
+		// get grid fields
+		$gridFieldsCriteria  = new CDbCriteria();
+		$gridFieldsCriteria->condition = 'parentId=' . $fieldId;
+		$gridFieldsCriteria->order = '`order` ASC';
+		$gridFields = FrameworkFields::model()->findAll($gridFieldsCriteria);
+		//print_r($gridFields); //die;
+		$inputs = '<tr class="copy' . $fieldId . '">';
+		$labels = [];
+		$properties = [];
+		$rules = [];
+		//for ($i = 0; $i < $multipleRowsToShow; $i++) {
+		foreach($gridFields as $field) {
+			//$el = new CFormInputElement()
+			$attribute = $field->inputName . '_' . $field->id;
+			$dForm->setpropertyName($attribute);
+			//$model->setAttribute($attribute, $field->inputName);
+//			$dForm->_dynamicLabels[$attribute] = isset($field->label) ?
+//				$field->label : $dForm->generateAttributeLabel($field->inputName);
+			$labels[$attribute] = isset($field->label) ?
+				$field->label : $dForm->generateAttributeLabel($field->inputName);
+			$validation = $field->required ? 'required' : 'safe';
+			$rules[] = [$attribute, $validation];
+			$i = 0;
+			$inputs .= '<td>';
+			switch($field->inputType) {
+				case 'text':
+					$inputs .= CHtml::activeTextField($dForm, "[$i]$attribute");
+					$inputs .= CHtml::error($dForm, "[$i]$attribute");
+					break;
+				case 'dropdownlist':
+					$options = [];
+					if($field->multiple) {
+						$options['multiple'] = true;
+					}
+					$inputs .= CHtml::activeDropDownList($dForm, "[$i]$attribute",
+						Options::model()->getContextFieldOptions($field->id), $options);
+					$inputs .= CHtml::error($dForm, "[$i]$attribute");
+					break;
+			}
+			$inputs .= '</td>';
+
+			//$elements['elements'][] = '</td>';
+
+		}
+		$dForm->setRules($rules);
+		$dForm->setAttributeLabels($labels);
+		//print_r(array_values($labels));
+		$inputs .= '<td></td></tr>';
+		$tableHeader = '<th>' . implode('</th><th>', array_values($labels));
+		$table = '<table class="jgTabular"><thead><tr>' . $tableHeader . '<th></th></tr></thead>';
+		$table .= '<tbody>' . $inputs . '</tbody>';
+		$table .= '</table>';
+		$table .= CHtml::htmlButton('<span class="ui-icon ui-icon-plusthick"></span>Add new row', [
+			'id' => 'copyLink-' . $fieldId,
+			'rel' => '.copy' . $fieldId
+		]);
+		return $table;
+
+
+
 	}
 
 }

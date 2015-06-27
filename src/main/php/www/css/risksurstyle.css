@@ -1040,19 +1040,6 @@ area {
 	cursor: pointer;
 }
 
-.graphButtonSet {
-	float: left;
-	width: 68%;
-}
-
-.legendButtonSet {
-	width: 28%;
-	float: right;
-}
-
-.legendButtonSet button {
-	float: right;
-}
 
 .orgLegend {
 	font-size: 1.1em; 
@@ -1119,36 +1106,7 @@ table.dataTable {
 	word-wrap:break-word;
 }*/
 
-.masterDataWidgetOptions {
-	/*float:right;*/
-	/*padding-right: 10px;*/
-	/*padding-top: 10px;*/
-}
-.masterDataWidgetOptions button, .masterDataWidgetOptions div.chzn-container {
-	margin-bottom:20px;
-	padding-right: 3px;
-	padding-top:4px;
-	margin-top: 0px;
-}
-.masterDataWidgetOptions button {
-	/*position:relative;*/
-	border-radius: 5px 5px 5px 5px;
-	height: 25px;
-	width: 25px;
-	/*margin-left: 2px;*/
-	font-size:1.1em;
-}
 
-/* org mapping, vocabulary validation error */
-.mappingError, .vocError {
-	background : #FEF1EC;
-	border-color : #C00;
-}
-/*.vocListInline input, .vocListInline label {
-display: inline-block;
-margin: 0.5em;
-float: left;
-}*/
 
 /* override multiselect css to align multiselect for available widgets in org mgt */
 .ms-container {
@@ -1524,4 +1482,17 @@ div.attrHead a, div.attrHead button span {
 
 #wzd-menu li.wzd-active a, #wzd-menu li.wzd-previous a {
     color: #333;
+}
+input.checkboxlist {
+    float: left;
+    margin-right: 10px;
+    display: inline-block;
+    width: 1em;
+
+}
+.row > span {
+ /*border: 1px solid #000000;*/
+}
+div.form {
+    margin: 0 1em;
 }

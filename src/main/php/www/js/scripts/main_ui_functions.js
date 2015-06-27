@@ -1,7 +1,7 @@
 $(function() {
 
 	// update the button to jquery button themes
-    $('button').button();
+    $('button, a.btn').button();
     $('input:button').button();
     $('input:submit').button();
 
