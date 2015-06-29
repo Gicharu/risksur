@@ -561,6 +561,74 @@ class ContextController extends Controller {
 		$this->process($step);
 	}
 
+	public function generateOverviewTable($event) {
+
+		echo '<table id="survTable"><thead><tr><th></th><th></th></tr></thead><tbody>';
+		//print_r($event->data); die;
+		echo '<tr>';
+		echo '<td>Name</td>';
+		echo '<td>' .  $event->data['surveillanceModel']['name'] . '</td>';
+		echo '<tr>';
+		echo '<tr>';
+		echo '<td>Description</td>';
+		echo '<td>' .  $event->data['surveillanceModel']['description'] . '</td>';
+		echo '</tr>';
+		$surveillanceCriteria = new CDbCriteria();
+		$surveillanceCriteria->order = 'frameworkFields.sectionId ASC, frameworkFields.order ASC';
+		$rsSurveillance = SurveillanceSections::model()->with('survData', 'frameworkFields')->findAll($surveillanceCriteria);
+		//print_r($rsSurveillance); die;
+		foreach ($rsSurveillance as $surveillanceData) {
+			echo '<tr>';
+			echo CHtml::tag('td', array('colspan' => 2), '<b>' . $surveillanceData->sectionName . '</b>');
+			echo '</tr>';
+			foreach ($surveillanceData->frameworkFields as $field) {
+				if($field->inputType == 'label' || $field->inputType == 'grid') {
+					echo '<tr>';
+					echo CHtml::tag('td', array('colspan' => 2), '<b>' . $field->label . '</b>');
+					echo '</tr>';
+					continue;
+				}
+				echo '<tr>';
+				echo '<td>';
+				echo isset($field->label) ?
+					$field->label : FrameworkFields::model()->generateAttributeLabel($field->inputName);
+				echo '</td>';
+				foreach($surveillanceData->survData as $data) {
+					$dataValue = '';
+					if(isset($data->frameworkFieldId) && $data->frameworkFieldId == $field->id) {
+						$dataValue = $data->value;
+
+						if($field->inputType == 'checkboxlist' || $field->inputType == 'dropdownlist') {
+							$opts = '';
+							$optionsRs = Options::model()->findAllByPk(json_decode($data->value), '', ['select' => 'label']);
+							foreach($optionsRs as $optionValue) {
+								$opts .= $optionValue->label . ', ';
+							}
+							$dataValue = rtrim($opts, ", ");
+							//print_r($dataValue); die;
+						}
+						echo '<td>';
+						echo $dataValue;
+						echo '</td>';
+					}
+
+				}
+
+			}
+			echo '</tr>';
+		}
+		echo '</table>';
+		//die;
+	}
+
+	/**
+	 * @param $string
+	 * @return bool
+	 */
+	public static function isJson($string) {
+		json_decode($string);
+		return (json_last_error() == JSON_ERROR_NONE);
+	}
 
 	/**
 	 * actionUpdate
@@ -571,7 +639,7 @@ class ContextController extends Controller {
 	public function actionUpdate() {
 		Yii::log("actionUpdate ContextController called", "trace", self::LOG_CAT);
 		//$model = new FrameworkContext();
-		$dForm = new DynamicFormDetails('update', 'frameworkFields');
+		$dForm = new DynamicForm('update');
 		$dynamicLabels = array();
 
 		//print_r($_POST); die;
@@ -593,7 +661,7 @@ class ContextController extends Controller {
 
 		$frameworkFieldData = FrameworkFieldData::model()->findAll('frameworkId=' . $_GET['contextId']);
 		$frameworkFieldDataModel = new FrameworkFieldData();
-		$contextFields = $dForm->findAll();
+		$contextFields = $frameworkFieldDataModel->findAll();
 		$elements = self::getDefaultElements();
 		$elements['elements']['context']['elements'] = self::getElements($model, array('name', 'description'));
 		//$contextForm = new CForm($modelElements, $model);

@@ -1496,3 +1496,9 @@ input.checkboxlist {
 div.form {
     margin: 0 1em;
 }
+#survTable tr {
+    border: 1px solid;
+}
+#survTable tr td {
+    border-right: 1px solid;
+}

@@ -2,88 +2,55 @@
 
 /**
  * This is the model class for table "surveillanceSections".
- *
  * The followings are the available columns in table 'surveillanceSections':
  * @property string $sectionId
  * @property string $sectionName
- *
  * The followings are the available model relations:
  * @property FrameworkFields[] $frameworkFields
  */
-class SurveillanceSections extends CActiveRecord
-{
+class SurveillanceSections extends CActiveRecord {
 	/**
 	 * @return string the associated database table name
 	 */
-	public function tableName()
-	{
+	public function tableName() {
 		return 'surveillanceSections';
 	}
 
 	/**
 	 * @return array validation rules for model attributes.
 	 */
-	public function rules()
-	{
+	public function rules() {
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
 			array('sectionName', 'required'),
-			array('sectionName', 'length', 'max'=>30),
-			// The following rule is used by search().
-			// @todo Please remove those attributes that should not be searched.
-			array('sectionId, sectionName', 'safe', 'on'=>'search'),
+			array('sectionName', 'length', 'max' => 30),
 		);
 	}
 
 	/**
 	 * @return array relational rules.
 	 */
-	public function relations()
-	{
+	public function relations() {
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
 			'frameworkFields' => array(self::HAS_MANY, 'FrameworkFields', 'sectionId'),
+			'survData' => array(self::HAS_MANY, 'FrameworkFieldData', array('id' => 'frameworkFieldId'),
+				'through' => 'frameworkFields')
 		);
 	}
 
 	/**
 	 * @return array customized attribute labels (name=>label)
 	 */
-	public function attributeLabels()
-	{
+	public function attributeLabels() {
 		return array(
-			'sectionId' => 'Section',
+			'sectionId'   => 'Section',
 			'sectionName' => 'Section Name',
 		);
 	}
 
-	/**
-	 * Retrieves a list of models based on the current search/filter conditions.
-	 *
-	 * Typical usecase:
-	 * - Initialize the model fields with values from filter form.
-	 * - Execute this method to get CActiveDataProvider instance which will filter
-	 * models according to data in model fields.
-	 * - Pass data provider to CGridView, CListView or any similar widget.
-	 *
-	 * @return CActiveDataProvider the data provider that can return the models
-	 * based on the search/filter conditions.
-	 */
-	public function search()
-	{
-		// @todo Please modify the following code to remove attributes that should not be searched.
-
-		$criteria=new CDbCriteria;
-
-		$criteria->compare('sectionId',$this->sectionId,true);
-		$criteria->compare('sectionName',$this->sectionName,true);
-
-		return new CActiveDataProvider($this, array(
-			'criteria'=>$criteria,
-		));
-	}
 
 	/**
 	 * Returns the static model of the specified AR class.
@@ -91,8 +58,7 @@ class SurveillanceSections extends CActiveRecord
 	 * @param string $className active record class name.
 	 * @return SurveillanceSections the static model class
 	 */
-	public static function model($className=__CLASS__)
-	{
+	public static function model($className = __CLASS__) {
 		return parent::model($className);
 	}
 }
