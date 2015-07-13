@@ -14,6 +14,7 @@ class ContextController extends Controller {
 	const LOG_CAT = 'ctrl.ContextController';
 	// use 2 column layout
 	public $layout = '//layouts/column2';
+	public $surveillanceId;
 
 	/**
 	 * actionIndex
@@ -302,20 +303,25 @@ class ContextController extends Controller {
 		}
 		return $steps;
 	}
+	private function getScenario() {
+		return isset(Yii::app()->session['surveillanceId']) ? 'update' : 'insert';
+	}
 	public function processSurveillance($event) {
 		$fieldsCriteria = new CDbCriteria();
 		$fieldsCriteria->condition = 'sectionId=' . $event->sender->getCurrentStep();
 		$fieldsCriteria->order = '`order` ASC, `parentId` ASC';
 		$surveillanceFieldsModel = FrameworkFields::model()->findAll($fieldsCriteria);
-		$dForm = new DForm('insert');
-//		print_r($_POST);
-//		die;
+		$dForm = new DForm($this->getScenario());
 
-		$elements = self::getDefaultElements();
+		$elements = $this->getDefaultElements();
 		if($event->sender->getCurrentStep() === 1) {
 			$surveillanceModel = new FrameworkContext();
 			$surveillanceModel->userId = Yii::app()->user->id;
-			$elements['elements']['context']['elements'] = self::getElements($surveillanceModel, array('name', 'description'));
+			if($dForm->scenario == 'update') {
+				$surveillanceModel = FrameworkContext::model()->findByPk(Yii::app()->session['surveillanceId']);
+			}
+			$elements['elements']['context']['elements'] = self::getElements($surveillanceModel,
+				array('name', 'description'));
 
 		}
 
@@ -323,12 +329,6 @@ class ContextController extends Controller {
 			'name' => 'next',
 			'label' => 'Next'
 		));
-		$errorArray = array(
-			'showErrors' => true,
-			'showErrorSummary' => true,
-			'errorSummaryHeader' => Yii::app()->params['headerErrorSummary'],
-			'errorSummaryFooter' => Yii::app()->params['footerErrorSummary'],
-		);
 
 		$elements['elements']['context']['type'] = 'form';
 		//$elements['elements']['contextFields']['elements'] = self::getDefaultElements();
@@ -364,6 +364,8 @@ class ContextController extends Controller {
 				$elements['elements']['contextFields']['elements'][] = '</fieldset>';
 				$elements['elements']['contextFields']['elements'][] = '</div>';
 				$gridFieldIds[] = $field->id;
+
+				continue;
 			}
 			if($field->gridField) {
 				continue;
@@ -420,6 +422,7 @@ class ContextController extends Controller {
 			if(isset($_POST['DForm'][0])) {
 				//print_r($dForm->attributes); die;
 				// This can be refactored later
+				$dataIdArray = [];
 				foreach($_POST['DForm'] as $row => $rowData ) {
 						//print_r($rowData);
 					foreach($rowData as $attrName => $attrVal) {
@@ -428,8 +431,14 @@ class ContextController extends Controller {
 								$attrVal = json_encode($attrVal);
 							}
 							$fieldNameAndId = explode('_', $attrName);
+							$dataId = $dForm->getFieldDataId($fieldNameAndId[1]);
+							if(isset($dataId) && isset($dataIdArray[$dataId])) {
+								$dataId = null;
+							}
+							$dataIdArray[$dataId] = $dataId;
 							$fieldData[$row][$attrName]['frameworkFieldId'] = $fieldNameAndId[1];
 							$fieldData[$row][$attrName]['value'] = $attrVal;
+							$fieldData[$row][$attrName]['id'] = $dataId;
 
 						}
 					}
@@ -448,6 +457,8 @@ class ContextController extends Controller {
 								$val = json_encode($attrVal);
 							}
 							$fieldData[$fieldNameAndId[0]]['value'] = $val;
+							$fieldData[$fieldNameAndId[0]]['id'] = $dForm->getFieldDataId($fieldNameAndId[1]);
+
 						}
 					}
 
@@ -488,14 +499,19 @@ class ContextController extends Controller {
 	 * @param WizardEvent The event
 	 */
 	public function wizardInvalidStep($event) {
-		Yii::app()->getUser()->setFlash('notice', $event->step.' is not a vaild step in this wizard');
+		Yii::app()->user->setFlash('notice', $event->step.' is not a valid step in this wizard');
 	}
 	public function wizardFinished($event) {
 		$surveillanceDataModel = new FrameworkFieldData();
 		$frameWorkModel = new FrameworkContext();
+		if(isset(Yii::app()->session['surveillanceId'])) {
+			$frameWorkModel = FrameworkContext::model()->findByPk(Yii::app()->session['surveillanceId']);
+			$surveillanceDataModel->setScenario('update');
+		}
 		$frameWorkData = $event->getData();
 		$frameWorkModel->attributes = $frameWorkData['surveillanceModel'];
 		$transaction = Yii::app()->db->beginTransaction();
+		$dataKeys = [];
 		try {
 			if ($frameWorkModel->save()) {
 				//if(true) {
@@ -509,23 +525,33 @@ class ContextController extends Controller {
 						foreach($fieldData as $fieldName => $data) {
 							//print_r($data);
 							if (isset($data['value'])) {
-								$surveillanceDataModel->setIsNewRecord(true);
+								$newRecord = is_null($data['id']) ? true : false;
 								$surveillanceDataModel->attributes = $data;
 								$surveillanceDataModel->frameworkId = $frameWorkModel->frameworkId;
-								$surveillanceDataModel->id = null;
-								//var_dump($surveillanceDataModel); die;
+								$surveillanceDataModel->setPrimaryKey($data['id']);
+								$surveillanceDataModel->setIsNewRecord($newRecord);
+								//var_dump($surveillanceDataModel); //die;
 								$surveillanceDataModel->save();
+								if(isset($data['id'])) {
+									$dataKeys[] = $data['id'];
+								} else {
+									$dataKeys[] = $surveillanceDataModel->id;
+								}
 							} else {
 								foreach($data as $field) {
 
 									if(isset($field['value'])) {
-										//print_r($field); die;
-										$surveillanceDataModel->setIsNewRecord(true);
+										$newRecord = is_null($field['id']) ? true : false;
 										$surveillanceDataModel->attributes = $field;
 										$surveillanceDataModel->frameworkId = $frameWorkModel->frameworkId;
-										$surveillanceDataModel->id = null;
+										$surveillanceDataModel->setPrimaryKey($field['id']);
+										$surveillanceDataModel->setIsNewRecord($newRecord);
 										$surveillanceDataModel->save();
-
+										if(isset($data['id'])) {
+											$dataKeys[] = $data['id'];
+										} else {
+											$dataKeys[] = $surveillanceDataModel->id;
+										}
 									}
 								}
 							}
@@ -536,8 +562,12 @@ class ContextController extends Controller {
 					}
 
 				}
+				$deleteCriteria = new CDbCriteria();
+				$deleteCriteria->addNotInCondition('id', $dataKeys);
+				$surveillanceDataModel->deleteAll($deleteCriteria);
 				//var_dump($surveillanceDataModel); die;
 				$transaction->commit();
+				//die;
 			}
 		} catch (Exception $e) {
 			$transaction->rollBack();
@@ -558,12 +588,14 @@ class ContextController extends Controller {
 	}
 
 	public function actionCreate($step=null) {
+		unset(Yii::app()->session['surveillanceId']);
 		$this->process($step);
 	}
 
 	public function generateOverviewTable($event) {
 
-		echo '<table id="survTable"><thead><tr><th></th><th></th></tr></thead><tbody>';
+		echo '<table id="survTable" width="100%" border="0" cellspacing="0" cellpadding="0">' .
+			'<thead><tr><th></th><th></th></tr></thead><tbody>';
 		//print_r($event->data); die;
 		echo '<tr>';
 		echo '<td>Name</td>';
@@ -594,7 +626,6 @@ class ContextController extends Controller {
 					$field->label : FrameworkFields::model()->generateAttributeLabel($field->inputName);
 				echo '</td>';
 				foreach($surveillanceData->survData as $data) {
-					$dataValue = '';
 					if(isset($data->frameworkFieldId) && $data->frameworkFieldId == $field->id) {
 						$dataValue = $data->value;
 
@@ -621,13 +652,11 @@ class ContextController extends Controller {
 		//die;
 	}
 
-	/**
-	 * @param $string
-	 * @return bool
-	 */
-	public static function isJson($string) {
-		json_decode($string);
-		return (json_last_error() == JSON_ERROR_NONE);
+	public function actionUpdate($step = null, $contextId = null) {
+		if(isset($contextId)) {
+			Yii::app()->session['surveillanceId'] = $contextId;
+		}
+		$this->process($step);
 	}
 
 	/**
@@ -636,143 +665,143 @@ class ContextController extends Controller {
 	 * @access public
 	 * @return void
 	 */
-	public function actionUpdate() {
-		Yii::log("actionUpdate ContextController called", "trace", self::LOG_CAT);
-		//$model = new FrameworkContext();
-		$dForm = new DynamicForm('update');
-		$dynamicLabels = array();
-
-		//print_r($_POST); die;
-//			$dataArray = array();
-//			$dataArray['formType'] = "Edit";
-		if (isset($_GET['contextId'])) {
-			//fetch the form data
-			$model = FrameworkContext::model()->findByPk($_GET['contextId']);
-			//print_r($model); die;
-			if (!$model->frameworkId) {
-				Yii::app()->user->setFlash('error', Yii::t("translation", "The selected system does not exist"));
-				$this->redirect(array('context/list'));
-				return;
-			}
-		} else {
-			Yii::app()->user->setFlash('error', Yii::t("translation", "Please select a surveillance system before you attempt to update it"));
-			$this->redirect(array('context/list'));
-		}
-
-		$frameworkFieldData = FrameworkFieldData::model()->findAll('frameworkId=' . $_GET['contextId']);
-		$frameworkFieldDataModel = new FrameworkFieldData();
-		$contextFields = $frameworkFieldDataModel->findAll();
-		$elements = self::getDefaultElements();
-		$elements['elements']['context']['elements'] = self::getElements($model, array('name', 'description'));
-		//$contextForm = new CForm($modelElements, $model);
-		$modelData = array();
-		$dynamicDataAttributes = array();
-		$elements['elements']['context']['type'] = 'form';
-		$elements['elements']['contextFields']['type'] = 'form';
-		$fieldDataMap = array();
-		foreach ($contextFields as $field) {
-			$dynamicDataAttributes[$field->inputName . '-' . $field->id] = 1;
-			$dynamicLabels[$field->inputName . '-' . $field->id] = isset($field->label) ? $field->label : $dForm->generateAttributeLabel($field->inputName);
-			$elements['elements']['contextFields']['elements'][$field->inputName . '-' . $field->id] = array(
-				'label' => isset($field->label) ? $field->label : $dForm->generateAttributeLabel($field->inputName),
-				'required' => $field->required,
-				'type' => $field->inputType
-			);
-			if ($field->inputType == 'dropdownlist') {
-				$elements['elements']['contextFields']['elements'][$field->inputName . '-' . $field->id]['items'] =
-					Options::model()->getContextFieldOptions($field->id);
-			}
-			foreach ($frameworkFieldData as $fieldValue) {
-				if ($fieldValue->frameworkFieldId == $field->id) {
-
-					$modelData[$field->inputName . '-' . $field->id] = $fieldValue->value;
-					$fieldDataMap[$field->id] = $fieldValue->id;
-
-				}
-				//print_r($fieldValue); die;
-			}
-		}
-		$elements['buttons'] = array(
-			'updateContext' => array(
-				'type' => 'submit',
-				'label' => 'Update Context',
-			),
-			'cancel' => array(
-				'type' => 'button',
-				'label' => 'Cancel',
-				'onclick' => "window.location='" . $this->createUrl('list') . "'"
-			)
-		);
-		//$model = new DynamicForm();
-		$dForm->_dynamicFields = $dynamicDataAttributes;
-		$dForm->_dynamicLabels = $dynamicLabels;
-		$dForm->attributes = $modelData;
-		$form = new CForm($elements);
-		$form['context']->model = $model;
-		$form['contextFields']->model = $dForm;
-
-		//var_dump($form->validate()); die('here');
-		if ($form->submitted('updateContext')) {
-			$context = $form['context']->model;
-			$context->userId = Yii::app()->user->id;
-			$error = false;
-			//print_r($_POST['DynamicFormDetails']); die;
-			if ($context->save()) {
-				foreach ($_POST['DynamicFormDetails'] as $inputName => $inputVal) {
-					$inputNameArray = explode('-', $inputName);
-					$fieldId = null;
-					if (!empty($fieldDataMap[$inputNameArray[1]])) {
-						$fieldId = $fieldDataMap[$inputNameArray[1]];
-						$attributes = array(
-							'id' => $fieldId,
-							'frameworkId' => $context->primaryKey,
-							'frameworkFieldId' => $inputNameArray[1],
-							'value' => $inputVal
-						);
-						$frameworkFieldDataModel->updateByPk($fieldId, $attributes);
-
-					} else {
-						$operation = 'save';
-						$attributes = array(
-							'id' => $fieldId,
-							'frameworkId' => $context->primaryKey,
-							'frameworkFieldId' => $inputNameArray[1],
-							'value' => $inputVal
-						);
-						$frameworkFieldDataModel->attributes = $attributes;
-						$frameworkFieldDataModel->setIsNewRecord(true);
-						$frameworkFieldDataModel->save();
-
-					}
-					//print_r($dataModel); die;
-					//var_dump($newRecord, $fieldId, $fieldDataMap, $inputNameArray, $frameworkFieldDataModel); die;
-//						if (!$frameworkFieldDataModel->$operation()) {
-//							Yii::app()->user->setFlash('error', 'A problem occurred while updating the surveillance context, ' .
-//								'please try again or contact the administrator if this persists');
-//							$error = true;
-//							break;
-//						}
-				}
-
-				if (!$error) {
-					Yii::app()->user->setFlash('success', 'Surveillance context updated successfully');
-					$this->redirect(array('context/list'));
-					return;
-				}
-				//$frameworkFieldDataModel->setIsNewRecord(true);
-				//$frameworkFieldDataModel->setAttributes($frameworkFieldData);
-
-
-			}
-			Yii::app()->user->setFlash('error', 'A problem occurred while updating the surveillance context, ' .
-				'please try again or contact the administrator if this persists');
-
-		}
-
-		$this->render('update', array(
-			'form' => $form
-		));
-	}
+//	public function actionUpdate() {
+//		Yii::log("actionUpdate ContextController called", "trace", self::LOG_CAT);
+//		//$model = new FrameworkContext();
+//		$dForm = new DynamicForm('update');
+//		$dynamicLabels = array();
+//
+//		//print_r($_POST); die;
+////			$dataArray = array();
+////			$dataArray['formType'] = "Edit";
+//		if (isset($_GET['contextId'])) {
+//			//fetch the form data
+//			$model = FrameworkContext::model()->findByPk($_GET['contextId']);
+//			//print_r($model); die;
+//			if (!$model->frameworkId) {
+//				Yii::app()->user->setFlash('error', Yii::t("translation", "The selected system does not exist"));
+//				$this->redirect(array('context/list'));
+//				return;
+//			}
+//		} else {
+//			Yii::app()->user->setFlash('error', Yii::t("translation", "Please select a surveillance system before you attempt to update it"));
+//			$this->redirect(array('context/list'));
+//		}
+//
+//		$frameworkFieldData = FrameworkFieldData::model()->findAll('frameworkId=' . $_GET['contextId']);
+//		$frameworkFieldDataModel = new FrameworkFieldData();
+//		$contextFields = $frameworkFieldDataModel->findAll();
+//		$elements = self::getDefaultElements();
+//		$elements['elements']['context']['elements'] = self::getElements($model, array('name', 'description'));
+//		//$contextForm = new CForm($modelElements, $model);
+//		$modelData = array();
+//		$dynamicDataAttributes = array();
+//		$elements['elements']['context']['type'] = 'form';
+//		$elements['elements']['contextFields']['type'] = 'form';
+//		$fieldDataMap = array();
+//		foreach ($contextFields as $field) {
+//			$dynamicDataAttributes[$field->inputName . '-' . $field->id] = 1;
+//			$dynamicLabels[$field->inputName . '-' . $field->id] = isset($field->label) ? $field->label : $dForm->generateAttributeLabel($field->inputName);
+//			$elements['elements']['contextFields']['elements'][$field->inputName . '-' . $field->id] = array(
+//				'label' => isset($field->label) ? $field->label : $dForm->generateAttributeLabel($field->inputName),
+//				'required' => $field->required,
+//				'type' => $field->inputType
+//			);
+//			if ($field->inputType == 'dropdownlist') {
+//				$elements['elements']['contextFields']['elements'][$field->inputName . '-' . $field->id]['items'] =
+//					Options::model()->getContextFieldOptions($field->id);
+//			}
+//			foreach ($frameworkFieldData as $fieldValue) {
+//				if ($fieldValue->frameworkFieldId == $field->id) {
+//
+//					$modelData[$field->inputName . '-' . $field->id] = $fieldValue->value;
+//					$fieldDataMap[$field->id] = $fieldValue->id;
+//
+//				}
+//				//print_r($fieldValue); die;
+//			}
+//		}
+//		$elements['buttons'] = array(
+//			'updateContext' => array(
+//				'type' => 'submit',
+//				'label' => 'Update Context',
+//			),
+//			'cancel' => array(
+//				'type' => 'button',
+//				'label' => 'Cancel',
+//				'onclick' => "window.location='" . $this->createUrl('list') . "'"
+//			)
+//		);
+//		//$model = new DynamicForm();
+//		$dForm->_dynamicFields = $dynamicDataAttributes;
+//		$dForm->_dynamicLabels = $dynamicLabels;
+//		$dForm->attributes = $modelData;
+//		$form = new CForm($elements);
+//		$form['context']->model = $model;
+//		$form['contextFields']->model = $dForm;
+//
+//		//var_dump($form->validate()); die('here');
+//		if ($form->submitted('updateContext')) {
+//			$context = $form['context']->model;
+//			$context->userId = Yii::app()->user->id;
+//			$error = false;
+//			//print_r($_POST['DynamicFormDetails']); die;
+//			if ($context->save()) {
+//				foreach ($_POST['DynamicFormDetails'] as $inputName => $inputVal) {
+//					$inputNameArray = explode('-', $inputName);
+//					$fieldId = null;
+//					if (!empty($fieldDataMap[$inputNameArray[1]])) {
+//						$fieldId = $fieldDataMap[$inputNameArray[1]];
+//						$attributes = array(
+//							'id' => $fieldId,
+//							'frameworkId' => $context->primaryKey,
+//							'frameworkFieldId' => $inputNameArray[1],
+//							'value' => $inputVal
+//						);
+//						$frameworkFieldDataModel->updateByPk($fieldId, $attributes);
+//
+//					} else {
+//						$operation = 'save';
+//						$attributes = array(
+//							'id' => $fieldId,
+//							'frameworkId' => $context->primaryKey,
+//							'frameworkFieldId' => $inputNameArray[1],
+//							'value' => $inputVal
+//						);
+//						$frameworkFieldDataModel->attributes = $attributes;
+//						$frameworkFieldDataModel->setIsNewRecord(true);
+//						$frameworkFieldDataModel->save();
+//
+//					}
+//					//print_r($dataModel); die;
+//					//var_dump($newRecord, $fieldId, $fieldDataMap, $inputNameArray, $frameworkFieldDataModel); die;
+////						if (!$frameworkFieldDataModel->$operation()) {
+////							Yii::app()->user->setFlash('error', 'A problem occurred while updating the surveillance context, ' .
+////								'please try again or contact the administrator if this persists');
+////							$error = true;
+////							break;
+////						}
+//				}
+//
+//				if (!$error) {
+//					Yii::app()->user->setFlash('success', 'Surveillance context updated successfully');
+//					$this->redirect(array('context/list'));
+//					return;
+//				}
+//				//$frameworkFieldDataModel->setIsNewRecord(true);
+//				//$frameworkFieldDataModel->setAttributes($frameworkFieldData);
+//
+//
+//			}
+//			Yii::app()->user->setFlash('error', 'A problem occurred while updating the surveillance context, ' .
+//				'please try again or contact the administrator if this persists');
+//
+//		}
+//
+//		$this->render('update', array(
+//			'form' => $form
+//		));
+//	}
 
 
 	/**
@@ -914,50 +943,127 @@ class ContextController extends Controller {
 		$gridFieldsCriteria  = new CDbCriteria();
 		$gridFieldsCriteria->condition = 'parentId=' . $fieldId;
 		$gridFieldsCriteria->order = '`order` ASC';
-		$gridFields = FrameworkFields::model()->findAll($gridFieldsCriteria);
-		//print_r($gridFields); //die;
-		$inputs = '<tr class="copy' . $fieldId . '">';
+		$gridFieldsNames = [];
 		$labels = [];
 		$properties = [];
 		$rules = [];
-		//for ($i = 0; $i < $multipleRowsToShow; $i++) {
-		foreach($gridFields as $field) {
-			//$el = new CFormInputElement()
-			$attribute = $field->inputName . '_' . $field->id;
-			$dForm->setpropertyName($attribute);
-			//$model->setAttribute($attribute, $field->inputName);
+		$inputs = '';
+		if($dForm->getScenario() == 'insert') {
+			$gridFields =  FrameworkFields::model()->findAll($gridFieldsCriteria);
+			$inputs .= '<tr class="copy' . $fieldId . '">';
+
+			foreach($gridFields as $field) {
+				//$el = new CFormInputElement()
+				$attribute = $field->inputName . '_' . $field->id;
+				$dForm->setpropertyName($attribute);
+//			continue;
+				//$model->setAttribute($attribute, $field->inputName);
 //			$dForm->_dynamicLabels[$attribute] = isset($field->label) ?
 //				$field->label : $dForm->generateAttributeLabel($field->inputName);
-			$labels[$attribute] = isset($field->label) ?
-				$field->label : $dForm->generateAttributeLabel($field->inputName);
-			$validation = $field->required ? 'required' : 'safe';
-			$rules[] = [$attribute, $validation];
-			$i = 0;
-			$inputs .= '<td>';
-			switch($field->inputType) {
-				case 'text':
-					$inputs .= CHtml::activeTextField($dForm, "[$i]$attribute");
-					$inputs .= CHtml::error($dForm, "[$i]$attribute");
-					break;
-				case 'dropdownlist':
-					$options = [];
-					if($field->multiple) {
-						$options['multiple'] = true;
-					}
-					$inputs .= CHtml::activeDropDownList($dForm, "[$i]$attribute",
-						Options::model()->getContextFieldOptions($field->id), $options);
-					$inputs .= CHtml::error($dForm, "[$i]$attribute");
-					break;
-			}
-			$inputs .= '</td>';
+				$labels[$attribute] = isset($field->label) ?
+					$field->label : $dForm->generateAttributeLabel($field->inputName);
+				$validation = $field->required ? 'required' : 'safe';
+				$rules[] = [$attribute, $validation];
+				$i = 0;
+				$inputs .= '<td>';
+				switch($field->inputType) {
+					case 'text':
+						$inputs .= CHtml::activeTextField($dForm, "[$i]$attribute");
+						$inputs .= CHtml::error($dForm, "[$i]$attribute");
+						break;
+					case 'dropdownlist':
+						$options = [];
+						if($field->multiple) {
+							$options['multiple'] = true;
+						}
+						$inputs .= CHtml::activeDropDownList($dForm, "[$i]$attribute",
+							Options::model()->getContextFieldOptions($field->id), $options);
+						$inputs .= CHtml::error($dForm, "[$i]$attribute");
+						break;
+				}
+				$inputs .= '</td>';
 
-			//$elements['elements'][] = '</td>';
+				//$elements['elements'][] = '</td>';
+
+			}
+			$inputs .= '<td></td></tr>';
+
+
+
+		} else {
+			// get id's of fields that belong to the grid
+			//$gridFieldsCriteria->select = 'id';
+			$childFields = ModelToArray::convertModelToArray(FrameworkFields::model()->findAll($gridFieldsCriteria),
+				['frameworkFields' => 'id, inputName, label, inputType, required, multiple']);
+			$gridFieldsIds = array_map(function($item) {
+				return $item['id'];
+			}, $childFields);
+			// get grid data
+			$fieldDataCriteria = new CDbCriteria();
+			$fieldDataCriteria->addInCondition('frameworkFieldId', $gridFieldsIds);
+			$gridFields = FrameworkFieldData::model()->with('frameworkFields')->findAll($fieldDataCriteria);
+			if(empty($gridFields)) {
+				$dForm->setScenario('insert');
+				//print_r($dForm); die;
+				return self::generateGridElements($fieldId, $dForm);
+			}
+//				print_r($childFields); die;
+			foreach($childFields as $child) {
+				$gridFieldsNames[$child['id']] = $child['inputName'] . '_' . $child['id'];
+				$gridParams[$child['inputName'] . '_' . $child['id']]['id'] = $child['id'];
+				$labels[$child['inputName'] . '_' . $child['id']] = $child['label'];
+				$gridParams[$child['inputName'] . '_' . $child['id']]['inputType'] = $child['inputType'];
+				$gridParams[$child['inputName'] . '_' . $child['id']]['required'] = $child['required'];
+				$gridParams[$child['inputName'] . '_' . $child['id']]['multiple'] = $child['multiple'];
+			}
+			//$gridFields =  FrameworkFields::model()->findAll($gridFieldsCriteria);
+
+			$k = 0;
+			$dFormGrid = [];
+			$dFormGrid[$k] = new DForm();
+			foreach($gridFields as $gridFieldData) {
+
+				if(count($gridFieldsIds) == count($dFormGrid[$k]->attributes)) {
+					$k++;
+					$dFormGrid[$k] = new DForm();
+				}
+				//echo $gridFieldsNames[$gridFieldData->frameworkFieldId];
+				$dFormGrid[$k]->setPropertyName($gridFieldsNames[$gridFieldData->frameworkFieldId], $gridFieldData->value);
+				$cols[$gridFieldData->frameworkFieldId] = $gridFieldData->frameworkFieldId;
+			}
+			//$inputs = '';
+			foreach($dFormGrid as $key => $gridItems) {
+				$inputs .= '<tr class="copy' . $fieldId . '">';
+				foreach($gridItems->attributeNames() as $attr) {
+				//var_dump($gridItems[$attr]); die;
+					$inputs .= '<td>';
+					switch($gridParams[$attr]['inputType']) {
+						case 'text':
+							$inputs .= CHtml::activeTextField($gridItems, "[$key]$attr");
+							$inputs .= CHtml::error($gridItems, "[$key]$attr");
+							break;
+						case 'dropdownlist':
+							$options = [];
+							if($gridParams[$attr]['multiple']) {
+								$options['multiple'] = true;
+							}
+							$inputs .= CHtml::activeDropDownList($gridItems, "[$key]$attr",
+								Options::model()->getContextFieldOptions($gridParams[$attr]['id']), $options);
+							$inputs .= CHtml::error($gridItems, "[$key]$attr");
+							break;
+					}
+					$inputs .= '</td>';
+				}
+				$inputs .= '</tr>';
+			}
+			//echo $inputs; die;
 
 		}
+		//var_dump($data, $cols); die('lklk');
+		//die;
 		$dForm->setRules($rules);
 		$dForm->setAttributeLabels($labels);
 		//print_r(array_values($labels));
-		$inputs .= '<td></td></tr>';
 		$tableHeader = '<th>' . implode('</th><th>', array_values($labels));
 		$table = '<table class="jgTabular"><thead><tr>' . $tableHeader . '<th></th></tr></thead>';
 		$table .= '<tbody>' . $inputs . '</tbody>';
@@ -966,6 +1072,9 @@ class ContextController extends Controller {
 			'id' => 'copyLink-' . $fieldId,
 			'rel' => '.copy' . $fieldId
 		]);
+//		if($fieldId == 37) {
+//			print_r($table); //die('pop');
+//		}
 		return $table;
 
 
