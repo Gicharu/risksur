@@ -74,11 +74,11 @@ class Options extends CActiveRecord {
 	 * @return array
 	 */
 	public function getContextFieldOptions($contextInputId) {
-		$optionsRs = $this->findAll('frameworkfieldId=' . $contextInputId);
+		$optionsRs = $this->findAll('frameworkFieldId=' . $contextInputId);
 		$options = array();
 		if(!empty($optionsRs)) {
 			foreach($optionsRs as $option) {
-				$options[$option->val] = $option->label;
+				$options[$option->optionId] = $option->label;
 			}
 		}
 		return $options;

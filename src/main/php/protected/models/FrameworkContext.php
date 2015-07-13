@@ -82,8 +82,8 @@ class FrameworkContext extends CActiveRecord {
 	 */
 	public function attributeLabels() {
 		return array(
-			'name' => Yii::t('translation', 'Context Name'),
-			'description' => Yii::t('translation', 'Description of context'),
+			'name' => Yii::t('translation', 'Surveillance Name'),
+			'description' => Yii::t('translation', 'Surveillance Description'),
 		);
 	}
 

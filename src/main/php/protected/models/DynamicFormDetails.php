@@ -11,11 +11,12 @@
 	 * @license Tracetracker {@link http://www.tracetracker.com}
 	 * @SuppressWarnings checkUnusedVariables
 	 */
-	class DynamicFormDetails extends CActiveRecord {
-		private $_dynamicData = array();
+	class DynamicFormDetails extends CFormModel {
+		const LOG_CAT = 'models.DynamicFormDetails';
+		public $_dynamicData = array();
 		public $_dynamicFields = array();
 		public $_dynamicLabels = array();
-		protected  $_tableName;
+		public $_rules = [];
 		protected $_md;
 
 
@@ -24,8 +25,7 @@
 		 * @param string $scenario
 		 * @param null $tableName
 		 */
-		public function __construct($scenario = 'insert', $tableName = null) {
-			$this->_tableName = $tableName;
+		public function __construct($scenario = 'insert') {
 			parent::__construct($scenario);
 		}
 
@@ -37,7 +37,7 @@
 		 * @return CActiveRecord
 		 */
 		protected function instantiate($attributes) {
-			return new DynamicFormDetails(null, $this->tableName());
+			return new DynamicFormDetails(null);
 		}
 		/**
 		 * Returns meta-data for this DB table
@@ -79,12 +79,11 @@
 		 * @return mixed|null|void
 		 */
 		public function __get($name) {
-			if (!empty($this->_dynamicFields[$name])) {
+			if (isset($this->_dynamicFields[$name])) {
 				if (!empty($this->_dynamicData[$name])) {
 					return $this->_dynamicData[$name];
-				} else {
-					return null;
 				}
+				return $this->_dynamicFields[$name];
 
 			} else {
 				return parent::__get($name);
@@ -100,8 +99,9 @@
 		 * @return void
 		 */
 		public function __set($name, $val) {
-			if (!empty($this->_dynamicFields[$name])) {
-				$this->_dynamicData[$name] = $val;
+			if (isset($this->_dynamicFields[$name])) {
+				Yii::log("Setting $name to " . json_encode($val) . " \n", 'trace', self::LOG_CAT);
+				$this->_dynamicData[$name] = is_null($val) ? '' : $val;
 			} else {
 				parent::__set($name, $val);
 			}
@@ -113,14 +113,19 @@
 		 * @return array
 		 */
 		public function rules() {
-			$required = array();
-			foreach ($this->_dynamicFields as $attr => $val) {
-				if ($val) {
-					$required[] = $attr;
+			$required = [];
+			$safe = [];
+			foreach ($this->_rules as $key => $rule) {
+				if ($rule['required']) {
+					$required[] = $rule['attribute'];
+				} else {
+					$safe[] = $rule['attribute'];
 				}
 			}
 			return array(
 				array(implode(', ', $required), 'required'),
+				array(implode(', ', $safe), 'safe')
+
 			);
 		}
 
@@ -132,17 +137,19 @@
 			return parent::model($className);
 		}
 
-	/**
-	 * attributeLabels 
-	 * 
-	 * @access public
-	 * @return void
-	 */
-	public function attributeLabels() {
-		$attributeLabels = array();
-		if (!empty ($this->_dynamicLabels)) {
-			$attributeLabels = $this->_dynamicLabels;
+		/**
+		 * attributeLabels
+		 *
+		 * @access public
+		 * @return array
+		 */
+		public function attributeLabels() {
+			$attributeLabels = array();
+			if (!empty ($this->_dynamicLabels)) {
+				$attributeLabels = $this->_dynamicLabels;
+			}
+			return $attributeLabels;
 		}
-		return $attributeLabels;
-	}
+
+
 	}

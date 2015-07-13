@@ -13,8 +13,7 @@
  */
 class DynamicForm extends CFormModel {
 	private $_dynamicData = array();
-	public $_dynamicFields = array(); 
-	public $_dynamicLabels = array();
+	public $_dynamicFields = [],  $_dynamicLabels = array(), $_rules = [];
 	/**
 	 * attributeNames 
 	 * 
@@ -71,27 +70,30 @@ class DynamicForm extends CFormModel {
 	public function rules() {
 		$required = array();
 		$unique = array();
-		foreach ($this->_dynamicFields as $attr => $val) {
-			if ($val === 1) {
-				$required[] = $attr;
+		$safe = [];
+		foreach ($this->_rules as $key => $rule) {
+			if ($rule['required']) {
+				$required[] = $rule['attribute'];
+			} elseif($rule == 2) {
+				$unique[] = $rule['attribute'];
+			} else {
+				$safe[] = $rule['attribute'];
 			}
-			if ($val === 2) {
-				$required[] = $attr;
-				$unique[] = $attr;
-			}
-
 		}
-		$rules[] = array(implode(', ', $required), 'required');
-		$rules[] = array(implode(', ', $unique), 'unique');
-		//print_r(array_filter($rules)); die;
-		return array_filter($rules);
+		return array(
+			array(implode(', ', $required), 'required'),
+			array(implode(', ', $safe), 'safe'),
+			array(implode(', ', $unique), 'unique')
+
+		);
+
 	}
 
 	/**
 	 * attributeLabels 
 	 * 
 	 * @access public
-	 * @return void
+	 * @return array
 	 */
 	public function attributeLabels() {
 		$attributeLabels = array();
