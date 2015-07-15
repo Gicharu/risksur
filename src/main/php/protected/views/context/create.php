@@ -1,4 +1,10 @@
-
+<?php
+/**
+ * @var $event WizardBehavior
+ * @var $form CForm
+ * @var $sectionInfo CActiveRecord
+ */
+?>
 <div class="ui-widget">
 	<div class="ui-widget-header">
 		<p>Surveillance System</p>
@@ -16,7 +22,6 @@
 		?>
 	</div>
 </div>
-		<?php print_r($_SESSION); ?>
 <?php
 if(!empty($gridFieldIds)) {
 	foreach($gridFieldIds as $fieldId) {

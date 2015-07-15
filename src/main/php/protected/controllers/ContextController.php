@@ -7,70 +7,168 @@
  * @author    James Njoroge <james@tracetracker.com>
  * @copyright Tracetracker
  * @version   $id$
- * @uses      Controller
+ * @uses      RiskController
  * @license   Tracetracker {@link http://www.tracetracker.com}
  */
-class ContextController extends Controller {
+class ContextController extends RiskController {
 	const LOG_CAT = 'ctrl.ContextController';
 	// use 2 column layout
 	public $layout = '//layouts/column2';
 	public $surveillanceId;
+	public $docName = 'survIndex';
+
+
+	/**
+	 * @param $action CAction
+	 * @return bool
+	 */
+	public function beforeAction($action) {
+		$this->setPageTitle('Surveillance - ' . $action->getId());
+		return true;
+
+	}
+
+	/**
+	 * actionIntro
+	 */
+	public function actionIntro() {
+		Yii::log("actionIntro ContextController called", "trace", self::LOG_CAT);
+		$this->docName = 'survIntro';
+		if(isset($_POST['pageId'])) {
+			$this->savePage('intro');
+		}
+		$page = $this->getPageContent();
+		if(empty($page)) {
+			throw new CHttpException(404, 'The page requested does not exist');
+		}
+		$this->render('intro', [
+				'content' => $page['content'],
+				'editAccess' => $page['editAccess'],
+				'editMode' => $page['editMode']
+			]
+		);
+
+	}
 
 	/**
 	 * actionIndex
-	 *
-	 * @access public
-	 * @return void
 	 */
 	public function actionIndex() {
+		//$this->setPageTitle($this->id . 'Introduction');
 		Yii::log("actionIndex ContextController called", "trace", self::LOG_CAT);
-		$dataArray = array();
-		$dataArray['dtHeader'] = "Surveillance design List";
-		$dataArray['surveillanceList'] = json_encode(array());
-		//$this->performAjaxValidation($model);
-
-		// get list of surveillance designs
-		$surveillanceList = FrameworkContext::model()->findAll(array(
-			//'select' => 'pageId, pageName',
-			'condition' => 'userId=:userId',
-			'params' => array(
-				':userId' => Yii::app()->user->id,
-			),
-		));
-		$surveillanceListArray = array();
-		// format datatable data
-		foreach ($surveillanceList as $sur) {
-			$deleteButton = "";
-			//if (Yii::app()->user->name != $valu['userName']) {
-			$editButton = "<button id='editComponent" . $sur->frameworkId .
-				"' type='button' class='bedit' onclick=\"window.location.href ='" .
-				$this->createUrl('context/edit/', array(
-						'contextId' => $sur->frameworkId
-					)
-				) .
-				"'\">Edit</button>";
-			$deleteButton = "<button id='deleteContext" . $sur->frameworkId .
-				"' type='button' class='bdelete' onclick=\"$('#deleteBox').dialog('open');" .
-				"deleteConfirm('" . $sur->name . "', '" .
-				$sur->frameworkId . "')\">Remove</button>";
-			//}
-			$surveillanceListArray[] = array(
-				'frameworkId' => $sur->frameworkId,
-				'name' => $sur->name,
-				'userId' => $sur->userId,
-				'description' => $sur->description,
-				'editButton' => $editButton,
-				'deleteButton' => $deleteButton
-			);
+		$this->docName = 'survIndex';
+		if(isset($_POST['pageId'])) {
+			$this->savePage('index');
 		}
-		$dataArray['surveillanceList'] = json_encode($surveillanceListArray);
-
-		if (!empty($_GET['getContext'])) {
-			$jsonData = json_encode(array("aaData" => $surveillanceListArray));
-			echo $jsonData;
-			return;
+		$page = $this->getPageContent();
+		if(empty($page)) {
+			throw new CHttpException(404, 'The page requested does not exist');
 		}
+		$this->render('index', [
+				'content' => $page['content'],
+				'editAccess' => $page['editAccess'],
+				'editMode' => $page['editMode']
+			]
+		);
+
+
 	}
+
+	/**
+	 * @return array
+	 */
+	private function getPageContent() {
+		Yii::log("Function getPageContent ContextController called", "trace", self::LOG_CAT);
+		$content = DocPages::model()->find("docName='$this->docName'");
+		if(empty($content)) {
+			return [];
+		}
+		$editAccess = false;
+		if(Yii::app()->rbac->checkAccess('context', 'savePage')) {
+			$editAccess = true;
+		}
+		$editMode = false;
+		if(isset($_POST['page']) && DocPages::model()->count('docId=' . $_POST['page']) > 0) {
+			$editMode = true;
+		}
+		return [
+			'content' => $content,
+			'editAccess' => $editAccess,
+			'editMode' => $editMode
+		];
+	}
+
+	/**
+	 * @param $action
+	 */
+	private function savePage($action) {
+		//var_dump($_POST); die;
+		Yii::log("Function SavePage ContextController called", "trace", self::LOG_CAT);
+		$model = DocPages::model()->findByPk($_POST['pageId']);
+		if (isset($_POST['survContent'])) {
+			$purifier = new CHtmlPurifier();
+			$model->docData = $purifier->purify($_POST['survContent']);
+			if($model->update()) {
+				Yii::app()->user->setFlash('success', 'The page was updated successfully');
+				$this->redirect($action);
+				return;
+			}
+		}
+
+		Yii::app()->user->setFlash('error', 'The page was not updated successfully, contact your administrator');
+		$this->redirect($action);
+		return;
+	}
+
+//	public function actionIndex() {
+//		Yii::log("actionIndex ContextController called", "trace", self::LOG_CAT);
+//		$dataArray = array();
+//		$dataArray['dtHeader'] = "Surveillance design List";
+//		$dataArray['surveillanceList'] = json_encode(array());
+//		//$this->performAjaxValidation($model);
+//
+//		// get list of surveillance designs
+//		$surveillanceList = FrameworkContext::model()->findAll(array(
+//			//'select' => 'pageId, pageName',
+//			'condition' => 'userId=:userId',
+//			'params' => array(
+//				':userId' => Yii::app()->user->id,
+//			),
+//		));
+//		$surveillanceListArray = array();
+//		// format datatable data
+//		foreach ($surveillanceList as $sur) {
+//			$deleteButton = "";
+//			//if (Yii::app()->user->name != $valu['userName']) {
+//			$editButton = "<button id='editComponent" . $sur->frameworkId .
+//				"' type='button' class='bedit' onclick=\"window.location.href ='" .
+//				$this->createUrl('context/edit/', array(
+//						'contextId' => $sur->frameworkId
+//					)
+//				) .
+//				"'\">Edit</button>";
+//			$deleteButton = "<button id='deleteContext" . $sur->frameworkId .
+//				"' type='button' class='bdelete' onclick=\"$('#deleteBox').dialog('open');" .
+//				"deleteConfirm('" . $sur->name . "', '" .
+//				$sur->frameworkId . "')\">Remove</button>";
+//			//}
+//			$surveillanceListArray[] = array(
+//				'frameworkId' => $sur->frameworkId,
+//				'name' => $sur->name,
+//				'userId' => $sur->userId,
+//				'description' => $sur->description,
+//				'editButton' => $editButton,
+//				'deleteButton' => $deleteButton
+//			);
+//		}
+//		$dataArray['surveillanceList'] = json_encode($surveillanceListArray);
+//
+//		if (!empty($_GET['getContext'])) {
+//			$jsonData = json_encode(array("aaData" => $surveillanceListArray));
+//			echo $jsonData;
+//			return;
+//		}
+//	}
 
 
 	/**
@@ -336,7 +434,7 @@ class ContextController extends Controller {
 //		$elements['elements']['context'] = array_merge($elements['elements']['context'], $errorArray);
 //		$elements['elements']['contextFields'] = array_merge($elements['elements']['contextFields'], $errorArray);
 		//$contextFields = $dForm->findAll();
-		$dynamicDataRules = array();
+		$dynamicDataRules = [];
 		$childCounter = 0;
 		$childCount = 0;
 		$parentFieldId = 0;
@@ -501,6 +599,11 @@ class ContextController extends Controller {
 	public function wizardInvalidStep($event) {
 		Yii::app()->user->setFlash('notice', $event->step.' is not a valid step in this wizard');
 	}
+
+
+	/**
+	 * @param $event
+	 */
 	public function wizardFinished($event) {
 		$surveillanceDataModel = new FrameworkFieldData();
 		$frameWorkModel = new FrameworkContext();
@@ -965,6 +1068,7 @@ class ContextController extends Controller {
 				$validation = $field->required ? 'required' : 'safe';
 				$rules[] = [$attribute, $validation];
 				$i = 0;
+				//print_r($dForm); die;
 				$inputs .= '<td>';
 				switch($field->inputType) {
 					case 'text':
@@ -1028,7 +1132,13 @@ class ContextController extends Controller {
 					$dFormGrid[$k] = new DForm();
 				}
 				//echo $gridFieldsNames[$gridFieldData->frameworkFieldId];
-				$dFormGrid[$k]->setPropertyName($gridFieldsNames[$gridFieldData->frameworkFieldId], $gridFieldData->value);
+				$dFormGrid[$k]->setPropertyName($gridFieldsNames[$gridFieldData->frameworkFieldId],
+					$gridFieldData->value);
+				if(DForm::isJson($gridFieldData->value)) {
+					$dFormGrid[$k]->setPropertyName($gridFieldsNames[$gridFieldData->frameworkFieldId],
+						json_decode($gridFieldData->value));
+
+				}
 				$cols[$gridFieldData->frameworkFieldId] = $gridFieldData->frameworkFieldId;
 			}
 			//$inputs = '';

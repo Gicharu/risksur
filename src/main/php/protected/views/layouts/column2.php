@@ -11,14 +11,16 @@
 		<?php
 		$currentView = Yii::app()->controller->getAction()->getId();
 		if (Yii::app()->controller->id == 'context') {
-			$this->menu = array(
-				array('label'  => Yii::t("translation", "New Surveillance System"), 'url' => array('create'),
-					'active' => strstr('create', $currentView)),
-				array('label'  => Yii::t("translation", "List Existing Systems"), 'url' => array('list'),
-					'active' => strstr('list', $currentView)),
-				array('label'       => Yii::t("translation", "List Components"), 'url' => array('design/listComponents'),
-					'itemOptions' => array('id' => 'showComponents')),
-			);
+			$this->menu = [
+				['label'  => Yii::t("translation", "Introduction"), 'url' => ['index'],
+					'active' => strstr('index', $currentView)],
+				['label'  => Yii::t("translation", "New Surveillance System"), 'url' => ['create'],
+					'active' => strstr('create', $currentView)],
+				['label'  => Yii::t("translation", "List Existing Systems"), 'url' => ['list'],
+					'active' => strstr('list', $currentView)],
+				['label'       => Yii::t("translation", "List Components"), 'url' => ['design/listComponents'],
+					'itemOptions' => ['id' => 'showComponents']],
+			];
 		}
 		// Setup Design controller side menus
 		if (Yii::app()->controller->id == 'design') {

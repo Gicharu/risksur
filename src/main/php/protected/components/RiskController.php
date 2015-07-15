@@ -10,7 +10,7 @@
  * @license Tracetracker {@link http://www.tracetracker.com}
  * @SuppressWarnings checkUnusedVariables 
  */
-abstract class Controller extends CController {
+abstract class RiskController extends CController {
 /**
  * Controller is the customized base controller class.
  * All controller classes for this application should extend from this base class.

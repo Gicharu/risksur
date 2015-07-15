@@ -6,14 +6,85 @@
  * @author    Chirag Doshi <chirag@tracetracker.com>
  * @copyright Tracetracker
  * @version   $id$
- * @uses      Controller
+ * @uses      RiskController
  * @license   Tracetracker {@link http://www.tracetracker.com}
  */
-class DesignController extends Controller {
+class DesignController extends RiskController {
 	const LOG_CAT = "ctrl.DesignController";
 	//Use layout
 	public $layout = '//layouts/column2';
+	public $docName;
 
+
+	/**
+	 * actionIndex
+	 */
+	public function actionIndex() {
+		//$this->setPageTitle($this->id . 'Introduction');
+		Yii::log("actionIndex DesignController called", "trace", self::LOG_CAT);
+		$this->docName = 'desIndex';
+		if(isset($_POST['pageId'])) {
+			$this->savePage('index');
+		}
+		$page = $this->getPageContent();
+		if(empty($page)) {
+			throw new CHttpException(404, 'The page requested does not exist');
+		}
+		$this->render('index', [
+				'content' => $page['content'],
+				'editAccess' => $page['editAccess'],
+				'editMode' => $page['editMode']
+			]
+		);
+
+
+	}
+
+	/**
+	 * @return array
+	 */
+	private function getPageContent() {
+		Yii::log("Function getPageContent DesignController called", "trace", self::LOG_CAT);
+		$content = DocPages::model()->find("docName='$this->docName'");
+		if(empty($content)) {
+			return [];
+		}
+		$editAccess = false;
+		if(Yii::app()->rbac->checkAccess('context', 'savePage')) {
+			$editAccess = true;
+		}
+		$editMode = false;
+		if(isset($_POST['page']) && DocPages::model()->count('docId=' . $_POST['page']) > 0) {
+			$editMode = true;
+		}
+		return [
+			'content' => $content,
+			'editAccess' => $editAccess,
+			'editMode' => $editMode
+		];
+	}
+
+	/**
+	 * @param $action
+	 */
+	private function savePage($action) {
+		//var_dump($_POST); die;
+		Yii::log("Function SavePage DesignController called", "trace", self::LOG_CAT);
+		$model = DocPages::model()->findByPk($_POST['pageId']);
+		if (isset($_POST['desContent'])) {
+			$purifier = new CHtmlPurifier();
+			$model->docData = $purifier->purify($_POST['desContent']);
+			if($model->update()) {
+				Yii::app()->user->setFlash('success', 'The page was updated successfully');
+				$this->redirect($action);
+				return;
+			}
+		}
+
+		Yii::app()->user->setFlash('error', 'The page was not updated successfully, contact your administrator');
+		$this->redirect($action);
+		return;
+	}
 	/**
 	 * actionShowComponent
 	 * @access public

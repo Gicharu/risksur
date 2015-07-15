@@ -2,14 +2,14 @@
 
 /**
  * EvaluationController
- * @uses Controller
+ * @uses RiskController
  * @package
  * @version $id$
  * @copyright Tracetracker
  * @author Chirag Doshi <chirag@tracetracker.com>
  * @license Tracetracker {@link http://www.tracetracker.com}
  */
-class EvaluationController extends Controller {
+class EvaluationController extends RiskController {
 	const LOG_CAT = "ctrl.EvaluationController";
 	public $layout = '//layouts/column2';
 	private $frameworkId;
