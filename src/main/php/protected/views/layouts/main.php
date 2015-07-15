@@ -230,7 +230,7 @@ if (!Yii::app()->user->isGuest) {
 
 	<div id="header">
 		<div id="logo">
-			<a href='<?php echo $baseUrl; ?>/index.php/context/list'>
+			<a href='<?= Yii::app()->createUrl("context/intro"); ?>'>
 				<img src="<?php echo $baseUrl; ?>/<?php echo $storySettings->logopath;?>"
 					 alt="link to landing page" />
 			</a>

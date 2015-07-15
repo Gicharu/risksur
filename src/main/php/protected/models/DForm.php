@@ -44,6 +44,7 @@ class DForm extends CFormModel {
 	 * @param string $value
 	 */
 	public function setPropertyName($name, $value = '') {
+		//$this->_properties[$name] = self::isJson($value) ? json_decode($value) : $value;
 		$this->_properties[$name] = $value;
 		if($this->scenario == 'update' && $this->_properties[$name] == '') {
 			$frameworkDataCriteria = new CDbCriteria();

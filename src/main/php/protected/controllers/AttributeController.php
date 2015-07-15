@@ -2,14 +2,14 @@
 
 /**
  * AttributeController
- * @uses Controller
+ * @uses RiskController
  * @package
  * @version $id$
  * @copyright Tracetracker
  * @author Chirag Doshi <chirag@tracetracker.com>
  * @license Tracetracker {@link http://www.tracetracker.com}
  */
-class AttributeController extends Controller {
+class AttributeController extends RiskController {
 	private $configuration;
 	const LOG_CAT = "ctrl.AttributeController";
 	//Use layout

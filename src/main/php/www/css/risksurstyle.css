@@ -1436,6 +1436,9 @@ input.checkboxlist {
 div.form {
     margin: 0 1em;
 }
+div.form label {
+    font-size: 1em;
+}
 
 .overViewTable {
     margin:0px;padding:0px;

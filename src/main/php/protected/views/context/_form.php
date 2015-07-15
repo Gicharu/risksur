@@ -1,3 +1,8 @@
+<?php
+/**
+ * @var $form CForm
+ */
+?>
 <div class="form">
 <?php
 	//echo $event->sender->menu->run();

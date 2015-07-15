@@ -1,16 +1,15 @@
 <?php
-//error_reporting(E_ALL);
 /**
- * AdminController 
+ * OptionsController
  * 
- * @uses Controller
+ * @uses RiskController
  * @package 
  * @version $id$
  * @copyright Tracetracker
  * @author Chirag Doshi <chirag@tracetracker.com> 
  * @license Tracetracker {@link http://www.tracetracker.com}
  */
-class OptionsController extends Controller {
+class OptionsController extends RiskController {
 	public $page;
 	private	$configuration;
 	const LOG_CAT = "ctrl.OptionsController";
