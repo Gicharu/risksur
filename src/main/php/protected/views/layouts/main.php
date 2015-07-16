@@ -21,6 +21,7 @@
 		$baseUrl . "/libraries/DataTables-1.9.4/media/css/jquery.dataTables.css" => "all",
 		$baseUrl . "/libraries/DataTables-1.9.4/extras/TableTools/media/css/TableTools.css" => "all",
 		$baseUrl . "/css/jquery.selectBoxIt.css" => "all",
+		$baseUrl . "/libraries/jquery-qtip/jquery.qtip.min.css" => "all",
 		$baseUrl . "/css/risksurstyle.css" => "noMedia", 
 
 	);
@@ -45,6 +46,7 @@
 		"/libraries/jquery-showloading-1.0/jquery.showLoading.js",
 		"/libraries/jsTimezoneDetect-1.0.4/jstz.min.js",
 		"/libraries/chosen_v1.3.0/chosen.jquery.js",
+		"/libraries/jquery-qtip/jquery.qtip.min.js",
 
 	);
 	// add the theme to the cssArray
@@ -191,9 +193,7 @@ function MM_openBrWindow(theURL,winName,features) { //v2.0
 <div id="deleteBox" title="Delete Confirmation" style="display:none">
 	<p><?php echo Yii::t("translation", "Delete")?></p>
 </div>
-<div id="sendBox" title="Confirm Status Change">
-	<p><?php echo Yii::t("translation", "Disable")?></p>
-</div>
+
 
 <div id="doc3">
 <!--<div class="container" id="page">-->
@@ -306,6 +306,7 @@ if ($flashMessages) {
 </div>
 <!-- End Flash Message Area -->
 	<div id="bd" >
+		<div id="operationInfo"></div>
 	<?php echo $content; ?>
 	</div>
 

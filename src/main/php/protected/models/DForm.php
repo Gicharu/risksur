@@ -2,7 +2,7 @@
 
 class DForm extends CFormModel {
 	private $_rules = array();
-	private $_properties = array();
+	protected $_properties = array();
 	private $_dynamicLabels = [];
 	private $_propertyDataMap = [];
 
@@ -34,8 +34,10 @@ class DForm extends CFormModel {
 	 */
 	public function setPropertyNames(array $names) {
 		//if (empty($this->_properties)) {
-			foreach ($names as $name)
-				$this->_properties[$name] = '';
+		foreach ($names as $name) {
+			$this->_properties[$name] = '';
+		}
+		//print_r($names); die;
 		//}
 	}
 
