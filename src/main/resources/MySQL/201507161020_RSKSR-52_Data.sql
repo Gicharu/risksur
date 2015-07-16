@@ -1,5 +1,15 @@
 DELETE FROM `programpages` WHERE `pageId` = '16';
-INSERT INTO `programpages` (`pageName`, `parentId`) VALUES ('Manage Evaluation Tool', '8');
+INSERT INTO `programpages` (
+  `pageName`,
+  `path`,
+  `parentId`,
+  `menuOrder`
+) VALUES (
+  'Manage Evaluation Tool',
+  'adminEva/index',
+  '8',
+  '18'
+);
 
 ALTER TABLE `evalElements`
 ADD COLUMN `elementMetaData` BLOB NULL AFTER `inputType` ;
