@@ -57,13 +57,13 @@
 					'items' => [
 						['label' => 'The EVA Tool', 'url' => ["$currentController/evaPage"]],
 						['label' => 'Evaluation Concepts', 'url' => ["$currentController/evaConcept"]],
-						['label' => 'Economic methods', 'url' =>
+						['label' => 'Economic Methods', 'url' =>
 							["$currentController/evaMethods"]],
-						['label' => 'Evaluation attributes', 'url' => ["$currentController/evaAttributes"]]
+						['label' => 'Evaluation Attributes', 'url' => ["$currentController/evaAttributes"]]
 					]
 				],
 				['label' => Yii::t("translation", "Describe Evaluation Context"),
-				      'url'   => ["$currentController/addEvaContext"]],
+				      'url'   => ["$currentController/listEvaContext"]],
 				['label' => Yii::t("translation", "Select Evaluation Question"),
 				      'url'   => ["$currentController/selectEvaQuestion"]],
 				['label' => Yii::t("translation", "Select Evaluation Method"),
@@ -71,9 +71,9 @@
 					['label' => Yii::t("translation", "Select components"),
 					      'url'   => ["$currentController/index"]],
 					['label' => Yii::t("translation", "Select evaluation criteria and method"),
-						  'url'   => ["$currentController/index"]],
+						  'url'   => ["$currentController/selectCriteriaMethod"]],
 					['label' => Yii::t("translation", "Select evaluation attributes"),
-					 'url'   => ["$currentController/index"]],
+					 'url'   => ["$currentController/selectEvaAttributes"]],
 				],
 				],
 				['label' => Yii::t("translation", "Summary of the evaluation protocol"),

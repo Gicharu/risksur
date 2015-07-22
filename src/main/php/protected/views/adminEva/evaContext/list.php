@@ -64,7 +64,7 @@
 			.on('click', '.bdelete', {
 				operation: 'delete',
 				link: '<?= $this->createUrl("deleteEvaContext"); ?>',
-				refreshLink: '<?= $this->createUrl("listEvaContext"); ?>',
+				refreshLink: '<?= $this->createUrl("listEvaContext") . '/ajax/1'; ?>',
 				table: '#evaContext',
 				rowIdentifier: 'evalElementsId'
 			}, requestHandler);

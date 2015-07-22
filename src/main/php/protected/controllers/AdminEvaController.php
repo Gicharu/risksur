@@ -31,6 +31,9 @@ class AdminEvaController extends RiskController {
 		$this->render('evaContext/index');
 	}
 
+	/**
+	 * @param bool $ajax
+	 */
 	public function actionListEvaContext($ajax = false) {
 		if($ajax) {
 			$elementsArray = ModelToArray::convertModelToArray(EvaluationElements::model()->findAll());
@@ -43,6 +46,9 @@ class AdminEvaController extends RiskController {
 		$this->render('evaContext/list');
 	}
 
+	/**
+	 * @param $id
+	 */
 	public function actionUpdateEvaContext($id) {
 		$elementModel = EvaluationElements::model()->findByPk($id);
 		if(!empty($elementModel)) {
@@ -70,9 +76,12 @@ class AdminEvaController extends RiskController {
 		$this->redirect(['adminEva/listEvaContext']);
 	}
 
-	public function actionDeleteEvaContext($evaContextId) {
+	/**
+	 * @param $id
+	 */
+	public function actionDeleteEvaContext($id) {
 		Yii::log("actionDeleteEvaContext called", "trace", self::LOG_CAT);
-		if(EvaMethods::model()->deleteByPk($evaContextId) > 0) {
+		if(EvaluationElements::model()->deleteByPk($id) > 0) {
 			echo 'Form field successfully deleted';
 			return;
 		}
@@ -89,22 +98,22 @@ class AdminEvaController extends RiskController {
 	public function actionListEvaMethods($ajax = false) {
 		Yii::log("actionListEvaMethods called", "trace", self::LOG_CAT);
 		$this->setPageTitle(Yii::app()->name . ' - List Evaluation Methods');
-		$dataProvider = new CActiveDataProvider('EvaMethods');
+		$dataProvider = new CActiveDataProvider('EconEvaMethods');
 		//print_r(ModelToArray::convertModelToArray($dataProvider->getData())); die;
 		if($ajax) {
-			$data = array('aaData' => ModelToArray::convertModelToArray($dataProvider->getData()));
+			$data = ['aaData' => ModelToArray::convertModelToArray($dataProvider->getData())];
 			echo json_encode($data, JSON_UNESCAPED_SLASHES);
 			return;
 		}
-		$this->render('evaMethods/list', array('dataProvider' => $dataProvider));
+		$this->render('evaMethods/list', ['dataProvider' => $dataProvider]);
 	}
 
 	/**
-	 * @param $evaMethodId
+	 * @param $id
 	 */
-	public function actionDeleteEvaMethod($evaMethodId) {
+	public function actionDeleteEvaMethod($id) {
 		Yii::log("actionDeleteEvaMethod called", "trace", self::LOG_CAT);
-		if(EvaMethods::model()->deleteByPk($evaMethodId) > 0) {
+		if(EconEvaMethods::model()->deleteByPk($id) > 0) {
 			echo 'Economic evaluation method successfully deleted';
 			return;
 		}
@@ -120,22 +129,22 @@ class AdminEvaController extends RiskController {
 	public function actionAddEvaMethod() {
 		Yii::log("actionAddEvaMethod called", "trace", self::LOG_CAT);
 		$config = self::getEvaMethodsFormConfig();
-		$buttonParam = array('name' => 'add', 'label' => 'Add');
+		$buttonParam = ['name' => 'add', 'label' => 'Add'];
 		$config['buttons'] = ContextController::getButtons($buttonParam, 'admin/listEvaMethods');
 		unset($config['buttons']['cancel']);
-		$model = new EvaMethods();
+		$model = new EconEvaMethods();
 		$form = new CForm($config, $model);
 		if($form->submitted('add') && $form->validate()) {
 			$model = $form->model;
 			if($model->save(false)) {
 				Yii::app()->user->setFlash('success', 'Economic evaluation method add successfully');
-				$this->redirect(array('admin/listEvaMethods'));
+				$this->redirect(['adminEva/listEvaMethods']);
 			}
 			Yii::app()->user->setFlash('error',
 				'An error occurred while saving, please try again or contact your administrator if the problem persists');
 		}
 		//var_dump($model, $form); die;
-		$this->render('evaMethods/add', array('form' => $form));
+		$this->render('evaMethods/add', ['form' => $form]);
 
 	}
 
@@ -146,12 +155,12 @@ class AdminEvaController extends RiskController {
 	public function actionUpdateEvaMethod($id) {
 		Yii::log("actionUpdateEvaMethod called", "trace", self::LOG_CAT);
 		$config = self::getEvaMethodsFormConfig();
-		$buttonParam = array('name' => 'update', 'label' => 'Update');
+		$buttonParam = ['name' => 'update', 'label' => 'Update'];
 		$config['buttons'] = ContextController::getButtons($buttonParam, 'admin/listEvaMethods');
-		$model = EvaMethods::model()->findByPk($id);
+		$model = EconEvaMethods::model()->findByPk($id);
 		if(is_null($model)) {
 			Yii::app()->user->setFlash('notice', 'That economic evaluation method does not exist.');
-			$this->redirect(array('admin/listEvaMethods'));
+			$this->redirect(['adminEva/listEvaMethods']);
 			return;
 		}
 		unset($config['buttons']['cancel']);
@@ -160,13 +169,13 @@ class AdminEvaController extends RiskController {
 			$model = $form->model;
 			if($model->save(false)) {
 				Yii::app()->user->setFlash('success', 'Economic evaluation method updated successfully');
-				$this->redirect(array('admin/listEvaMethods'));
+				$this->redirect(['adminEva/listEvaMethods']);
 			}
 			Yii::app()->user->setFlash('error',
 				'An error occurred while updating, please try again or contact ' .
 				'your administrator if the problem persists');
 		}
-		$this->render('evaMethods/update', array('form' => $form));
+		$this->render('evaMethods/update', ['form' => $form]);
 
 	}
 
@@ -175,17 +184,17 @@ class AdminEvaController extends RiskController {
 	 */
 	private function getEvaMethodsFormConfig() {
 		$elements = ContextController::getDefaultElements();
-		$elements['elements'] = array(
-			'buttonName' => array(
+		$elements['elements'] = [
+			'buttonName' => [
 				'type' => 'text'
-			),
-			'link' => array(
+			],
+			'link' => [
 				'type' => 'text'
-			),
-			'description' => array(
+			],
+			'description' => [
 				'type' => 'text'
-			)
-		);
+			]
+		];
 		return $elements;
 	}
 }

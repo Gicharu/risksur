@@ -146,7 +146,7 @@ return CMap::mergeArray($configArray, array(
 		'db' => array(
 			'emulatePrepare' => true,
 			'enableParamLogging' => true,
-			// 'enableProfiling' => true,
+			'initSQLs' => ['SET NAMES utf8']
 		),
 		'log' => array(
 			'class' => 'CLogRouter',

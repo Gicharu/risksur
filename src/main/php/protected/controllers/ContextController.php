@@ -70,8 +70,6 @@ class ContextController extends RiskController {
 				'editMode' => $page['editMode']
 			]
 		);
-
-
 	}
 
 	/**
@@ -184,6 +182,7 @@ class ContextController extends RiskController {
 		$dataArray['dtHeader'] = "Surveillance design List";
 		$dataArray['surveillanceList'] = json_encode(array());
 		$this->performAjaxValidation($model);
+		Yii::app()->session->add('referrer', Yii::app()->request->urlReferrer);
 
 		if (isset($_POST['FrameworkContext'])) {
 			$model->attributes = $_POST['FrameworkContext'];
@@ -253,14 +252,14 @@ class ContextController extends RiskController {
 		$model = new FrameworkContext();
 		$dataArray = array();
 		if (isset($_GET['contextId'])) {
-			$selectedDesign = FrameworkContext::model()->findAll(array(
+			$selectedDesign = FrameworkContext::model()->findAll([
 				//'select' => 'pageId, pageName',
 				'condition' => 'frameworkId=:frameworkId AND userId=:userId',
-				'params' => array(
+				'params' => [
 					':frameworkId' => $_GET['contextId'],
 					':userId' => Yii::app()->user->id,
-				),
-			));
+				],
+			]);
 			$dataArray['selectedDesign'] = $selectedDesign;
 			//add the surveillance context to the session
 			if (count($selectedDesign) == 1) {
@@ -268,6 +267,11 @@ class ContextController extends RiskController {
 					'id' => $_GET['contextId'],
 					'name' => $selectedDesign[0]->name
 				));
+				if(isset(Yii::app()->session['referrer']) && false != parse_url(Yii::app()->session['referrer'])) {
+					//unset(Yii::app()->session['referrer']);
+					$this->redirect(Yii::app()->session['referrer']);
+					return;
+				}
 			} else {
 				Yii::app()->session->remove('surDesign');
 			}

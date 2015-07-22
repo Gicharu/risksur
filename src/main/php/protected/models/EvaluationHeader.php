@@ -18,7 +18,7 @@ class EvaluationHeader extends CActiveRecord {
 	 * @param mixed $className
 	 * @static
 	 * @access public
-	 * @return void
+	 * @return static
 	 */
 	public static function model($className = __CLASS__) {
 		return parent::model($className);
@@ -69,8 +69,19 @@ class EvaluationHeader extends CActiveRecord {
 	 */
 	public function relations() {
 		return [
-			'designFrameworks' => [self::BELONGS_TO, 'FrameworkContext', 'frameworkId'],
-			'evalDetails'      => [self::HAS_MANY, 'EvaluationDetails', 'evalId']
+			'frameworks' => [self::BELONGS_TO, 'FrameworkContext', 'frameworkId',
+				'select' => 'name'
+			],
+			'question' => [self::BELONGS_TO, 'EvaluationQuestion', 'questionId',
+				'select' => 'question'
+			],
+			'evalDetails' => [self::HAS_MANY, 'EvaluationDetails', 'evalId'],
+			'evaCriteriaMethods' => [self::HAS_MANY, 'EvaQuestionHasCriteriaAndMethod',
+				['evalQuestionId' => 'questionId'], 'through' => 'question'],
+			'evaMethods' => [self::HAS_MANY, 'EvaMethods', ['methodId' => 'evaMethodId'],
+				'through' => 'evaCriteriaMethods'],
+			'evaCriteria' => [self::HAS_MANY, 'EvaCriteria', ['criteriaId' => 'criteriaId'],
+				'through' => 'evaCriteriaMethods']
 		];
 	}
 

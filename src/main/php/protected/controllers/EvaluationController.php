@@ -13,6 +13,8 @@ class EvaluationController extends RiskController {
 	const LOG_CAT = "ctrl.EvaluationController";
 	public $layout = '//layouts/column2';
 	private $frameworkId;
+	private $evaContextId;
+	private $docName;
 
 	/**
 	 * init
@@ -20,6 +22,8 @@ class EvaluationController extends RiskController {
 	public function init() {
 		$this->frameworkId = isset(Yii::app()->session['surDesign']['id']) ?
 			Yii::app()->session['surDesign']['id'] : null;
+		$this->evaContextId = isset(Yii::app()->session['evaContext']['id']) ?
+			Yii::app()->session['evaContext']['id'] : null;
 	}
 
 
@@ -78,90 +82,96 @@ class EvaluationController extends RiskController {
 		]);
 	}
 
+
 	/**
-	 * actionEvaToolPage
-	 * @access public
-	 * @return void
+	 * @throws CHttpException
 	 */
 	public function actionEvaPage() {
 		Yii::log("actionEvaPage called", "trace", self::LOG_CAT);
-
-		$model = DocPages::model()->findByPk("1");
-		$userId = Yii::app()->user->id;
-
-		// check if the user has roles 1 or 2 - admin roles
-		$userRoles = UsersHasRoles::model()->findAll([
-			'condition' => 't.users_id = :users_id AND (t.roles_id = :roleA OR t.roles_id = :roleB)',
-			'params'    => [
-				':users_id' => $userId,
-				':roleA'    => 1,
-				':roleB'    => 2
-			],
-		]);
-		$editButton = false;
-		if (!empty($userRoles)) {
-			$editButton = true;
+		$this->docName = 'evaPage';
+		if(isset($_POST['pageId'])) {
+			$this->savePage('evaPage');
 		}
-		$editPage = false;
-		if (!empty($_GET['edit']) && $_GET['edit'] == 1) {
-			$editPage = true;
+		$page = $this->getPageContent();
+		if(empty($page)) {
+			Yii::app()->user->setFlash('notice', 'This page is missing some information');
 		}
 
-		$this->render('evaPage', [
-			'model'      => $model,
-			'editButton' => $editButton,
-			'editPage'   => $editPage
-		]);
+		$this->render('_page', [
+				'content' => $page['content'],
+				'editAccess' => $page['editAccess'],
+				'editMode' => $page['editMode']
+			]
+		);
 	}
 
+
 	/**
-	 * actionEvaConcept
-	 * @access public
-	 * @return void
+	 * @throws CHttpException
 	 */
 	public function actionEvaConcept() {
 		Yii::log("actionEvaConcept called", "trace", self::LOG_CAT);
-
-		$model = DocPages::model()->findByPk("2");
-		$userId = Yii::app()->user->id;
-
-		// check if the user has roles 1 or 2 - admin roles
-		$userRoles = UsersHasRoles::model()->findAll([
-			'condition' => 't.users_id = :users_id AND (t.roles_id = :roleA OR t.roles_id = :roleB)',
-			'params'    => [
-				':users_id' => $userId,
-				':roleA'    => 1,
-				':roleB'    => 2
-			],
-		]);
-		$editButton = false;
-		if (!empty($userRoles)) {
-			$editButton = true;
+		$this->docName = 'evaConcepts';
+		if(isset($_POST['pageId'])) {
+			$this->savePage('evaConcept');
 		}
-		$editPage = false;
-		if (!empty($_GET['edit']) && $_GET['edit'] == 1) {
-			$editPage = true;
+		$page = $this->getPageContent();
+		if(empty($page)) {
+			Yii::app()->user->setFlash('notice', 'This page is missing some information');
 		}
-		$this->render('evaConcept', [
-			'model'      => $model,
-			'editButton' => $editButton,
-			'editPage'   => $editPage
-		]);
+		$this->render('_page', [
+				'content' => $page['content'],
+				'editAccess' => $page['editAccess'],
+				'editMode' => $page['editMode']
+			]
+		);
+
 	}
 
 	/**
-	 * actionSaveEvaPage
-	 * @access public
-	 * @return void
+	 * @return array
 	 */
-	public function actionSaveEvaPage() {
-		Yii::log("actionSaveEvaPage called", "trace", self::LOG_CAT);
-		$model = DocPages::model()->findByPk("1");
-		if (isset($_POST['redactor'])) {
-			$model->docData = self::clearTags($_POST['redactor']);
-			$model->update();
+	private function getPageContent() {
+		Yii::log("Function getPageContent ContextController called", "trace", self::LOG_CAT);
+		$content = DocPages::model()->find("docName='$this->docName'");
+		if(empty($content)) {
+			return [];
 		}
-		echo json_encode([]);
+		$editAccess = false;
+		if(Yii::app()->rbac->checkAccess('context', 'savePage')) {
+			$editAccess = true;
+		}
+		$editMode = false;
+		if(isset($_POST['page']) && DocPages::model()->count('docId=' . $_POST['page']) > 0) {
+			$editMode = true;
+		}
+		return [
+			'content' => $content,
+			'editAccess' => $editAccess,
+			'editMode' => $editMode
+		];
+	}
+
+	/**
+	 * @param $action
+	 */
+	private function savePage($action) {
+		//var_dump($_POST); die;
+		Yii::log("Function SavePage ContextController called", "trace", self::LOG_CAT);
+		$model = DocPages::model()->findByPk($_POST['pageId']);
+		if (isset($_POST['survContent'])) {
+			$purifier = new CHtmlPurifier();
+			$model->docData = $purifier->purify($_POST['survContent']);
+			if($model->update()) {
+				Yii::app()->user->setFlash('success', 'The page was updated successfully');
+				$this->redirect($action);
+				return;
+			}
+		}
+
+		Yii::app()->user->setFlash('error', 'The page was not updated successfully, contact your administrator');
+		$this->redirect($action);
+		return;
 	}
 
 	/**
@@ -175,27 +185,23 @@ class EvaluationController extends RiskController {
 		$this->render('evaMethods', ['dataProvider' => $dataProvider]);
 	}
 
-	/**
-	 * actionSaveEvaConcept
-	 * @access public
-	 * @return void
-	 */
-	public function actionSaveEvaConcept() {
-		Yii::log("actionSaveEvaConcept called", "trace", self::LOG_CAT);
-		$model = DocPages::model()->findByPk("2");
-		if (isset($_POST['redactor'])) {
-			$model->docData = self::clearTags($_POST['redactor']);
-			$model->update();
-		}
-		echo json_encode([]);
-	}
 
 	/**
-	 * @return string
+	 * @throws CHttpException
 	 */
 	public function actionSelectEvaQuestion() {
 		$this->setPageTitle('Select evaluation question');
-		return $this->render('selectEvaQuestion');
+		$this->docName = 'evaQuestion';
+		if(isset($_POST['pageId'])) {
+			$this->savePage('selectEvaQuestion');
+		}
+		$page = $this->getPageContent();
+		if(empty($page)) {
+			Yii::app()->user->setFlash('notice', 'This page is missing some information');
+		}
+
+		$this->render('selectEvaQuestion', ['page' => $page]);
+		return;
 	}
 
 	/**
@@ -205,13 +211,18 @@ class EvaluationController extends RiskController {
 	public function actionEvalQuestionList($questionId = '') {
 		$this->setPageTitle('Select evaluation question');
 		if (!empty($_POST['EvaluationQuestion']['question'])) {
+			$model = EvaluationHeader::model()->findByPk($this->evaContextId);
+			$model->questionId = $_POST['EvaluationQuestion']['question'];
+			$model->update();
 			Yii::app()->session['evalQuestion'] = $_POST['EvaluationQuestion']['question'];
 			//print_r(Yii::app()->session['evalQuestion']); die;
-			$this->redirect('econEval');
+			$this->redirect('selectCriteriaMethod');
 			return;
 		}
 		$model = new EvaluationQuestion();
 		$questionsRs = $model->findAll('parentQuestion is null');
+		$currentQuestion = EvaluationHeader::model()->findByPk($this->evaContextId);
+		$model->question = $currentQuestion->questionId;
 		$elements = ContextController::getDefaultElements();
 		$elements['title'] = '<h3>Evaluation question pick list </h3>';
 		$elements['elements'] = [
@@ -333,6 +344,110 @@ class EvaluationController extends RiskController {
 
 	}
 
+	public function actionSelectCriteriaMethod() {
+		$evaDetails = $this->getEvaDetails();
+
+		// get method / criteria groups
+		$groups = EvaQuestionGroups::model()->find("section='evaCriteriaMethod'");
+		$groupsArray = json_decode($groups->questions);
+		$group = $this->getQuestionGroup($groupsArray);
+		$pageData = [];
+		$pageData['message'] = 'No further decisions about the evaluation methods are' .
+			' required please click next to display summary of evaluation protocol';
+		$pageData['link'] = $this->createUrl('evaSummary');
+		if($group > 1) {
+			$pageData['message'] = 'Please click next to select evaluation attributes to include in your evaluation';
+			$pageData['link'] = $this->createUrl('selectEvaAttributes');
+		}
+		$this->render('selectCriteriaMethod', ['evaDetails' => $evaDetails, 'pageData' => $pageData]);
+	}
+
+	private function getQuestionGroup($groupArray) {
+		$groupKey = null;
+		foreach( $groupArray as $group => $questionsArray) {
+			if(in_array($this->evaContextId, $questionsArray)) {
+				$groupKey = $group;
+				break;
+			}
+		}
+		return $groupKey;
+	}
+
+	private function getEvaDetails() {
+		$detailsCriteria = new CDbCriteria();
+		$detailsCriteria->select = 'evalId, evaluationName';
+		$detailsCriteria->with = ['frameworks', 'evaMethods', 'evaCriteria'];
+		$model = ModelToArray::convertModelToArray(EvaluationHeader::model()
+			->findByPk($this->evaContextId, $detailsCriteria));
+		//print_r($model); die;
+		$evaMethods = '';
+		$evaCriteria = '';
+		array_walk($model['evaMethods'], function($item) use (&$evaMethods) {
+			$evaMethods .= $item['name'] . ',';
+		});
+		array_walk($model['evaCriteria'], function($item) use (&$evaCriteria) {
+			$evaCriteria .= $item['name'] . ',';
+		});
+		$model['evaMethods'] = rtrim($evaMethods, ',');
+		$model['evaCriteria'] = rtrim($evaCriteria, ',');
+
+		$evaDetails[] = ['Surveillance Name', $model['frameworks']['name']];
+		$evaDetails[] = ['Evaluation Name', $model['evaluationName']];
+		$evaDetails[] = ['Surveillance components to evaluate', '']; //$evaDetailsArray;
+		$evaDetails[] = ['Evaluation question', $model['question']['question']];
+		$evaDetails[] = ['Evaluation criteria', $model['evaCriteria']];
+		$evaDetails[] = ['Evaluation method', $model['evaMethods']];
+		$evaDetails[] = ['Whether risk based approach used', '']; //$evaDetailsArray;
+		return $evaDetails;
+	}
+
+	public function actionSelectEvaAttributes() {
+		$evaDetails = $this->getEvaDetails();
+		$this->docName = 'evaAttributes';
+		if(isset($_POST['pageId'])) {
+			$this->savePage('selectEvaAttributes');
+		}
+		$page = $this->getPageContent();
+		if(!isset($page)) {
+			Yii::app()->user->setFlash('notice', 'This page is missing some information');
+		}
+		$groups = EvaQuestionGroups::model()->find("section='evaCriteriaMethod'");
+		$groupsArray = json_decode($groups->questions);
+		$group = $this->getQuestionGroup($groupsArray);
+		$attributesCriteria = new CDbCriteria();
+		$attributesCriteria->with = ['attributeTypes', 'attribute'];
+		$attributesCriteria->order = 'relevance DESC';
+		$attributesCriteria->condition = "evaQuestionGroup=:group";
+		$attributesCriteria->addCondition('surveillanceObj=:survObj');
+		$attributesCriteria->params = [':group' => $group, ':survObj' => 1];
+		$attributes = ModelToArray::convertModelToArray(EvaAttributesMatrix::model()->findAll($attributesCriteria));
+		//print_r($attributes); die;
+		$this->render('selectEvaAttributes', [
+			'attributes' => $attributes,
+			'evaDetails' => $evaDetails,
+			'page' => $page
+			]
+		);
+	}
+
+	/**
+	 * @param bool $ajax
+	 */
+	public function actionListEvaContext($ajax = false) {
+		if($ajax) {
+			$contextCriteria = new CDbCriteria();
+			$contextCriteria->select = 'evaluationName, frameworkId, evaluationDescription, questionId';
+			$contextCriteria->with = ['frameworks', 'question'];
+			$contextCriteria->condition = 't.userId=' . Yii::app()->user->id;
+			$evaContexts = 	ModelToArray::convertModelToArray(EvaluationHeader::model()->findAll($contextCriteria));
+
+			//var_dump($evaContexts); die;
+			echo json_encode(['aaData' => $evaContexts]);
+			return;
+		}
+		$this->render('listEvaContext');
+	}
+
 	/**
 	 * actionAddEvaContext
 	 * @access public
@@ -357,7 +472,7 @@ class EvaluationController extends RiskController {
 		$returnArray = self::getElementsAndDynamicAttributes(["frameworkId" => $this->frameworkId]);
 		$elements = $returnArray['elements'];
 		$model->setRules($returnArray['rules']);
-		$model->setPropertyNames($returnArray['dynamicDataAttributes']);
+		$model->setProperties($returnArray['dynamicDataAttributes']);
 		$model->setAttributeLabels($returnArray['labels']);
 		//$model->setPropertyName('frameworkId', $this->frameworkId);
 		// generate the elements form
@@ -369,56 +484,44 @@ class EvaluationController extends RiskController {
 		//validate and save the evaluation data
 		//print_r($form->elements['frameworkId']); die();
 		//$form->elements['frameworkId']->options = [$this->frameworkId => ['selected' => true]];
-		if ($form->submitted('DynamicForm') && $form->validate()) {
-			$evaluationHeader->evaluationName = $form->model->evaluationName;
-			$evaluationHeader->frameworkId = $form->model->frameworkId;
+		if ($form->submitted('newEvaluation')) {
+			$evaluationHeader = $form['evaluationHeader']->model;
+			$evaluationHeader->frameworkId = Yii::app()->session['surDesign']['id'];
 			$evaluationHeader->userId = Yii::app()->user->id;
+			$model->setProperties($_POST['EvalForm']);
+			//print_r($model); die;
 			//save the componentHead values
-			if (!$evaluationHeader->validate()) {
+			if ($evaluationHeader->save() && $model->save($evaluationHeader->evalId)) {
 //				print_r($evaluationHeader->getErrors());
 //				var_dump($form); die;
-				Yii::app()->user->setFlash("notice", "The evaluation name must be unique.");
-				//return $this->redirect('addEvaContext');
-				$this->render('context', [
-					'model'     => $model,
-					'dataArray' => $dataArray,
-					'form'      => $form
+//				Yii::app()->user->setFlash("notice", "The evaluation name must be unique.");
+//				//return $this->redirect('addEvaContext');
+//				$this->render('context', [
+//					'model'     => $model,
+//					'dataArray' => $dataArray,
+//					'form'      => $form
+//				]);
+//				return;
+				$evalId = $evaluationHeader->evalId;
+
+				Yii::app()->session->add('evaContext', [
+					'id'   => $evaluationHeader->evalId,
+					'name' => $evaluationHeader->evaluationName,
 				]);
+				Yii::app()->user->setFlash('success', Yii::t("translation", "Evaluation protocol created successfully"));
+				$this->redirect(['selectEvaQuestion']);
 				return;
 			}
-			$evaluationHeader->save();
-			$evalId = $evaluationHeader->evalId;
-			// fetch the form data
-			foreach ($form->model as $key => $val) {
-				//ignore the attribute arrays
-				if (!is_array($key) && !is_array($val)) {
-					if ($key != "evaluationName" && $key != "frameworkId") {
-						$evaluationDetails->setIsNewRecord(true);
-						$evaluationDetails->evalDetailsId = null;
-						$evaluationDetails->evalId = $evalId;
-						$params = explode("-", $key);
-						$evaluationDetails->evalElementsId = $params[1];
-						$evaluationDetails->value = $val;
-						$evaluationDetails->save();
-					}
-				}
-			}
 			//update the session variable for design
-			$modelDesign = FrameworkContext::model()->findByPk($form->model->frameworkId);
-			if (!empty($modelDesign)) {
-				Yii::app()->session->add('surDesign', [
-					'id'   => $modelDesign->frameworkId,
-					'name' => $modelDesign->name
-					//'goalId' => $modelDesign->goalId
-				]);
-			}
+//			$modelDesign = FrameworkContext::model()->findByPk($form->model->frameworkId);
+//			if (!empty($modelDesign)) {
+//				Yii::app()->session->add('surDesign', [
+//					'id'   => $modelDesign->frameworkId,
+//					'name' => $modelDesign->name
+//					//'goalId' => $modelDesign->goalId
+//				]);
+//			}
 			//print_r($evaluationHeader); die;
-			Yii::app()->session->add('evaContext', [
-				'id'   => $evaluationHeader->evalId,
-				'name' => $evaluationHeader->evaluationName,
-			]);
-			Yii::app()->user->setFlash('success', Yii::t("translation", "Evaluation successfully created"));
-			$this->redirect(['addEvaContext']);
 		}
 
 		$this->render('context', [
@@ -426,6 +529,20 @@ class EvaluationController extends RiskController {
 			'dataArray' => $dataArray,
 			'form'      => $form
 		]);
+	}
+
+	/**
+	 * @param $id
+	 * @param $name
+	 */
+	public function actionSetEvaContext($id, $name) {
+		Yii::app()->session->add('evaContext', [
+			'id'   => $id,
+			'name' => $name,
+		]);
+		Yii::app()->user->setFlash('success', "The Evaluation context is now $name");
+		$this->redirect(['evaluation/listEvaContext']);
+		return;
 	}
 
 	/**
@@ -469,84 +586,24 @@ class EvaluationController extends RiskController {
 
 	}
 
-	/**
-	 * actionShowEval
-	 * @access public
-	 * @return void
-	 */
-	public function actionShowEval() {
-		Yii::log("actionShowEval called", "trace", self::LOG_CAT);
-		$model = new EvaluationHeader();
-		$dataArray = [];
-		if (isset($_GET['evalId'])) {
-			$selectedEval = Yii::app()->db->createCommand()
-				->select(' h.evalId,
-						h.evaluationName,
-						fh.frameworkId,
-						fh.name,
-						ee.label,
-						ed.value'
-				)
-				->from('evaluationHeader h')
-				->join('frameworkHeader fh', 'h.frameworkId = fh.frameworkId')
-				->join('evaluationDetails ed', 'ed.evalId = h.evalId')
-				->join('evalElements ee', 'ee.evalElementsId = ed.evalElementsId')
-				->where('h.evalId =' . $_GET['evalId'])
-				->queryAll();
-			// prepare the array for the view
-			foreach ($selectedEval as $dat) {
-				if (empty($dataArray['selectedEval']['Evaluation Name'])) {
-					$dataArray['selectedEval']['Evaluation Name'] = $dat['evaluationName'];
-				}
-				if (empty($dataArray['selectedEval']['Design Context'])) {
-					$dataArray['selectedEval']['Design Context'] = $dat['name'];
-				}
-				$dataArray['selectedEval'][$dat['label']] = $dat['value'];
-			}
-			//$dataArray['selectedEval'] = $selectedEval[0];
-			//add the surveilance design to the session
-			if (count($selectedEval) >= 1) {
-				Yii::app()->session->add('evaContext', [
-					'id'   => $_GET['evalId'],
-					'name' => $selectedEval[0]['evaluationName'],
-				]);
 
-				//update the session variable for design
-				Yii::app()->session->add('surDesign', [
-					'id'   => $selectedEval[0]['frameworkId'],
-					'name' => $selectedEval[0]['name']
-					//'goalId' => $selectedEval[0]['goalId']
-				]);
-			} else {
-				Yii::app()->session->remove('evaContext');
-			}
-			//print_r($selectedEval);
-			//print_r($_SESSION);
-		}
-
-		$this->render('showEval', [
-			'model'     => $model,
-			'dataArray' => $dataArray
-		]);
-	}
 
 	/**
 	 * actionDeleteEval
-	 * @access public
+	 * @param string $id
 	 * @return void
 	 */
-	public function actionDeleteEval() {
+	public function actionDeleteEval($id) {
 		Yii::log("actionDeleteEval called", "trace", self::LOG_CAT);
-		if (isset($_POST["delId"])) {
-			$record = EvaluationHeader::model()->findByPk($_POST['delId']);
-			if (!$record->delete()) {
-				Yii::log("Error deleting evaluation:" . $_POST['delId'], "warning", self::LOG_CAT);
-				//echo $errorMessage;
-				echo Yii::t("translation", "A problem occured when deleting an evaluation ") . $_POST['delId'];
-			} else {
-				echo Yii::t("translation", "The Evaluation Context ") . Yii::t("translation", " has been successfully deleted");
-			}
+		$record = EvaluationHeader::model()->findByPk($id);
+		if (!$record->delete()) {
+			Yii::log("Error deleting evaluation: $id", "warning", self::LOG_CAT);
+			//echo $errorMessage;
+			echo Yii::t("translation", "A problem occurred when deleting the evaluation context");
+		} else {
+			echo Yii::t("translation", "The Evaluation Context has been successfully deleted");
 		}
+		return;
 	}
 
 	/**
@@ -567,7 +624,7 @@ class EvaluationController extends RiskController {
 		$elements['showErrors'] = true;
 		$elements['errorSummaryHeader'] = Yii::app()->params['headerErrorSummary'];
 		$elements['errorSummaryFooter'] = Yii::app()->params['footerErrorSummary'];
-		$elements['activeForm']['id'] = "Dynamic";
+		$elements['activeForm']['id'] = "EvalForm";
 		$elements['activeForm']['enableClientValidation'] = true;
 		$elements['activeForm']['clientOptions'] = [
 			'validateOnSubmit' => true,
@@ -601,8 +658,8 @@ class EvaluationController extends RiskController {
 		$labels = [];
 		foreach ($evalElements as $element) {
 			//set the model attribute array
-			$attributeId = $element->inputName . "-" . $element->evalElementsId;
-			$dynamicDataAttributes[$attributeId] = $attributeId;
+			$attributeId = $element->inputName . "_" . $element->evalElementsId;
+			$dynamicDataAttributes[$attributeId] = '';
 			$validation = $element->required ? 'required' : 'safe';
 			$rules[] = [$attributeId, $validation];
 			$highlightClass = "";
@@ -647,14 +704,13 @@ class EvaluationController extends RiskController {
 				$elements['elements']['evaContext']['elements']['frameworkId']['value'] = $componentData['frameworkId'];
 			}
 			//add the dropdown parameters
-			if ($inputType == 'dropdownlist') {
+			if ($element->inputType == 'dropdownlist') {
 				$items = CHtml::listData(Options::model()->findAll([
 					'condition' => 'elementId=:elementId',
 					'params'    => [
 						':elementId' => $element->evalElementsId
 					],
 				]), 'optionId', 'label');
-
 				// add the dropdown items to the element
 				$elements['elements']['evaContext']['elements'][$attributeId]['items'] = $items;
 			}

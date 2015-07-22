@@ -72,6 +72,14 @@ a:link, a:visited {
     font-weight:700;
     text-decoration:underline;
 }
+a.btn {
+    color: #000;
+    background: #fa9d00 url("images/ui-bg_gloss-wave_60_FA9D00_500x100.png") repeat-x scroll 50% 50%;;
+}
+.evaFieldSet legend {
+    font-weight: bold;
+    font-size: medium;
+}
 /*a:link:after, a:visited:after {
 content:" (" attr(href) ")";
 font-size:90%;
@@ -413,7 +421,7 @@ body, .dataTables_wrapper{
     float: left;
 }
 body {
-    font:13px/1.231 arial, helvetica, clean, sans-serif;
+    font:14px/1.231 arial, helvetica, clean, sans-serif;
 }
 select, input, button, textarea, button {
     font:99% arial, helvetica, clean, sans-serif;
@@ -557,6 +565,9 @@ caption, th {
 }
 input, textarea, select {
     width: 220px;
+}
+.dtCheck {
+    width: 0.5em;
 }
 #selectNodeBox {
     width: auto;

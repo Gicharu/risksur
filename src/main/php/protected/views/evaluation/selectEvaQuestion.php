@@ -1,27 +1,25 @@
-<script type="text/javascript">
-	$(document).ready(function() {
-		$('#geq').button({
-			icons: {
-				primary: 'ui-icon-clipboard'
-			}
-		}).click(function() {
-			window.location = '<?= $this->createUrl('evaQuestionWizard') ?>';
-		});
-		$('#eqpl').button({
-			icons: {
-				primary: 'ui-icon-check'
-			}
-		}).click(function() {
-			window.location = '<?= $this->createUrl('evalQuestionList') ?>';
-		});
-	});
-</script>
 <?php
 /**
  * Created by PhpStorm.
  * User: james
  * Date: 5/5/15
  * Time: 12:01 PM
+ * @var $this EvaluationController
+ * @var $page Array
  */
-echo CHtml::htmlButton('Guidance to define the evaluation question', array('id' => 'geq', 'class' => 'ui-button'));
-echo CHtml::htmlButton('Evaluation question pick list', array('id' => 'eqpl', 'class' => 'ui-button'));
+
+$this->renderPartial('_page', [
+		'content' => $page['content'],
+		'editAccess' => $page['editAccess'],
+		'editMode' => $page['editMode']
+	]
+);
+if(!$page['editMode']) {
+	echo CHtml::tag('fieldset', ['class' => 'evaFieldSet'], '<legend> What would you like to do? </legend>', false);
+	echo CHtml::link('Guidance to define the evaluation question',
+		$this->createUrl('evaQuestionWizard'), ['class' => 'btn']);
+	echo CHtml::link('Evaluation question pick list',
+		$this->createUrl('evalQuestionList'), ['class' => 'btn']);
+	echo CHtml::closeTag('fieldset');
+
+}

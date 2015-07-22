@@ -32,10 +32,10 @@ class DForm extends CFormModel {
 	/**
 	 * @param array $names
 	 */
-	public function setPropertyNames(array $names) {
+	public function setProperties(array $names) {
 		//if (empty($this->_properties)) {
-		foreach ($names as $name) {
-			$this->_properties[$name] = '';
+		foreach ($names as $name => $value) {
+			$this->_properties[$name] = $value;
 		}
 		//print_r($names); die;
 		//}

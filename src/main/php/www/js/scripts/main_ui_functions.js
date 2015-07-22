@@ -462,13 +462,13 @@ var requestHandler = function(event) {
     } else {
         aPos = table.fnGetPosition($(event.target).parent()[0]);
     }
+    //console.log(event.data.link);
+    //return false;
     /* Get the full row     */
     var aData = table.fnGetData(aPos[0]);
     var rowId = aData[event.data.rowIdentifier];
     switch(event.data.operation) {
         case "edit":
-            console.log('edit');
-
             window.location.href = event.data.link +
             "/id/" + rowId;
             break;
@@ -481,18 +481,19 @@ var requestHandler = function(event) {
 
 };
 var deleteConfirm = function(deleteVal, delLink, reloadLink, table) {
+    console.log(deleteVal, delLink, reloadLink, table);
     $('body #deleteBox')
         .html("<p>Are you sure you want to delete this item </p>")
         .dialog('option', 'buttons', {
             "Confirm" : function() {
-                console.log(deleteVal, delLink, reloadLink, table);
                 $(this).dialog("close");
                 var opt = {'loadMsg': 'Deleting item...'};
                 $("#operationInfo").showLoading(opt);
                 $.ajax({
                     type: 'GET',
                     url: delLink,
-                    data: {evaMethodId:deleteVal},
+                    data: {id:deleteVal},
+                    dataType: "text",
                     success: function(data){
                         var checkSuccess = /successfully/i;
                         if (checkSuccess.test(data)) {
@@ -509,15 +510,14 @@ var deleteConfirm = function(deleteVal, delLink, reloadLink, table) {
                             $("#ajaxFlashMsgWrapper").attr('class', 'flash-error').show();
                         }
                         table.fnReloadAjax(reloadLink);
-                        $("#listEvaMethods").hideLoading();
+                        $("#operationInfo").hideLoading();
                     },
                     error: function(data){
                         $("#ajaxFlashMsg").html("Error occurred while deleting the item");
                         $("#ajaxFlashMsgWrapper").attr('class', 'flash-error').show();
                         //console.log("error occured while posting data" + data);
-                        $("#listSurveilance").hideLoading();
-                    },
-                    dataType: "text"
+                        $("#operationInfo").hideLoading();
+                    }
                 });
             },
             "Cancel" : function() {

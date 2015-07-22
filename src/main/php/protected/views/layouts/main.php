@@ -35,6 +35,8 @@
 		"/libraries/jquery-datatables-third-party/jquery.dataTables.customPagination.js",
 		"/libraries/jquery-datatables-third-party/jquery.dataTables.customListbox.js",
 		"/libraries/jquery-datatables-third-party/jquery.dataTables.buttons_input.js",
+		"/libraries/jquery-datatables-third-party/jquery-datatables-row-grouping/media/js/" .
+		"jquery.dataTables.rowGrouping.js",
 		//"/libraries/DataTables-1.9.4/extras/TableTools/media/js/TableTools.js",
 		// TableTools version 2.1.6-dev supports exporting visible rows to PDF / CSV
 		"/libraries/TableTools-2.1.6-dev/TableTools.js",
@@ -58,7 +60,7 @@
 	?>
 	<!--<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />-->
 	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-	<meta charset="UTF-8">
+	<meta charset="<?= Yii::app()->charset ?>">
 	<link rel="shortcut icon" type="image/x-icon" href="<?php echo $baseUrl; ?>/favicon.ico" />
 <?php
 	// add the css include files to the page
