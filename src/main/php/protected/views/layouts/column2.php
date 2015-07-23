@@ -51,33 +51,37 @@
 
 		if (Yii::app()->controller->id == 'evaluation') {
 			$currentController = Yii::app()->controller->id;
-			$this->menu = array(
-				array('label' => Yii::t("translation", "Introduction to Evaluation of Surveillance "),
-					'url'   => array('evaPage'),
-					'items' => array(
-						array('label' => 'The EVA Tool', 'url' => array("$currentController/evaPage")),
-						array('label' => 'Evaluation Concepts', 'url' => array("$currentController/evaConcept")),
-						array('label' => 'Economic Evaluation methods', 'url' =>
-							array("$currentController/evaMethods")),
-						array('label' => 'Evaluation attributes', 'url' => array("$currentController/evaAttributes"))
-					)
-				),
-				array('label' => Yii::t("translation", "Describe Evaluation Context"),
-					'url'   => array("$currentController/addEvaContext")),
-				array('label' => Yii::t("translation", "Select Evaluation Question"),
-					'url'   => array("$currentController/selectEvaQuestion")),
-				array('label' => Yii::t("translation", "Evaluation attributes and economic criteria"),
-					'url'   => array("$currentController/index"), 'items' => array(
-						array('label' => Yii::t("translation", "Economic evaluation"),
-							'url'   => array("$currentController/index")),
-						array('label' => Yii::t("translation", "Epidemiological assessment"),
-							'url'   => array("$currentController/index")),
-						array('label' => 'Final list of attributes', 'url' => array("$currentController/index"))
-					),
-				),
-				array('label' => Yii::t("translation", "Summary and Report"),
-					'url' => array("$currentController/index")),
-			);
+			$this->menu = [
+				['label' => Yii::t("translation", "Introduction to Evaluation of Surveillance "),
+					'url'   => ['evaPage'],
+					'items' => [
+						['label' => 'The EVA Tool', 'url' => ["$currentController/evaPage"]],
+						['label' => 'Evaluation Concepts', 'url' => ["$currentController/evaConcept"]],
+						['label' => 'Economic Methods', 'url' =>
+							["$currentController/evaMethods"]],
+						['label' => 'Evaluation Attributes', 'url' => ["$currentController/evaAttributes"]]
+					]
+				],
+				['label' => Yii::t("translation", "Describe Evaluation Context"),
+				      'url'   => ["$currentController/listEvaContext"]],
+				['label' => Yii::t("translation", "Select Evaluation Question"),
+				      'url'   => ["$currentController/selectEvaQuestion"]],
+				['label' => Yii::t("translation", "Select Evaluation Method"),
+				      'url'   => ["$currentController/index"], 'items' => [
+					['label' => Yii::t("translation", "Select components"),
+					      'url'   => ["$currentController/index"]],
+					['label' => Yii::t("translation", "Select evaluation criteria and method"),
+						  'url'   => ["$currentController/selectCriteriaMethod"]],
+					['label' => Yii::t("translation", "Select evaluation attributes"),
+					 'url'   => ["$currentController/selectEvaAttributes"]],
+				],
+				],
+				['label' => Yii::t("translation", "Summary of the evaluation protocol"),
+					'url' => ["$currentController/index"]],
+				['label' => 'Perform the evaluation', 'url' => ["$currentController/index"]],
+				['label' => 'How to report on the evaluation results', 'url' => ["$currentController/index"]]
+
+			];
 		}
 		//        $this->beginWidget('zii.widgets.CPortlet', array(
 		//            'title' => 'Operations',

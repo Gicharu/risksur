@@ -5,11 +5,29 @@
  * @uses CActiveRecord
  * @package 
  * @version $id$
- * @copyright Tracetracker
+ * @copyright TraceTracker
  * @author Chirag Doshi <chirag@tracetracker.com> 
  * @license Tracetracker {@link http://www.tracetracker.com}
  */
 class Options extends CActiveRecord {
+	/**
+	 * @return array relational rules.
+	 */
+	public function relations() {
+		// NOTE: you may need to adjust the relation name and the related
+		// class name for the relations automatically generated below.
+		return [
+			'element'        => [self::BELONGS_TO, 'EvaluationElements', 'elementId',
+				'joinType' => 'INNER JOIN'],
+			'component'      => [self::BELONGS_TO, 'ComponentDetails', 'componentId',
+				'joinType' => 'INNER JOIN'],
+			'frameworkField' => [self::BELONGS_TO, 'FrameworkFields', 'frameworkFieldId',
+				'joinType' => 'INNER JOIN',
+				'select' => 'label, id'
+			],
+		];
+	}
+
 	/**
 	 * model
 	 *
@@ -48,25 +66,26 @@ class Options extends CActiveRecord {
 	 * @return array
 	 */
 	public function rules() {
-		return array(
-			array(
+		return [
+			[
 				'label, elementId',
 				'required'
-			)
-		);
+			]
+		];
 	}
 
-	/**
-	 * attributeLabels 
-	 * 
-	 * @access public
-	 * @return array
-	 */
+/**
+* @return array customized attribute labels (name=>label)
+*/
 	public function attributeLabels() {
-		return array(
-			'label' => Yii::t('translation', 'Input Name'),
-			'elementId' => Yii::t('translation', 'Option Name')
-		);
+		return [
+			'optionId'         => 'Option',
+			'frameworkFieldId' => 'Framework Field',
+			'componentId'      => 'Component',
+			'elementId'        => 'Element',
+			'val'              => 'Val',
+			'label'            => 'Label',
+		];
 	}
 
 	/**
@@ -75,7 +94,7 @@ class Options extends CActiveRecord {
 	 */
 	public function getContextFieldOptions($contextInputId) {
 		$optionsRs = $this->findAll('frameworkFieldId=' . $contextInputId);
-		$options = array();
+		$options = [];
 		if(!empty($optionsRs)) {
 			foreach($optionsRs as $option) {
 				$options[$option->optionId] = $option->label;

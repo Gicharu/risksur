@@ -26,37 +26,21 @@ class AttributeController extends RiskController {
 
 	/**
 	 * actionIndex
-	 * @access public
+	 * @var $ajax bool
 	 * @return void
 	 */
-	public function actionIndex() {
+	public function actionIndex($ajax = false) {
 		Yii::log("actionIndex AttributeController called", "trace", self::LOG_CAT);
 		$dataArray = array();
 		$dataArray['dtHeader'] = "Manage Attributes"; // Set page title when printing the datatable
-		$attributesList = Attributes::model()->findAll(array('select' => 'attributeId, name, description'));
-		$attributesListArray = array();
+		$attributesList = ModelToArray::convertModelToArray(Attributes::model()
+			->with('evaAttributeTypes')
+			->findAll(['select' => 'attributeId, name, description']));
 		// Format datatable data. Define the Edit & Delete buttons
-		foreach ($attributesList as $attribute) {
-			$editButton = "<button id='editAttribute" . $attribute['attributeId'] .
-				"' type='button' class='bedit' onclick=\"window.location.href ='" . CController::createUrl('attribute/editAttribute/', array(
-						'attributeId' => $attribute['attributeId'])
-				) . "'\">Edit</button>";
-			$deleteButton = "<button id='deleteAttribute" . $attribute['attributeId'] .
-				"' type='button' class='bdelete' onclick=\"$('#deleteBox').dialog('open');" .
-				"deleteConfirm('" . $attribute['name'] . "', '" .
-				$attribute['attributeId'] . "')\">Remove</button>";
-			// Pack the data to be sent to the view
-			$attributesListArray[] = array(
-				'name'         => $attribute['name'],
-				'description'  => $attribute['description'],
-				'editButton'   => $editButton,
-				'deleteButton' => $deleteButton
-			);
-		}
-		$dataArray['attributesList'] = json_encode($attributesListArray);
-		if (!empty($_GET['getAttributes'])) {
-			$jsonData = json_encode(array("aaData" => $attributesListArray));
-			echo $jsonData;
+
+		$dataArray['attributesList'] = json_encode($attributesList);
+		if ($ajax) {
+			echo json_encode(["aaData" => $attributesList]);
 			return;
 		}
 		$this->render('index', array(
@@ -94,21 +78,16 @@ class AttributeController extends RiskController {
 	 * @access public
 	 * @return void
 	 */
-	public function actionEditAttribute() {
+	public function actionEditAttribute($id) {
 		Yii::log("actionEditAttribute AttributeController called", "trace", self::LOG_CAT);
-		$model = new Attributes('update');
-
-		if (!empty($_GET['attributeId'])) {
-			// fetch the form data, search using the "attributeId" sent from the listing.
-			$model = Attributes::model()->findByPk($_GET['attributeId']);
-			if ($model === null) {
-				Yii::app()->user->setFlash('error', Yii::t("translation", "The attribute does not exist"));
-				$this->redirect(array('attribute/index'));
-			}
-		} else {
-			Yii::app()->user->setFlash('notice', Yii::t("translation", "Please select an attribute to edit"));
-			$this->redirect(array('attribute/index'));
+		// fetch the form data, search using the "attributeId" sent from the listing.
+		$model = Attributes::model()->findByPk($id);
+		if ($model === null) {
+			Yii::app()->user->setFlash('error', Yii::t("translation", "The attribute does not exist"));
+			$this->redirect(['attribute/index']);
+			return;
 		}
+
 		if (isset($_POST['Attributes'])) {
 			$model->attributes = $_POST['Attributes'];
 			if (isset($_POST['ajax']) && $_POST['ajax'] == 'newAttribute') {
@@ -119,37 +98,39 @@ class AttributeController extends RiskController {
 			if ($model->validate()) {
 				$model->update();
 				Yii::app()->user->setFlash('success', Yii::t("translation", "Attribute successfully edited"));
-				$this->redirect(array('index'));
+				$this->redirect(['index']);
 			}
 		}
-		$this->render('edit', array(
+		$this->render('edit', [
 			'model' => $model
-		));
+		]);
 	}
 
 	/**
 	 * actionDeleteAttribute
-	 * @access public
+	 * @var $id string
 	 * @return void
 	 */
-	public function actionDeleteAttribute() {
+	public function actionDeleteAttribute($id) {
 		Yii::log("actionDeleteAttribute AttributeController called", "trace", self::LOG_CAT);
-		if (isset($_POST["delId"])) {
-			$queryAttributeRelations = AttributeFormRelation::model()->findAll('attributeId=' . $_POST["delId"]);
 
-			if (count($queryAttributeRelations) > 0) {
-				// ATTRIBUTES WITH RELATIONS SHOULD NOT BE DELETABLE
-				echo Yii::t("translation", "Cannot delete Attribute. The attribute has a relation to a form element. Delete the relation first then re-try deleting the attribute.");
+		$queryAttributeRelations = AttributeFormRelation::model()->findAll('attributeId=' . $id);
+
+		if (count($queryAttributeRelations) > 0) {
+			// ATTRIBUTES WITH RELATIONS SHOULD NOT BE DELETABLE
+			echo Yii::t("translation", "Cannot delete Attribute. The attribute has a relation to a form element." .
+				" Delete the relation first then try deleting the attribute.");
+		} else {
+			$record = Attributes::model()->findByPk($id);
+			if (!$record->delete()) {
+				Yii::log("Error deleting Attribute: " . $id, "error", self::LOG_CAT);
+				echo Yii::t("translation", "A problem occurred when deleting the Attribute ") . $id .
+					". Please contact your Administrator";
 			} else {
-				$record = Attributes::model()->findByPk($_POST['delId']);
-				if (!$record->delete()) {
-					Yii::log("Error deleting Attribute: " . $_POST['delId'], "error", self::LOG_CAT);
-					echo Yii::t("translation", "A problem occured when deleting the Attribute ") . $_POST['delId'] . ". Please contact the Risksur Admin";
-				} else {
-					echo Yii::t("translation", "The Attribute has been successfully deleted");
-				}
+				echo Yii::t("translation", "The Attribute has been successfully deleted");
 			}
 		}
+		return;
 	}
 
 	/**

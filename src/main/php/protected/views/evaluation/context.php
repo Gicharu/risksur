@@ -1,3 +1,9 @@
+<?php
+/**
+ * @var $form CForm
+ * @var $dataArray array
+ */
+?>
 <div class="contentContainer">
 	<h3><?php echo $dataArray['formType']; ?> Evaluation Context</h3>
 	<div class="contentLeft">
@@ -6,6 +12,15 @@
 		</div>
 		<script type="text/javascript">
 			$(document).ready(function() {
+				$('[title!=""]').qtip({
+					content: {
+						title: 'Info'
+					},
+					style: {
+						widget: true,
+						def: false
+					}
+				});
 				var surSummary = $("#surSummary").dataTable({
 					"bProcessing": true,
 					"sAjaxSource": "<?php echo $this->createUrl('evaluation/getSurveillanceSummary'); ?>",

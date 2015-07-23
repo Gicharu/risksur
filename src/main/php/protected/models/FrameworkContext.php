@@ -71,7 +71,7 @@ class FrameworkContext extends CActiveRecord {
 	public function relations() {
 		return array(
 			//'goal' => array( self::BELONGS_TO, 'GoalData', 'goalId' ),
-			'designHead' => array( self::HAS_MANY, 'FrameworkDetails', 'frameworkDetailsId' )
+			'designHead' => array( self::HAS_MANY, 'FrameworkDetails', 'frameworkDetailsId' ),
 		);
 	}
 	/**
