@@ -567,7 +567,7 @@ input, textarea, select {
     width: 220px;
 }
 .dtCheck {
-    width: 0.5em;
+    width: 25px;
 }
 #selectNodeBox {
     width: auto;

@@ -24,6 +24,25 @@ class EvaluationController extends RiskController {
 			Yii::app()->session['surDesign']['id'] : null;
 		$this->evaContextId = isset(Yii::app()->session['evaContext']['id']) ?
 			Yii::app()->session['evaContext']['id'] : null;
+
+	}
+
+	protected function beforeAction($action) {
+		$contextActions = [
+			'selectEvaQuestion' => 'selectEvaQuestion',
+			'evaQuestionList' => 'selectEvaQuestion',
+			'evaQuestionWizard' => 'evaQuestionWizard',
+			'evaAttributes' => 'evaAttributes',
+			'selectCriteriaMethod' => 'selectCriteriaMethod',
+			'selectEvaAttributes' => 'selectEvaAttributes',
+
+		];
+		if(isset($contextActions[$action->id]) && !isset($this->evaContextId)) {
+			Yii::app()->user->setFlash('notice', 'Please select an evaluation context before you proceed');
+			$this->redirect('listEvaContext');
+			return true;
+		}
+		return true;
 	}
 
 
@@ -180,7 +199,7 @@ class EvaluationController extends RiskController {
 	public function actionEvaMethods() {
 		Yii::log("actionEvaMethods called", "trace", self::LOG_CAT);
 		$this->setPageTitle(Yii::app()->name . ' - Economic evaluation methods');
-		$dataProvider = new CActiveDataProvider('EvaMethods');
+		$dataProvider = new CActiveDataProvider('EconEvaMethods');
 		//print_r($dataProvider->getData()); die;
 		$this->render('evaMethods', ['dataProvider' => $dataProvider]);
 	}
@@ -434,18 +453,41 @@ class EvaluationController extends RiskController {
 	 * @param bool $ajax
 	 */
 	public function actionListEvaContext($ajax = false) {
+		Yii::log("actionListEvaContext called", "trace", self::LOG_CAT);
 		if($ajax) {
 			$contextCriteria = new CDbCriteria();
 			$contextCriteria->select = 'evaluationName, frameworkId, evaluationDescription, questionId';
 			$contextCriteria->with = ['frameworks', 'question'];
 			$contextCriteria->condition = 't.userId=' . Yii::app()->user->id;
-			$evaContexts = 	ModelToArray::convertModelToArray(EvaluationHeader::model()->findAll($contextCriteria));
-
+			$evaContextArray = 	ModelToArray::convertModelToArray(EvaluationHeader::model()->findAll($contextCriteria));
+			$evaContexts =$this->replaceNullQuestion($evaContextArray);
 			//var_dump($evaContexts); die;
 			echo json_encode(['aaData' => $evaContexts]);
 			return;
 		}
+		if (is_null($this->frameworkId)) {
+			Yii::log('No surveillance system selected! redirecting to context/list', 'trace', self::LOG_CAT);
+			Yii::app()->user->setFlash('notice', 'Please select a surveillance system first');
+			return $this->redirect(['context/list']);
+
+		}
 		$this->render('listEvaContext');
+	}
+
+	private function replaceNullQuestion($array) {
+		foreach ($array as $key => $value) {
+			if (is_array($array[$key])) {
+				$array[$key] = $this->replaceNullQuestion($array[$key]);
+			} else {
+				if(is_null($array[$key])) {
+					$array[$key] = '';
+					if($key == 'question') {
+						$array[$key]['question'] = '';
+					}
+				}
+			}
+		}
+		return $array;
 	}
 
 	/**

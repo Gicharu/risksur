@@ -34,24 +34,43 @@ $this->renderPartial('_page', [
 				{"mData": "attribute.name" },
 				{"mData": "attribute.description" },
 				{"mData": "attributeTypes.name" },
-				{"mData": "relevance" },
+				{"mData": "relevance", "fnCreatedCell": function(nTd, sData, oData, iRow, iCol) {
+					switch(sData) {
+						case '1':
+							$(nTd).html('Low');
+							break;
+						case '2':
+							$(nTd).html('Medium');
+							break;
+						default:
+							$(nTd).html('High');
+					}
+
+				}
+				},
 				{
 					"mData": null,
 					"bSortable": false,
 					"sWidth": '18%',
-					"sClass": "delMethod",
-					"sDefaultContent": '<button title="Delete" class="breport">Fill in assessment form</button>'
+					"sClass": "assButtonContainer",
+					"sDefaultContent": '<button title="Delete" type="button" class="assButton">Fill in assessment form</button>'
 				}
 			],
 			// update the buttons stying after the table data is loaded
 			"fnDrawCallback": function() {
-				$('button.breport').button({
-					icons: {primary: "ui-icon-document"}, text: true});
+				$('button.assButton').button();
 			},
 			"bJQueryUI": true,
 			"sPaginationType": "buttons_input"
 
-		});
+		})
+			.on('click', '.assButtonContainer', function() {
+				var table = $("#evaAttributes").dataTable();
+				var row = table.fnGetPosition(this);
+				var data = table.fnGetData(row[0]);
+
+				//console.log(data);
+			});
 	});
 </script>
 <div id="evaSummaryContainer">
