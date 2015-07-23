@@ -69,7 +69,7 @@
 				['label' => Yii::t("translation", "Select Evaluation Method"),
 				      'url'   => ["$currentController/index"], 'items' => [
 					['label' => Yii::t("translation", "Select components"),
-					      'url'   => ["$currentController/index"]],
+					      'url'   => "#"],
 					['label' => Yii::t("translation", "Select evaluation criteria and method"),
 						  'url'   => ["$currentController/selectCriteriaMethod"]],
 					['label' => Yii::t("translation", "Select evaluation attributes"),

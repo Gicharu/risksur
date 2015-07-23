@@ -16,7 +16,11 @@
 				{"mDataProp": "evaluationName", "sClass": "underline setEvaContext clickable" },
 				{"mDataProp": "evaluationDescription" },
 				{"mDataProp": "frameworks.name" },
-				{"mDataProp": "question.question" },
+				{"mDataProp": "question.question", "fnCreatedCell": function(nTd, sData, oData, iRow, iCol) {
+					if(oData.question.question == '') {
+						$(nTd).html('[No question selected for this context]').css('color', 'red');
+					}
+				} },
 				{
 					"mData": null,
 					"bSortable": false,
