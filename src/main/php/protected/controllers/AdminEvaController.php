@@ -28,7 +28,7 @@ class AdminEvaController extends RiskController {
 	}
 
 	public function actionIndex() {
-		$this->render('evaContext/index');
+		$this->render('index');
 	}
 
 	/**
@@ -44,6 +44,28 @@ class AdminEvaController extends RiskController {
 			['label' => 'Add Evaluation Context Field', 'url' => ['adminEva/AddEvaContext']]
 		];
 		$this->render('evaContext/list');
+	}
+
+	public function actionAddEvaContext() {
+		$elementModel = new EvaluationElements('insert');
+		$form = new CForm(EvaluationElements::getFormElements(), $elementModel);
+		$this->menu = [
+			['label' => 'List Evaluation Context Fields', 'url' => ['adminEva/listEvaContext']]
+		];
+		if($form->submitted('save') && $form->validate()) {
+			$elementModel = $form->model;
+			//print_r($elementModel); die;
+			if($elementModel->save(false)) {
+				Yii::app()->user->setFlash('success', 'The form field was created successfully');
+				$this->redirect(['adminEva/listEvaContext']);
+				return;
+			}
+			Yii::app()->user->setFlash('error', 'The form field was not created successfully, please' .
+				'try again or contact your administrator if the problem persists');
+		}
+		$this->render('evaContext/_form', [
+			'form' => $form
+		]);
 	}
 
 	/**

@@ -45,8 +45,10 @@ class EvaluationElements extends CActiveRecord {
 	public function rules() {
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
-		return [['evalElementsId, inputName, label, inputType, required', 'required'],
-			['evalElementsId', 'numerical', 'integerOnly' => true],
+		return [
+			['inputName, label, inputType, required', 'required'],
+			['evalElementsId', 'numerical', 'integerOnly' => true, 'on' => 'update'],
+			['evalElementsId', 'required', 'on' => 'update'],
 			['inputName, inputType', 'length', 'max' => 50],
 			['label', 'length', 'max' => 100],
 			['inputName', 'match', 'pattern' => '/^[a-zA-Z0-9]{1,20}$/',
@@ -69,6 +71,18 @@ class EvaluationElements extends CActiveRecord {
 
 	public static function getFormElements() {
 		return [
+			'showErrorSummary' => true,
+			'showErrors' => true,
+			'errorSummaryHeader' => Yii::app()->params['headerErrorSummary'],
+			'errorSummaryFooter' => Yii::app()->params['footerErrorSummary'],
+			'activeForm' => [
+				'id' => 'EvaContextFields',
+				'class' => 'CActiveForm',
+				'enableClientValidation' => true,
+				'clientOptions' => [
+					'validateOnSubmit' => true,
+				]
+			],
 			'elements' => [
 				'label'     => [
 					'type'      => 'text',

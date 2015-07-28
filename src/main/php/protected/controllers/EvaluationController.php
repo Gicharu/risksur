@@ -410,8 +410,8 @@ class EvaluationController extends RiskController {
 		$model['evaMethods'] = rtrim($evaMethods, ',');
 		$model['evaCriteria'] = rtrim($evaCriteria, ',');
 
-		$evaDetails[] = ['Surveillance Name', $model['frameworks']['name']];
 		$evaDetails[] = ['Evaluation Name', $model['evaluationName']];
+		$evaDetails[] = ['Surveillance Name', $model['frameworks']['name']];
 		$evaDetails[] = ['Surveillance components to evaluate', '']; //$evaDetailsArray;
 		$evaDetails[] = ['Evaluation question', $model['question']['question']];
 		$evaDetails[] = ['Evaluation criteria', $model['evaCriteria']];
@@ -440,13 +440,90 @@ class EvaluationController extends RiskController {
 		$attributesCriteria->addCondition('surveillanceObj=:survObj');
 		$attributesCriteria->params = [':group' => $group, ':survObj' => 1];
 		$attributes = ModelToArray::convertModelToArray(EvaAttributesMatrix::model()->findAll($attributesCriteria));
-		//print_r($attributes); die;
+		$evaluationModel = EvaluationHeader::model()->findByPk($this->evaContextId, ['select' => 'evalId, evaAttributes']);
+		$evaAttributes = isset($evaluationModel->evaAttributes) ? json_decode($evaluationModel->evaAttributes): [];
+		$evaluationModel->scenario = 'selectEvaAttributes';
+//		var_dump($_POST); die;
+		if(isset($_POST['saveEvaAttr'])) {
+//			$evaluationModel->evaAttributes = json_encode($_POST['EvaluationHeader']['evaAttributes']);
+				$evaluationModel->evaAttributes = isset($_POST['EvaluationHeader']) ?
+					json_encode($_POST['EvaluationHeader']['evaAttributes']) : null;
+				if($evaluationModel->validate() && $evaluationModel->update(['evaAttributes'])) {
+					Yii::app()->user->setFlash('success', 'Evaluation attributes saved successfully');
+					$this->redirect('selectEvaAssMethod');
+					return;
+
+				}
+			//var_dump($_POST, $evaluationModel); die;
+		}
 		$this->render('selectEvaAttributes', [
-			'attributes' => $attributes,
-			'evaDetails' => $evaDetails,
-			'page' => $page
+				'attributes' => $attributes,
+				'evaDetails' => $evaDetails,
+				'page' => $page,
+				'evaluationModel' => $evaluationModel
 			]
 		);
+	}
+
+	public function actionSelectEvaAssMethod() {
+		$evaAttrCriteria = new CDbCriteria();
+		$evaAttrCriteria->select = 'evaAttributes';
+		$evaAttrCriteria->condition = 'evalId=' . $this->evaContextId;
+		$evaluationAttributes = EvaluationHeader::model()
+			->find($evaAttrCriteria);
+		$evaAttributes = json_decode($evaluationAttributes->evaAttributes);
+		// Get attribute names
+		$evaAttributeMapCriteria = new CDbCriteria();
+		$evaAttributeMapCriteria->select = 'attributeId, name';
+		$evaAttributeMapCriteria->addInCondition('attributeId', $evaAttributes);
+		$evaAttributeMap = CHtml::listData(EvaAttributes::model()->findAll($evaAttributeMapCriteria),
+			'attributeId', 'name');
+		// check if assessment method(s) exist
+		$assessModel = EvaAssessmentMethods::model()
+			->findAll(['condition' => 'evaluationId=' . $this->evaContextId]);
+
+		foreach($evaAttributes as $key => $evaAttribute) {
+			if(!isset($assessModel[$key])) {
+				$assessModel[$key] = new EvaAssessmentMethods();
+				$assessModel[$key]['evaAttribute'] = $evaAttribute;
+				$assessModel[$key]['evaluationId'] = $this->evaContextId;
+
+			}
+			$assessModel[$key]['evaAttributeName'] = $evaAttributeMap[$evaAttribute];
+
+		}
+		if(isset($_POST['EvaAssessmentMethods'])) {
+			$success = false;
+			$transaction = Yii::app()->db->beginTransaction();
+			try {
+				for($key = 0; $key < count($assessModel); $key++) {
+					$assessModel[$key]->attributes = $_POST['EvaAssessmentMethods'][$key];
+					$success = $assessModel[$key]->save();
+
+				}
+				$transaction->commit();
+				if($success) {
+					Yii::app()->user->setFlash('success', 'Assessment method(s) saved successfully');
+				}
+
+			} catch (Exception $e) {
+				$transaction->rollBack();
+			}
+		}
+		$this->render('selectEvaAssMethod', ['assessModel' => $assessModel, 'evaAttributeMap' => $evaAttributeMap
+		]);
+	}
+
+	public function actionEvaSummary() {
+		$evaDetails = $this->getEvaDetails();
+		$evaAssMethods = ModelToArray::convertModelToArray(EvaAssessmentMethods::model()
+			->with('evaluationAttributes')
+			->findAll(['select' => 'evaAttribute, methodDescription, dataAvailability']));
+//		print_r($evaAssMethods); die;
+		$this->render('evaSummary', [
+			'evaDetails' => $evaDetails,
+			'evaAssMethods' => $evaAssMethods
+		]);
 	}
 
 	/**
@@ -458,7 +535,8 @@ class EvaluationController extends RiskController {
 			$contextCriteria = new CDbCriteria();
 			$contextCriteria->select = 'evaluationName, frameworkId, evaluationDescription, questionId';
 			$contextCriteria->with = ['frameworks', 'question'];
-			$contextCriteria->condition = 't.userId=' . Yii::app()->user->id;
+			$contextCriteria->condition = 't.userId=' . Yii::app()->user->id .
+				' AND t.frameworkId=' . $this->frameworkId;
 			$evaContextArray = 	ModelToArray::convertModelToArray(EvaluationHeader::model()->findAll($contextCriteria));
 			$evaContexts =$this->replaceNullQuestion($evaContextArray);
 			//var_dump($evaContexts); die;

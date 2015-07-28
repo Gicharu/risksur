@@ -457,14 +457,16 @@ var requestHandler = function(event) {
     var table = $(event.data.table).dataTable();
     var aPos;
     /* Get current  row pos */
-    if(typeof event.data.parent !== 'undefined') {
-        aPos = table.fnGetPosition(event.target);
-    } else {
-        aPos = table.fnGetPosition($(event.target).parent()[0]);
-    }
+    //if(typeof event.data.parent !== 'undefined') {
+    //    aPos = table.fnGetPosition(event.target);
+    //} else {
+    //    aPos = table.fnGetPosition($(event.target).parent()[0]);
+    //}
+    aPos = table.fnGetPosition($(event.target).closest('td')[0]);
     //console.log(event.data.link);
     //return false;
     /* Get the full row     */
+    //console.log(aPos); return false;
     var aData = table.fnGetData(aPos[0]);
     var rowId = aData[event.data.rowIdentifier];
     switch(event.data.operation) {
