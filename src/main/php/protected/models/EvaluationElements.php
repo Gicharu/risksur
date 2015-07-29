@@ -17,13 +17,10 @@ class EvaluationElements extends CActiveRecord {
 	public $inputType;
 	public $required;
 
+
 	/**
-	 * model
-	 *
-	 * @param mixed $className
-	 * @static
-	 * @access public
-	 * @return void
+	 * @param string $className
+	 * @return static
 	 */
 	public static function model($className = __CLASS__) {
 		return parent::model($className);
@@ -33,7 +30,7 @@ class EvaluationElements extends CActiveRecord {
 	 * tableName
 	 *
 	 * @access public
-	 * @return void
+	 * @return string
 	 */
 	public function tableName() {
 		return 'evalElements';
@@ -43,29 +40,95 @@ class EvaluationElements extends CActiveRecord {
 	 * rules 
 	 * 
 	 * @access public
-	 * @return void
+	 * @return array
 	 */
 	public function rules() {
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
-		return array(array('evalElemantsId, inputName, label, inputType, required', 'required'),
-			array('evalElemantsId', 'numerical', 'integerOnly' => true),
-			array('inputName, label, inputType', 'length', 'max' => 50),
-			array('inputName', 'match', 'pattern' => '/^[a-zA-Z0-9]{1,20}$/',
-				'message' => 'input name should not contain spaces or punctuation.'),
+		return [
+			['inputName, label, inputType, required', 'required'],
+			['evalElementsId', 'numerical', 'integerOnly' => true, 'on' => 'update'],
+			['evalElementsId', 'required', 'on' => 'update'],
+			['inputName, inputType', 'length', 'max' => 50],
+			['label', 'length', 'max' => 100],
+			['inputName', 'match', 'pattern' => '/^[a-zA-Z0-9]{1,20}$/',
+				'message' => 'input name should not contain spaces or punctuation.'],
+			['elementMetaData', 'safe'],
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
-			array('evalElemantsId, inputName, label, inputType, required', 'safe', 'on' => 'search'),);
+			['evalElementsId, inputName, label, inputType, required', 'safe', 'on' => 'search'],];
 	}
 
 	/**
 	 * primaryKey
 	 *
 	 * @access public
-	 * @return void
+	 * @return string
 	 */
 	public function primaryKey() {
-		return 'evalElemantsId';
+		return 'evalElementsId';
+	}
+
+	public static function getFormElements() {
+		return [
+			'showErrorSummary' => true,
+			'showErrors' => true,
+			'errorSummaryHeader' => Yii::app()->params['headerErrorSummary'],
+			'errorSummaryFooter' => Yii::app()->params['footerErrorSummary'],
+			'activeForm' => [
+				'id' => 'EvaContextFields',
+				'class' => 'CActiveForm',
+				'enableClientValidation' => true,
+				'clientOptions' => [
+					'validateOnSubmit' => true,
+				]
+			],
+			'elements' => [
+				'label'     => [
+					'type'      => 'text',
+					'maxlength' => 100,
+					//'required'  => 1
+				],
+				'inputName' => [
+					'type'      => 'text',
+					'maxlength' => 50,
+					//'required'  => 1
+
+				],
+				'elementMetaData' => [
+					'type'      => 'textarea',
+					//'maxlength' => 50,
+					//'required'  => 1
+
+				],
+				'inputType' => [
+					'type'      => 'dropdownlist',
+					'maxlength' => 50,
+					//'required'  => 1,
+					'items' => [
+						'text' => 'Text',
+						'dropdownlist' => 'Drop down list'
+					]
+
+				],
+				'required' => [
+					'type'      => 'dropdownlist',
+					'maxlength' => 50,
+					//'required'  => 1,
+					'items' => [
+						1 => 'Yes',
+						0 => 'No'
+					]
+
+				]
+			],
+			'buttons' => [
+				'save' => [
+					'label' => 'Save',
+					'type' => 'submit'
+				]
+			]
+		];
 	}
 
 }

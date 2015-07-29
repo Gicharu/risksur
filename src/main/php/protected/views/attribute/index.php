@@ -1,14 +1,18 @@
 <?php
-$this->menu = array(
-	array('label' => 'Add Attribute', 'url' => array('attribute/addAttribute')), 
-	array('label' => 'Add Relation', 'url' => array('attribute/addRelation')),
-	array('label' => 'List Relation', 'url' => array('attribute/listRelations'))
-);
+/**
+ * @var $this AttributeController
+ * @var $dataArray array
+ */
+$this->menu = [
+	['label' => 'Add Attribute', 'url' => ['attribute/addAttribute']],
+	['label' => 'Add Relation', 'url' => ['attribute/addRelation']],
+	['label' => 'List Relation', 'url' => ['attribute/listRelations']]
+];
 ?>
 <script type="text/javascript">
 $(function(){
 	$("#bd").attr('style', '');
-	slist = $("<?php echo '#attributesList'; ?>").dataTable({
+	$("#attributesList").dataTable({
 		"sDom": '<"H"rlTf>t<"F"ip>',
 		"oTableTools": {
 		"sSwfPath": "<?php echo Yii::app()->request->baseUrl; ?>/js/copy_csv_xls_pdf.swf",
@@ -61,13 +65,15 @@ $(function(){
 			]
 		},
 		"bProcessing": true,
-		"bStateSave": false,
 		"aaData": <?php echo $dataArray['attributesList']; ?>,
 		"aoColumns": [
-		{"mDataProp": "name",  "bVisible": true },
-		{"mDataProp": "description",  "bVisible": true },
-		{"mDataProp": "editButton", "bSortable": false },
-		{"mData": "deleteButton", "bSortable": false },
+		{"mDataProp": "evaAttributeTypes.name"  },
+		{"mDataProp": "name"},
+		{"mDataProp": "description" },
+		{"mDataProp": null, "bSortable": false,
+			"sDefaultContent": '<button title="Edit" class="bedit">Edit</button>' },
+		{"mData": null, "bSortable": false,
+			"sDefaultContent": '<button title="Delete" class="bdelete">Delete</button>' }
 		],
 		// update the buttons stying after the table data is loaded
 		"fnDrawCallback": function() {
@@ -81,11 +87,21 @@ $(function(){
 		"sPaginationType": "buttons_input",
 		"iDisplayLength": 10,
 		"aLengthMenu": [[10, 25, 50, 75, 100], [10, 25, 50, 75, 100]],
-		"bFilter": true,
-		"bSort": true,
-		"bInfo": true,
-		"bLengthChange": true
-	});
+	})
+		.on('click', '.bedit', {
+			operation: 'edit',
+			link: '<?= $this->createUrl("editAttribute"); ?>',
+			table: '#attributesList',
+			rowIdentifier: 'attributeId'
+		}, requestHandler)
+		.on('click', '.bdelete', {
+			operation: 'delete',
+			link: '<?= $this->createUrl("deleteAttribute"); ?>',
+			refreshLink: '<?= $this->createUrl("index") . '/ajax/1'; ?>',
+			table: '#attributesList',
+			rowIdentifier: 'attributeId'
+		}, requestHandler)
+		.rowGrouping();
 });
 
 	deleteConfirm = function(confirmMsg, deleteVal) {
@@ -129,15 +145,16 @@ $(function(){
 	});
 }
 </script>
-<div id="listAttributes" width="100%">
+<div id="listAttributes">
 	
 	<table id="attributesList" width="100%" border="0" cellspacing="0" cellpadding="0">
 		<thead>
 		<tr>
+			<th title = "Type">Type</th>
 			<th title = "Name">Name</th>
 			<th title = "Name">Description</th>
-			<th title = "Edit">Edit</th>
-			<th title = "Delete">Delete</th>
+			<th title = "Edit"></th>
+			<th title = "Delete"></th>
 		</tr>
 		</thead>
 		<tbody>

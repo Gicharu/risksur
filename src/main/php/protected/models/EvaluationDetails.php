@@ -17,7 +17,7 @@ class EvaluationDetails extends CActiveRecord {
 	 * @param mixed $className 
 	 * @static
 	 * @access public
-	 * @return void
+	 * @return static
 	 */
 	public static function model($className = __CLASS__) {
 		return parent::model($className);
@@ -27,7 +27,7 @@ class EvaluationDetails extends CActiveRecord {
 	 * tableName 
 	 * 
 	 * @access public
-	 * @return void
+	 * @return string
 	 */
 	public function tableName() {
 		return 'evaluationDetails';
@@ -37,7 +37,7 @@ class EvaluationDetails extends CActiveRecord {
 	 * primaryKey 
 	 * 
 	 * @access public
-	 * @return void
+	 * @return string
 	 */
 	public function primaryKey() {
 		return 'evalDetailsId';
@@ -47,7 +47,7 @@ class EvaluationDetails extends CActiveRecord {
 	 * relations 
 	 * 
 	 * @access public
-	 * @return void
+	 * @return array
 	 */
 	public function relations() {
 		return array(

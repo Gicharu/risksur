@@ -204,12 +204,6 @@ class SiteController extends CController {
 			if(isset($_POST['LoginForm']['username'])) {
 				Yii::app()->user->setName($_POST['LoginForm']['username']); 
 			}
-			//$ldap = Yii::app()->ldapresource;
-			//$configuration = Yii::app()->tsettings;
-			//$ldapConnection = $ldap->ldapConnect();
-			//$defaultDn = Yii::app()->params->ldap['dn'];
-			//$ldapOu = Yii::app()->params->ldap['ou'];
-			//$loid = Yii::app()->loid->load();
 
 			// if it is ajax validation request
 			if (isset($_POST['ajax']) && $_POST['ajax'] === 'login-form') {
@@ -221,16 +215,11 @@ class SiteController extends CController {
 				$model->attributes = $_POST['LoginForm'];
 			}		
 
-			//$newLdpaOu = explode(",", $ldapOu);
-			//$newDn = array();
-			//foreach ($newLdpaOu as $key => $value) {
-				//$newDn["ou=" . $value . " , " . $defaultDn] = "ou=" . $value . " , " . $defaultDn;
-			//}
 			//validate user input and redirect to the previous page if valid
 			if ($model->validate() && $model->login()) { // || Yii::app()->user->login($identity)) {
 				// if nodeId provided set the selectedTix session variable to skip the select node page
 				$this->redirect(array(
-					'context/list'
+					'context/intro'
 				));
 				return;
 			}

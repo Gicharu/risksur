@@ -1,7 +1,7 @@
 $(function() {
 
 	// update the button to jquery button themes
-    $('button').button();
+    $('button, a.btn').button();
     $('input:button').button();
     $('input:submit').button();
 
@@ -443,7 +443,7 @@ clearDataTables = function(tableIds) {
         }
     });
 
-}
+};
 // This function clears graphs, maps and sets the width
 clearAndSetWidth = function(width, widgetId, msg) {
     msg = typeof msg === 'undefined' ? 'graph' : msg;
@@ -452,7 +452,83 @@ clearAndSetWidth = function(width, widgetId, msg) {
         width : width,
         height: "400"
     });
-}
+};
+var requestHandler = function(event) {
+    var table = $(event.data.table).dataTable();
+    var aPos;
+    /* Get current  row pos */
+    //if(typeof event.data.parent !== 'undefined') {
+    //    aPos = table.fnGetPosition(event.target);
+    //} else {
+    //    aPos = table.fnGetPosition($(event.target).parent()[0]);
+    //}
+    aPos = table.fnGetPosition($(event.target).closest('td')[0]);
+    //console.log(event.data.link);
+    //return false;
+    /* Get the full row     */
+    //console.log(aPos); return false;
+    var aData = table.fnGetData(aPos[0]);
+    var rowId = aData[event.data.rowIdentifier];
+    switch(event.data.operation) {
+        case "edit":
+            window.location.href = event.data.link +
+            "/id/" + rowId;
+            break;
+        case 'delete':
+            deleteConfirm(rowId, event.data.link, event.data.refreshLink, table);
+            break;
+        default:
+            break;
+    }
+
+};
+var deleteConfirm = function(deleteVal, delLink, reloadLink, table) {
+    console.log(deleteVal, delLink, reloadLink, table);
+    $('body #deleteBox')
+        .html("<p>Are you sure you want to delete this item </p>")
+        .dialog('option', 'buttons', {
+            "Confirm" : function() {
+                $(this).dialog("close");
+                var opt = {'loadMsg': 'Deleting item...'};
+                $("#operationInfo").showLoading(opt);
+                $.ajax({
+                    type: 'GET',
+                    url: delLink,
+                    data: {id:deleteVal},
+                    dataType: "text",
+                    success: function(data){
+                        var checkSuccess = /successfully/i;
+                        if (checkSuccess.test(data)) {
+                            // add process message
+                            //$("#ajaxFlashMsg").html('');
+                            $("#ajaxFlashMsg").html(data);
+                            $("#ajaxFlashMsgWrapper")
+                                .attr('class', 'flash-success')
+                                .show()
+                                .animate({opacity: 1.0}, 3000).fadeOut("slow");
+                        } else {
+                            // add process message
+                            $("#ajaxFlashMsg").html(data);
+                            $("#ajaxFlashMsgWrapper").attr('class', 'flash-error').show();
+                        }
+                        table.fnReloadAjax(reloadLink);
+                        $("#operationInfo").hideLoading();
+                    },
+                    error: function(data){
+                        $("#ajaxFlashMsg").html("Error occurred while deleting the item");
+                        $("#ajaxFlashMsgWrapper").attr('class', 'flash-error').show();
+                        //console.log("error occured while posting data" + data);
+                        $("#operationInfo").hideLoading();
+                    }
+                });
+            },
+            "Cancel" : function() {
+                $(this).dialog("close");
+            }
+        });
+    $("#deleteBox").dialog("open");
+};
+
 
 
 

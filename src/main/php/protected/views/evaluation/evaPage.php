@@ -1,20 +1,30 @@
 <?php
+/**
+ * @var $editButton bool
+ * @var $editPage bool
+ * @var $this EvaluationController
+ */
 	if (!$editButton OR !$editPage) {
 
 		if ($editButton) {
-			echo CHtml::htmlButton(Yii::t('translation', 'Edit'), array(
-				'submit' => array(
+			echo CHtml::htmlButton(Yii::t('translation', 'Edit'), [
+				'submit' => [
 					'evaluation/evaPage?edit=1'
-				),
+				],
 				'type' => 'submit',
 				'style' => 'float:right;'
-			));
+			]);
 		}
 		echo urldecode($model->docData);
+
+		echo CHtml::link('Create New Evaluation Protocol', $this->createUrl('addEvaContext'),
+			['class' => 'btn']);
+		echo CHtml::link('Update Existing Evaluation Protocol', $this->createUrl('listEvaContext'),
+			['class' => 'btn']);
 	} else {
 Yii::import('ext.imperavi-redactor-widget.ImperaviRedactorWidget');
 
-$this->widget('ImperaviRedactorWidget', array(
+$this->widget('ImperaviRedactorWidget', [
 	// You can either use it for model attribute
 	//'model' => $model,
 	//'attribute' => 'evaluationDescription',
@@ -23,7 +33,7 @@ $this->widget('ImperaviRedactorWidget', array(
 	//'name' => 'my_input_name',
 	'selector' => '#redactor',
 	// Some options, see http://imperavi.com/redactor/docs/
-	'options' => array(
+	'options' => [
 		'lang' => 'en',
 		'toolbar' => true,
 		'buttonSource' => true,
@@ -37,34 +47,34 @@ $this->widget('ImperaviRedactorWidget', array(
 		'imageUpload' => 'imageUpload',
 		//'imageManagerJson' => '/images/images.json',
 		//'css' => 'wym.css',
-	),
-	'plugins' => array(
-		'fullscreen' => array(
-			'js' => array('fullscreen.js',),
-		),
-		'fontsize' => array(
-			'js' => array('fontsize.js',),
-		),
-		'table' => array(
-			'js' => array('table.js',),
-		),
-		'imagemanager' => array(
-			'js' => array('imagemanager.js',),
-		),
-		'fontcolor' => array(
-			'js' => array('fontcolor.js',),
-		),
-	),
+	],
+	'plugins' => [
+		'fullscreen' => [
+			'js' => ['fullscreen.js',],
+		],
+		'fontsize' => [
+			'js' => ['fontsize.js',],
+		],
+		'table' => [
+			'js' => ['table.js',],
+		],
+		'imagemanager' => [
+			'js' => ['imagemanager.js',],
+		],
+		'fontcolor' => [
+			'js' => ['fontcolor.js',],
+		],
+	],
 
-));
+]);
 
-	echo CHtml::htmlButton(Yii::t('translation', 'View'), array(
-		'submit' => array(
+	echo CHtml::htmlButton(Yii::t('translation', 'View'), [
+		'submit' => [
 			'evaluation/evaPage'
-		),
+		],
 		'type' => 'submit',
 		'style' => 'float:right; z-index:2000'
-	));
+	]);
 ?>
 <form action="" id="formID" method="post">
 <textarea id="redactor" name="redactor">

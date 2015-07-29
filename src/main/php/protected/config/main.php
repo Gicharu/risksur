@@ -77,6 +77,7 @@ return CMap::mergeArray($configArray, array(
 		'application.extensions.TSettingsIni.*',
 		'application.extensions.TTMailer.*',
 		'application.extensions.Encryption.*',
+		'application.extensions.ModelToArray.*',
 //		'application.extensions.WizardBehaviour.*',
 		//'application.extensions.TKmlResource.*',
 		/*'application.extensions.timeout-dialog.*',*/
@@ -146,11 +147,7 @@ return CMap::mergeArray($configArray, array(
 		'db' => array(
 			'emulatePrepare' => true,
 			'enableParamLogging' => true,
-			// 'enableProfiling' => true,
-		),
-		'errorHandler' => array(
-			// use 'site/error' action to display errors
-			'errorAction' => 'site/error',
+			'initSQLs' => ['SET NAMES utf8']
 		),
 		'log' => array(
 			'class' => 'CLogRouter',

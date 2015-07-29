@@ -5,7 +5,7 @@
  *
  * A wrapper for the jquery plugin 'relCopy'
  *
- * @link http://www.andresvidal.com/labs/relcopy.html
+ * @link http://www.andresvidal.com/labs/relcopy.html, https://github.com/digitick/yii-jqrelcopy
  *
  * @author Joe Blocher <yii@myticket.at>
  * @copyright 2011 myticket it-solutions gmbh
@@ -80,6 +80,9 @@ class JQRelcopy extends CWidget
 	 * @var string $_assets
 	 */
 	private $_assets;
+	// This is used to determine if we are copying elements in a table therefore, the remove link needs to be
+	// put inside a <td> tag
+	public $tableLayout = false;
 
 	/**
 	 * Support for CJuiDatePicker
@@ -156,34 +159,37 @@ class JQRelcopy extends CWidget
 	public function init()
 	{
 		$this->_assets = Yii::app()->assetManager->publish(dirname(__FILE__).DIRECTORY_SEPARATOR.'assets');
-
 		Yii::app()->clientScript->registerCoreScript('jquery')
-		          ->registerScriptFile($this->_assets.'/js/jquery.relcopy.yii.1.1.js');
-
+			->registerScriptFile($this->_assets.'/js/jquery.relcopy.yii.1.1.js');
 		if (!empty($this->removeText))
 		{
 			$onClick = '$(this).parent().remove(); return false;';
-			$htmlOptions = array_merge($this->removeHtmlOptions,array('onclick'=>$onClick));
-			$append = CHtml::link($this->removeText,'#',$htmlOptions);
+			if($this->tableLayout) {
+				$onClick = '$(this).parent().parent().remove(); return false;';
+				$append = '<td>' . CHtml::link($this->removeText,'#',
+						array_merge(array('onclick'=>$onClick),$this->removeHtmlOptions)) . '</td>';
+			} else {
+				$append = CHtml::link($this->removeText,'#',
+					array_merge(array('onclick'=>$onClick),$this->removeHtmlOptions));
 
+			}
+			//$htmlOptions = array_merge(array('onclick'=>$onClick),$this->removeHtmlOptions);
 			$this->options['append'] = empty($this->options['append']) ? $append : $append .' '.$this->options['append'];
 		}
-
 		if (!empty($this->jsBeforeClone))
 			$this->options['beforeClone'] = $this->jsBeforeClone;
-
 		if (!empty($this->jsAfterClone))
 			$this->options['afterClone'] = $this->jsAfterClone;
 
 		if (!empty($this->jsBeforeNewId))
 			$this->options['beforeNewId'] = $this->jsBeforeNewId;
-
 		if (!empty($this->jsAfterNewId))
 			$this->options['afterNewId'] = $this->jsAfterNewId;
 
+		if (!empty($this->jsFinish))
+			$this->options['finish'] = $this->jsFinish;
 		$options = CJavaScript::encode($this->options);
 		Yii::app()->getClientScript()->registerScript(__CLASS__.'#'.$this->id,"jQuery('#{$this->id}').relCopy($options);");
 		parent::init();
 	}
 }
-?>

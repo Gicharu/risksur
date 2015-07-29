@@ -72,7 +72,8 @@ class FrameworkFieldData extends CActiveRecord {
 	 */
 	public function relations() {
 		return array(
-			'contextHeader' => array( self::BELONGS_TO, 'FrameworkHeader', 'frameworkId' )
+			'contextHeader' => array( self::BELONGS_TO, 'FrameworkHeader', 'frameworkId' ),
+			'frameworkFields' => array( self::BELONGS_TO, 'FrameworkFields', 'id' )
 		);
 	}
 }

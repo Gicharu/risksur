@@ -11,26 +11,28 @@
 		<?php
 		$currentView = Yii::app()->controller->getAction()->getId();
 		if (Yii::app()->controller->id == 'context') {
-			$this->menu = array(
-				array('label'  => Yii::t("translation", "New Surveillance System"), 'url' => array('create'),
-					'active' => strstr('create', $currentView)),
-				array('label'  => Yii::t("translation", "List Existing Systems"), 'url' => array('list'),
-					'active' => strstr('list', $currentView)),
-				array('label'       => Yii::t("translation", "List Components"), 'url' => array('design/listComponents'),
-					'itemOptions' => array('id' => 'showComponents')),
-			);
+			$this->menu = [
+				['label'  => Yii::t("translation", "Introduction"), 'url' => ['index'],
+					'active' => strstr('index', $currentView)],
+				['label'  => Yii::t("translation", "New Surveillance System"), 'url' => ['create'],
+					'active' => strstr('create', $currentView)],
+				['label'  => Yii::t("translation", "List Existing Systems"), 'url' => ['list'],
+					'active' => strstr('list', $currentView)],
+				['label'       => Yii::t("translation", "List Components"), 'url' => ['design/listComponents'],
+					'itemOptions' => ['id' => 'showComponents']],
+			];
 		}
 		// Setup Design controller side menus
 		if (Yii::app()->controller->id == 'design') {
 
 			$this->menu = array(
-				array('label'       => Yii::t("translation", "Add Component"), 'url' => array('addComponent'),
+				array('label'       => Yii::t("translation", "Design Component"), 'url' => array('addComponent'),
 					'itemOptions' => array(
 						'id' => 'addComponent'
 					),
 					'active' => strstr('addComponent', $currentView),
 				),
-				array('label'  => Yii::t("translation", "Add Multiple Components"),
+				array('label'  => Yii::t("translation", "Add Components"),
 					'url' => array('addMultipleComponents'), 'itemOptions' => array(
 					'id' => 'addMultipleComponents'
 				),
@@ -49,33 +51,37 @@
 
 		if (Yii::app()->controller->id == 'evaluation') {
 			$currentController = Yii::app()->controller->id;
-			$this->menu = array(
-				array('label' => Yii::t("translation", "Introduction to Evaluation of Surveillance "),
-					'url'   => array('evaPage'),
-					'items' => array(
-						array('label' => 'The EVA Tool', 'url' => array("$currentController/evaPage")),
-						array('label' => 'Evaluation Concepts', 'url' => array("$currentController/evaConcept")),
-						array('label' => 'Economic Evaluation methods', 'url' =>
-							array("$currentController/evaMethods")),
-						array('label' => 'Evaluation attributes', 'url' => array("$currentController/evaAttributes"))
-					)
-				),
-				array('label' => Yii::t("translation", "Describe Evaluation Context"),
-					'url'   => array("$currentController/addEvaContext")),
-				array('label' => Yii::t("translation", "Select Evaluation Question"),
-					'url'   => array("$currentController/selectEvaQuestion")),
-				array('label' => Yii::t("translation", "Evaluation attributes and economic criteria"),
-					'url' => '#', 'items' => array(
-						array('label' => Yii::t("translation", "Economic evaluation"),
-							'url'   => array("$currentController/econEval")),
-						array('label' => Yii::t("translation", "Epidemiological assessment"),
-							'url'   => array("$currentController/index")),
-						array('label' => 'Final list of attributes', 'url' => array("$currentController/index"))
-					),
-				),
-				array('label' => Yii::t("translation", "Summary and Report"),
-					'url' => array("$currentController/index")),
-			);
+			$this->menu = [
+				['label' => Yii::t("translation", "Introduction to Evaluation of Surveillance "),
+					'url'   => ['evaPage'],
+					'items' => [
+						['label' => 'The EVA Tool', 'url' => ["$currentController/evaPage"]],
+						['label' => 'Evaluation Concepts', 'url' => ["$currentController/evaConcept"]],
+						['label' => 'Economic Methods', 'url' =>
+							["$currentController/evaMethods"]],
+						['label' => 'Evaluation Attributes', 'url' => ["$currentController/evaAttributes"]]
+					]
+				],
+				['label' => Yii::t("translation", "Describe Evaluation Context"),
+				      'url'   => ["$currentController/listEvaContext"]],
+				['label' => Yii::t("translation", "Select Evaluation Question"),
+				      'url'   => ["$currentController/selectEvaQuestion"]],
+				['label' => Yii::t("translation", "Select Evaluation Method"),
+				      'url'   => ["$currentController/index"], 'items' => [
+					['label' => Yii::t("translation", "Select components"),
+					      'url'   => "#"],
+					['label' => Yii::t("translation", "Select attributes"),
+						  'url'   => ["$currentController/selectEvaAttributes"]],
+					['label' => Yii::t("translation", "Select assessment method"),
+					 'url'   => ["$currentController/selectEvaAssMethod"]],
+				],
+				],
+				['label' => Yii::t("translation", "Summary of the evaluation protocol"),
+					'url' => ["$currentController/evaSummary"]],
+//				['label' => 'Perform the evaluation', 'url' => ["$currentController/index"]],
+//				['label' => 'How to report on the evaluation results', 'url' => ["$currentController/index"]]
+
+			];
 		}
 		//        $this->beginWidget('zii.widgets.CPortlet', array(
 		//            'title' => 'Operations',

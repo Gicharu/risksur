@@ -1,16 +1,15 @@
 <?php
-//error_reporting(E_ALL);
 /**
- * AdminController 
+ * OptionsController
  * 
- * @uses Controller
+ * @uses RiskController
  * @package 
  * @version $id$
  * @copyright Tracetracker
  * @author Chirag Doshi <chirag@tracetracker.com> 
  * @license Tracetracker {@link http://www.tracetracker.com}
  */
-class OptionsController extends Controller {
+class OptionsController extends RiskController {
 	public $page;
 	private	$configuration;
 	const LOG_CAT = "ctrl.OptionsController";
@@ -38,41 +37,37 @@ class OptionsController extends Controller {
 	 * @access public
 	 * @return void
 	 */
-	public function actionIndex() {
+	public function actionIndex($id) {
 		Yii::log("actionIndex AdminController called", "trace", self::LOG_CAT);
 		$model = new Options;
-		$dataArray = array();
+		$dataArray = [];
 		$dataArray['dtHeader'] = "Manage Options"; // Set page title when printing the datatable
 		// Get list of options 
 		// $optionsList = Options::model()->findAll(array(
 		// 	'select' => 'optionId, label',
 		// ));
-		$optionsList = Yii::app()->db->createCommand()
-			->select('opt.optionId, opt.label as option, sfd.label')
-			->from('options opt')
-			->join('surFormDetails sfd', 'sfd.subFormId = opt.elementId')
-			->queryAll();
-			// print_r($optionsList);die();
+		$optionsMask = [
+			'relationNames' => [
+				0 => 'frameworkField',
+				1 => 'component',
+				2 => 'element'
+			],
+			'joinLabels' => [
+				0 => 'label',
+				1 => 'label',
+				2 => 'label'
+			]
+		];
+		$dataArray['optsCategory'] = $optionsMask['relationNames'][0] . '.' . $optionsMask['joinLabels'][0];
+		$optionsListCriteria = new CDbCriteria();
+		$optionsListCriteria->select = 'optionId, label';
+		$optionsListCriteria->with = $optionsMask['relationNames'][$id];
+		$optionsList = ModelToArray::convertModelToArray(Options::model()->findAll($optionsListCriteria));
+		//print_r($optionsList); die;
 		$optionsListArray = array();
 		// Format datatable data. Define the Edit & Delete buttons
-		foreach ($optionsList as $options) {
-				$editButton = "<button id='editOption" . $options['optionId'] . 
-				"' type='button' class='bedit' onclick=\"window.location.href ='" . CController::createUrl('options/editOption/', array(
-					'optionId' => $options['optionId'])
-				) . "'\">Edit</button>";
-				$deleteButton = "<button id='deleteOption" . $options['optionId'] . 
-				"' type='button' class='bdelete' onclick=\"$('#deleteBox').dialog('open');" . 
-				"deleteConfirm('" . $options['label'] . "', '" .
-				$options['optionId'] . "')\">Remove</button>";
-			// Pack the data to be sent to the view
-			$optionsListArray[] = array (
-				'label' =>   $options['label'],
-				'option' =>   $options['option'],
-				'editButton' => $editButton,
-				'deleteButton' => $deleteButton
-			);
-		}
-		$dataArray['optionsList'] =  json_encode($optionsListArray);
+
+		$dataArray['optionsList'] =  json_encode($optionsList);
 		if (!empty($_GET['getOptions'])) {
 			$jsonData = json_encode(array("aaData" => $optionsListArray));
 			echo $jsonData;
@@ -80,7 +75,7 @@ class OptionsController extends Controller {
 		}
 		$this->render('index', array(
 			'model' => $model,
-			'dataArray' => $dataArray
+			'dataArray' => $dataArray,
 		));
 	}
 
@@ -126,38 +121,39 @@ class OptionsController extends Controller {
 	 * @access public
 	 * @return void
 	 */
-	public function actionEditOption() {
+	public function actionEditOption($id) {
 		Yii::log("actionEditOption OptionsController called", "trace", self::LOG_CAT);
-		$model = new Options;
-		$dataArray = array();
+		$model = new Options();
+		$dataArray = [];
 		$dataArray['formType'] = "Edit";
 
-		if (!empty($_GET['optionId'])) {
-			// fetch the form data, search using the "optionId" sent from the listing.
-			$model = Options::model()->findByPk($_GET['optionId']);
-			if ($model === null) {
-				Yii::app()->user->setFlash('error', Yii::t("translation", "The option does not exist"));
-				$this->redirect(array('options/index'));
-			}
-			$fetchElementName = Yii::app()->db->createCommand()
-				->select('sfd.label')
-				->from('surFormDetails sfd')
-				->where('sfd.subFormId =' . $model['elementId']  )
-				->queryAll();
-
-			// Pick the selected Option's elementId. This will be displayed as the default in the dropdown
-			$dataArray['elementName'] = $fetchElementName[0]['label'];
-		} else {
+		if (empty($id)) {
 			Yii::app()->user->setFlash('notice', Yii::t("translation", "Please select an option to edit"));
-			$this->redirect(array('options/index'));
+			$this->redirect(['options/index']);
+			return;
 		}
+		// fetch the form data, search using the "optionId" sent from the listing.
+		$model = Options::model()->findByPk($id);
+		if ($model === null) {
+			Yii::app()->user->setFlash('error', Yii::t("translation", "The option does not exist"));
+			$this->redirect(['options/index']);
+			return;
+		}
+		$fetchElementName = Yii::app()->db->createCommand()
+			->select('sfd.label')
+			->from('surFormDetails sfd')
+			->where('sfd.subFormId =' . $model['elementId']  )
+			->queryAll();
+
+		// Pick the selected Option's elementId. This will be displayed as the default in the dropdown
+		$dataArray['elementName'] = $fetchElementName[0]['label'];
 		if ( isset( $_POST['Options'] ) ) {
 			$model->attributes = $_POST['Options'];
 			// Validate and save the data
 			if ( $model->validate() ) {
 				$model->update();
 				Yii::app()->user->setFlash('success', Yii::t("translation", "Option successfully updated"));
-				$this->redirect(array('index'));
+				$this->redirect(['index']);
 			}
 		}
 

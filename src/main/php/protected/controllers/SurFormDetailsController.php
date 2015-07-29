@@ -7,10 +7,10 @@
 	 * @author    James Njoroge <james@tracetracker.com>
 	 * @copyright Tracetracker
 	 * @version   $id$
-	 * @uses      Controller
+	 * @uses      RiskController
 	 * @license   Tracetracker {@link http://www.tracetracker.com}
 	 */
-	class SurFormDetailsController extends Controller {
+	class SurFormDetailsController extends RiskController {
 		/**
 		 * @var string the default layout for the views. Defaults to '//layouts/column2', meaning
 		 * using two-column layout. See 'protected/views/layouts/column2.php'.

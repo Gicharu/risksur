@@ -2374,7 +2374,6 @@ EOD;
 	{
 		if(is_callable(self::$_modelNameConverter))
 			return call_user_func(self::$_modelNameConverter,$model);
-
 		$className=is_object($model) ? get_class($model) : (string)$model;
 		return trim(str_replace('\\','_',$className),'_');
 	}

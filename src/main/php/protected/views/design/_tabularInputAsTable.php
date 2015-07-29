@@ -19,4 +19,3 @@ foreach ($form->getElements() as $key => $element) {
 	echo "</td>";
 }
 //echo $form->renderEnd();
-?>

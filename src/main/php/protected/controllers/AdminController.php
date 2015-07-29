@@ -3,14 +3,14 @@
 /**
  * AdminController 
  * 
- * @uses Controller
+ * @uses RiskController
  * @package 
  * @version $id$
  * @copyright Tracetracker
  * @author Chirag Doshi <chirag@tracetracker.com> 
  * @license Tracetracker {@link http://www.tracetracker.com}
  */
-class AdminController extends Controller {
+class AdminController extends RiskController {
 	//public $page;
 	private	$configuration;
 	const LOG_CAT = "ctrl.AdminController";

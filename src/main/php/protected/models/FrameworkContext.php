@@ -71,7 +71,7 @@ class FrameworkContext extends CActiveRecord {
 	public function relations() {
 		return array(
 			//'goal' => array( self::BELONGS_TO, 'GoalData', 'goalId' ),
-			'designHead' => array( self::HAS_MANY, 'FrameworkDetails', 'frameworkDetailsId' )
+			'designHead' => array( self::HAS_MANY, 'FrameworkDetails', 'frameworkDetailsId' ),
 		);
 	}
 	/**
@@ -82,8 +82,8 @@ class FrameworkContext extends CActiveRecord {
 	 */
 	public function attributeLabels() {
 		return array(
-			'name' => Yii::t('translation', 'Context Name'),
-			'description' => Yii::t('translation', 'Description of context'),
+			'name' => Yii::t('translation', 'Surveillance Name'),
+			'description' => Yii::t('translation', 'Surveillance Description'),
 		);
 	}
 
