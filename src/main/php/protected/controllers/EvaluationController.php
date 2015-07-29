@@ -564,6 +564,8 @@ class EvaluationController extends RiskController {
 				$transaction->commit();
 				if($success) {
 					Yii::app()->user->setFlash('success', 'Assessment method(s) saved successfully');
+					$this->redirect('evaSummary');
+					return;
 				}
 
 			} catch (Exception $e) {
