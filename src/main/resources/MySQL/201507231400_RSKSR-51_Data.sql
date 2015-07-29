@@ -149,7 +149,10 @@ INSERT INTO `permissions` (`id`, `name`, `description`, `controller`, `action`, 
   (75, 'actionDeleteEvaContext', 'C/A to delete evaluation context form field', 'adminEva', 'deleteEvaContext', ''),
   (76, 'actionListEvaContext', 'C/A to list evaluation contexts', 'evaluation', 'listEvaContext', ''),
   (77, 'actionSetEvaContext', 'C/A to set the evaluation context', 'evaluation', 'setEvaContext', ''),
-  (78, 'actionSelectEvaAttributes', 'C/A to select evaluation attributes', 'evaluation', 'selectEvaAttributes', '');
+  (78, 'actionSelectEvaAttributes', 'C/A to select evaluation attributes', 'evaluation', 'selectEvaAttributes', ''),
+  (79, 'actionAddEvaContext', 'C/A to add new evaluation context form field', 'evaluation', 'addEvaContext', ''),
+  (80, 'actionSelectEvaAttributes', 'C/A to select evaluation assessment method', 'evaluation', 'selectEvaAssMethod', ''),
+  (81, 'actionEvaSummary', 'C/A to display eva tool summary', 'evaluation', 'evaSummary', '');
 
 --
 -- Truncate table before insert `programpages`
@@ -353,6 +356,15 @@ INSERT INTO `roles_has_permissions` (`permissions_id`, `roles_id`) VALUES
   (77, 3),
   (78, 1),
   (78, 2),
-  (78, 3);
+  (78, 3),
+  (79, 1),
+  (79, 2),
+  (79, 3),
+  (80, 1),
+  (80, 2),
+  (80, 3),
+  (81, 1),
+  (81, 2),
+  (81, 3);
 SET FOREIGN_KEY_CHECKS=1;
 

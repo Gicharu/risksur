@@ -70,16 +70,16 @@
 				      'url'   => ["$currentController/index"], 'items' => [
 					['label' => Yii::t("translation", "Select components"),
 					      'url'   => "#"],
-					['label' => Yii::t("translation", "Select evaluation criteria and method"),
-						  'url'   => ["$currentController/selectCriteriaMethod"]],
-					['label' => Yii::t("translation", "Select evaluation attributes"),
-					 'url'   => ["$currentController/selectEvaAttributes"]],
+					['label' => Yii::t("translation", "Select attributes"),
+						  'url'   => ["$currentController/selectEvaAttributes"]],
+					['label' => Yii::t("translation", "Select assessment method"),
+					 'url'   => ["$currentController/selectEvaAssMethod"]],
 				],
 				],
 				['label' => Yii::t("translation", "Summary of the evaluation protocol"),
-					'url' => ["$currentController/index"]],
-				['label' => 'Perform the evaluation', 'url' => ["$currentController/index"]],
-				['label' => 'How to report on the evaluation results', 'url' => ["$currentController/index"]]
+					'url' => ["$currentController/evaSummary"]],
+//				['label' => 'Perform the evaluation', 'url' => ["$currentController/index"]],
+//				['label' => 'How to report on the evaluation results', 'url' => ["$currentController/index"]]
 
 			];
 		}

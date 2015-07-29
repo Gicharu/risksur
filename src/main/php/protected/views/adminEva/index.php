@@ -7,7 +7,7 @@
  * @var $this AdminEvaController
  */
 $this->menu = [
-	['label' => 'Manage Evaluation Methods', 'url' => ['adminEva/listEvaMethods']],
+	['label' => 'Manage Economic Evaluation Methods', 'url' => ['adminEva/listEvaMethods']],
 	['label' => 'Manage Evaluation Context Form', 'url' => ['adminEva/listEvaContext']]
 ];
 ?>

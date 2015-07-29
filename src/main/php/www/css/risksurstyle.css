@@ -348,6 +348,9 @@ ol.widgets {
 table {
     border-collapse:collapse;
 }
+#assessMethod-form table {
+    border-collapse: separate;
+}
 #menubar .ui-widget-header{
     /*border-color: #77D5F7;*/
 }

@@ -51,10 +51,13 @@ class EvaluationHeader extends CActiveRecord {
 		return [
 			[
 				'evaluationName, frameworkId, userId',
-				'required'
+				'required', 'on' => 'create, update'
 			],
 			[
 				'evaluationDescription', 'safe'
+			],
+			[
+				'evaAttributes', 'required', 'on' => 'selectEvaAttributes'
 			],
 			[
 				'evaluationName', 'unique', 'on' => 'create'
@@ -85,6 +88,19 @@ class EvaluationHeader extends CActiveRecord {
 		];
 	}
 
+	protected function afterSave() {
+		if($this->scenario == 'selectEvaAttributes') {
+			$evaAttribsArray = json_decode($this->evaAttributes);
+			$assMethodsCriteria = new CDbCriteria();
+			$assMethodsCriteria->condition = 'evaluationId=' . $this->evalId;
+			$assMethodsCriteria->addNotInCondition('evaAttribute', $evaAttribsArray);
+			EvaAssessmentMethods::model()->deleteAll($assMethodsCriteria);
+			return parent::afterSave();
+
+
+		}
+	}
+
 	/**
 	 * attributeLabels
 	 * @access public
@@ -95,6 +111,7 @@ class EvaluationHeader extends CActiveRecord {
 			'evaluationName'        => Yii::t('translation', 'Evaluation Name'),
 			'evaluationDescription' => Yii::t('translation', 'Description of Evaluation'),
 			'frameworkId'           => Yii::t('translation', 'Design Context'),
+			'evaAttributes'           => Yii::t('translation', 'Evaluation Attribute'),
 		];
 	}
 
