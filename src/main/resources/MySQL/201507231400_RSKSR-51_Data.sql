@@ -142,17 +142,16 @@ INSERT INTO `permissions` (`id`, `name`, `description`, `controller`, `action`, 
   (65, 'actionDeleteEvaMethod', 'C/A to delete an economic evaluation method', 'adminEva', 'deleteEvaMethod', ''),
   (66, 'actionEvaAttributes', 'C/A to retrieve economic evaluation attribute', 'evaluation', 'evaAttributes', ''),
   (70, 'actionSavePage', 'Dummy C/A to save surveillance introduction p', 'context', 'savePage', ''),
-  (71, 'actionIntro', 'C/A to diplay intro page', 'context', 'intro', ''),
-  (72, 'actionIndex', 'C/A to introduce evaluation tool administrati', 'adminEva', 'index', ''),
+  (71, 'actionIntro', 'C/A to display intro page', 'context', 'intro', ''),
+  (72, 'actionIndex', 'C/A for evaluation tool admin intro', 'adminEva', 'index', ''),
   (73, 'actionListEvaContext', 'C/A to list available evaluation context elem', 'adminEva', 'listEvaContext', ''),
   (74, 'actionUpdateEvaContext', 'C/A to update evaluation context form field', 'adminEva', 'updateEvaContext', ''),
   (75, 'actionDeleteEvaContext', 'C/A to delete evaluation context form field', 'adminEva', 'deleteEvaContext', ''),
   (76, 'actionListEvaContext', 'C/A to list evaluation contexts', 'evaluation', 'listEvaContext', ''),
   (77, 'actionSetEvaContext', 'C/A to set the evaluation context', 'evaluation', 'setEvaContext', ''),
   (78, 'actionSelectEvaAttributes', 'C/A to select evaluation attributes', 'evaluation', 'selectEvaAttributes', ''),
-  (79, 'actionAddEvaContext', 'C/A to add new evaluation context form field', 'evaluation', 'addEvaContext', ''),
-  (80, 'actionSelectEvaAttributes', 'C/A to select evaluation assessment method', 'evaluation', 'selectEvaAssMethod', ''),
-  (81, 'actionEvaSummary', 'C/A to display eva tool summary', 'evaluation', 'evaSummary', '');
+  (79, 'actionSelectEvaAttributes', 'C/A to select evaluation assessment method', 'evaluation', 'selectEvaAssMethod', ''),
+  (80, 'actionEvaSummary', 'C/A to display eva tool summary', 'evaluation', 'evaSummary', '');
 
 --
 -- Truncate table before insert `programpages`

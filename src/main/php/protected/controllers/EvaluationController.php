@@ -396,16 +396,16 @@ class EvaluationController extends RiskController {
 			$description = Attributes::model()->findByPk($descId, ['select' => 'description']);
 			//print_r($description); die;
 			// The Regular Expression filter
-			$regExUrl = '/(http|https|ftp|ftps)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?/';
-			$attrDescription = $description->description;
+//			$regExUrl = '/(http|https|ftp|ftps)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?/';
 			// Check if there is a url in the text
-			if (preg_match($regExUrl, $description->description, $url)) {
-
-				// make the urls hyper links
-				$attrDescription = preg_replace($regExUrl, "<a href=\"{$url[0]}\" target=\"_blank\">{$url[0]}</a>",
-					$description->description);
-
-			}
+			$attrDescription = UtilModel::urlToLink($description->description);
+//			if (preg_match($regExUrl, $description->description, $url)) {
+//
+//				// make the urls hyper links
+//				$attrDescription = preg_replace($regExUrl, "<a href=\"{$url[0]}\" target=\"_blank\">{$url[0]}</a>",
+//					$description->description);
+//
+//			}
 			echo json_encode(['description' => "<p>$attrDescription</p>"]);
 			return;
 		}
@@ -590,12 +590,13 @@ class EvaluationController extends RiskController {
 
 	/**
 	 * @param bool $ajax
+	 * @return void
 	 */
 	public function actionListEvaContext($ajax = false) {
 		Yii::log("actionListEvaContext called", "trace", self::LOG_CAT);
 		if($ajax) {
 			$contextCriteria = new CDbCriteria();
-			$contextCriteria->select = 'evaluationName, frameworkId, evaluationDescription, questionId';
+			$contextCriteria->select = 'evaluationName, frameworkId, questionId';
 			$contextCriteria->with = ['frameworks', 'question'];
 			$contextCriteria->condition = 't.userId=' . Yii::app()->user->id .
 				' AND t.frameworkId=' . $this->frameworkId;
@@ -640,7 +641,8 @@ class EvaluationController extends RiskController {
 		if (is_null($this->frameworkId)) {
 			Yii::log('No surveillance system selected! redirecting to context/list', 'trace', self::LOG_CAT);
 			Yii::app()->user->setFlash('notice', 'Please select a surveillance system first');
-			return $this->redirect(['context/list']);
+			$this->redirect(['context/list']);
+			return;
 
 		}
 		$evaluationHeader = new EvaluationHeader('create');
@@ -732,37 +734,63 @@ class EvaluationController extends RiskController {
 	 * @return string
 	 */
 	public function actionGetSurveillanceSummary() {
-		$surveilanceRs = Yii::app()->db->createCommand()
-			->select('ff.inputName, ffd.value')
-			->from('frameworkHeader fh')
-			->join('frameworkFieldData ffd', 'fh.frameworkId=ffd.frameworkId')
-			->join('frameworkFields ff', 'ffd.frameworkFieldId=ff.Id')
-			->where('fh.frameworkId=:id', [':id' => $this->frameworkId])
-			->queryAll();
+		$surveillanceCriteria = new CDbCriteria();
+		$surveillanceCriteria->condition = 'frameworkId=' . $this->frameworkId;
+		$surveillanceRs = FrameworkFields::model()->with('data', 'options')->findAll();
+		$surveillanceFields = [
+			'hazardName' => 'Hazard Name',
+			'survobj' => 'Surveillance objective',
+			'geographicalArea' => 'Geographical area',
+			'stateOfDisease' => 'State of disease',
+			'legalReq' => 'Legal Requirements',
+		];
+//		$evaDetails[] = ['Evaluation Name', $model['evaluationName']];
 
-		$componentsRs = Yii::app()->db->createcommand()
-			->select('ch.componentName, cd.value, sfd.inputName')
-			->from('componentHead ch')
-			->join('componentDetails cd', 'ch.componentId=cd.componentId')
-			->join('surFormDetails sfd', 'cd.subFormId=sfd.subFormId')
-			->where('ch.frameworkId=:id', [':id' => $this->frameworkId])
-			->queryAll();
-		$components = '<ul>';
-		if (!empty($componentsRs)) {
-			foreach ($componentsRs as $component) {
-				$components .= '<li><b>' . $component['inputName'] . '</b>: ' .
-					$component['value'] . '</li>';
+		$surveillanceSummary = [];
+		$surveillanceSummary[] = ['Surveillance system name', Yii::app()->session['surDesign']['name']];
+		foreach($surveillanceRs as $surveillanceFieldKey => $surveillanceField) {
+			if(isset($surveillanceFields[$surveillanceField->inputName])) {
+				$surveillanceFieldKey++;
+				$surveillanceKey = $surveillanceFields[$surveillanceField->inputName];
+				$surveillanceSummary[$surveillanceFieldKey]= [$surveillanceKey, $surveillanceField->data[0]['value']];
+				if(!empty($surveillanceField->options) && DForm::isJson($surveillanceField->data[0]['value'])) {
+					//die('pop');
+					foreach($surveillanceField->options as $option) {
+						if(($dataValue = json_decode($surveillanceField->data[0]['value'])[0]) == $option->optionId) {
+							$surveillanceSummary[$surveillanceFieldKey] =
+								[$surveillanceKey,  $option->label];
+						}
+					}
+				}
+
+
 			}
-			//print_r($components); die;
-			array_push($surveilanceRs, [
-				'inputName' => 'Components',
-				'value'     => $components]);
-
 		}
-		$components .= '</ul>';
+		//print_r($surveillanceSummary); die;
+
+//		$componentsRs = Yii::app()->db->createcommand()
+//			->select('ch.componentName, cd.value, sfd.inputName')
+//			->from('componentHead ch')
+//			->join('componentDetails cd', 'ch.componentId=cd.componentId')
+//			->join('surFormDetails sfd', 'cd.subFormId=sfd.subFormId')
+//			->where('ch.frameworkId=:id', [':id' => $this->frameworkId])
+//			->queryAll();
+//		$components = '<ul>';
+//		if (!empty($componentsRs)) {
+//			foreach ($componentsRs as $component) {
+//				$components .= '<li><b>' . $component['inputName'] . '</b>: ' .
+//					$component['value'] . '</li>';
+//			}
+//			//print_r($components); die;
+//			array_push($surveilanceRs, [
+//				'inputName' => 'Components',
+//				'value'     => $components]);
+//
+//		}
+//		$components .= '</ul>';
 		//print_r(array('inputName' => 'Component', 'value' => array_values($components))); die;
 //print_r(json_encode(array("aaData" => $surveilanceRs))); die;
-		echo json_encode(["aaData" => $surveilanceRs], JSON_UNESCAPED_SLASHES);
+		echo json_encode(["aaData" => $surveillanceSummary], JSON_UNESCAPED_SLASHES);
 		return;
 
 
@@ -887,14 +915,18 @@ class EvaluationController extends RiskController {
 			}
 			//add the dropdown parameters
 			if ($element->inputType == 'dropdownlist') {
-				$items = CHtml::listData(Options::model()->findAll([
-					'condition' => 'elementId=:elementId',
-					'params'    => [
-						':elementId' => $element->evalElementsId
-					],
-				]), 'optionId', 'label');
+				$items = json_decode($element->options);
+				if(!isset($element->options))  {
+					$items = CHtml::listData(Options::model()->findAll([
+						'condition' => 'elementId=:elementId',
+						'params'    => [
+							':elementId' => $element->evalElementsId
+						],
+					]), 'optionId', 'label');
+				}
 				// add the dropdown items to the element
 				$elements['elements']['evaContext']['elements'][$attributeId]['items'] = $items;
+				$elements['elements']['evaContext']['elements'][$attributeId]['prompt'] = 'Choose one';
 			}
 		}
 		$elements['buttons'] = [

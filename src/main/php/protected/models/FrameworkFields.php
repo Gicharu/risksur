@@ -49,6 +49,7 @@ class FrameworkFields extends CActiveRecord {
 			'section' => array(self::BELONGS_TO, 'SurveillanceSections', 'sectionId'),
 			'options' => array(self::HAS_MANY, 'Options', 'frameworkFieldId'),
 			'data' => array(self::HAS_MANY, 'FrameworkFieldData', 'frameworkFieldId'),
+			//'dataAndOptions' => array(self::HAS_MANY, ['id' => 'frameworkFieldId'])
 		);
 	}
 

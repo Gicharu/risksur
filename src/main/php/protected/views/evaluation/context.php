@@ -25,8 +25,8 @@
 					"bProcessing": true,
 					"sAjaxSource": "<?php echo $this->createUrl('evaluation/getSurveillanceSummary'); ?>",
 					"aoColumns": [
-						{ "mDataProp": "inputName" },
-						{ "mDataProp": "value" }
+						{ "sTitle": "" },
+						{ "sTitle": "" }
 					],
 					"bJQueryUI": true,
 					"sPaginationType": "buttons_input",
@@ -44,13 +44,13 @@
 		<div class="ui-widget-header ui-widget-content ui-corner-all widgetHead">
 			Summary of the surveillance system</div>
 		<table id="surSummary" cellspacing="0" width="100%">
-			<thead>
-			<tr>
-				<th></th>
-				<th></th>
-			</tr>
-			</thead>
-			<tbody></tbody>
+<!--			<thead>-->
+<!--			<tr>-->
+<!--				<th></th>-->
+<!--				<th></th>-->
+<!--			</tr>-->
+<!--			</thead>-->
+<!--			<tbody></tbody>-->
 		</table>
 	</div>
 </div>

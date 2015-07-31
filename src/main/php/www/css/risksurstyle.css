@@ -1317,7 +1317,13 @@ span.rb {
     line-height: 2.2em;
     width: 100%;
 }
-span.rb input {
+span.radiolist {
+    display: inline-block;
+    line-height: 1.5em;
+    margin-top: 1em;
+    width: 100%;
+}
+span.rb input, span.radiolist input {
     float: left;
 }
 span.rb label {
@@ -1452,6 +1458,11 @@ div.form {
 }
 div.form label {
     font-size: 1em;
+}
+div.surHeading {
+    background-color: #003b78;
+    color: #ffffff;
+    font-weight: bold;
 }
 
 .overViewTable {

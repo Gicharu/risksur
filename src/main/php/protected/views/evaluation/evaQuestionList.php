@@ -14,6 +14,8 @@
 		$(".rb:odd").each(function(){
 			$(this).addClass('odd');
 		});
+		$('html, body').animate({ scrollTop: $('#DForm input[type="radio"]:checked').offset().top }, 500);
+		$('input[type="radio"]:checked', '#DForm').parent().css('border', '5px #FA9D00 solid');
 	});
 </script>
 <div class="form">

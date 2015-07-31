@@ -423,7 +423,9 @@ class ContextController extends RiskController {
 				$surveillanceModel = FrameworkContext::model()->findByPk(Yii::app()->session['surveillanceId']);
 			}
 			$elements['elements']['context']['elements'] = self::getElements($surveillanceModel,
-				array('name', 'description'));
+				array('name'));
+			$elements['elements']['contextFields']['elements'][] = '<div class="surHeading">' .
+			'1.' . $event->sender->getCurrentStep() . ' ' .  $event->sender->getStepLabel() . '</div>';
 
 		}
 
@@ -483,9 +485,19 @@ class ContextController extends RiskController {
 				'label'    => isset($field->label) ? $field->label : $dForm->generateAttributeLabel($field->inputName),
 				'required' => $field->required,
 				'type'     => $field->inputType,
-				'hint' => $field->description
+				'hint' => UtilModel::urlToLink($field->description)
 			);
 			if ($field->inputType == 'dropdownlist') {
+				$elements['elements']['contextFields']['elements'][$attributeName]['items'] =
+					Options::model()->getContextFieldOptions($field->id);
+				$elements['elements']['contextFields']['elements'][$attributeName]['prompt'] = 'Choose one';
+			}
+			if($field->inputType == 'radiolist') {
+				$elements['elements']['contextFields']['elements'][$attributeName]['separator'] = '<br>';
+				//'labelOptions'=>array('style'=>'display:inline-block'),
+				$elements['elements']['contextFields']['elements'][$attributeName]['style'] = 'width:1em;';
+				$elements['elements']['contextFields']['elements'][$attributeName]['template']  =
+					'<span class="radiolist">{input} {label}</span>';
 				$elements['elements']['contextFields']['elements'][$attributeName]['items'] =
 					Options::model()->getContextFieldOptions($field->id);
 			}
@@ -521,8 +533,8 @@ class ContextController extends RiskController {
 		$fieldData = [];
 		//$form->loadData();
 		if ($form->submitted('next')) {
+			//print_r($_POST['DForm']); die;
 			if(isset($_POST['DForm'][0])) {
-				//print_r($dForm->attributes); die;
 				// This can be refactored later
 				$dataIdArray = [];
 				foreach($_POST['DForm'] as $row => $rowData ) {
@@ -736,7 +748,8 @@ class ContextController extends RiskController {
 					if(isset($data->frameworkFieldId) && $data->frameworkFieldId == $field->id) {
 						$dataValue = $data->value;
 
-						if($field->inputType == 'checkboxlist' || $field->inputType == 'dropdownlist') {
+						if($field->inputType == 'checkboxlist' || $field->inputType == 'dropdownlist' ||
+							$field->inputType == 'radiolist') {
 							$opts = '';
 							$optionsRs = Options::model()->findAllByPk(json_decode($data->value), '', ['select' => 'label']);
 							foreach($optionsRs as $optionValue) {

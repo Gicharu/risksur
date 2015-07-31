@@ -14,7 +14,6 @@
 			"sAjaxSource": "<?= $this->createUrl('evaluation/listEvaContext/ajax/1'); ?>",
 			"aoColumns": [
 				{"mDataProp": "evaluationName", "sClass": "underline setEvaContext clickable" },
-				{"mDataProp": "evaluationDescription" },
 				{"mDataProp": "frameworks.name" },
 				{"mDataProp": "question.question", "fnCreatedCell": function(nTd, sData, oData, iRow, iCol) {
 					if(oData.question.question == '') {
@@ -69,7 +68,6 @@
 		<thead>
 		<tr>
 			<th title = "Evaluation name">Evaluation name</th>
-			<th title = "Evaluation Description">Evaluation Description</th>
 			<th title = "Surveillance System">Surveillance System</th>
 			<th title = "Evaluation Question">Evaluation Question</th>
 			<th title = "Delete"></th>
