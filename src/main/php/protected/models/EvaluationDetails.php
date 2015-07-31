@@ -11,6 +11,14 @@
  */
 class EvaluationDetails extends CActiveRecord {
 
+
+	public function rules() {
+		return [
+			['evalId', 'required'],
+			['evalElementsId, value', 'safe']
+		];
+	}
+
 	/**
 	 * model 
 	 * 

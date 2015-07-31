@@ -24,17 +24,31 @@ class EvalForm extends DForm {
 	public function save($evalId) {
 		// fetch the form data
 		$evaElements = [];
-		foreach ($this->_properties as $attrNameAndId => $attrVal) {
-
-			$attrParams = explode("_", $attrNameAndId);
-			$evaElements['evalId'] = $evalId;
-			$evaElements['evalElementsId'] = $attrParams[1];
-			$evaElements['value'] = is_array($attrVal) ? json_encode($attrVal): $attrVal;
-
-		}
 		$model = new EvaluationDetails();
-		$model->attributes = $evaElements;
-		return $model->save();
+		$transaction = Yii::app()->db->beginTransaction();
+		try{
+			foreach ($this->_properties as $attrNameAndId => $attrVal) {
+				$model->unsetAttributes();
+				$attrParams = explode("_", $attrNameAndId);
+				$evaElements['evalId'] = $evalId;
+				$evaElements['evalElementsId'] = $attrParams[1];
+				$evaElements['value'] = is_array($attrVal) ? json_encode($attrVal): $attrVal;
+				$model->attributes = $evaElements;
+				//var_dump($evaElements);
+				$model->setIsNewRecord(true);
+				$model->save();
+			}
+			//die;
+			$transaction->commit();
+
+		} catch (Exception $e) {
+			Yii::log($e->getMessage(), 'error', 'models.EvalForm');
+			$transaction->rollBack();
+			EvaluationHeader::model()->deleteByPk($evalId);
+			return false;
+		}
+		//var_dump($evaElements, $model); die;
+		return true;
 
 
 	}

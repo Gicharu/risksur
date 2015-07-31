@@ -45,7 +45,8 @@ class EvaAttributesMatrix extends CActiveRecord {
 			'attribute' => [self::BELONGS_TO, 'EvaAttributes', 'attributeId'],
 			'attributeTypes' => [self::BELONGS_TO, 'EvaAttributeTypes',
 				['attributeType' => 'id'], 'through' => 'attribute'
-			]
+			],
+			'objective' => [self::BELONGS_TO, 'Options', 'optionId']
 		];
 	}
 

@@ -252,20 +252,31 @@ class ContextController extends RiskController {
 		$model = new FrameworkContext();
 		$dataArray = array();
 		if (isset($_GET['contextId'])) {
-			$selectedDesign = FrameworkContext::model()->findAll([
+			$contextId = $_GET['contextId'];
+			$selectedDesign = FrameworkContext::model()->find([
 				//'select' => 'pageId, pageName',
 				'condition' => 'frameworkId=:frameworkId AND userId=:userId',
 				'params' => [
-					':frameworkId' => $_GET['contextId'],
+					':frameworkId' => $contextId,
 					':userId' => Yii::app()->user->id,
 				],
 			]);
+			$survObjCriteria = new CDbCriteria();
+			$survObjCriteria->with = ['data', 'options'];
+			$survObjCriteria->select = 'inputName';
+			$survObjCriteria->condition = "inputName='survObj' AND data.frameworkId=" . $contextId . " AND options.optionId=data.value";
+
+			$rsSurveillanceObjective = FrameworkFields::model()->find($survObjCriteria);
 			$dataArray['selectedDesign'] = $selectedDesign;
 			//add the surveillance context to the session
 			if (count($selectedDesign) == 1) {
 				Yii::app()->session->add('surDesign', array(
-					'id' => $_GET['contextId'],
-					'name' => $selectedDesign[0]->name
+					'id' => $contextId,
+					'name' => $selectedDesign->name
+				));
+				Yii::app()->session->add('surveillanceObjective', array(
+					'id' => $rsSurveillanceObjective->data[0]['value'],
+					'name' => $rsSurveillanceObjective->options[0]['label']
 				));
 				if(isset(Yii::app()->session['referrer']) && false != parse_url(Yii::app()->session['referrer'])) {
 					//unset(Yii::app()->session['referrer']);

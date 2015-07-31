@@ -237,7 +237,7 @@ class EvaluationController extends RiskController {
 			$model->update();
 			Yii::app()->session['evalQuestion'] = $_POST['EvaluationQuestion']['question'];
 			//print_r(Yii::app()->session['evalQuestion']); die;
-			$this->redirect('selectCriteriaMethod');
+			$this->redirect('selectEvaAttributes');
 			return;
 		}
 		$model = new EvaluationQuestion();
@@ -458,7 +458,10 @@ class EvaluationController extends RiskController {
 		$detailsCriteria->with = ['frameworks', 'evaMethods', 'evaCriteria'];
 		$model = ModelToArray::convertModelToArray(EvaluationHeader::model()
 			->findByPk($this->evaContextId, $detailsCriteria));
-		//print_r($model); die;
+		$evaluationDataModel = EvaluationElements::model()
+			->with('data')
+			->find("inputName='riskBasedOpts' AND data.evalId=" . $this->evaContextId);
+		//var_dump($evaluationDataModel, $evaluationDataModel->data); die;
 		$evaMethods = '';
 		$evaCriteria = '';
 		array_walk($model['evaMethods'], function($item) use (&$evaMethods) {
@@ -476,7 +479,8 @@ class EvaluationController extends RiskController {
 		$evaDetails[] = ['Evaluation question', $model['question']['question']];
 		$evaDetails[] = ['Evaluation criteria', $model['evaCriteria']];
 		$evaDetails[] = ['Evaluation method', $model['evaMethods']];
-		$evaDetails[] = ['Whether risk based approach used', '']; //$evaDetailsArray;
+		$evaDetails[] = ['Whether risk based approach used',
+			json_decode($evaluationDataModel->options)[$evaluationDataModel->data[0]['value']]]; //$evaDetailsArray;
 		return $evaDetails;
 	}
 
@@ -673,21 +677,10 @@ class EvaluationController extends RiskController {
 			$evaluationHeader->frameworkId = Yii::app()->session['surDesign']['id'];
 			$evaluationHeader->userId = Yii::app()->user->id;
 			$model->setProperties($_POST['EvalForm']);
-			//print_r($model); die;
+			//var_dump($model); die;
 			//save the componentHead values
 			if ($evaluationHeader->save() && $model->save($evaluationHeader->evalId)) {
-//				print_r($evaluationHeader->getErrors());
-//				var_dump($form); die;
-//				Yii::app()->user->setFlash("notice", "The evaluation name must be unique.");
-//				//return $this->redirect('addEvaContext');
-//				$this->render('context', [
-//					'model'     => $model,
-//					'dataArray' => $dataArray,
-//					'form'      => $form
-//				]);
-//				return;
-				$evalId = $evaluationHeader->evalId;
-
+//
 				Yii::app()->session->add('evaContext', [
 					'id'   => $evaluationHeader->evalId,
 					'name' => $evaluationHeader->evaluationName,
@@ -696,16 +689,9 @@ class EvaluationController extends RiskController {
 				$this->redirect(['selectEvaQuestion']);
 				return;
 			}
-			//update the session variable for design
-//			$modelDesign = FrameworkContext::model()->findByPk($form->model->frameworkId);
-//			if (!empty($modelDesign)) {
-//				Yii::app()->session->add('surDesign', [
-//					'id'   => $modelDesign->frameworkId,
-//					'name' => $modelDesign->name
-//					//'goalId' => $modelDesign->goalId
-//				]);
-//			}
-			//print_r($evaluationHeader); die;
+			Yii::app()->user->setFlash('error', Yii::t("translation", "An error occurred when creating the " .
+				"evaluation, please try again or contact your administrator if the problem persists"));
+
 		}
 
 		$this->render('context', [
