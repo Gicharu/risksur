@@ -15,35 +15,35 @@ SET
   `multiple` = NULL
 WHERE `frameworkFields`.`id` = 5 ;
 
-INSERT INTO `frameworkFields` (
-  `id`,
-  `sectionId`,
-  `parentId`,
-  `label`,
-  `inputName`,
-  `inputType`,
-  `required`,
-  `order`,
-  `gridField`,
-  `description`,
-  `childCount`,
-  `multiple`
-)
-VALUES
-  (
-    56,
-    2,
-    NULL,
-    'Based on the current disease status, what is the primary surveillance objective?',
-    'survObj',
-    'radiolist',
-    1,
-    '2',
-    0,
-    '(Visit the WIKI if you need help deciding)',
-    NULL,
-    NULL
-  ) ;
+# INSERT INTO `frameworkFields` (
+#   `id`,
+#   `sectionId`,
+#   `parentId`,
+#   `label`,
+#   `inputName`,
+#   `inputType`,
+#   `required`,
+#   `order`,
+#   `gridField`,
+#   `description`,
+#   `childCount`,
+#   `multiple`
+# )
+# VALUES
+#   (
+#     56,
+#     2,
+#     NULL,
+#     'Based on the current disease status, what is the primary surveillance objective?',
+#     'survObj',
+#     'radiolist',
+#     1,
+#     '2',
+#     0,
+#     '(Visit the WIKI if you need help deciding)',
+#     NULL,
+#     NULL
+#   ) ;
 INSERT INTO `frameworkFields` (`id`, `sectionId`, `parentId`, `label`, `inputName`, `inputType`, `required`, `order`, `gridField`, `description`, `childCount`, `multiple`) VALUES
   (56, 2, NULL, 'Based on the current disease status, what is the primary surveillance objective?', 'survObj', 'radiolist', 1, '2', 0, '(Visit the WIKI if you need help deciding)', NULL, NULL),
   (57, 2, NULL, 'What is the surveillance purpose?', 'survPurpose', 'textarea', 0, '3', 0, 'How will the information collected in this surveillance system be used to inform policy decision (e.g. to eradicate or manage the occurrence of disease or inform trade)', NULL, NULL),
@@ -116,30 +116,33 @@ INSERT INTO `evaMethods` (`evaMethodId`, `name`) VALUES
   (5, 'Functional assessment'),
   (6, 'Process assessment');
 
+SET FOREIGN_KEY_CHECKS=0;
+
 TRUNCATE TABLE `evaluationQuestion`;
 --
 -- Dumping data for table `evaluationQuestion`
 --
 
+
 INSERT INTO `evaluationQuestion` (`evalQuestionId`, `question`, `questionNumber`, `parentQuestion`, `flag`) VALUES
-  (1, 'Assess whether one or more surveillance component(s) is/are capable of meeting a technical effectiveness target ', NULL, NULL, 'final'),
-  (2, 'Assess the costs of surveillance components (out of two or more) that achieve a defined effectiveness target', NULL, NULL, 'final'),
-  (3, 'Assess the technical effectiveness of one or more surveillance components', NULL, NULL, 'final'),
-  (4, 'Assess the technical effectiveness of one or more surveillance components and the functional aspects of surveillance that may influence effectiveness', NULL, NULL, 'final'),
-  (5, 'Assess whether a surveillance component generates a net benefit for society, industry, or animal holder(s): Benefit to be measured in monetary terms', NULL, NULL, 'final'),
-  (6, 'Assess whether a surveillance component generates a net benefit for society, industry, or animal holder(s): Benefit to be measured in non-monetary terms (effectiveness is one type of non-monetary benefit)', NULL, NULL, 'final'),
-  (7, 'Assess whether a surveillance component generates a net benefit for society, industry, or animal holder(s): Benefit to be measured in both monetary and non-monetary terms (effectiveness is one type of non-monetary benefit)', NULL, NULL, 'final'),
-  (8, 'Identify the surveillance component (out of two or more) that generates the biggest net benefit for society, industry, or animal holder(s): Benefit to be measured in monetary terms', NULL, NULL, 'final'),
-  (9, 'Identify the surveillance component (out of two or more) that generates the biggest net benefit for society, industry, or animal holder(s): Benefit to be measured in both monetary and non-monetary terms (effectiveness is one type of non-monetary benefit)', NULL, NULL, 'final'),
-  (10, 'Identify the surveillance component (out of two or more) that generates the biggest net benefit for society, industry, or animal holder(s) under a budget constraint Budget constraint and benefit to be measured in non-monetary terms (effectiveness is one type of non-monetary benefit)', NULL, NULL, 'final'),
-  (11, 'Assess the functional aspects of surveillance which may influence effectiveness', NULL, NULL, 'final'),
-  (12, 'Assess the costs and effectiveness of surveillance components (out of two or more) to determine which  achieves a defined effectiveness target at least cost, the effectiveness needs to be determined\r\n', NULL, NULL, 'final'),
-  (13, 'Assess the surveillance structure, function and processes', NULL, NULL, 'final'),
-  (14, 'Identify the surveillance component (out of two or more) that generates the biggest net benefit for society, industry, or animal holder(s) and benefit to be measured in monetary terms', NULL, NULL, 'final'),
-  (15, 'Identify the surveillance component (out of two or more) that generates the biggest net benefit for society, industry, or animal holder(s) and benefit to be measured in non-monetary terms or to be expressed as an effectiveness measure', NULL, NULL, 'final'),
+  (1, 'Assess whether one or more surveillance component(s) is/are capable of meeting a technical effectiveness target ', '1', NULL, 'final'),
+  (2, 'Assess the costs of surveillance components (out of two or more) that achieve a defined effectiveness target', '2', NULL, 'final'),
+  (3, 'Assess the technical effectiveness of one or more surveillance components', '4', NULL, 'final'),
+  (4, 'Assess the technical effectiveness of one or more surveillance components and the functional aspects of surveillance that may influence effectiveness', '9', NULL, 'final'),
+  (5, 'Assess whether a surveillance component generates a net benefit for society, industry, or animal holder(s): Benefit to be measured in monetary terms', '5(a)', NULL, 'final'),
+  (6, 'Assess whether a surveillance component generates a net benefit for society, industry, or animal holder(s): Benefit to be measured in non-monetary terms (effectiveness is one type of non-monetary benefit)', '5(b)', NULL, 'final'),
+  (7, 'Assess whether a surveillance component generates a net benefit for society, industry, or animal holder(s): Benefit to be measured in both monetary and non-monetary terms (effectiveness is one type of non-monetary benefit)', '5(c)', NULL, 'final'),
+  (8, 'Identify the surveillance component (out of two or more) that generates the biggest net benefit for society, industry, or animal holder(s): Benefit to be measured in monetary terms', '7(a)', NULL, 'final'),
+  (9, 'Identify the surveillance component (out of two or more) that generates the biggest net benefit for society, industry, or animal holder(s): Benefit to be measured in both monetary and non-monetary terms (effectiveness is one type of non-monetary benefit)', '7(c)', NULL, 'final'),
+  (10, 'Identify the surveillance component (out of two or more) that generates the biggest net benefit for society, industry, or animal holder(s) under a budget constraint Budget constraint and benefit to be measured in non-monetary terms (effectiveness is one type of non-monetary benefit)', '7(b)', NULL, 'final'),
+  (11, 'Assess the functional aspects of surveillance which may influence effectiveness', '8', NULL, 'final'),
+  (12, 'Assess the costs and effectiveness of surveillance components (out of two or more) to determine which  achieves a defined effectiveness target at least cost, the effectiveness needs to be determined\r\n', '3', NULL, 'final'),
+  (13, 'Assess the surveillance structure, function and processes', '11', NULL, 'final'),
+  (14, 'Identify the surveillance component (out of two or more) that generates the biggest net benefit for society, industry, or animal holder(s) and benefit to be measured in monetary terms', '6(a)', NULL, 'final'),
+  (15, 'Identify the surveillance component (out of two or more) that generates the biggest net benefit for society, industry, or animal holder(s) and benefit to be measured in non-monetary terms or to be expressed as an effectiveness measure', '6(b)', NULL, 'final'),
   (16, 'Are you aiming to evaluate the effectiveness of surveillance or how well surveillance is performing or to re-design your surveillance to improve its performance', NULL, 41, NULL),
   (17, 'Are you aiming to evaluate how well your surveillance is performing or re-design your surveillance to improve its performance', NULL, 41, NULL),
-  (18, 'Identify the surveillance component (out of two or more) that generates the biggest net benefit for society, industry, or animal holder(s) and benefit to be measured in both monetary and non-monetary terms (or to be expressesed as an effectiveness measure)', NULL, NULL, 'final'),
+  (18, 'Identify the surveillance component (out of two or more) that generates the biggest net benefit for society, industry, or animal holder(s) and benefit to be measured in both monetary and non-monetary terms (or to be expressesed as an effectiveness measure)', '6(c)', NULL, 'final'),
   (20, 'Do you want to assess whether your surveillance meets a specified technical target or do you want to assess the absolute level of effectiveness', NULL, 16, NULL),
   (21, 'What do you want to evaluate', NULL, 16, NULL),
   (22, 'Have you evaluated the effectiveness of your surveillance', NULL, 16, NULL),
@@ -160,7 +163,8 @@ INSERT INTO `evaluationQuestion` (`evalQuestionId`, `question`, `questionNumber`
   (37, 'Is there a budget constraint?', NULL, 34, NULL),
   (41, 'Evaluations can be carried out at system or component level, at what level would you like to carry out your evaluation /improvement.  ', NULL, NULL, 'primary'),
   (42, 'What do you want to evaluate?', NULL, 17, NULL),
-  (43, 'Assess the technical effectiveness of the surveillance system', NULL, NULL, 'final');
+  (43, 'Assess the technical effectiveness of the surveillance system', '10', NULL, 'final');
+SET FOREIGN_KEY_CHECKS=1;
 
 TRUNCATE TABLE `evaQuestion_has_criteria_and_method`;
 --
@@ -211,3 +215,41 @@ INSERT INTO `evaQuestion_has_criteria_and_method` (`questionId`, `criteriaId`, `
   (18, 3, 4),
   (18, 4, 4),
   (43, 1, 1);
+
+TRUNCATE TABLE `evaAttributesMatrix`;
+INSERT INTO `evaAttributesMatrix` (`id`, `surveillanceObj`, `evaQuestionGroup`, `attributeId`, `relevance`) VALUES
+  (1, 62, 2, 3, '1'),
+  (2, 63, 2, 3, '1'),
+  (3, 64, 2, 3, '2'),
+  (4, 65, 2, 3, '3'),
+  (5, 62, 2, 6, '3'),
+  (6, 63, 2, 6, '2');
+
+UPDATE `evaQuestionGroups` SET `groupId` = 1,`section` = 'evaCriteriaMethod',`questions` = '{"1":[1,12,3,6,7,15,18,10,9,4],"2":[11,4],"3":[2,12,6,7,15,1810,9],"4":[5,6,7,14,15,18,8,10,9]}' WHERE `evaQuestionGroups`.`groupId` = 1;
+
+
+INSERT INTO `permissions` (`id`, `name`, `description`, `controller`, `action`, `bizrule`) VALUES
+  (81, 'actionIndex', 'C/A to display evaluation questions', 'adminevaquestion', 'index', ''),
+  (82, 'actionUpdate', 'C/A to update evaluation questions', 'adminevaquestion', 'update', ''),
+  (83, 'actionIndex', 'C/A to view attribute relevance', 'adminattributerelevance', 'index', ''),
+  (84, 'actionCreate', 'C/A to add attribute relevance', 'adminattributerelevance', 'create', ''),
+  (85, 'actionAddMatrixRow', 'C/A to add new attribute relevance row', 'adminattributerelevance', 'addMatrixRow', ''),
+  (86, 'actionUpdate', 'C/A to update attribute relevance', 'adminattributerelevance', 'update', ''),
+  (87, 'actionDelete', 'C/A to delete attribute relevance', 'adminattributerelevance', 'delete', '');
+
+DELETE FROM `roles_has_permissions` WHERE `permissions_id` = '81' AND `roles_id` = '3';
+INSERT INTO `roles_has_permissions` (`permissions_id`, `roles_id`) VALUES
+#   (81, 1),
+#   (81, 2),
+  (82, 1),
+  (82, 2),
+  (83, 1),
+  (83, 2),
+  (84, 1),
+  (84, 2),
+  (85, 1),
+  (85, 2),
+  (86, 1),
+  (86, 2),
+  (87, 1),
+  (87, 2);
