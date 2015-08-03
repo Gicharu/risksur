@@ -5,7 +5,7 @@
  * Date: 5/12/15
  * Time: 10:33 AM
  */
-$this->menu = [['label' => 'Add Economic Evaluation Method', 'url' => ['adminEva/addEvaMethod']],];
+$this->menu = [['label' => 'Add Economic Evaluation Method', 'url' => ['admineva/addEvaMethod']],];
 ?>
 
 <script type="text/javascript">

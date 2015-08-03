@@ -27,8 +27,8 @@ class EvaAttributesMatrix extends CActiveRecord {
 		// will receive user inputs.
 		return [
 			['surveillanceObj, evaQuestionGroup, attributeId, relevance', 'required'],
-			['attributeId', 'numerical', 'integerOnly' => true],
-			['surveillanceObj, relevance', 'length', 'max' => 1],
+			['attributeId, surveillanceObj', 'numerical', 'integerOnly' => true],
+			['relevance', 'length', 'max' => 1],
 			['evaQuestionGroup', 'length', 'max' => 11],
 			// The following rule is used by search().
 
@@ -42,10 +42,11 @@ class EvaAttributesMatrix extends CActiveRecord {
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return [
-			'attribute' => [self::BELONGS_TO, 'EvaAttributes', 'attributeId'],
+			'attribute' => [self::BELONGS_TO, 'EvaAttributes', 'attributeId', 'select' => 'attributeId, name'],
 			'attributeTypes' => [self::BELONGS_TO, 'EvaAttributeTypes',
 				['attributeType' => 'id'], 'through' => 'attribute'
-			]
+			],
+			'objective' => [self::BELONGS_TO, 'Options', 'surveillanceObj', 'select' => 'optionId, label']
 		];
 	}
 
@@ -55,8 +56,8 @@ class EvaAttributesMatrix extends CActiveRecord {
 	public function attributeLabels() {
 		return [
 			'id'               => 'ID',
-			'surveillanceObj'  => 'Surveillance Obj',
-			'evaQuestionGroup' => 'Eva Question Group',
+			'surveillanceObj'  => 'Surveillance Objective',
+			'evaQuestionGroup' => 'Evaluation Question Group',
 			'attributeId'      => 'Attribute',
 			'relevance'        => 'Relevance',
 		];

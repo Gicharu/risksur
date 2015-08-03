@@ -45,11 +45,12 @@ class FrameworkFields extends CActiveRecord {
 	public function relations() {
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
-		return array(
-			'section' => array(self::BELONGS_TO, 'SurveillanceSections', 'sectionId'),
-			'options' => array(self::HAS_MANY, 'Options', 'frameworkFieldId'),
-			'data' => array(self::HAS_MANY, 'FrameworkFieldData', 'frameworkFieldId'),
-		);
+		return [
+			'section' => [self::BELONGS_TO, 'SurveillanceSections', 'sectionId'],
+			'options' => [self::HAS_MANY, 'Options', 'frameworkFieldId'],
+			'data' => [self::HAS_MANY, 'FrameworkFieldData', 'frameworkFieldId']
+			//'dataAndOptions' => array(self::HAS_MANY, ['id' => 'frameworkFieldId'])
+		];
 	}
 
 	/**

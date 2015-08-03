@@ -10,7 +10,7 @@
 	 * @uses      RiskController
 	 * @license   Tracetracker {@link http://www.tracetracker.com}
 	 */
-	class SurFormDetailsController extends RiskController {
+	class SurformdetailsController extends RiskController {
 		/**
 		 * @var string the default layout for the views. Defaults to '//layouts/column2', meaning
 		 * using two-column layout. See 'protected/views/layouts/column2.php'.
@@ -57,7 +57,7 @@
 		public function actionUpdate() {
 			if (empty($_GET['id'])) {
 				Yii::app()->user->setFlash('error', Yii::t("translation", "Please select a form element to edit"));
-				$this->redirect(array('SurFormDetails/index'));
+				$this->redirect(array('surformdetails/index'));
 			}
 			$id = $_GET['id'];
 			$model = $this->loadModel($id);
@@ -161,7 +161,7 @@
 			$model = SurFormDetails::model()->findByPk($id);
 			if ($model === null) {
 				Yii::app()->user->setFlash('error', Yii::t("translation", "The form element does not exist"));
-				$this->redirect(array('SurFormDetails/index'));
+				$this->redirect(array('surformdetails/index'));
 			}
 			return $model;
 		}

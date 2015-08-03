@@ -1,15 +1,15 @@
 <?php
 /**
- * AdminController
+ * AdminevaController
  * @uses RiskController
  * @copyright TraceTracker
  * @author Chirag Doshi <james@tracetracker.com>
  * @license TraceTracker {@link http://www.tracetracker.com}
  */
-class AdminEvaController extends RiskController {
+class AdminevaController extends RiskController {
 	//public $page;
 	private	$configuration;
-	const LOG_CAT = "ctrl.AdminEvaluationController";
+	const LOG_CAT = "ctrl.adminevaController";
 
 	/**
 	 * @var string the default layout for the views. Defaults to '//layouts/column2', meaning
@@ -41,7 +41,7 @@ class AdminEvaController extends RiskController {
 			return;
 		}
 		$this->menu = [
-			['label' => 'Add Evaluation Context Field', 'url' => ['adminEva/AddEvaContext']]
+			['label' => 'Add Evaluation Context Field', 'url' => ['admineva/AddEvaContext']]
 		];
 		$this->render('evaContext/list');
 	}
@@ -50,14 +50,14 @@ class AdminEvaController extends RiskController {
 		$elementModel = new EvaluationElements('insert');
 		$form = new CForm(EvaluationElements::getFormElements(), $elementModel);
 		$this->menu = [
-			['label' => 'List Evaluation Context Fields', 'url' => ['adminEva/listEvaContext']]
+			['label' => 'List Evaluation Context Fields', 'url' => ['admineva/listEvaContext']]
 		];
 		if($form->submitted('save') && $form->validate()) {
 			$elementModel = $form->model;
 			//print_r($elementModel); die;
 			if($elementModel->save(false)) {
 				Yii::app()->user->setFlash('success', 'The form field was created successfully');
-				$this->redirect(['adminEva/listEvaContext']);
+				$this->redirect(['admineva/listEvaContext']);
 				return;
 			}
 			Yii::app()->user->setFlash('error', 'The form field was not created successfully, please' .
@@ -76,14 +76,14 @@ class AdminEvaController extends RiskController {
 		if(!empty($elementModel)) {
 			$form = new CForm(EvaluationElements::getFormElements(), $elementModel);
 			$this->menu = [
-				['label' => 'Add Evaluation Context Field', 'url' => ['adminEva/AddEvaContext']],
-				['label' => 'List Evaluation Context Fields', 'url' => ['adminEva/listEvaContext']]
+				['label' => 'Add Evaluation Context Field', 'url' => ['admineva/AddEvaContext']],
+				['label' => 'List Evaluation Context Fields', 'url' => ['admineva/listEvaContext']]
 			];
 			if($form->submitted('save') && $form->validate()) {
 				$elementModel = $form->model;
 				if($elementModel->save(false)) {
 					Yii::app()->user->setFlash('success', 'The form field was updated successfully');
-					$this->redirect(['adminEva/listEvaContext']);
+					$this->redirect(['admineva/listEvaContext']);
 					return;
 				}
 				Yii::app()->user->setFlash('error', 'The form field was not updated successfully, please' .
@@ -95,7 +95,7 @@ class AdminEvaController extends RiskController {
 			return;
 		}
 		Yii::app()->user->setFlash('error', 'The selected item does not exist or has been deleted');
-		$this->redirect(['adminEva/listEvaContext']);
+		$this->redirect(['admineva/listEvaContext']);
 	}
 
 	/**
@@ -160,7 +160,7 @@ class AdminEvaController extends RiskController {
 			$model = $form->model;
 			if($model->save(false)) {
 				Yii::app()->user->setFlash('success', 'Economic evaluation method add successfully');
-				$this->redirect(['adminEva/listEvaMethods']);
+				$this->redirect(['admineva/listEvaMethods']);
 			}
 			Yii::app()->user->setFlash('error',
 				'An error occurred while saving, please try again or contact your administrator if the problem persists');
@@ -182,7 +182,7 @@ class AdminEvaController extends RiskController {
 		$model = EconEvaMethods::model()->findByPk($id);
 		if(is_null($model)) {
 			Yii::app()->user->setFlash('notice', 'That economic evaluation method does not exist.');
-			$this->redirect(['adminEva/listEvaMethods']);
+			$this->redirect(['admineva/listEvaMethods']);
 			return;
 		}
 		unset($config['buttons']['cancel']);
@@ -191,7 +191,7 @@ class AdminEvaController extends RiskController {
 			$model = $form->model;
 			if($model->save(false)) {
 				Yii::app()->user->setFlash('success', 'Economic evaluation method updated successfully');
-				$this->redirect(['adminEva/listEvaMethods']);
+				$this->redirect(['admineva/listEvaMethods']);
 			}
 			Yii::app()->user->setFlash('error',
 				'An error occurred while updating, please try again or contact ' .

@@ -123,10 +123,6 @@ class EvaluationHeader extends CActiveRecord {
 					'evaluationName'        => [
 						'type'     => 'text',
 						'required' => true
-					],
-					'evaluationDescription' => [
-						'type'     => 'text',
-						'required' => true
 					]
 				]
 

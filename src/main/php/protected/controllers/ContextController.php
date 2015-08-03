@@ -252,21 +252,37 @@ class ContextController extends RiskController {
 		$model = new FrameworkContext();
 		$dataArray = array();
 		if (isset($_GET['contextId'])) {
-			$selectedDesign = FrameworkContext::model()->findAll([
+			$contextId = $_GET['contextId'];
+			$selectedDesign = FrameworkContext::model()->find([
 				//'select' => 'pageId, pageName',
 				'condition' => 'frameworkId=:frameworkId AND userId=:userId',
 				'params' => [
-					':frameworkId' => $_GET['contextId'],
+					':frameworkId' => $contextId,
 					':userId' => Yii::app()->user->id,
 				],
 			]);
+			$survObjCriteria = new CDbCriteria();
+			$survObjCriteria->with = ['data', 'options'];
+			$survObjCriteria->select = 'inputName';
+			$survObjCriteria->condition = "inputName='survObj' AND data.frameworkId=" . $contextId .
+				" AND options.optionId=data.value";
+
+			$rsSurveillanceObjective = FrameworkFields::model()->find($survObjCriteria);
 			$dataArray['selectedDesign'] = $selectedDesign;
 			//add the surveillance context to the session
 			if (count($selectedDesign) == 1) {
 				Yii::app()->session->add('surDesign', array(
-					'id' => $_GET['contextId'],
-					'name' => $selectedDesign[0]->name
+					'id' => $contextId,
+					'name' => $selectedDesign->name
 				));
+				if(isset($rsSurveillanceObjective)) {
+					Yii::app()->session->add('surveillanceObjective', array(
+						'id' => $rsSurveillanceObjective->data[0]['value'],
+						'name' => $rsSurveillanceObjective->options[0]['label'],
+						'fieldId' => $rsSurveillanceObjective->id
+					));
+
+				}
 				if(isset(Yii::app()->session['referrer']) && false != parse_url(Yii::app()->session['referrer'])) {
 					//unset(Yii::app()->session['referrer']);
 					$this->redirect(Yii::app()->session['referrer']);
@@ -423,7 +439,9 @@ class ContextController extends RiskController {
 				$surveillanceModel = FrameworkContext::model()->findByPk(Yii::app()->session['surveillanceId']);
 			}
 			$elements['elements']['context']['elements'] = self::getElements($surveillanceModel,
-				array('name', 'description'));
+				array('name'));
+			$elements['elements']['contextFields']['elements'][] = '<div class="surHeading">' .
+			'1.' . $event->sender->getCurrentStep() . ' ' .  $event->sender->getStepLabel() . '</div>';
 
 		}
 
@@ -483,9 +501,19 @@ class ContextController extends RiskController {
 				'label'    => isset($field->label) ? $field->label : $dForm->generateAttributeLabel($field->inputName),
 				'required' => $field->required,
 				'type'     => $field->inputType,
-				'hint' => $field->description
+				'hint' => UtilModel::urlToLink($field->description)
 			);
 			if ($field->inputType == 'dropdownlist') {
+				$elements['elements']['contextFields']['elements'][$attributeName]['items'] =
+					Options::model()->getContextFieldOptions($field->id);
+				$elements['elements']['contextFields']['elements'][$attributeName]['prompt'] = 'Choose one';
+			}
+			if($field->inputType == 'radiolist') {
+				$elements['elements']['contextFields']['elements'][$attributeName]['separator'] = '<br>';
+				//'labelOptions'=>array('style'=>'display:inline-block'),
+				$elements['elements']['contextFields']['elements'][$attributeName]['style'] = 'width:1em;';
+				$elements['elements']['contextFields']['elements'][$attributeName]['template']  =
+					'<span class="radiolist">{input} {label}</span>';
 				$elements['elements']['contextFields']['elements'][$attributeName]['items'] =
 					Options::model()->getContextFieldOptions($field->id);
 			}
@@ -521,8 +549,8 @@ class ContextController extends RiskController {
 		$fieldData = [];
 		//$form->loadData();
 		if ($form->submitted('next')) {
+			//print_r($_POST['DForm']); die;
 			if(isset($_POST['DForm'][0])) {
-				//print_r($dForm->attributes); die;
 				// This can be refactored later
 				$dataIdArray = [];
 				foreach($_POST['DForm'] as $row => $rowData ) {
@@ -736,7 +764,8 @@ class ContextController extends RiskController {
 					if(isset($data->frameworkFieldId) && $data->frameworkFieldId == $field->id) {
 						$dataValue = $data->value;
 
-						if($field->inputType == 'checkboxlist' || $field->inputType == 'dropdownlist') {
+						if($field->inputType == 'checkboxlist' || $field->inputType == 'dropdownlist' ||
+							$field->inputType == 'radiolist') {
 							$opts = '';
 							$optionsRs = Options::model()->findAllByPk(json_decode($data->value), '', ['select' => 'label']);
 							foreach($optionsRs as $optionValue) {

@@ -53,10 +53,10 @@ class EvaAssessmentMethods extends CActiveRecord {
 		return [
 			'id'                => 'ID',
 			'evaluationId'      => 'Evaluation',
-			'evaAttribute'      => 'Eva Attribute',
+			'evaAttribute'      => 'Evaluation Attribute',
 			'expertise'         => 'Expertise',
 			'methodDescription' => 'Method Description',
-			'dataAvailability'  => 'Data Availability',
+			'dataAvailability'  => 'Data Availability?',
 			'references'        => 'References',
 		];
 	}
@@ -85,8 +85,11 @@ class EvaAssessmentMethods extends CActiveRecord {
 	 * afterValidate
 	 */
 	protected function afterValidate() {
-		$expertiseString = implode(',', $this->expertise);
-		$this->expertise = $expertiseString;
+		if(isset($this->expertise)) {
+			$expertiseString = implode(',', $this->expertise);
+			$this->expertise = $expertiseString;
+
+		}
 		return parent::afterValidate();
 	}
 

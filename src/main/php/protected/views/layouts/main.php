@@ -46,7 +46,7 @@
 		"/js/scripts/main_ui_functions.js",
 		"/js/common.js",
 		"/libraries/jquery-showloading-1.0/jquery.showLoading.js",
-		"/libraries/jsTimezoneDetect-1.0.4/jstz.min.js",
+		//"/libraries/jsTimezoneDetect-1.0.4/jstz.min.js",
 		"/libraries/chosen_v1.3.0/chosen.jquery.js",
 		"/libraries/jquery-qtip/jquery.qtip.min.js",
 

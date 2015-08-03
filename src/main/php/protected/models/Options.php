@@ -97,7 +97,13 @@ class Options extends CActiveRecord {
 		$options = [];
 		if(!empty($optionsRs)) {
 			foreach($optionsRs as $option) {
-				$options[$option->optionId] = $option->label;
+				if(isset($option->value)) {
+					$options[$option->value] = $option->label;
+
+				} else {
+					$options[$option->optionId] = $option->label;
+
+				}
 			}
 		}
 		return $options;

@@ -26,6 +26,7 @@ $this->renderPartial('_page', [
 			//"sDom": '<"H"rlf>t<"F"ip>',
 			"aaData": <?= json_encode($attributes); ?>,
 			"aoColumns": [
+				{"mData": "relevance", "bVisible": false },
 				{"mData": null, "fnCreatedCell": function(nTd, sData, oData, iRow, iCol) {
 					//EvaluationHeader[evaAttributes][]
 					var checkBox = $('<input>').attr({
@@ -58,19 +59,13 @@ $this->renderPartial('_page', [
 					}
 
 				}
-				},
-				{
-					"mData": null,
-					"bSortable": false,
-					"sWidth": '18%',
-					"sClass": "assButtonContainer",
-					"sDefaultContent": '<button title="Delete" type="button" class="assButton">Fill in assessment form</button>'
 				}
 			],
 			// update the buttons stying after the table data is loaded
 			"fnDrawCallback": function() {
 				$('button.assButton').button();
 			},
+			"aaSorting": [[0,'desc']],
 			"bJQueryUI": true,
 			"sPaginationType": "buttons_input"
 
@@ -107,11 +102,11 @@ $this->renderPartial('_page', [
 		<thead>
 		<tr>
 			<th title = ""></th>
+			<th title = ""></th>
 			<th title = "Attribute Name">Attribute Name</th>
 			<th title = "Attribute Description">Attribute Description</th>
 			<th title = "Attribute Type">Attribute Type</th>
 			<th title = "Relevance">Relevance</th>
-			<th title = ""></th>
 		</tr>
 		</thead>
 		<tbody>

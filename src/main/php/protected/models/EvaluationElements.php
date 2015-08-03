@@ -69,6 +69,18 @@ class EvaluationElements extends CActiveRecord {
 		return 'evalElementsId';
 	}
 
+	/**
+	 * @return array relational rules.
+	 */
+	public function relations()	{
+		// NOTE: you may need to adjust the relation name and the related
+		// class name for the relations automatically generated below.
+		return [
+			'options0' => [self::HAS_MANY, 'Options', 'elementId'],
+			'data' => [self::HAS_MANY, 'EvaluationDetails', 'evalElementsId']
+		];
+	}
+
 	public static function getFormElements() {
 		return [
 			'showErrorSummary' => true,
@@ -85,32 +97,32 @@ class EvaluationElements extends CActiveRecord {
 			],
 			'elements' => [
 				'label'     => [
-					'type'      => 'text',
+					'type'      => 'textarea',
 					'maxlength' => 100,
 					//'required'  => 1
 				],
-				'inputName' => [
-					'type'      => 'text',
-					'maxlength' => 50,
-					//'required'  => 1
-
-				],
+//				'inputName' => [
+//					'type'      => 'text',
+//					'maxlength' => 50,
+//					//'required'  => 1
+//
+//				],
 				'elementMetaData' => [
 					'type'      => 'textarea',
 					//'maxlength' => 50,
 					//'required'  => 1
 
 				],
-				'inputType' => [
-					'type'      => 'dropdownlist',
-					'maxlength' => 50,
-					//'required'  => 1,
-					'items' => [
-						'text' => 'Text',
-						'dropdownlist' => 'Drop down list'
-					]
-
-				],
+//				'inputType' => [
+//					'type'      => 'dropdownlist',
+//					'maxlength' => 50,
+//					//'required'  => 1,
+//					'items' => [
+//						'text' => 'Text',
+//						'dropdownlist' => 'Drop down list'
+//					]
+//
+//				],
 				'required' => [
 					'type'      => 'dropdownlist',
 					'maxlength' => 50,

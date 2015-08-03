@@ -11,7 +11,7 @@ $(function() {
         icons: { primary: "ui-icon-document" }, text: false});
     $('button.bedit').button({
         icons: { primary: "ui-icon-pencil" }, text: false});
-    $('button.bdelete').button({
+    $('button.bdelete, a.bdelete').button({
         icons: { primary: "ui-icon-trash" }, text: false});
     $('button.binfo').button({
         icons: { primary: "ui-icon-info" }, text: false});

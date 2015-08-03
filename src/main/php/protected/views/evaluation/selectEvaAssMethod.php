@@ -1,8 +1,3 @@
-<script type="text/javascript">
-	$(function() {
-		$('.tabular-input-container, .tabular-input-add, .tabular-input-remove').remove();
-	});
-</script>
 <?php
 /**
  * Created by PhpStorm.
@@ -11,6 +6,13 @@
  * Time: 11:43 AM
  * @var $assessModel EvaAssessmentMethods
  */
+?>
+<script type="text/javascript">
+	$(function() {
+		$('.tabular-input-container, .tabular-input-add, .tabular-input-remove').remove();
+	});
+</script>
+<?php
 echo CHtml::tag('div', ['class' => 'form'], false, false);
 //echo CHtml::beginForm();
 $form = $this->beginWidget('CActiveForm', array(
