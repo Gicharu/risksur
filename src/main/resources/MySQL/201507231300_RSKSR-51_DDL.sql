@@ -11,3 +11,9 @@ CREATE TABLE IF NOT EXISTS `evaAssessmentMethods` (
 
 ALTER TABLE `evaluationHeader`
 ADD COLUMN `evaAttributes` TEXT CHARSET utf8 COLLATE utf8_unicode_ci NULL AFTER `questionId` ;
+
+ALTER TABLE `evalElements`
+ADD COLUMN `options` TEXT NULL AFTER `inputType`;
+
+ALTER TABLE `evalElements`
+CHANGE `label` `label` VARCHAR(200) CHARSET latin1 COLLATE latin1_swedish_ci NULL;
