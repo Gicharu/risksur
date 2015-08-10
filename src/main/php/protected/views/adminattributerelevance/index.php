@@ -69,9 +69,16 @@ $(function() {
 				rowIdentifier: 'id'
 			}, requestHandler);
 
+	$('#questionGroups').dialog({
+		autoOpen: false,
+		width: 800,
+		position: { my: "left top", at: "left top", of: window }
+	});
+//	$( "div.listAttributeRelevance #yw0" ).accordion();
+//
 	});
 </script>
-<div id="listEvaAttributes">
+<div class="listAttributeRelevance">
 	<table id="evaAttributeRelevance" width="100%" class="display">
 		<thead>
 		<tr>
@@ -86,5 +93,11 @@ $(function() {
 		<tbody>
 		</tbody>
 	</table>
-	<?= CHtml::link('What are question groups?', '#', ['class' => 'btn qGroups']); ?>
+	<?= CHtml::ajaxLink('What are question groups?', 'getQuestionGroups',
+		['update' => '#questionGroups'],
+		['id' => 'questionGroups-link-'.uniqid(), 'class' => 'btn', 'onclick' => '$("#questionGroups").dialog("open")']
+	);
+	?>
+
+	<div id="questionGroups" title="Question Groups"></div>
 </div>

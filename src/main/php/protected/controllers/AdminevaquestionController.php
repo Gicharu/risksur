@@ -43,8 +43,12 @@ class AdminevaquestionController extends RiskController {
 		if (isset($_POST['EvaluationQuestion'])) {
 			$model->attributes = $_POST['EvaluationQuestion'];
 			if ($model->save()) {
-				$this->redirect(['view', 'id' => $model->evalQuestionId]);
+				Yii::app()->user->setFlash('success', 'Evaluation question updated successfully');
+				$this->redirect(['index']);
 			}
+			Yii::app()->user->setFlash('error',
+				'An error occurred when updating the evaluation question, please contact your administrator');
+
 		}
 
 		$this->render('update', [
@@ -57,22 +61,31 @@ class AdminevaquestionController extends RiskController {
 	 * If deletion is successful, the browser will be redirected to the 'admin' page.
 	 * @param integer $id the ID of the model to be deleted
 	 */
-	public function actionDelete($id) {
-		$this->loadModel($id)->delete();
-
-		// if AJAX request (triggered by deletion via admin grid view), we should not redirect the browser
-		if (!isset($_GET['ajax'])) {
-			$this->redirect(isset($_POST['returnUrl']) ? $_POST['returnUrl'] : ['admin']);
-		}
-	}
+//	public function actionDelete($id) {
+//		$this->loadModel($id)->delete();
+//
+//		// if AJAX request (triggered by deletion via admin grid view), we should not redirect the browser
+//		if (!isset($_GET['ajax'])) {
+//			$this->redirect(isset($_POST['returnUrl']) ? $_POST['returnUrl'] : ['admin']);
+//		}
+//	}
 
 	/**
 	 * Lists all models.
+	 * @param bool $ajax
 	 */
-	public function actionIndex() {
-		$dataProvider = new CActiveDataProvider('EvaluationQuestion');
+	public function actionIndex($ajax = false) {
+		$dataProvider = EvaluationQuestion::model()->findAll("flag='final'");
+		if($ajax) {
+			$dataProviderJson = json_encode(['aaData' => ModelToArray::convertModelToArray($dataProvider)]);
+			echo $dataProviderJson;
+			return;
+		}
+		$this->menu= [
+			['label'=>'Manage Evaluation Tool', 'url'=>['admineva/index']],
+		];
 		$this->render('index', [
-			'dataProvider' => $dataProvider,
+			//'dataProviderJson' => $dataProviderJson,
 		]);
 	}
 

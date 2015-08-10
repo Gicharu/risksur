@@ -24,7 +24,7 @@ class EvaluationQuestion extends CActiveRecord {
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('question', 'required'),
+			array('question, questionNumber', 'required'),
 			array('parentQuestion', 'length', 'max' => 11),
 			// The following rule is used by search().
 			//array('evalQuestionId, question, parentQuestion', 'safe', 'on'=>'search'),

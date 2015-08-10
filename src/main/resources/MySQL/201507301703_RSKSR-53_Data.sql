@@ -253,3 +253,22 @@ INSERT INTO `roles_has_permissions` (`permissions_id`, `roles_id`) VALUES
   (86, 2),
   (87, 1),
   (87, 2);
+
+SET FOREIGN_KEY_CHECKS=0;
+
+TRUNCATE TABLE `evalElements`;
+--
+-- Dumping data for table `evalElements`
+--
+
+INSERT INTO `evalElements` (`evalElementsId`, `inputName`, `label`, `inputType`, `options`, `elementMetaData`, `required`) VALUES
+  (1, 'StrengthsWeakness', 'Strengths and weaknesses of current approach', 'text', NULL, NULL, 1),
+  (3, 'stakeholderConcerns', 'Stakeholder concerns about current approach', 'text', NULL, NULL, 1),
+  (4, 'altStrategies', 'Alternative strategies to consider?', 'text', NULL, NULL, 1),
+  (5, 'evaType', 'Do you want to evaluate or change the system or some components in the system?', 'dropdownlist', '["System","Component"]', NULL, 1),
+  (6, 'componentNo', 'How many components will you include in this evaluation?', 'text', NULL, NULL, 1),
+  (7, 'riskBasedOpts', 'Are you considering risk-based options?', 'dropdownlist', '["Yes","No"]', NULL, 1),
+  (8, 'survCosts', 'Will you consider the costs of surveillance in you', 'dropdownlist', '["Yes","No"]', NULL, 1),
+  (9, 'currentCost', 'Do you know the current cost of your system and/or components?', 'dropdownlist', '["Yes","No"]', NULL, 1),
+  (10, 'budgetLimit', 'Do you have a budget constraint?', 'dropdownlist', '["Yes","No"]', NULL, 1);
+SET FOREIGN_KEY_CHECKS=1;

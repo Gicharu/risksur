@@ -9,13 +9,11 @@ $this->breadcrumbs=array(
 );
 
 $this->menu=array(
-	array('label'=>'List EvaluationQuestion', 'url'=>array('index')),
-	array('label'=>'Create EvaluationQuestion', 'url'=>array('create')),
-	array('label'=>'View EvaluationQuestion', 'url'=>array('view', 'id'=>$model->evalQuestionId)),
-	array('label'=>'Manage EvaluationQuestion', 'url'=>array('admin')),
+	array('label'=>'List EvaluationQuestions', 'url'=>array('index')),
+
 );
 ?>
 
-<h1>Update EvaluationQuestion <?php echo $model->evalQuestionId; ?></h1>
+<h3>Update EvaluationQuestion <?php echo $model->questionNumber; ?></h3>
 
 <?php $this->renderPartial('_form', array('model'=>$model)); ?>
