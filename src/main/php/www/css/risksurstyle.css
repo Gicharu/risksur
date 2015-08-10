@@ -1361,6 +1361,9 @@ div.attrHead a, div.attrHead button span {
     width: 13em;
 
 }
+#grpAccordion ul {
+    line-height: 2em;
+}
 #wzd-menu {
     padding: 0;
 }

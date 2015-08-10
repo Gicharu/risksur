@@ -144,9 +144,26 @@ class AdminattributerelevanceController extends RiskController {
 			'model' => $model,
 		]);
 	}
-	// @todo an accordion that pops up to explain the various question groups
+
 	public function actionGetQuestionGroups(){
-		//$rsQuestions = Evaqu
+		// get question groups
+		$rsQuestionGroups = EvaQuestionGroups::model()->find("section='evaCriteriaMethod'");
+		$questionGroups = json_decode($rsQuestionGroups->questions);
+		//Get questions
+		$rsQuestions = EvaluationQuestion::model()->findAll("flag='final'");
+		$panels = [];
+		foreach( $questionGroups as $group => $questions ) {
+			$panels['Group ' . $group] = '<ul class="rb">';
+			foreach( $rsQuestions as $evaQuestion) {
+				if(in_array($evaQuestion->evalQuestionId, $questions)) {
+					$panels['Group ' . $group] .= '<li>' . $evaQuestion->questionNumber . ' ' .
+						$evaQuestion->question . '</li>';
+				}
+			}
+			$panels['Group ' . $group] .= '</ul>';
+		}
+//		print_r($panels); die;
+		 $this->renderPartial('questionGroupPopup', ['panels' => $panels], false, true);
 
 	}
 
