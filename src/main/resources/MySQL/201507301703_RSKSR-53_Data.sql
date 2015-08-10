@@ -254,6 +254,7 @@ INSERT INTO `roles_has_permissions` (`permissions_id`, `roles_id`) VALUES
   (87, 1),
   (87, 2);
 
+SET FOREIGN_KEY_CHECKS=0;
 
 TRUNCATE TABLE `evalElements`;
 --
@@ -270,3 +271,4 @@ INSERT INTO `evalElements` (`evalElementsId`, `inputName`, `label`, `inputType`,
   (8, 'survCosts', 'Will you consider the costs of surveillance in you', 'dropdownlist', '["Yes","No"]', NULL, 1),
   (9, 'currentCost', 'Do you know the current cost of your system and/or components?', 'dropdownlist', '["Yes","No"]', NULL, 1),
   (10, 'budgetLimit', 'Do you have a budget constraint?', 'dropdownlist', '["Yes","No"]', NULL, 1);
+SET FOREIGN_KEY_CHECKS=1;
