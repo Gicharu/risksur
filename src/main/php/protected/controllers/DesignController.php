@@ -14,6 +14,15 @@ class DesignController extends RiskController {
 	//Use layout
 	public $layout = '//layouts/column2';
 	public $docName;
+	public $displayItems = [];
+
+	public function init() {
+		$this->displayItems = [
+			'otherTargetSpecies' => ['name' => 'targetSpecies', 'type' => 'field'],
+			'otherSurveillanceObj' => ['name' => Yii::app()->session['surveillanceObjective']['name'], 'type' => 'string'],
+			'otherTargetSector' => ['name' => 'targetSector', 'type' => 'field']
+		];
+	}
 
 
 	/**
@@ -92,8 +101,8 @@ class DesignController extends RiskController {
 	 */
 	public function actionShowComponent() {
 		Yii::log("actionShowComponent DesignController called", "trace", self::LOG_CAT);
-		$dataArray = array();
-		$dataArray['selectedComponent'] = array();
+		$dataArray = [];
+		$dataArray['selectedComponent'] = [];
 		//fetch the components data
 		if (!empty ($_GET['compId'])) {
 			$fetchComponentData = Yii::app()->db->createCommand()
@@ -129,10 +138,10 @@ class DesignController extends RiskController {
 			}
 		}
 
-		$this->render('showComponent', array(
+		$this->render('showComponent', [
 			//'model' => $model,
 			'dataArray' => $dataArray
-		));
+		]);
 	}
 
 //		/**
@@ -190,60 +199,75 @@ class DesignController extends RiskController {
 	 */
 	public function actionAddComponent() {
 		Yii::log("actionAddComponent DesignController called", "trace", self::LOG_CAT);
-		$component = new ComponentHead;
-		$componentDetails = new ComponentDetails();
-		$dataArray = array();
+
+		$dataArray = [];
 		$dataArray['formType'] = 'Create';
 		//$attributeArray = array();
 //			print_r(Yii::app()->session['surDesign']); die('here');
-
 		if (!empty(Yii::app()->session['surDesign'])) {
 			$returnArray = self::getElementsAndDynamicAttributes();
 			$elements = $returnArray['elements'];
-			$model = new DynamicForm();
-			$model->_dynamicFields = $returnArray['dynamicDataAttributes'];
-			$model->_dynamicLabels = $returnArray['dynamicLabels'];
+			$model = new DesignForm('create');
+			$model->setProperties($returnArray['dynamicDataAttributes']);
+			$model->setAttributeLabels($returnArray['dynamicLabels']);
+			$model->setRules($returnArray['dynamicRules']);
+			//var_dump($model); die;
 			// generate the components form
 			$form = new CForm($elements, $model);
+			if(Yii::app()->getRequest()->getIsAjaxRequest()) {
+				echo CActiveForm::validate( [ $model]);
+				Yii::app()->end();
+			}
 			//validate and save the component data
-			if ($form->submitted('DynamicForm') && $form->validate()) {
-				//print_r($form->getModel()); die();
-				$component->componentName = $val = $form->model->componentName;
+			if ($form->submitted('DesignForm') && $form->validate()) {
+				$component = new ComponentHead;
+				$componentDetails = new ComponentDetails();
+				//var_dump($form->model); die();
+				$component->componentName = $form->model->componentName;
 				$component->frameworkId = Yii::app()->session['surDesign']['id'];
 				//save the componentHead values
 				$component->save();
 				$componentId = $component->componentId;
+				$form->model->unsetProperties(['componentName']);
 				// fetch the form data
-				foreach ($form->model as $key => $val) {
-					//ignore the attribute arrays
-					if (!is_array($key) && !is_array($val)) {
-						if ($key != "componentName") {
-							$componentDetails->setIsNewRecord(true);
-							$componentDetails->componentDetailId = null;
-							$componentDetails->componentId = $componentId;
-							$params = explode("-", $key);
-							$componentDetails->subFormId = $params[1];
-							$componentDetails->value = $val;
-							$componentDetails->save();
-						}
+				$transaction = Yii::app()->db->beginTransaction();
+				try {
+					foreach ($form->model as $key => $val) {
+						$componentDetails->unsetAttributes();
+						$componentDetails->setIsNewRecord(true);
+						$componentDetails->componentDetailId = null;
+						$componentDetails->componentId = $componentId;
+						$params = explode("_", $key);
+
+						//var_dump($form, $key, $val, $params); die;
+						$componentDetails->subFormId = $params[1];
+						$componentDetails->value = $val;
+						$componentDetails->save();
 					}
+					$transaction->commit();
+					Yii::app()->user->setFlash('success', Yii::t("translation", "Component successfully created"));
+					$this->redirect(['getDesignElements']);
+					return;
+				} catch (Exception $e) {
+					$transaction->rollBack();
+					Yii::app()->user->setFlash('error', Yii::t("translation", "A problem occurred when saving the" .
+						" component, please try again or contact your administrator if the problem persists"));
+
 				}
-				Yii::app()->user->setFlash('success', Yii::t("translation", "Component successfully created"));
-				$this->redirect(array('listComponents'));
-				return;
 			}
 //				print_r($model);
-//				print_r($form); die('here');
+//			print_r($form['componentName']); die('here');
+			//print_r($form->render()); die('here');
 
-			$this->render('component', array(
-				'model'     => $model,
+			$this->render('component', [
+				//'model'     => $model,
 				'dataArray' => $dataArray,
 				'form'      => $form
-			));
+			]);
 			return;
 		}
 		Yii::app()->user->setFlash('notice', Yii::t("translation", "Please select a surveillance context first"));
-		$this->redirect(array('design/listComponents'));
+		$this->redirect(['context/list']);
 		return;
 
 	}
@@ -264,15 +288,18 @@ class DesignController extends RiskController {
 		//$errorMessage = "";
 		$errorStatus = "";
 
-		$dataArray = array();
+		$dataArray = [];
 		$dataArray['formType'] = 'Create';
-		$attributeArray = array();
+		$attributeArray = [];
 		if (!empty(Yii::app()->session['surDesign'])) {
-			$returnArray = self::getElementsAndDynamicAttributes(array(), true);
+			$returnArray = self::getElementsAndDynamicAttributes([], true);
+			//var_dump($returnArray); die;
 			$elements = $returnArray['elements'];
-			$model = new DynamicForm();
-			$model->_dynamicFields = $returnArray['dynamicDataAttributes'];
-			$model->_dynamicLabels = $returnArray['dynamicLabels'];
+			$model = new DesignForm();
+			$model->setProperties($returnArray['dynamicDataAttributes']);
+			$model->setAttributeLabels($returnArray['dynamicLabels']);
+			$model->setRules($returnArray['dynamicRules']);
+
 			// generate the components form
 			$form = new CForm($elements, $model);
 			$formHeader = new CForm($elements, $model);
@@ -283,17 +310,18 @@ class DesignController extends RiskController {
 			//->where('sfd.inputType ="select"')
 			//->queryAll();
 			// ajax request to add a new row
-			if ($form->submitted('DynamicForm')) {
+			if ($form->submitted('DesignForm')) {
+				//print_r($form->model); die;
 				//$items=$this->getItemsToUpdate();
-				if (isset($_POST['DynamicForm'])) {
+				if (isset($_POST['DesignForm'])) {
 					$valid = true;
-					foreach ($_POST['DynamicForm'] as $i => $item) {
-						$data = new DynamicForm();
-						$data->_dynamicFields = $returnArray['dynamicDataAttributes'];
+					foreach ($_POST['DesignForm'] as $i => $item) {
+						$data = new DesignForm();
+						$data->setProperties($returnArray['dynamicDataAttributes']);
 
 						// generate the components form
 
-						if (isset($_POST['DynamicForm'][$i])) {
+						if (isset($_POST['DesignForm'][$i])) {
 //									$data->attributes = $item; //$_POST['ComponentsForm'][$i];
 							$data->setAttributes($item, false); //$_POST['ComponentsForm'][$i];
 							$valid = $data->validate() && $valid;
@@ -304,9 +332,9 @@ class DesignController extends RiskController {
 					//	die;
 					if ($valid) { // all items are valid
 						//print_r($form->getModel()); die();
-						foreach ($_POST['DynamicForm'] as $i => $item) {
-							$data = new DynamicForm();
-							$data->_dynamicFields = $returnArray['dynamicDataAttributes'];
+						foreach ($_POST['DesignForm'] as $i => $item) {
+							$data = new DesignForm();
+							$data->setProperties($returnArray['dynamicDataAttributes']);
 							//$data->attributes = $item;
 							$data->setAttributes($item, false);
 
@@ -315,6 +343,7 @@ class DesignController extends RiskController {
 							$component->componentName = $val = $data->componentName;
 							$component->frameworkId = Yii::app()->session['surDesign']['id'];
 							//save the componentHead values
+							//var_dump($data); die;
 							$component->save();
 							$componentId = $component->componentId;
 							// fetch the form data
@@ -325,7 +354,7 @@ class DesignController extends RiskController {
 										$componentDetails->setIsNewRecord(true);
 										$componentDetails->componentDetailId = null;
 										$componentDetails->componentId = $componentId;
-										$params = explode("-", $key);
+										$params = explode("_", $key);
 										$componentDetails->subFormId = $params[1];
 										$componentDetails->value = $val;
 										$componentDetails->save();
@@ -335,23 +364,22 @@ class DesignController extends RiskController {
 						}
 						Yii::app()->user->setFlash('success', Yii::t("translation", "Components successfully created"));
 
-						$this->redirect(array('listComponents'));
+						$this->redirect(['getDesignElements']);
 					}
 				}
 			}
 			// check if there was a post and the muliple forms are invalid
-			if (isset($_POST['DynamicForm']) && !$valid) {
-				$modelArray = $postedModelArray;
-			} else {
+			$modelArray = [];
+			for ($i = 0; $i < $multipleRowsToShow; $i++) {
 				// number of model records to show by default on the view
-				for ($i = 0; $i < $multipleRowsToShow; $i++) {
-					$modelArray[] = $model;
-				}
+				$modelArray[] = $model;
+			}
+			if (isset($_POST['DesignForm']) && !$valid) {
+				$modelArray = $postedModelArray;
 			}
 
 			if (Yii::app()->request->isAjaxRequest && isset($_GET['index'])) {
-				$modelArray = array($model);
-				$this->renderPartial('_tabularInputAsTable', array(
+				$this->renderPartial('_tabularInputAsTable', [
 					'errorStatus' => $errorStatus,
 					//'multipleRowsToShow' => $multipleRowsToShow,
 					'elements'    => $elements,
@@ -359,12 +387,11 @@ class DesignController extends RiskController {
 					'model'       => $model,
 					'form'        => $form,
 					'index'       => $_GET['index']
-				));
+				]);
 				return;
 			}
-			//$modelArray = array($model, $model);
-			$form = new CForm($elements, $model);
-			$this->render('multipleComponent', array(
+			//var_dump($formHeader->getElements()); die;
+			$this->render('multipleComponent', [
 				'errorStatus' => $errorStatus,
 				//'multipleRowsToShow' => $multipleRowsToShow,
 				'elements'    => $elements,
@@ -372,12 +399,227 @@ class DesignController extends RiskController {
 				'modelArray'  => $modelArray,
 				'form'        => $form,
 				'formHeader'  => $formHeader
-			));
+			]);
 			return;
 		}
 		Yii::app()->user->setFlash('notice', Yii::t("translation", "Please select a surveillance context first"));
-		$this->redirect(array('design/listComponents'));
+		$this->redirect(['design/listComponents']);
 		return;
+	}
+
+
+	public function actionGetDesignData($componentId, $componentName) {
+		$rsDesignData = SurveillanceSections::model()
+			->with('designFields', 'designData')
+//			->findAll("designData.componentId=$componentId OR designData.componentId is NULL");
+			->findAll("tool='design'");
+		//print_r($rsDesignData); die;
+		$model = new DesignForm();
+		$sectionTwo =[];
+		$elements = ContextController::getDefaultElements();
+		$elements['activeForm']['id'] = 'DesignForm';
+		$elements['showErrors'] = false;
+		$properties = [];
+		$properties['propertyNames'] = [];
+		preg_match('/(\[\w*\])?\[(\w*)\]/', $componentName, $matches);
+		$indexString = $matches[1];
+
+		foreach($rsDesignData as $section) {
+			if($section->sectionNumber == '2.0') {
+				foreach($section->designFields as $sectionField) {
+					$sectionTwo[$sectionField->inputName] = $sectionField;
+					foreach($section->designData as $sectionData) {
+						if($sectionData->subFormId == $sectionField->subFormId &&
+							$componentId == $sectionData->componentId) {
+							//print_r($sectionField); die;
+							$sectionTwo[$sectionField->inputName]->value = $sectionData->value;
+						}
+					}
+				}
+
+				continue;
+			}
+
+			if(isset($section->designFields[0])) {
+				//print_r($section); die;
+				foreach($section->designFields as $designField) {
+					$fieldName = "$indexString" . $designField->inputName . '_' . $designField->subFormId;
+					$property = $designField->inputName . '_' . $designField->subFormId;
+					$properties['propertyNames'][$property] = '';
+					if(isset(CFormInputElement::$coreTypes[$designField->inputType])) {
+						$properties['propertyLabels'][$fieldName] = $designField->label;
+						$properties['rules'][] = [$fieldName, $designField->required ? 'required' : 'safe'];
+					}
+					if ($designField->inputType == 'label') {
+						$elements['elements'][] = CHtml::tag('div', ['class' => 'surHeading'], $designField->label);
+						continue;
+					}
+					if (isset($this->displayItems[$designField->inputName])) {
+						switch ($this->displayItems[$designField->inputName]['type']) {
+							case 'field':
+								$elements['elements'][] = CHtml::tag('span', ['class' => $designField->inputName],
+									$sectionTwo[$this->displayItems[$designField->inputName]['name']]->label .
+									': ' . $sectionTwo[$this->displayItems[$designField->inputName]['name']]->value);
+								break;
+							case 'string':
+								$elements['elements'][] = CHtml::tag('span', [],
+									$this->displayItems[$designField->inputName]['name']);
+								break;
+
+						}
+					}
+					$elements['elements'][$fieldName] = [
+						'label'    => $designField->label,
+						'required' => $designField->required,
+						'type'     => $designField->inputType,
+					];
+					foreach($section->designData as $fieldData) {
+
+						if($designField->subFormId == $fieldData->subFormId &&
+							$componentId == $fieldData->componentId) {
+							$properties['propertyNames'][$property] = $fieldData->value;
+
+						}
+					}
+				}
+			}
+		}
+		$model->setProperties($properties['propertyNames']);
+		$model->setAttributeLabels($properties['propertyLabels']);
+		$model->setRules($properties['rules']);
+		$form = new CFormTabular($elements, $model, null, trim($indexString, '[, ]'));
+//		print_r($form->render()); die;
+//		print_r($elements); die;
+		echo json_encode(['formData' => $form->renderElements(), 'index' => $indexString]);
+		return;
+
+	}
+
+	public function actionGetDesignElements() {
+		$designSectionsCriteria = new CDbCriteria();
+		$designSectionsCriteria->condition = "tool='design'";
+		$rsDesignSections = SurveillanceSections::model()->with('designFields')->findAll($designSectionsCriteria);
+		//print_r($rsDesignSections); die;
+		$elements = ContextController::getDefaultElements();
+		$elements['activeForm']['id'] = 'DesignForm';
+		$properties = [];
+		$elements['elements'][] = CHtml::tag('div', ['class' => 'accStyle'], false, false);
+
+		$randomIds = [];
+		foreach($rsDesignSections as $sectionKey => $section) {
+			if($section->sectionNumber == '2.0') {
+//				foreach($section->designFields as $sectionField) {
+//					$sectionTwo[$sectionField->inputName] = $sectionField;
+//				}
+
+				continue;
+			}
+			if($section->sectionNumber * 10 % 10 == 0) {
+				$elements['elements'][] = CHtml::tag('h3', [], $section->sectionNumber . ' ' . $section->sectionName);
+				$randomId = rand(0, 100);
+				$randomIds[] = $randomId;
+				$elements['elements'][] = CHtml::tag('div', [], $section->description, false);
+				$elements['elements'][] = CHtml::tag('p', [], false);
+				$elements['elements'][] = CHtml::link('Add component', '#', [
+					'id' => 'copyLink-' . $randomId,
+					'class' => ' btn',
+					'rel' => '.desCopy' . $randomId
+				]);
+				$elements['elements'][] = CHtml::tag('fieldset', ['class' => 'desCopy' . $randomId], false, false);
+
+				$elements['elements']['[0]component'] = [
+					'label'    => 'Component Name',
+					'type'     => 'dropdownlist',
+					'class'     => 'componentList',
+					'items' => CHtml::listData(ComponentHead::model()->findAll('frameworkId=' .
+						Yii::app()->session['surDesign']['id']), 'componentId', 'componentName'),
+					'prompt' => 'Select component'
+				];
+				$properties['propertyNames']['component'] = '';
+				$properties['propertyLabels']['component'] = 'Component Name';
+				$properties['rules'][] = ['component', 'required'];
+
+
+			}
+			//print_r($displayItems); die;
+
+
+			//if($section->sectionNumber * 10 % 10 == 0 && $sectionNo !=) {
+				$elements['elements'][] = CHtml::closeTag('fieldset');
+				$elements['elements'][] = CHtml::closeTag('div');
+			//}
+
+
+		}
+		$elements['elements'][] = CHtml::closeTag('div');
+		$elements['buttons'] = [
+			'save' => [
+				'label' => 'Save',
+				'type' => 'submit',
+			]
+		];
+
+		$model = new DesignForm();
+		$model->setProperties($properties['propertyNames']);
+		$model->setAttributeLabels($properties['propertyLabels']);
+		$model->setRules($properties['rules']);
+		$form = new CFormTabular($elements, $model, null, 0);
+		if($form->submitted('save')) {
+			if(self::saveComponents()) {
+				Yii::app()->user->setFlash('success', 'Component data saved successfully');
+			} else {
+				Yii::app()->user->setFlash('error', 'An error occurred while saving the component data, ' .
+					'please try again or contact your administrator if the problem persists');
+			}
+		}
+		//print_r($model);
+		//echo $form->render(); die;
+		$this->render('framework', compact('form', 'randomIds'));
+	}
+
+	private function saveComponents() {
+
+		$subFormIds = [];
+		$componentId = null;
+		$transaction = Yii::app()->db->beginTransaction();
+		try{
+			foreach($_POST['DesignForm'] as $componentData) {
+				//print_r($_POST); die;
+				foreach($componentData as $element => $value) {
+					if($element == 'component') {
+						$componentId = $value;
+						continue;
+					}
+					$elementArray = explode('_', $element);
+					$model = new ComponentDetails();
+					$model->unsetAttributes();
+					$model->componentId = $componentId;
+					$model->subFormId = $elementArray[1];
+					$model->value = $value;
+					$existCriteria = new CDbCriteria();
+					$existCriteria->condition = 'componentId=' . $model->componentId;
+					$existCriteria->addCondition('subFormId=' . $model->subFormId);
+					$existCriteria->select = 'componentDetailId';
+					//print_r(ComponentDetails::model()->find($existCriteria)); die;
+					$rsDataExists = ComponentDetails::model()->find($existCriteria);
+					$model->componentDetailId = isset($rsDataExists->componentDetailId) ?
+						$rsDataExists->componentDetailId : null;
+					$model->setIsNewRecord(isset($model->componentDetailId) ? false : true);
+					$subFormIds[] = $model->subFormId;
+					//print_r($model); die;
+					$model->save();
+				}
+//				$deleteCriteria = new CDbCriteria();
+//				$deleteCriteria->condition = 'componentId=' . $model->componentId;
+//				$deleteCriteria->addNotInCondition('subFormId=' . $model->subFormId);
+//				ComponentDetails::model()->deleteAll($deleteCriteria);
+			}
+			$transaction->commit();
+			return true;
+		} catch(Exception $e) {
+			$transaction->rollBack();
+			return false;
+		}
 	}
 
 	/**
@@ -388,10 +630,10 @@ class DesignController extends RiskController {
 	 */
 	public function actionAddNewMultiRow() {
 		if (Yii::app()->request->isAjaxRequest && isset($_GET['index'])) {
-			$this->getController()->renderPartial($this->viewName, array(
+			$this->getController()->renderPartial($this->viewName, [
 				'model' => $this->getModel(),
 				'index' => $_GET['index']
-			));
+			]);
 		} else {
 			throw new CHttpException(400, 'Invalid request. Please do not repeat this request again.');
 		}
@@ -401,113 +643,102 @@ class DesignController extends RiskController {
 	/**
 	 * getElementsAndDynamicAttributes
 	 * @param array $componentData
-	 * @param bool $muliForm
+	 * @param bool $multiForm
 	 * @return array
 	 */
-	public function getElementsAndDynamicAttributes($componentData = array(), $muliForm = false) {
-		$elements = array();
-		$attributeArray = array();
-		$dynamicDataAttributes = array();
-		$dynamicLabels = array();
+	public function getElementsAndDynamicAttributes($componentData = [], $multiForm = false) {
+		$elements = [];
+		$attributeArray = [];
+		$dynamicDataAttributes = [];
+		$dynamicLabels = [];
+		$dynamicRules = [];
 		if (!empty(Yii::app()->session['surDesign'])) {
-			$getFormCondition = 't.formId=:formId';
-			$getFormParams = array(':formId' => 1);
+			$getFormCondition = "tool=:design AND sectionNumber=:sectNo";
+			$getFormParams = [
+				':design' => 'design',
+				':sectNo' => '2.0'
+			];
 			// show only the elements where showOnMultiForm = true for multi form layout
-			if ($muliForm) {
-				$getFormCondition = 't.formId=:formId  and surFormHead.showOnMultiForm=:showOnMulti';
-				$getFormParams = array(':formId' => 1, 'showOnMulti' => 1);
+			if ($multiForm) {
+				$getFormCondition .= ' AND showOnMultiForm=:showOnMulti';
+				$getFormParams['showOnMulti'] = 1;
 			}
-			$getForm = SurForm::model()->with("surFormHead")->findAll(array(
+			$getForm = SurveillanceSections::model()->with('designFields')->find([
 				//'select' => 'pageId, pageName',
 				'condition' => $getFormCondition,
 				'params'    => $getFormParams
-			));
-			if (!empty(Yii::app()->session['performanceAttribute'])) {
-				$attributeList = AttributeFormRelation::model()->findAll(array(
-					'condition' => 'attributeId=:attributeId',
-					'params'    => array(
-						':attributeId' => Yii::app()->session['performanceAttribute']['id'],
-					),
-				));
-				foreach ($attributeList as $attrs) {
-					$attributeArray[$attrs->subFormId] = $attrs->subFormId;
-				}
-			}
-			//$elements['title'] = "Components Form";
+			]);
+//			if (!empty(Yii::app()->session['performanceAttribute'])) {
+//				$attributeList = AttributeFormRelation::model()->findAll([
+//					'condition' => 'attributeId=:attributeId',
+//					'params'    => [
+//						':attributeId' => Yii::app()->session['performanceAttribute']['id'],
+//					],
+//				]);
+//				foreach ($attributeList as $attrs) {
+//					$attributeArray[$attrs->subFormId] = $attrs->subFormId;
+//				}
+//			}
+			$elements['title'] = "Components Form";
 			$elements['showErrorSummary'] = true;
+			$elements['showErrors'] = true;
 			$elements['errorSummaryHeader'] = Yii::app()->params['headerErrorSummary'];
 			$elements['errorSummaryFooter'] = Yii::app()->params['footerErrorSummary'];
-			if (!$muliForm) {
-				$elements['showErrors'] = true;
-			}
-			$elements['activeForm']['id'] = "DynamicForm";
-			$elements['activeForm']['enableClientValidation'] = true;
-			//$elements['activeForm']['enableAjaxValidation'] = false;
-			$elements['activeForm']['class'] = 'CActiveForm';
+
+			$elements['activeForm'] =
+				[
+					'id' => "DesignForm",
+					'class' => 'CActiveForm',
+					'enableClientValidation' => true,
+					'enableAjaxValidation' => true,
+					'clientOptions' => [
+						'validateOnSubmit' => true,
+					]
+			];
 			//print_r($getForm); die();
-			$components = $getForm[0]->surFormHead;
+			$components = $getForm->designFields;
 			$dataArray['getForm'] = $components;
-			$inputType = 'text';
 			// add componentName form element
-			$dynamicDataAttributes['componentName'] = 1;
+			$dynamicDataAttributes['componentName'] = '';
 			$dynamicLabels['componentName'] = "Component Name";
-			$elements['elements']['componentName'] = array(
+			//$elements['elements']['type'] = 'form';
+			$elements['elements']['componentName'] = [
 				'label'    => "Component Name",
 				'required' => true,
 				'type'     => 'text',
-			);
+			];
+			$dynamicRules[] = ['componentName','required'];
+
 			// hide the label for multiple form layout
-			if ($muliForm) {
+			$elements['elements']['componentName']['layout'] = '{label} {input} {hint} {error}';
+			if ($multiForm) {
 				$elements['elements']['componentName']['layout'] = '{input} {hint} {error}';
-			} else {
-				$elements['elements']['componentName']['layout'] = '{label} {input} {hint} {error}';
 			}
 			foreach ($components as $valu) {
+				$attributeId = $valu->inputName . "_" . $valu->subFormId;
+				$dynamicRules[] = [$attributeId, $valu->required ? 'required' : 'safe'];
 				//set the model attribute array
-				$dynamicDataAttributes[$valu->inputName . "-" . $valu->subFormId] = 1;
-				$dynamicLabels[$valu->inputName . "-" . $valu->subFormId] = $valu->label;
-				//update the element type
-				if ($valu->inputType == 'int') {
-					$inputType = 'text';
-				} else {
-					if ($valu->inputType == 'select') {
-						$inputType = 'dropdownlist';
-					} else {
-						$inputType = 'text';
-					}
-				}
+				$dynamicDataAttributes[$attributeId] = '';
+				$dynamicLabels[$attributeId] = $valu->label;
 
 				$hightlightClass = "";
 				if (isset($attributeArray[$valu->subFormId])) {
 					$hightlightClass = "attributeHighlight";
 				}
-				$attributeId = $valu->inputName . "-" . $valu->subFormId;
 				// add the elements to the CForm array
-				$elements['elements'][$attributeId] = array(
+				$elements['elements'][$attributeId] = [
 					'label'    => $valu->label,
 					'required' => $valu->required,
-					'type'     => $inputType,
-//                        'layout' => '{input}{error}',
+					'type'     => $valu->inputType,
 					'class'    => $hightlightClass
-				);
+				];
 				// hide the label for multiple form layout
-				if ($muliForm) {
+				if ($multiForm) {
 					$elements['elements'][$attributeId]['layout'] = '{input} {hint} {error}';
 				} else {
-					// Add an image icon that will be displayed on the ui to show more infor
-					$button = CHtml::image('', '', array(
-						'id'      => 'moreInfoButton' . $valu->subFormId,
-						'style'   => 'cursor:pointer',
-						'class'   => 'ui-icon ui-icon-info',
-						'title'   => 'More Information',
-						'onClick' => '$("#moreInfoDialog").html($("#popupData' . $valu->subFormId . '").html());$("#moreInfoDialog").dialog("open")'
-					));
-					// Add the image icon and information to the layout/ui
 					if (!empty($valu->moreInfo) && !empty($valu->url) && !empty($valu->description)) {
-						$elements['elements'][$attributeId]['layout'] = '{label}<div class="componentImagePopup">' . $button .
-							'</div>{hint} {input}' . '<div id="popupData' . $valu->subFormId . '" style="display:none">' . $valu->moreInfo . '</div>' .
-							'<div class="componentDataPopup">' . $valu->description .
-							' <br/> <a href=' . $valu->url . ' target=_blank>' . $valu->url . '</a></div> {error}';
+						$elements['elements'][$attributeId]['title'] = '<p>'. $valu->description .
+							'</p><p>' . $valu->moreInfo . '</p><p>' . $valu->url;
 					}
 				}
 
@@ -520,30 +751,31 @@ class DesignController extends RiskController {
 				//$elements['elements']['componentName']['value'] = $componentData['componentName'];
 				//}
 				//add the dropdown parameters
-				if ($inputType == 'dropdownlist') {
-					$data = Options::model()->findAll(array(
-						'condition' => 'elementId=:elementId',
-						'params'    => array(
-							':elementId' => $valu->subFormId
-						),
-					));
-					$items = array();
-					// process the dropdown data into an array
-					foreach ($data as $params) {
-						$items[$params->optionId] = $params->label;
-					}
+				if ($valu->inputType == 'dropdownlist') {
+
 					// add the dropdown items to the element
-					$elements['elements'][$valu->inputName . "-" . $valu->subFormId]['items'] = $items;
+					$elements['elements'][$attributeId]['items'] = CHtml::listData(Options::model()->findAll([
+						'condition' => 'componentId=:componentId',
+						'params'    => [
+							':componentId' => $valu->subFormId
+						],
+					]), 'optionId', 'label');
+					$elements['elements'][$attributeId]['prompt'] = 'Select one';
 				}
 			}
-			$elements['buttons'] = array(
-				'newComponent' => array(
+			$elements['buttons'] = [
+				'newComponent' => [
 					'type'  => 'submit',
 					'label' => 'Create Component',
-				),
-			);
+				],
+			];
 		}
-		$returnArray = array('elements' => $elements, 'dynamicDataAttributes' => $dynamicDataAttributes, 'dynamicLabels' => $dynamicLabels);
+		$returnArray = [
+			'elements' => $elements,
+			'dynamicDataAttributes' => $dynamicDataAttributes,
+			'dynamicLabels' => $dynamicLabels,
+			'dynamicRules' => $dynamicRules
+		];
 		return $returnArray;
 	}
 
@@ -556,46 +788,49 @@ class DesignController extends RiskController {
 		Yii::log("actionEditComponent DesignController called", "trace", self::LOG_CAT);
 		$component = new ComponentHead;
 		$componentDetails = new ComponentDetails;
-		$dataArray = array();
+		$dataArray = [];
 		$dataArray['formType'] = 'Edit';
-		$model = new DynamicForm();
-		$attributeArray = array();
-		if (empty($_GET['compId'])) {
+		$model = new DesignForm();
+		$attributeArray = [];
+		if (empty($_GET['id'])) {
 			Yii::app()->user->setFlash('error', Yii::t("translation", "Please select a component to edit"));
-			$this->redirect(array('design/listComponents'));
+			$this->redirect(['design/listComponents']);
 		}
-		if (!empty(Yii::app()->session['surDesign']) && !empty($_GET['compId'])) {
+		if (!empty(Yii::app()->session['surDesign'])) {
 			//fetch the form data
 			$fetchComponentData = Yii::app()->db->createCommand()
-				->select('cd.componentDetailId, cd.componentId, cd.subFormId, cd.value, sd.inputName, sd.inputType,ch.componentName')
+				->select('cd.componentDetailId, cd.componentId, cd.subFormId, cd.value, sd.inputName,
+				sd.inputType,ch.componentName, op.optionId, op.label')
 				->from('componentDetails cd')
 				->join('surFormDetails sd', 'sd.subFormId = cd.subFormId')
 				->join('componentHead ch', 'ch.componentId = cd.componentId')
-				->where('cd.componentId =' . $_GET['compId'])
+				->leftJoin('options op', 'op.componentId = sd.subFormId')
+				->where('cd.componentId =' . $_GET['id'])
 				->queryAll();
 			//print_r($fetchComponentData);
 			//arrange data in array
-			$componentData = array();
+			$componentData = [];
 
 			$returnArray = self::getElementsAndDynamicAttributes();
-			$returnArray['elements']['buttons'] = array(
-				'updateComponent' => array(
+			$returnArray['elements']['buttons'] = [
+				'updateComponent' => [
 					'type'  => 'submit',
 					'label' => 'Update component',
-				),
-			);
+				],
+			];
 			$elements = $returnArray['elements'];
 			//$model = new ComponentsForm;
-			$model->_dynamicFields = $returnArray['dynamicDataAttributes'];
-			$model->_dynamicLabels = $returnArray['dynamicLabels'];
+			$model->setProperties($returnArray['dynamicDataAttributes']);
+			$model->setAttributeLabels($returnArray['dynamicLabels']);
+			$model->setRules($returnArray['dynamicRules']);
 
 			// update the model with the data values and add id
 			foreach ($fetchComponentData as $dat) {
-				$compKey = $dat['inputName'] . "-" . $dat['subFormId'];
-				$componentData[$compKey] = array(
+				$compKey = $dat['inputName'] . "_" . $dat['subFormId'];
+				$componentData[$compKey] = [
 					'value' => $dat['value'],
 					'id'    => $dat['componentDetailId']
-				);
+				];
 				$model->{$compKey} = $dat['value'];
 				// add the component name to the array as well but just once
 				if (empty($componentData['componentName'])) {
@@ -603,57 +838,57 @@ class DesignController extends RiskController {
 					$model->componentName = $dat['componentName'];
 				}
 			}
+			//var_dump($model, $fetchComponentData); die;
 
 			// generate the components form
 			$form = new CForm($elements, $model);
-
+			if(Yii::app()->getRequest()->getIsAjaxRequest()) {
+				echo CActiveForm::validate( [$model]);
+				Yii::app()->end();
+			}
 			//validate and save the component data
-			if ($form->submitted('DynamicForm') && $form->validate()) {
+			if ($form->submitted('DesignForm') && $form->validate()) {
 				//print_r($form->getModel()); die();
 				$component->setIsNewRecord(false);
 				$component->componentName = $form->model->componentName;
 				$component->frameworkId = Yii::app()->session['surDesign']['id'];
-				$component->componentId = $_GET['compId'];
+				$component->componentId = $_GET['id'];
 				//save the componentHead values
 				$component->save();
-				//$componentId = $component->componentId;
-				$componentId = $_GET['compId'];
+				$form->model->unsetProperties(['componentName']);
+				//var_dump($form->model); die;
+				$componentId = $_GET['id'];
 				// fetch the form data
 				foreach ($form->model as $key => $val) {
-					//ignore the attribute arrays
-					if (!is_array($key) && !is_array($val)) {
-						if ($key != "componentName") {
-							$componentDetails = new ComponentDetails;
-							// record found edit record
-							if (!empty($componentData[$key])) {
-								$componentDetails->setIsNewRecord(false);
-								$componentDetails->componentDetailId = $componentData[$key]['id'];
-								$componentDetails->componentId = $componentId;
-								$componentDetails->value = $val;
-								$componentDetails->save(false);
-								// record not found add new record
-							} else {
-								$componentDetails->setIsNewRecord(true);
-								$componentDetails->componentDetailId = null;
-								$componentDetails->componentId = $componentId;
-								$params = explode("-", $key);
-								$componentDetails->subFormId = $params[1];
-								$componentDetails->value = $val;
-								$componentDetails->save();
+					$componentDetails = new ComponentDetails();
+					// record found edit record
+					if (!empty($componentData[$key])) {
+						$componentDetails->setIsNewRecord(false);
+						$componentDetails->componentDetailId = $componentData[$key]['id'];
+						$componentDetails->componentId = $componentId;
+						$componentDetails->value = $val;
+						$componentDetails->save(false);
+						// record not found add new record
+					} else {
+						$componentDetails->setIsNewRecord(true);
+						$componentDetails->componentDetailId = null;
+						$componentDetails->componentId = $componentId;
+						$params = explode("_", $key);
+						$componentDetails->subFormId = $params[1];
+						$componentDetails->value = $val;
+						$componentDetails->save();
 
-							}
-						}
 					}
 				}
 				Yii::app()->user->setFlash('success', Yii::t("translation", "Component successfully updated"));
-				$this->redirect(array('listComponents'));
+				$this->redirect(['getDesignElements']);
 			}
+			$this->render('component', [
+				'model'     => $model,
+				'dataArray' => $dataArray,
+				'form'      => $form
+			]);
 		}
-		$this->render('component', array(
-			'model'     => $model,
-			'dataArray' => $dataArray,
-			'form'      => $form
-		));
 	}
 
 
@@ -665,41 +900,38 @@ class DesignController extends RiskController {
 	public function actionListComponents() {
 		Yii::log("actionListComponents DesignController called", "trace", self::LOG_CAT);
 		//$model = new ComponentHead;
-		$dataArray = array();
-		$dataArray['componentList'] = json_encode(array());
+		$dataArray = [];
+		$dataArray['componentList'] = json_encode([]);
 		$dataArray['dtHeader'] = "Components List";
-		$componentListArray = array();
-		$formDetailsArray = array();
+		$componentListArray = [];
+		$formDetailsArray = [];
 
 		if (!empty(Yii::app()->session['surDesign'])) {
 			// get list of surveillance designs
-			$componentList = ComponentHead::model()->with("compDetails")->findAll(array(
+			$componentList = ComponentHead::model()->with("compDetails")->findAll([
 				//'select' => 'pageId, pageName',
 				'condition' => 'frameworkId=:frameworkId',
-				'params'    => array(
+				'params'    => [
 					':frameworkId' => Yii::app()->session['surDesign']['id'],
-				),
-			));
-			$formDetails = SurFormDetails::model()->findAll(array(
+				],
+			]);
+			$formDetails = SurFormDetails::model()->findAll([
 				//'select' => 'pageId, pageName',
-				'condition' => 'formId=:formId  and showOnComponentList=:showOnList',
-				'params'    => array(
-					// ':formId' => Yii::app()->session['surDesign']['goalId'],
-					// Make the form active.
-					':formId'     => 1,
+				'condition' => 'showOnComponentList=:showOnList',
+				'params'    => [
 					':showOnList' => true,
-				),
-			));
+				],
+			]);
 			$selectOptions = Options::model()->findAll();
-			$optionsArray = array();
+			$optionsArray = [];
 			// process the selecte options data into an array
 			foreach ($selectOptions as $params) {
 				$optionsArray[$params->optionId] = $params->label;
 			}
-			$selectElement = array();
+			$selectElement = [];
 			foreach ($formDetails as $data) {
 				$formDetailsArray[$data->subFormId] = $data->label;
-				if ($data->inputType == "select") {
+				if ($data->inputType == "dropdownlist") {
 					$selectElement[$data->subFormId] = $data->subFormId;
 				}
 			}
@@ -707,34 +939,19 @@ class DesignController extends RiskController {
 			// format datatable data
 			$count = 0;
 			foreach ($componentList as $com) {
-				//print_r($com->compDetails); die();
-				$deleteButton = "";
-				$editButton = "";
-				$deleteButton = "<button id='deleteComponent" . $com->componentId .
-					"' type='button' class='bdelete' onclick=\"$('#deleteBox').dialog('open');" .
-					"deleteConfirm('" . $com->componentName . "', '" .
-					$com->componentId . "')\">Remove</button>";
-				$editButton = "<button id='editComponent" . $com->componentId .
-					"' type='button' class='bedit' onclick=\"window.location.href ='" .
-					$this->createUrl('design/editComponent/', array(
-							'compId' => $com->componentId
-						)
-					) .
-					"'\">Edit</button>";
+
 				$duplicateButton = "<button id='duplicateComponent" . $com->componentId .
 					"' type='button' class='bcopy' onclick=\"$('#copyBox').dialog('open');" .
 					"duplicatePopup('" . $com->componentId . "', '" .
 					$com->componentName . "')\">Duplicate</button>";
-				$componentListArray[$count] = array(
+				$componentListArray[$count] = [
 					'componentId'     => $com->componentId,
 					'frameworkId'     => $com->frameworkId,
 					'name'            => $com->componentName,
 					//'description' => $com->comments,
-					'editButton'      => $editButton,
-					'deleteButton'    => $deleteButton,
 					'duplicateButton' => $duplicateButton,
-				);
-				$subDetails = array();
+				];
+				$subDetails = [];
 				foreach ($com->compDetails as $data) {
 					$subDetails[$data->subFormId] = $data->value;
 				}
@@ -755,15 +972,15 @@ class DesignController extends RiskController {
 		$dataArray['componentList'] = json_encode($componentListArray);
 		// return ajax json data
 		if (!empty($_GET['getComponents'])) {
-			$jsonData = json_encode(array("aaData" => $componentListArray));
+			$jsonData = json_encode(["aaData" => $componentListArray]);
 			echo $jsonData;
 			return;
 		}
-		$this->render('componentList', array(
+		$this->render('componentList', [
 			//'model' => $model,
 			'dataArray'    => $dataArray,
 			'columnsArray' => $formDetailsArray
-		));
+		]);
 	}
 
 	/**
@@ -773,16 +990,17 @@ class DesignController extends RiskController {
 	 */
 	public function actionDeleteComponent() {
 		Yii::log("actionDeleteComponent called", "trace", self::LOG_CAT);
-		if (isset($_POST["delId"])) {
-			$record = ComponentHead::model()->findByPk($_POST['delId']);
+		if (isset($_GET["id"])) {
+			$record = ComponentHead::model()->findByPk($_GET['id']);
 			if (!$record->delete()) {
-				Yii::log("Error Deleing user:" . $_POST['delId'], "warning", self::LOG_CAT);
+				Yii::log("Error Deleing user:" . $_GET['id'], "warning", self::LOG_CAT);
 				//echo $errorMessage;
-				echo Yii::t("translation", "A problem occured when deleting a component ") . $_POST['delId'];
+				echo Yii::t("translation", "A problem occured when deleting the component") ;
 			} else {
-				echo Yii::t("translation", "The component ") . Yii::t("translation", " has been successfully deleted");
+				echo Yii::t("translation", "The component has been successfully deleted");
 			}
 		}
+		return;
 	}
 
 	/**
@@ -827,7 +1045,7 @@ class DesignController extends RiskController {
 	 * @return void
 	 */
 	protected function performAjaxValidation($model) {
-		if (isset($_POST['ajax']) && $_POST['ajax'] === 'newDesignForm') {
+		if (isset($_POST['ajax']) && $_POST['ajax'] === 'DesignForm') {
 			echo CActiveForm::validate($model);
 			Yii::app()->end();
 		}
@@ -840,9 +1058,9 @@ class DesignController extends RiskController {
 	 */
 	public function actionGetComponentMenu() {
 		if (!empty($_GET['parentId'])) {
-			$this->renderPartial('componentMenu', array(
+			$this->renderPartial('componentMenu', [
 				'parentId' => $_GET['parentId']
-			), false, true);
+			], false, true);
 		}
 	}
 
@@ -855,19 +1073,19 @@ class DesignController extends RiskController {
 		Yii::log("actionFetchComponents DesignController called", "trace", self::LOG_CAT);
 
 		$postData = $_POST;
-		$data = GoalData::model()->findAll(array(
+		$data = GoalData::model()->findAll([
 			'select'    => 'pageId, pageName',
 			'condition' => 'parentId=:parentId',
-			'params'    => array(
+			'params'    => [
 				':parentId' => $postData['FrameworkContext']['goalId'],
-			),
-		));
+			],
+		]);
 
 		$data = CHtml::listData($data, 'pageId', 'pageName');
 		//print_r($data);
 		foreach ($data as $value => $name) {
 			echo CHtml::tag('option',
-				array('value' => $value), CHtml::encode($name), true);
+				['value' => $value], CHtml::encode($name), true);
 		}
 	}
 }

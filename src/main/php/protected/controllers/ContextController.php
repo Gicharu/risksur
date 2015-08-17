@@ -415,7 +415,7 @@ class ContextController extends RiskController {
 	private function getSteps() {
 		$steps = array();
 		$stepsArray = SurveillanceSections::model()
-			->findAll();
+			->findAll("tool='surveillance'");
 		foreach($stepsArray as $step) {
 			$steps[$step->sectionId] = $step->sectionName;
 		}
@@ -546,6 +546,7 @@ class ContextController extends RiskController {
 			$form['context']->model = $surveillanceModel;
 		}
 		$form['contextFields']->model = $dForm;
+		//print_r($form); die;
 		$fieldData = [];
 		//$form->loadData();
 		if ($form->submitted('next')) {

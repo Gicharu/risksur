@@ -21,6 +21,7 @@ class SurFormDetails extends CActiveRecord {
 	public $showOnComponentList;
 	public $url;
 	public $moreInfo;
+	public $value;
 
 	/**
 	 * model
@@ -28,7 +29,7 @@ class SurFormDetails extends CActiveRecord {
 	 * @param mixed $className
 	 * @static
 	 * @access public
-	 * @return void
+	 * @return static
 	 */
 	public static function model($className = __CLASS__) {
 		return parent::model($className);
@@ -38,7 +39,7 @@ class SurFormDetails extends CActiveRecord {
 	 * tableName
 	 *
 	 * @access public
-	 * @return void
+	 * @return string
 	 */
 	public function tableName() {
 		return 'surFormDetails';
@@ -48,7 +49,7 @@ class SurFormDetails extends CActiveRecord {
 	 * rules 
 	 * 
 	 * @access public
-	 * @return void
+	 * @return array
 	 */
 	public function rules() {
 		// NOTE: you should only define rules for those attributes that
@@ -67,7 +68,7 @@ class SurFormDetails extends CActiveRecord {
 	 * relations
 	 *
 	 * @access public
-	 * @return void
+	 * @return array
 	 */
 	public function relations() {
 		return array('surFormElements' => array(self::BELONGS_TO, 'SurForm', 'formId'));
@@ -77,7 +78,7 @@ class SurFormDetails extends CActiveRecord {
 	 * primaryKey
 	 *
 	 * @access public
-	 * @return void
+	 * @return string
 	 */
 	public function primaryKey() {
 		return 'subFormId';

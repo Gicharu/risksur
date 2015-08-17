@@ -1,6 +1,6 @@
 	<script type="text/javascript">
 $(function(){
-	clist = $("<?php echo '#componentList'; ?>").dataTable({
+	clist = $('#componentList').dataTable({
 		"sDom": '<"H"rlTf>t<"F"ip>',
 		"oTableTools": {
 		"sSwfPath": "<?php echo Yii::app()->request->baseUrl; ?>/js/copy_csv_xls_pdf.swf",
@@ -72,9 +72,23 @@ $(function(){
 					echo '{"mDataProp": "' . $key . '", "bVisible": true},';
 				}
 			?>
-			{"mDataProp": "editButton", "bVisible": true},
-			{"mDataProp": "deleteButton", "bSortable": false, "bVisible": true },
-			{"mDataProp": "duplicateButton", "bSortable": false, "bVisible": true },
+			{
+				"mDataProp": null,
+				"bSortable": false,
+				"sWidth": '5%',
+				"sDefaultContent": '<button class="bcopy">Duplicate</button>'
+			},
+			{
+				"mDataProp": null,
+				"bSortable": false,
+				"sWidth": '5%',
+				"sDefaultContent": '<button class="bedit">Edit</button>'
+			},
+			{
+				"mDataProp": null,
+				"bSortable": false,
+				"sWidth": '5%',
+				"sDefaultContent": '<button class="bdelete">Delete</button>'			},
 		],
 		// update the buttons stying after the table data is loaded
 		"fnDrawCallback": function() {
@@ -87,22 +101,31 @@ $(function(){
 		},
 		"bJQueryUI": true,
 		//"sPaginationType": "customListbox",
-		"sPaginationType": "buttons_input",
-		"iDisplayLength": 10,
-		"aLengthMenu": [[10, 25, 50, 75, 100], [10, 25, 50, 75, 100]],
-		"bFilter": true,
-		"bSort": true,
-		"bInfo": true,
-		"bLengthChange": true
-	});
+		"sPaginationType": "buttons_input"
+		//"iDisplayLength": 10,
+
+	})
+		.on('click', '.bdelete', {
+			operation: 'delete',
+			link: '<?= $this->createUrl("deleteComponent"); ?>',
+			refreshLink: '<?= $this->createUrl("listComponents") . '/getComponents/1'; ?>',
+			table: '#componentList',
+			rowIdentifier: 'componentId'
+		}, requestHandler)
+		.on('click', '.bedit', {
+			operation: 'edit',
+			link: '<?= $this->createUrl("editComponent"); ?>',
+			table: '#componentList',
+			rowIdentifier: 'componentId'
+		}, requestHandler);
 	// click event to show component details
-	$('.<?php echo "showDetails"; ?>').die('click').live('click', function() {
-				var aPos = clist.fnGetPosition(this); /* Get current  row pos */
-				//console.log(aPos);
-				var aData = clist.fnGetData(aPos[0]); /* Get the full row     */
-				//console.log(aData);
-				var componentId = aData['componentId'];
-		window.location.href = '<?php echo CController::createUrl("design/showComponent"); ?>' + "?compId=" + componentId;
+	$('.showDetails').die('click').live('click', function() {
+		var aPos = clist.fnGetPosition(this); /* Get current  row pos */
+		//console.log(aPos);
+		var aData = clist.fnGetData(aPos[0]); /* Get the full row     */
+		//console.log(aData);
+		var componentId = aData['componentId'];
+		window.location.href = '<?= $this->createUrl("showComponent"); ?>' + "/compId/" + componentId;
 	});
 
 	$("#copyBox").dialog({
@@ -187,47 +210,7 @@ $(function(){
 		} else {
 			updateTips("The value of new component name cannot be empty.");
 		}
-	}
-
-	deleteConfirm = function(confirmMsg, deleteVal) {
-	$('#deleteBox').html("<p>Are you sure you want to delete '" + confirmMsg + "' </p>");
-	$("#deleteBox").dialog('option', 'buttons', {
-		"Confirm" : function() {
-			//console.log(actionVal + ":" + confirmMsg + ":" + deleteVal + ":" + msgDivId + ":" + widId);
-				$(this).dialog("close");
-				  var opt = {'loadMsg': 'Processing delete user'};
-				$("#listComponent").showLoading(opt);
-				$.ajax({type: 'POST',
-					url: <?php echo "'" . CController::createUrl('design/deleteComponent') . "'"; ?>,
-					data: {delId:deleteVal},
-					success: function(data){
-						var checkSuccess = /successfully/i;
-						if (checkSuccess.test(data)) {
-							// add process message
-							$("#ajaxFlashMsg").html(data);
-							$("#ajaxFlashMsgWrapper").attr('class', 'flash-success').show();
-						} else{
-							// add process message
-							$("#ajaxFlashMsg").html(data);
-							$("#ajaxFlashMsgWrapper").attr('class', 'flash-error').show();
-						}
-						clist.fnReloadAjax("listComponents/getComponents/1");
-						$("#listComponent").hideLoading();
-					},
-						error: function(data){
-							$("#ajaxFlashMsg").html("Error occured while deleting data");
-							$("#ajaxFlashMsgWrapper").attr('class', 'flash-error').show();
-							//console.log("error occured while posting data" + data);
-							$("#listComponent").hideLoading();
-						},
-							dataType: "text"
-				});
-		},
-			"Cancel" : function() {
-				$(this).dialog("close");
-			}
-	});
-}
+	};
 
 	function duplicatePopup(oldComponentId, oldComponentName){
 		$('#headerCopyBox').html("<p><?php echo Yii::t('translation', 'Please provide a new component name for copy of ')?> '" + oldComponentName + "' </p>");
@@ -244,9 +227,9 @@ $(function(){
 					echo '<th title = "' . $val . '">' . $val . '</th>';
 				}
 			?>
+			<th title = "Duplicate">Duplicate</th>
 			<th title = "Edit">Edit</th>
 			<th title = "Delete">Delete</th>
-			<th title = "Duplicate">Duplicate</th>
 		</tr>
 		</thead>
 		<tbody>

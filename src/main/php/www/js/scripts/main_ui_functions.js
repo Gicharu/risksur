@@ -475,6 +475,7 @@ var requestHandler = function(event) {
             "/id/" + rowId;
             break;
         case 'delete':
+           //console.log(rowId, event.data.link, event.data.refreshLink, table);
             deleteConfirm(rowId, event.data.link, event.data.refreshLink, table);
             break;
         default:
@@ -483,7 +484,7 @@ var requestHandler = function(event) {
 
 };
 var deleteConfirm = function(deleteVal, delLink, reloadLink, table) {
-    console.log(deleteVal, delLink, reloadLink, table);
+    //console.log(deleteVal, delLink, reloadLink, table);
     $('body #deleteBox')
         .html("<p>Are you sure you want to delete this item </p>")
         .dialog('option', 'buttons', {

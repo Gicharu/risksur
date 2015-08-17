@@ -12,8 +12,21 @@
 class ComponentDetails extends CActiveRecord {
 
 	/**
-	 * model 
-	 * 
+	 * @return array validation rules for model attributes.
+	 */
+	public function rules() {
+		// NOTE: you should only define rules for those attributes that
+		// will receive user inputs.
+		return [
+			['componentId, subFormId', 'numerical', 'integerOnly' => true],
+			['value', 'length', 'max' => 254],
+			['comments', 'safe'],
+		];
+	}
+
+	/**
+	 * model
+	 *
 	 * @param mixed $className 
 	 * @static
 	 * @access public
