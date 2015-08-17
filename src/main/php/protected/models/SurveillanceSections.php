@@ -37,7 +37,11 @@ class SurveillanceSections extends CActiveRecord {
 		return array(
 			'frameworkFields' => array(self::HAS_MANY, 'FrameworkFields', 'sectionId'),
 			'survData' => array(self::HAS_MANY, 'FrameworkFieldData', array('id' => 'frameworkFieldId'),
-				'through' => 'frameworkFields')
+				'through' => 'frameworkFields'),
+			'designFields' => array(self::HAS_MANY, 'SurFormDetails', 'sectionId',
+				'order' => '`sectionNumber` ASC, `order` ASC'),
+			'designData' => array(self::HAS_MANY, 'ComponentDetails', array('subFormId' => 'subFormId'),
+				'through' => 'designFields'),
 		);
 	}
 

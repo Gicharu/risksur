@@ -1,3 +1,11 @@
+<?php
+/**
+ * @var $form CForm
+ * @var $formHeader CForm
+ * @var $modelArray Array
+ * @var $elements Array
+ */
+?>
 <h3>Create Components for <?php echo Yii::app()->session['surDesign']['name'];?></h3>
 <?php
 	echo $formHeader->renderBegin();
@@ -9,7 +17,7 @@
 		$headerTd .= '<td>' . CHtml::activeLabelEx($form->getModel(), $element->name) . '</td>';
 	}
 
-$headerTd .= "<td width='3%'>" . CHtml::htmlButton(Yii::t('translation', 'Copy First Row'), array(
+$headerTd .= "<td width='3%'>" . CHtml::htmlButton(Yii::t('translation', 'Copy First Row'), [
 		'onClick' =><<<END
 js:var rowIndex = 0; 
 var data = $(".tabular-input-container tr").eq(rowIndex).find("input[type=text],textarea,select").serializeArray(); 
@@ -29,9 +37,8 @@ END
 		'title' =>'Copy First Row',
 		'type' => 'button',
 		'id' => 'copyRow'
-	)
+	]
 ) . "</td>";
-
 
 ?>
 <script type="text/javascript">
@@ -42,7 +49,7 @@ $(function() {
 		},
 		text:false
 	});
-	var $inputs = $('#DynamicForm :input');
+	var $inputs = $('#DesignForm :input');
 	$inputs.each(function() {
 		if($(this).hasClass('error')) {
 			$('<div class="errorMessage">This field is required</div>').appendTo($(this).parent());
@@ -57,7 +64,7 @@ $(function() {
 });
 </script>
 <div class="form">
-	<?php $this->widget('ext.widgets.tabularinput.XTabularInput', array(
+	<?php $this->widget('ext.widgets.tabularinput.XTabularInput', [
 		'models' => $modelArray,
 		'form' => $form,
 		'elements' => $elements,
@@ -70,11 +77,11 @@ $(function() {
 		'inputUrl' => $this->createUrl('design/addMultipleComponents'),
 		'addTemplate' => '<tbody><tr><td colspan="' . $cols .'">{link}</td></tr></tbody>',
 		'addLabel' => Yii::t('ui','Add new row'),
-		'addHtmlOptions' => array('class' => 'addNewButton'),
+		'addHtmlOptions' => ['class' => 'addNewButton'],
 		'removeTemplate' => '<td>{link}</td>',
 		'removeLabel' => Yii::t('ui','&nbsp&nbsp'),
-		'removeHtmlOptions' => array('class' => 'trashIcon')
-	));	?>
+		'removeHtmlOptions' => ['class' => 'trashIcon']
+	]);	?>
 </div>
 <?php
 	echo $formHeader->renderButtons();
