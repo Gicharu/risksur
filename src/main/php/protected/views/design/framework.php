@@ -27,7 +27,7 @@
 					},
 					dataType: "json",
 					success: function (data) {
-						console.log($(this).parents('div')[0], $(this).parent().parent()[0])
+						//console.log($(this).parents('div')[0], $(this).parent().parent()[0])
 						$(this).not('p .btn').parents('div.row').siblings().remove();
 						$(this).parents('fieldset div:first-child').after(data.formData);
 

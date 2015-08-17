@@ -3,6 +3,8 @@ INSERT INTO `surveillanceSections` (`sectionId`, `sectionNumber`, `sectionName`,
 (9, 3.0, 'Objective and Target population', 'design', 'Each surveillance component is targeted at a particular susceptible population, for which conclusions will be made. In this step, you will be guided through the process of defining this population.'),
 (10, 4.0, 'Suspicion of disease', 'design', 'In this section you will be asked to think about how a suspected case of the hazard of interest is defined and reported to the relevant authorities. This is relevant to passive surveillance components where the collection of surveillance data is observer -initiated. ');
 
+SET FOREIGN_KEY_CHECKS=0;
+
 TRUNCATE TABLE `surFormDetails`;
 --
 -- Dumping data for table `surFormDetails`
@@ -22,6 +24,7 @@ INSERT INTO `surFormDetails` (`subFormId`, `sectionId`, `order`, `inputName`, `l
   (12, 9, '3.1.0', '', '3.1 Surveillance Objective', 'label', 0, 0, 0, NULL, NULL, NULL),
   (13, 9, '3.2.0', NULL, '3.2 Target species / animal group / material', 'label', 0, 0, 0, NULL, NULL, NULL),
   (14, 9, '3.3.0', NULL, '3.3 Sectors missed', 'label', 0, 0, 0, NULL, NULL, NULL);
+SET FOREIGN_KEY_CHECKS=1;
 
 
 UPDATE `options` SET `optionId` = 1,`frameworkFieldId` = NULL,`componentId` = 5,`elementId` = NULL,`val` = '',`label` = 'At the source (farm, wild life habitat, etc)' WHERE `options`.`optionId` = 1;

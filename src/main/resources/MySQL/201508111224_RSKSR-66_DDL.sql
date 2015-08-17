@@ -11,9 +11,14 @@ ALTER TABLE `surFormDetails`
 DROP FOREIGN KEY `surFormDetails_ibfk_1`;
 
 ALTER TABLE `surFormDetails`
-CHANGE `sectionId` `sectionId` INT(11) NULL;
+CHANGE `formId` `sectionId` INT(11) NULL;
 
 ALTER TABLE `surFormDetails`
 ADD COLUMN `parentId` INT(11) NULL AFTER `sectionId`;
 
+ALTER TABLE `attributeFormRelation`
+DROP FOREIGN KEY `fk_attributeFormRelation_surFormDetails`;
+
+ALTER TABLE `surFormDetails`
+ADD COLUMN `order` VARCHAR(10) NULL;
 

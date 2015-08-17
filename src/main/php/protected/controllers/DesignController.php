@@ -364,7 +364,7 @@ class DesignController extends RiskController {
 						}
 						Yii::app()->user->setFlash('success', Yii::t("translation", "Components successfully created"));
 
-						$this->redirect(['listComponents']);
+						$this->redirect(['getDesignElements']);
 					}
 				}
 			}
@@ -423,21 +423,7 @@ class DesignController extends RiskController {
 		$properties['propertyNames'] = [];
 		preg_match('/(\[\w*\])?\[(\w*)\]/', $componentName, $matches);
 		$indexString = $matches[1];
-//		foreach($rsDesignData[0]->designFields as $field) {
-//			$fieldName = $indexString . $field->inputName . '_' . $field->subFormId;
-//			foreach($rsDesignData[0]->designData as $fieldData) {
-//				//print_r($fieldData);
-//				if($field->inputName == 'targetSpecies') {
-//					$model->setPropertyName('otherTargetSpecies', 'Target Species: ' .$fieldData->value);
-//
-//				}
-//				if(isset($fieldData->subFormId) && $fieldData->subFormId == $field->subFormId) {
-//					$model->setPropertyName($fieldName, $fieldData->value);
-//					break;
-//				}
-//
-//			}
-//		}
+
 		foreach($rsDesignData as $section) {
 			if($section->sectionNumber == '2.0') {
 				foreach($section->designFields as $sectionField) {
@@ -482,6 +468,11 @@ class DesignController extends RiskController {
 
 						}
 					}
+					$elements['elements'][$fieldName] = [
+						'label'    => $designField->label,
+						'required' => $designField->required,
+						'type'     => $designField->inputType,
+					];
 					foreach($section->designData as $fieldData) {
 
 						if($designField->subFormId == $fieldData->subFormId &&
@@ -489,11 +480,6 @@ class DesignController extends RiskController {
 							$properties['propertyNames'][$property] = $fieldData->value;
 
 						}
-						$elements['elements'][$fieldName] = [
-							'label'    => $designField->label,
-							'required' => $designField->required,
-							'type'     => $designField->inputType,
-						];
 					}
 				}
 			}
@@ -502,8 +488,8 @@ class DesignController extends RiskController {
 		$model->setAttributeLabels($properties['propertyLabels']);
 		$model->setRules($properties['rules']);
 		$form = new CFormTabular($elements, $model, null, trim($indexString, '[, ]'));
-		//print_r($form->getActiveFormWidget()); die;
-		//print_r($properties); die;
+//		print_r($form->render()); die;
+//		print_r($elements); die;
 		echo json_encode(['formData' => $form->renderElements(), 'index' => $indexString]);
 		return;
 
@@ -675,24 +661,24 @@ class DesignController extends RiskController {
 			// show only the elements where showOnMultiForm = true for multi form layout
 			if ($multiForm) {
 				$getFormCondition .= ' AND showOnMultiForm=:showOnMulti';
-				$getFormParams[] = ['showOnMulti' => 1];
+				$getFormParams['showOnMulti'] = 1;
 			}
 			$getForm = SurveillanceSections::model()->with('designFields')->find([
 				//'select' => 'pageId, pageName',
 				'condition' => $getFormCondition,
 				'params'    => $getFormParams
 			]);
-			if (!empty(Yii::app()->session['performanceAttribute'])) {
-				$attributeList = AttributeFormRelation::model()->findAll([
-					'condition' => 'attributeId=:attributeId',
-					'params'    => [
-						':attributeId' => Yii::app()->session['performanceAttribute']['id'],
-					],
-				]);
-				foreach ($attributeList as $attrs) {
-					$attributeArray[$attrs->subFormId] = $attrs->subFormId;
-				}
-			}
+//			if (!empty(Yii::app()->session['performanceAttribute'])) {
+//				$attributeList = AttributeFormRelation::model()->findAll([
+//					'condition' => 'attributeId=:attributeId',
+//					'params'    => [
+//						':attributeId' => Yii::app()->session['performanceAttribute']['id'],
+//					],
+//				]);
+//				foreach ($attributeList as $attrs) {
+//					$attributeArray[$attrs->subFormId] = $attrs->subFormId;
+//				}
+//			}
 			$elements['title'] = "Components Form";
 			$elements['showErrorSummary'] = true;
 			$elements['showErrors'] = true;
@@ -856,7 +842,10 @@ class DesignController extends RiskController {
 
 			// generate the components form
 			$form = new CForm($elements, $model);
-
+			if(Yii::app()->getRequest()->getIsAjaxRequest()) {
+				echo CActiveForm::validate( [$model]);
+				Yii::app()->end();
+			}
 			//validate and save the component data
 			if ($form->submitted('DesignForm') && $form->validate()) {
 				//print_r($form->getModel()); die();
@@ -892,7 +881,7 @@ class DesignController extends RiskController {
 					}
 				}
 				Yii::app()->user->setFlash('success', Yii::t("translation", "Component successfully updated"));
-				$this->redirect(['listComponents']);
+				$this->redirect(['getDesignElements']);
 			}
 			$this->render('component', [
 				'model'     => $model,
