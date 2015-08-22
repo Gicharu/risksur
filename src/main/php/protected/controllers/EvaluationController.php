@@ -367,7 +367,7 @@ class EvaluationController extends RiskController {
 			$questions = $model->with('evalQuestionAnswers')->findAllByPk($questionId);
 			//print_r($questions); die;
 		}
-		if (!empty($questions[0]->flag) && 'final' == $questions[0]->flag) {
+		if (isset($questions[0]->flag) && 'final' == $questions[0]->flag) {
 			Yii::app()->user->setFlash('success', 'A question has been selected as per your previous choices');
 			$this->redirect(['evaluation/evalQuestionList', 'questionId' => $questionId]);
 		}
@@ -376,6 +376,9 @@ class EvaluationController extends RiskController {
 		foreach ($questions[0]['evalQuestionAnswers'] as $answerKey => $answer) {
 			if (!empty($answer->url)) {
 				$link = CHtml::link($answer->optionName, $this->createUrl($answer->url));
+				if($answer->url == 'epitools') {
+					$link = CHtml::link($answer->optionName, Yii::app()->params['other']['epitoolsUrl'], ['target' => '_blank']);
+				}
 				//$questions[0]['evalQuestionAnswers'][$answerKey]->unsetAttributes();
 			}
 		}
@@ -388,10 +391,6 @@ class EvaluationController extends RiskController {
 				'items'        => $model->getItems($questions[0]['evalQuestionAnswers'])
 			]
 		];
-		if (!empty($link)) {
-			array_push($elements['elements'], $link);
-		}
-		//print_r($questions[0]['evalQuestionAnswers']); die('pooop');
 		$elements['buttons'] = [
 			'back'   => [
 				'type'    => 'button',
@@ -406,6 +405,17 @@ class EvaluationController extends RiskController {
 
 			]
 		];
+		if(isset($questions[0]->flag) && 'end' == $questions[0]->flag) {
+			unset($elements['elements']['question']);
+			unset($elements['buttons']);
+			$link = '<br />' .
+				CHtml::link('Click here to select an evaluation question', $this->createUrl('evalQuestionList'));
+		}
+
+		if (!empty($link)) {
+			array_push($elements['elements'], $link);
+		}
+		//print_r($questions[0]['evalQuestionAnswers']); die('pooop');
 		$form = new CForm($elements, $model);
 		$this->render('evalQuestion', compact('form'));
 	}
@@ -770,18 +780,19 @@ class EvaluationController extends RiskController {
 			'legalReq' => 'Legal Requirements',
 		];
 //		$evaDetails[] = ['Evaluation Name', $model['evaluationName']];
-
+		//print_r($surveillanceRs); die;
 		$surveillanceSummary = [];
 		$surveillanceSummary[] = ['Surveillance system name', Yii::app()->session['surDesign']['name']];
 		foreach($surveillanceRs as $surveillanceFieldKey => $surveillanceField) {
 			if(isset($surveillanceFields[$surveillanceField->inputName])) {
 				$surveillanceFieldKey++;
 				$surveillanceKey = $surveillanceFields[$surveillanceField->inputName];
-				$surveillanceSummary[$surveillanceFieldKey]= [$surveillanceKey, $surveillanceField->data[0]['value']];
-				if(!empty($surveillanceField->options) && DForm::isJson($surveillanceField->data[0]['value'])) {
-					//die('pop');
+				$surveillanceKeyValue = isset($surveillanceField->data[0]['value']) ?
+					$surveillanceField->data[0]['value'] : '';
+				$surveillanceSummary[$surveillanceFieldKey]= [$surveillanceKey, $surveillanceKeyValue];
+				if(!empty($surveillanceField->options) && DForm::isJson($surveillanceKeyValue)) {
 					foreach($surveillanceField->options as $option) {
-						if(($dataValue = json_decode($surveillanceField->data[0]['value'])[0]) == $option->optionId) {
+						if(($dataValue = json_decode($surveillanceKeyValue[0])) == $option->optionId) {
 							$surveillanceSummary[$surveillanceFieldKey] =
 								[$surveillanceKey,  $option->label];
 						}
@@ -791,30 +802,7 @@ class EvaluationController extends RiskController {
 
 			}
 		}
-		//print_r($surveillanceSummary); die;
 
-//		$componentsRs = Yii::app()->db->createcommand()
-//			->select('ch.componentName, cd.value, sfd.inputName')
-//			->from('componentHead ch')
-//			->join('componentDetails cd', 'ch.componentId=cd.componentId')
-//			->join('surFormDetails sfd', 'cd.subFormId=sfd.subFormId')
-//			->where('ch.frameworkId=:id', [':id' => $this->frameworkId])
-//			->queryAll();
-//		$components = '<ul>';
-//		if (!empty($componentsRs)) {
-//			foreach ($componentsRs as $component) {
-//				$components .= '<li><b>' . $component['inputName'] . '</b>: ' .
-//					$component['value'] . '</li>';
-//			}
-//			//print_r($components); die;
-//			array_push($surveilanceRs, [
-//				'inputName' => 'Components',
-//				'value'     => $components]);
-//
-//		}
-//		$components .= '</ul>';
-		//print_r(array('inputName' => 'Component', 'value' => array_values($components))); die;
-//print_r(json_encode(array("aaData" => $surveilanceRs))); die;
 		echo json_encode(["aaData" => $surveillanceSummary], JSON_UNESCAPED_SLASHES);
 		return;
 
