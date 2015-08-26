@@ -49,6 +49,21 @@ $(function() {
 		},
 		text:false
 	});
+	$('form [title!=""]').qtip({
+		content: {
+			title: {
+				text: 'Info',
+				button: 'Close'
+			}
+		},
+		style: {
+			widget: true,
+			def: false
+		},
+		hide: {
+			event: 'click'
+		}
+	});
 	var $inputs = $('#DesignForm :input');
 	$inputs.each(function() {
 		if($(this).hasClass('error')) {

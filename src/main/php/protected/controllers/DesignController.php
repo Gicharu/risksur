@@ -303,12 +303,6 @@ class DesignController extends RiskController {
 			// generate the components form
 			$form = new CForm($elements, $model);
 			$formHeader = new CForm($elements, $model);
-			// Select all values whose inputType is "Select"
-			//$fetchOptions = Yii::app()->db->createCommand()
-			//->select('sfd.subFormId, sfd.label')
-			//->from('surFormDetails sfd')
-			//->where('sfd.inputType ="select"')
-			//->queryAll();
 			// ajax request to add a new row
 			if ($form->submitted('DesignForm')) {
 				//print_r($form->model); die;
@@ -735,11 +729,10 @@ class DesignController extends RiskController {
 				// hide the label for multiple form layout
 				if ($multiForm) {
 					$elements['elements'][$attributeId]['layout'] = '{input} {hint} {error}';
-				} else {
-					if (!empty($valu->moreInfo) && !empty($valu->url) && !empty($valu->description)) {
-						$elements['elements'][$attributeId]['title'] = '<p>'. $valu->description .
-							'</p><p>' . $valu->moreInfo . '</p><p>' . $valu->url;
-					}
+				}
+				if (!empty($valu->moreInfo) && !empty($valu->url) && !empty($valu->description)) {
+					$elements['elements'][$attributeId]['title'] = '<p>'. $valu->description .
+						'</p><p>' . $valu->moreInfo . '</p><p>' . $valu->url;
 				}
 
 				// add the values to the form

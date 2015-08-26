@@ -10,7 +10,7 @@
 			window.location = '<?php echo $this->createUrl("surFormDetails/index"); ?>';
 		});
 		$(".inputTypeSelect").on('change', function() {
-			if(this.value == 'select') {
+			if(this.value == 'dropdownlist') {
 				$("#optsContainer").show();
 				optsTable.fnReloadAjax('<?php echo $this->createUrl("surFormDetails/getInputTypeOpts", array("subFormId" => $model->subFormId)); ?>');
 			} else {
@@ -25,7 +25,7 @@
 			"bProcessing": true,
 			"aoColumns": [
 				{"mData": "label", "sTitle": "Label"},
-				{"mData": "val", "sTitle": "Value"}
+				{"mData": "optionId", "sTitle": "Value"}
 			],
 			"oLanguage": {
 				"sEmptyTable": "There are no options for this form element"
@@ -33,7 +33,7 @@
 			"aLengthMenu": [[5, 10, 25, 50, 75], [5, 10, 25, 50, 75]]
 
 		});
-		if($(".inputTypeSelect").val() == 'select') {
+		if($(".inputTypeSelect").val() == 'dropdownlist') {
 			optsTable.fnReloadAjax('<?php echo $this->createUrl("surFormDetails/getInputTypeOpts", array("subFormId" => $model->subFormId)); ?>');
 			$("#optsContainer").show();
 			optsTable.fnDraw();
@@ -63,12 +63,13 @@
 	<?php echo $form->errorSummary($model, Yii::app()->params['headerErrorSummary'],
 		Yii::app()->params['footerErrorSummary']); ?>
 		<!-- status is active by default -->
-	<!-- <div class="row">
-		<?php //echo $form->labelEx($model, 'formId'); ?>
-		<?php //echo $form->dropDownList($model, 'formId', CHtml::listData(SurForm::model()->findAll(), 'formId', 'formName')); ?>
-		<?php //echo $form->error($model, 'formId'); ?>
+	 <div class="row">
+		<?php echo $form->labelEx($model, 'sectionId'); ?>
+		<?php echo $form->dropDownList($model, 'sectionId', CHtml::listData(SurveillanceSections::model()
+			->findAll("tool='design'"), 'sectionId', 'sectionName')); ?>
+		<?php echo $form->error($model, 'sectionId'); ?>
 	</div>
- -->
+
 	<div class="row">
 		<?php echo $form->labelEx($model, 'inputName'); ?>
 		<?php echo $form->textField($model, 'inputName',array('size' => 50,'maxlength' => 50)); ?>
@@ -83,8 +84,13 @@
 
 	<div class="row">
 		<?php echo $form->labelEx($model,'inputType'); ?>
-		<?php echo $form->dropDownList($model,'inputType',array('text' => 'Text', 'select' => 'Drop down', 'int' => 'Integer'),
-			array('class' => 'inputTypeSelect')); ?>
+		<?php echo $form->dropDownList($model,'inputType', [
+			'text' => 'Text',
+			'dropdownlist' => 'Drop down',
+			'textarea' => 'Text area',
+			'label' => 'Label'
+		],
+			['class' => 'inputTypeSelect']); ?>
 		<?php echo $form->error($model,'inputType'); ?>
 		<div id="optsContainer" style="width: 40%; display: none">
 			<table id="optsTable" cellpadding="0" cellspacing="0" border="0" class="display">

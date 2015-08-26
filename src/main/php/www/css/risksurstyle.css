@@ -567,7 +567,7 @@ caption, th {
     text-align: center;
 }
 input, textarea, select {
-    width: 220px;
+    width: 250px;
 }
 .dtCheck {
     width: 25px;
@@ -1363,9 +1363,12 @@ div.attrHead a, div.attrHead button span {
 }
 #grpAccordion ul {
     line-height: 2em;
+
 }
 #wzd-menu {
     padding: 0;
+    width: 100%;
+
 }
 
 #wzd-menu li {
@@ -1374,9 +1377,10 @@ div.attrHead a, div.attrHead button span {
     display: inline;
     font-weight: bold;
     list-style: none;
-    margin: 0 20px 0 -23px;
-    padding: 0.3em 10px 0.3em 23px;
+    margin: 0 20px 0 -1.6em;
+    padding: 0.2em 0.4em 0.3em 0.6em;
     position: relative;
+    font-size: 0.9em
 }
 
 #wzd-menu li:before {
@@ -1385,11 +1389,11 @@ div.attrHead a, div.attrHead button span {
     position:absolute;
     width:0;
     height:0;
-    top:0px; /* controls vertical position */
-    right:-20px; /* value = - border-left-width - border-right-width */
+    top:0.3em; /* controls vertical position */
+    right:-0.8em; /* value = - border-left-width - border-right-width */
     bottom:auto;
     left:auto;
-    border-width:15px 0 15px 15px;
+    border-width:0.6em 0 0.6em 0.7em;
     border-style:solid;
     border-color:transparent #fff;
     z-index: 1;
@@ -1404,11 +1408,12 @@ div.attrHead a, div.attrHead button span {
     height:0;
 
 
-    top:1px; /* value = (:before top) + (:before border-top) - (:after border-top) */
-    right:-15px; /* value = - border-left-width - border-right-width */
+    top:0.3em; /* value = (:before top) + (:before border-top) - (:after border-top) */
+    right:-0.7em; /* value = - border-left-width - border-right-width */
     bottom:auto;
     left:auto;
-    border-width:15px 0 15px 11px;
+    /*border-width:15px 0 15px 11px;*/
+    border-width:0.6em 0 0.6em 0.5em;
     border-style:solid;
     border-color:transparent #fff;
     z-index: 1;
@@ -1416,7 +1421,7 @@ div.attrHead a, div.attrHead button span {
 
 #wzd-menu li.wzd-first {
     margin-left:0;
-    padding-left: 10px;
+    padding-left: 0.4em;
 }
 
 #wzd-menu li.wzd-last:before, #wzd-menu li.wzd-last:after {
@@ -1461,6 +1466,12 @@ div.form {
 }
 div.form label {
     font-size: 1em;
+}
+div.form .hint {
+    color: #003b78;
+}
+div.form fieldset legend {
+    font-weight: bold;
 }
 div.surHeading {
     background-color: #003b78;

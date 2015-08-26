@@ -22,7 +22,8 @@
 		$baseUrl . "/libraries/DataTables-1.9.4/extras/TableTools/media/css/TableTools.css" => "all",
 		$baseUrl . "/css/jquery.selectBoxIt.css" => "all",
 		$baseUrl . "/libraries/jquery-qtip/jquery.qtip.min.css" => "all",
-		$baseUrl . "/css/risksurstyle.css" => "noMedia", 
+		$baseUrl . "/libraries/chosen_v1.1.0/chosen.css" => "all",
+		$baseUrl . "/css/risksurstyle.css" => "noMedia",
 
 	);
 	// array of javascript include paths
@@ -47,7 +48,7 @@
 		"/js/common.js",
 		"/libraries/jquery-showloading-1.0/jquery.showLoading.js",
 		//"/libraries/jsTimezoneDetect-1.0.4/jstz.min.js",
-		"/libraries/chosen_v1.3.0/chosen.jquery.js",
+		"/libraries/chosen_v1.1.0/chosen.jquery.js",
 		"/libraries/jquery-qtip/jquery.qtip.min.js",
 
 	);

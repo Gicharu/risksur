@@ -17,20 +17,20 @@
 				['label'  => Yii::t("translation", "New Surveillance System"), 'url' => ['create'],
 					'active' => strstr('create', $currentView)],
 				['label'  => Yii::t("translation", "List Existing Systems"), 'url' => ['list'],
-					'active' => strstr('list', $currentView)],
-				['label'       => Yii::t("translation", "List Components"), 'url' => ['design/listComponents'],
-					'itemOptions' => ['id' => 'showComponents']],
+					'active' => strstr('list', $currentView)]
+//				['label'       => Yii::t("translation", "List Components"), 'url' => ['design/listComponents'],
+//					'itemOptions' => ['id' => 'showComponents']],
 			];
 		}
 		// Setup Design controller side menus
 		if (Yii::app()->controller->id == 'design') {
 
 			$this->menu = array(
-				array('label'       => Yii::t("translation", "Design Component"), 'url' => array('addComponent'),
+				array('label'       => Yii::t("translation", "Introduction"), 'url' => array('index'),
 					'itemOptions' => array(
-						'id' => 'addComponent'
+						'id' => 'index'
 					),
-					'active' => strstr('addComponent', $currentView),
+					'active' => strstr('index', $currentView),
 				),
 				array('label'  => Yii::t("translation", "Add Components"),
 					'url' => array('addMultipleComponents'), 'itemOptions' => array(
