@@ -68,6 +68,7 @@
 			if (isset($_POST['SurFormDetails'])) {
 				$model->attributes = $_POST['SurFormDetails'];
 				if ($model->save()) {
+					Yii::app()->user->setFlash('success', Yii::t("translation", "Form field updated successfully"));
 					$this->redirect(array('index'));
 					return;
 				}

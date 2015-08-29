@@ -49,21 +49,7 @@ $(function() {
 		},
 		text:false
 	});
-	$('form [title!=""]').qtip({
-		content: {
-			title: {
-				text: 'Info',
-				button: 'Close'
-			}
-		},
-		style: {
-			widget: true,
-			def: false
-		},
-		hide: {
-			event: 'click'
-		}
-	});
+
 	var $inputs = $('#DesignForm :input');
 	$inputs.each(function() {
 		if($(this).hasClass('error')) {
@@ -76,27 +62,75 @@ $(function() {
 			}
 		});
 	});
+
+	$('select')
+		.on('chosen:ready', function(chosen) {
+			//console.log($(chosen.currentTarget).attr('oldtitle'));
+			//console.log(chosen);
+			$(chosen.currentTarget.nextSibling).attr('title', $(chosen.currentTarget).attr('title'));
+			$('form [title!=""]').qtip({
+				overwrite: true,
+				content: {
+					title: {
+						text: 'Info',
+						button: 'Close'
+					}
+				},
+				style: {
+					widget: true,
+					def: false
+				},
+				hide: {
+					event: 'click'
+				}
+			});
+		})
+		.chosen({
+			create_option: function(term){
+				var chosen = this;
+				var options = {
+					label: term,
+					componentId: $(chosen.form_field).data('field'),
+					scenario: 'addComponentField'
+				};
+				console.log(options);
+				//return;
+				$.post('<?= $this->createUrl("options/addOption"); ?>', {options}, function(data){
+					if(data.optionId != '') {
+						chosen.append_option({
+							value: data.optionId,
+							text: data.label
+						});
+
+					}
+				}, 'json');
+			},
+			skip_no_results: true
+		});
+
 });
 </script>
 <div class="form">
-	<?php $this->widget('ext.widgets.tabularinput.XTabularInput', [
-		'models' => $modelArray,
-		'form' => $form,
-		'elements' => $elements,
-		'containerTagName' => 'table',
-		'headerTagName' => 'thead',
-		'header' => '<tr>' . $headerTd . '</tr>',
-		'inputContainerTagName' => 'tbody',
-		'inputTagName' => 'tr',
-		'inputView' => '_tabularInputAsTable',
-		'inputUrl' => $this->createUrl('design/addMultipleComponents'),
-		'addTemplate' => '<tbody><tr><td colspan="' . $cols .'">{link}</td></tr></tbody>',
-		'addLabel' => Yii::t('ui','Add new row'),
-		'addHtmlOptions' => ['class' => 'addNewButton'],
-		'removeTemplate' => '<td>{link}</td>',
-		'removeLabel' => Yii::t('ui','&nbsp&nbsp'),
-		'removeHtmlOptions' => ['class' => 'trashIcon']
-	]);	?>
+	<?php
+		$this->widget('ext.widgets.tabularinput.XTabularInput', [
+			'models' => $modelArray,
+			'form' => $form,
+			'elements' => $elements,
+			'containerTagName' => 'table',
+			'headerTagName' => 'thead',
+			'header' => '<tr>' . $headerTd . '</tr>',
+			'inputContainerTagName' => 'tbody',
+			'inputTagName' => 'tr',
+			'inputView' => '_tabularInputAsTable',
+			'inputUrl' => $this->createUrl('design/addMultipleComponents'),
+			'addTemplate' => '<tbody><tr><td colspan="' . $cols .'">{link}</td></tr></tbody>',
+			'addLabel' => Yii::t('ui','Add new row'),
+			'addHtmlOptions' => ['class' => 'addNewButton'],
+			'removeTemplate' => '<td>{link}</td>',
+			'removeLabel' => Yii::t('ui','&nbsp&nbsp'),
+			'removeHtmlOptions' => ['class' => 'trashIcon']
+		]);
+	?>
 </div>
 <?php
 	echo $formHeader->renderButtons();

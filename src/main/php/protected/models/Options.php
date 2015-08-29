@@ -76,6 +76,14 @@ class Options extends CActiveRecord {
 			[
 				'frameworkFieldId',
 				'required', 'on' => 'addFrameworkField'
+			],
+			[
+				'componentId',
+				'required', 'on' => 'addComponentField'
+			],
+			[
+				'elementId',
+				'required', 'on' => 'addElementField'
 			]
 		];
 	}

@@ -113,8 +113,7 @@ $(function(){
 
 	</script>
 
-<div id="listSurveilance" width="100%">
-	
+<div id="listSurveilance">
 	<table id="surveillanceList" width="100%" border="0" cellspacing="0" cellpadding="0">
 		<thead>
 		<tr>

@@ -246,13 +246,13 @@ if (!Yii::app()->user->isGuest) {
 			$activeDesignName = Yii::app()->session['surDesign']['name'] . ' - ';
 			$activeDesignAction = 'Change';
 		}
-		echo "Selected Surveillance System: $activeDesignName <a href='" . Yii::app()->createUrl("context/list") . "'>$activeDesignAction</a>";
+		echo "Selected surveillance system: $activeDesignName <a href='" . Yii::app()->createUrl("context/list") . "'>$activeDesignAction</a>";
 	?>
 	</div>
 	<div id="evalName">
 	<?php
 		if (!empty(Yii::app()->session['evaContext']) && Yii::app()->controller->id == 'evaluation') {
-			echo "Selected Evaluation Context: " . Yii::app()->session['evaContext']['name'];
+			echo "Selected evaluation context: " . Yii::app()->session['evaContext']['name'];
 		}
 	?>
 	</div>
@@ -265,7 +265,7 @@ if (!Yii::app()->user->isGuest) {
 				$activeAttributeName = Yii::app()->session['performanceAttribute']['name'] . ' - ';
 				$activeAttributeAction = 'Change';
 			}
-			echo "Selected Performance Attribute: $activeAttributeName <a href='" . Yii::app()->createUrl("attribute/selectAttribute") . "'>$activeAttributeAction</a>";
+			echo "Selected evaluation attribute: $activeAttributeName <a href='" . Yii::app()->createUrl("attribute/selectAttribute") . "'>$activeAttributeAction</a>";
 		}
 	?>
 	</div>

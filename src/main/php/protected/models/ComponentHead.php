@@ -50,8 +50,14 @@ class ComponentHead extends CActiveRecord {
 	 * @return array
 	 */
 	public function relations() {
-		return array(
-			'compDetails' => array( self::HAS_MANY, 'ComponentDetails', 'componentId' )
-		);
+		return [
+			'compDetails' => [self::HAS_MANY, 'ComponentDetails', 'componentId'],
+			'compData' => [
+				self::HAS_MANY,
+				'SurFormDetails',
+				['subFormId' => 'subFormId'],
+				'through' => 'compDetails'
+			]
+		];
 	}
 }
