@@ -458,6 +458,9 @@ class DesignController extends RiskController {
 						//'required' => 1,
 						'type'     => $componentElement->inputType
 					];
+					if (!empty($componentElement->description)) {
+						$elements['elements'][$componentKey]['elements'][$elementInputName]['title'] = UtilModel::urlToLink($componentElement->description);
+					}
 					$attributes[$elementInputName] = '';
 					$rules[] = [$elementInputName, $componentElement->required ? 'required' : 'safe'];
 					$labels[$elementInputName] = $componentElement->label;
@@ -530,6 +533,72 @@ class DesignController extends RiskController {
 			Yii::log('Error while updating component ' . $e->getMessage());
 			return false;
 		}
+	}
+
+	public function actionReports($system = null) {
+		$systemDropdown = CHtml::listData(FrameworkContext::model()
+				->findAll('userId=:userId', [':userId' => Yii::app()->user->id]), 'frameworkId', 'name');
+
+//		$model = new DesignForm();
+//		$model->setPropertyName('systemSelect', '');
+//		$model->setAttributeLabels(['systemsSelect' => 'Surveillance system']);
+//		$model->setRules([['systemSelect', 'required']]);
+//		$form = new CForm($elements, $model);
+		$reportData = [];
+		if($system !== null) {
+
+			$rsFramework = FrameworkContext::model()
+				->with(['fields' => [ 'condition' => "inputName='hazardName' OR inputName='survObj'"]])
+				->findByPk($system);
+			if($rsFramework !== null) {
+				$reportData[] = ['Surveillance system', $rsFramework->name, 'Surveillance System'];
+				$specialInputTypes = array_flip(['dropdownlist', 'checkboxlist', 'radiolist']);
+				foreach($rsFramework->fields as $surField) {
+					foreach($rsFramework->data as $surData) {
+						if($surData->frameworkFieldId == $surField->id) {
+							$fieldValue = $surData->value;
+							$fieldLabel = 'Hazard name';
+							if(isset($specialInputTypes[$surField->inputType])) {
+								$fieldLabel = 'Surveillance objective';
+								$fieldValue = Options::model()->findByPk($surData->value, ['select' => 'optionId, label'])->label;
+							}
+							$reportData[] = [$fieldLabel, $fieldValue, 'Surveillance System'];
+							break;
+						}
+					}
+				}
+				$rsDesign = ComponentHead::model()
+					->with('compData', 'compDetails')
+					->findAll('frameworkId=:framework', [':framework' => $system]);
+				if($rsDesign !== null) {
+					foreach($rsDesign as $design) {
+						$reportData[] = ['Component name', $design->componentName, $design->componentName];
+						foreach($design->compData as $designField) {
+							foreach($design->compDetails as $designData) {
+								if($designField->subFormId == $designData->subFormId) {
+									$fieldValue = $designData->value;
+									$fieldLabel = isset($designField->label) ?
+										$designField->label : ComponentHead::model()->generateAttributeLabel($designField->inputName);
+									if(isset($specialInputTypes[$designField->inputType])) {
+//										$fieldLabel = 'Surveillance objective';
+										$option = Options::model()->findByPk($designData->value, ['select' => 'optionId, label']);
+										//print_r($option); echo "\n";
+										$fieldValue = isset($option) ? $option->label : '';
+									}
+									$reportData[] = [$fieldLabel, $fieldValue, $design->componentName];
+									break;
+								}
+
+							}
+						}
+					}
+				}
+
+			}
+			echo json_encode(['aaData' => $reportData], JSON_PRETTY_PRINT);
+			return;
+		}
+		$this->render('reports', ['systemDropdown' => $systemDropdown]);
 	}
 
 
@@ -862,9 +931,8 @@ class DesignController extends RiskController {
 				if ($multiForm) {
 					$elements['elements'][$attributeId]['layout'] = '{input} {hint} {error}';
 				}
-				if (!empty($valu->moreInfo) && !empty($valu->url) && !empty($valu->description)) {
-					$elements['elements'][$attributeId]['title'] = $valu->description .
-						'<br />' . $valu->moreInfo . '<br />' . $valu->url;
+				if (!empty($valu->description)) {
+					$elements['elements'][$attributeId]['title'] = UtilModel::urlToLink($valu->description);
 				}
 
 				// add the values to the form

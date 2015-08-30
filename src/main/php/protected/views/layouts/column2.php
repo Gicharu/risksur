@@ -25,27 +25,31 @@
 		// Setup Design controller side menus
 		if (Yii::app()->controller->id == 'design') {
 
-			$this->menu = array(
-				array('label'       => Yii::t("translation", "Introduction"), 'url' => array('index'),
-					'itemOptions' => array(
+			$this->menu = [
+				['label'       => Yii::t("translation", "Introduction"), 'url' => ['index'],
+					'itemOptions' => [
 						'id' => 'index'
-					),
+					],
 					'active' => strstr('index', $currentView),
-				),
-				array('label'  => Yii::t("translation", "Add Components"),
-					'url' => array('addMultipleComponents'), 'itemOptions' => array(
+				],
+				['label'  => Yii::t("translation", "Add Components"),
+					'url' => ['addMultipleComponents'], 'itemOptions' => [
 					'id' => 'addMultipleComponents'
-				),
+				],
 					'active' => strstr('addMultipleComponents', $currentView),
-				),
-				array('label' => Yii::t("translation", "List Components"), 'url' => array('listComponents'),
-					'itemOptions' => array(
+				],
+				['label' => Yii::t("translation", "List Components"), 'url' => ['listComponents'],
+					'itemOptions' => [
 						'id' => 'showComponents'
-					),
+					],
 					'active' => strstr('listComponents', $currentView),
-				),
-				//array('label'=>'Manage SurFormDetails', 'url'=>array('admin')),
-			);
+					'items' => [
+						['label' => Yii::t("translation", "Add details"),
+						 'url'   => ['getDesignElements']],
+					]
+				],
+				['label'=>'Reports', 'url'=> ['reports']],
+			];
 		}
 		//Evaluation controller side menus
 
