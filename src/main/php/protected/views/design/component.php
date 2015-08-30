@@ -7,11 +7,17 @@
 	$(document).ready(function() {
 		$('[title!=""]').qtip({
 			content: {
-				title: 'Info'
+				title: {
+					text: 'Info',
+					button: 'Close'
+				}
 			},
 			style: {
 				widget: true,
 				def: false
+			},
+			hide: {
+				event: 'click'
 			}
 		});
 	});

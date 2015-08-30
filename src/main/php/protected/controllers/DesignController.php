@@ -266,7 +266,7 @@ class DesignController extends RiskController {
 			]);
 			return;
 		}
-		Yii::app()->user->setFlash('notice', Yii::t("translation", "Please select a surveillance context first"));
+		Yii::app()->user->setFlash('notice', Yii::t("translation", "Please select a surveillance system first"));
 		$this->redirect(['context/list']);
 		return;
 
@@ -303,12 +303,6 @@ class DesignController extends RiskController {
 			// generate the components form
 			$form = new CForm($elements, $model);
 			$formHeader = new CForm($elements, $model);
-			// Select all values whose inputType is "Select"
-			//$fetchOptions = Yii::app()->db->createCommand()
-			//->select('sfd.subFormId, sfd.label')
-			//->from('surFormDetails sfd')
-			//->where('sfd.inputType ="select"')
-			//->queryAll();
 			// ajax request to add a new row
 			if ($form->submitted('DesignForm')) {
 				//print_r($form->model); die;
@@ -402,9 +396,213 @@ class DesignController extends RiskController {
 			]);
 			return;
 		}
-		Yii::app()->user->setFlash('notice', Yii::t("translation", "Please select a surveillance context first"));
+		Yii::app()->user->setFlash('notice', Yii::t("translation", "Please select a surveillance system first"));
 		$this->redirect(['design/listComponents']);
 		return;
+	}
+
+	public function actionEditMultipleComponents() {
+		if (!empty(Yii::app()->session['surDesign'])) {
+//			$getFormCondition = "tool=:design AND sectionNumber=:sectNo";
+//			$getFormParams = [
+//				':design'     => 'design AND showOnMultiForm=:showOnMulti',
+//				':sectNo'     => '2.0',
+//				'showOnMulti' => 1
+//			];
+			if(isset($_POST['DesignForm'])) {
+				if(self::saveUpdatedComponents()) {
+					Yii::app()->user->setFlash('success', 'Components successfully updated');
+					$this->redirect('listComponents');
+					return;
+				}
+				Yii::app()->user->setFlash('error', 'An error occurred while saving the components,' .
+					' please try again or contact your administrator if this problem persists');
+
+			}
+			// Get components belonging to the selected surveillance system
+			$componentCriteria = new CDbCriteria();
+			$componentCriteria->with = ['compDetails', 'compData' => [
+				'condition' => 'showOnMultiForm=:showOnMulti',
+				'params' => [':showOnMulti' => 1]
+			]
+			];
+			$componentCriteria->condition = 'frameworkId=:framework';
+			$componentCriteria->params = [':framework' => Yii::app()->session['surDesign']['id']];
+			$components = ComponentHead::model()->findAll($componentCriteria);
+			if(is_null($components)) {
+				Yii::app()->user->setFlash('notice', 'You need to create a component before you attempt to edit it');
+				$this->redirect('listComponents');
+				return;
+			}
+			$modelArray = [];
+			$elements = ContextController::getDefaultElements();
+			$tableHeader = '';
+			foreach($components as $componentKey => $component) {
+				$labels = [];
+				$rules = [];
+				$attributes = [];
+				$componentInputName = 'componentName_' . $component->componentId;
+				//$elements['elements'][$componentKey]['elements']['type'] = 'form';
+				$elements['elements'][$componentKey]['elements'][$componentInputName] = [
+					'label'    => 'Component Name',
+					'required' => 1,
+					'type'     => 'text'
+				];
+				$attributes[$componentInputName] = $component->componentName;
+				$rules[] = [$componentInputName, 'required'];
+				$labels[$componentInputName] = 'Component Name';
+				foreach($component->compData as $componentElement) {
+					$elementInputName = $componentElement->inputName . '_' . $componentElement->subFormId;
+					$elements['elements'][$componentKey]['elements'][$elementInputName] = [
+						'label'    => $componentElement->label,
+						//'required' => 1,
+						'type'     => $componentElement->inputType
+					];
+					if (!empty($componentElement->description)) {
+						$elements['elements'][$componentKey]['elements'][$elementInputName]['title'] = UtilModel::urlToLink($componentElement->description);
+					}
+					$attributes[$elementInputName] = '';
+					$rules[] = [$elementInputName, $componentElement->required ? 'required' : 'safe'];
+					$labels[$elementInputName] = $componentElement->label;
+					if($componentElement->inputType == 'dropdownlist') {
+						$elements['elements'][$componentKey]['elements'][$elementInputName]['items'] = CHtml::listData(
+							Options::model()
+								->findAll('componentId=:component', [':component' => $componentElement->subFormId]),
+							'optionId', 'label'
+						);
+					}
+					foreach($component->compDetails as $componentData) {
+						if($componentElement->subFormId == $componentData->subFormId) {
+							$attributes[$elementInputName] = $componentData->value;
+							break;
+						}
+					}
+				}
+				$modelArray[$componentKey] = new DesignForm();
+				$modelArray[$componentKey]->setProperties($attributes);
+				$modelArray[$componentKey]->setRules($rules);
+				$modelArray[$componentKey]->setAttributeLabels($labels);
+				if(empty($tableHeader)) {
+					$tableHeader = '<td>' . implode('</td><td>', $labels) . '</td>';
+				}
+
+			}
+
+			$this->render('editMultipleComponents', [
+				'tableHeader' => $tableHeader,
+				'elements'    => $elements,
+				//'dataArray'   => $dataArray,
+				'modelArray'  => $modelArray,
+				//'form'        => $form,
+				//'formHeader'  => $formHeader
+			]);
+			return;
+
+		}
+		Yii::app()->user->setFlash('notice', Yii::t("translation", "Please select a surveillance system first"));
+		$this->redirect(['listComponents']);
+		return;
+	}
+
+	private function saveUpdatedComponents() {
+		$transaction = Yii::app()->db->beginTransaction();
+		try {
+			foreach($_POST['DesignForm'] as $component) {
+				foreach($component as $elementKey => $elementData) {
+					$elementParts = explode('_', $elementKey);
+					echo $elementKey;// die;
+					$compHead = new ComponentHead();
+					if($elementParts[0] == 'componentName') {
+						$compHead->componentName = $elementData;
+						$compHead->componentId = $elementParts[1];
+						$compHead->setIsNewRecord(false);
+						$compHead->save();
+						//print_r($compHead->componentId); die('lklkl');
+					}
+					$compDetails = ComponentDetails::model()->findAll('componentId=' . $elementParts[1]);
+					foreach($compDetails as $componentData) {
+						if($componentData->subFormId == $elementParts[1]) {
+							$componentData->value = $elementData;
+							$componentData->save();
+							break;
+						}
+					}
+
+				}
+			}
+			$transaction->commit();
+			return true;
+		} catch( Exception $e) {
+			$transaction->rollBack();
+			Yii::log('Error while updating component ' . $e->getMessage());
+			return false;
+		}
+	}
+
+	public function actionReports($system = null) {
+		$systemDropdown = CHtml::listData(FrameworkContext::model()
+				->findAll('userId=:userId', [':userId' => Yii::app()->user->id]), 'frameworkId', 'name');
+
+//		$model = new DesignForm();
+//		$model->setPropertyName('systemSelect', '');
+//		$model->setAttributeLabels(['systemsSelect' => 'Surveillance system']);
+//		$model->setRules([['systemSelect', 'required']]);
+//		$form = new CForm($elements, $model);
+		$reportData = [];
+		if($system !== null) {
+
+			$rsFramework = FrameworkContext::model()
+				->with(['fields' => [ 'condition' => "inputName='hazardName' OR inputName='survObj'"]])
+				->findByPk($system);
+			if($rsFramework !== null) {
+				$reportData[] = ['Surveillance system', $rsFramework->name, 'Surveillance System'];
+				$specialInputTypes = array_flip(['dropdownlist', 'checkboxlist', 'radiolist']);
+				foreach($rsFramework->fields as $surField) {
+					foreach($rsFramework->data as $surData) {
+						if($surData->frameworkFieldId == $surField->id) {
+							$fieldValue = $surData->value;
+							$fieldLabel = 'Hazard name';
+							if(isset($specialInputTypes[$surField->inputType])) {
+								$fieldLabel = 'Surveillance objective';
+								$fieldValue = Options::model()->findByPk($surData->value, ['select' => 'optionId, label'])->label;
+							}
+							$reportData[] = [$fieldLabel, $fieldValue, 'Surveillance System'];
+							break;
+						}
+					}
+				}
+				$rsDesign = ComponentHead::model()
+					->with('compData', 'compDetails')
+					->findAll('frameworkId=:framework', [':framework' => $system]);
+				if($rsDesign !== null) {
+					foreach($rsDesign as $design) {
+						$reportData[] = ['Component name', $design->componentName, $design->componentName];
+						foreach($design->compData as $designField) {
+							foreach($design->compDetails as $designData) {
+								if($designField->subFormId == $designData->subFormId) {
+									$fieldValue = $designData->value;
+									$fieldLabel = isset($designField->label) ?
+										$designField->label : ComponentHead::model()->generateAttributeLabel($designField->inputName);
+									if(isset($specialInputTypes[$designField->inputType])) {
+//										$fieldLabel = 'Surveillance objective';
+										$option = Options::model()->findByPk($designData->value, ['select' => 'optionId, label']);
+										//print_r($option); echo "\n";
+										$fieldValue = isset($option) ? $option->label : '';
+									}
+									$reportData[] = [$fieldLabel, $fieldValue, $design->componentName];
+									break;
+								}
+
+							}
+						}
+					}
+				}
+
+			}
+			echo json_encode(['aaData' => $reportData], JSON_PRETTY_PRINT);
+			return;
+		}
+		$this->render('reports', ['systemDropdown' => $systemDropdown]);
 	}
 
 
@@ -646,7 +844,7 @@ class DesignController extends RiskController {
 	 * @param bool $multiForm
 	 * @return array
 	 */
-	public function getElementsAndDynamicAttributes($componentData = [], $multiForm = false) {
+	private function getElementsAndDynamicAttributes($componentData = [], $multiForm = false) {
 		$elements = [];
 		$attributeArray = [];
 		$dynamicDataAttributes = [];
@@ -730,16 +928,15 @@ class DesignController extends RiskController {
 					'label'    => $valu->label,
 					'required' => $valu->required,
 					'type'     => $valu->inputType,
-					'class'    => $hightlightClass
+					'class'    => $hightlightClass,
+					'data-field' => $valu->subFormId
 				];
 				// hide the label for multiple form layout
 				if ($multiForm) {
 					$elements['elements'][$attributeId]['layout'] = '{input} {hint} {error}';
-				} else {
-					if (!empty($valu->moreInfo) && !empty($valu->url) && !empty($valu->description)) {
-						$elements['elements'][$attributeId]['title'] = '<p>'. $valu->description .
-							'</p><p>' . $valu->moreInfo . '</p><p>' . $valu->url;
-					}
+				}
+				if (!empty($valu->description)) {
+					$elements['elements'][$attributeId]['title'] = UtilModel::urlToLink($valu->description);
 				}
 
 				// add the values to the form
@@ -922,21 +1119,14 @@ class DesignController extends RiskController {
 					':showOnList' => true,
 				],
 			]);
-			$selectOptions = Options::model()->findAll();
-			$optionsArray = [];
-			// process the selecte options data into an array
-			foreach ($selectOptions as $params) {
-				$optionsArray[$params->optionId] = $params->label;
-			}
-			$selectElement = [];
-			foreach ($formDetails as $data) {
-				$formDetailsArray[$data->subFormId] = $data->label;
-				if ($data->inputType == "dropdownlist") {
-					$selectElement[$data->subFormId] = $data->subFormId;
-				}
-			}
-			//print_r($componentList); die();
-			// format datatable data
+			$selectOptions = CHtml::listData(Options::model()->findAll([
+				'condition' => 'componentId IS NOT NULL'
+			]), 'optionId', 'label');
+
+
+			//print_r($selectOptions); die;
+
+			// format dataTable data
 			$count = 0;
 			foreach ($componentList as $com) {
 
@@ -945,30 +1135,37 @@ class DesignController extends RiskController {
 					"duplicatePopup('" . $com->componentId . "', '" .
 					$com->componentName . "')\">Duplicate</button>";
 				$componentListArray[$count] = [
-					'componentId'     => $com->componentId,
-					'frameworkId'     => $com->frameworkId,
-					'name'            => $com->componentName,
+					'componentId'  => $com->componentId,
+					'frameworkId'  => $com->frameworkId,
+					'name'          => $com->componentName,
+					'targetSpecies' => '',
+					'targetSector' => '',
+					'dataColPoint' => '',
+					'diseaseType'  => '',
+					'sampleType'   => '',
 					//'description' => $com->comments,
-					'duplicateButton' => $duplicateButton,
+					//'duplicateButton' => $duplicateButton,
 				];
-				$subDetails = [];
-				foreach ($com->compDetails as $data) {
-					$subDetails[$data->subFormId] = $data->value;
-				}
-				foreach ($formDetailsArray as $key => $val) {
-					$columnVal = "";
-					if (!empty($subDetails[$key])) {
-						$columnVal = $subDetails[$key];
-						if (!empty($selectElement[$key]) && !empty($optionsArray[$subDetails[$key]])) {
-							$columnVal = $optionsArray[$subDetails[$key]];
+				foreach ($formDetails as $formInput) {
+					$formDetailsArray[$formInput->inputName] = $formInput->label;
+					foreach ($com->compDetails as $data) {
+						//$subDetails[$data->inputName] = $data->value;
+						if($formInput->subFormId == $data->subFormId) {
+							$componentListArray[$count][$formInput->inputName] = $data->value;
+							if ($formInput->inputType == "dropdownlist" && isset($selectOptions[$data->value])) {
+								$componentListArray[$count][$formInput->inputName] = $selectOptions[$data->value];
+							}
+
 						}
+
 					}
-					$componentListArray[$count][$key] = $columnVal;
 				}
 				$count++;
 
 			}
 		}
+		//print_r($componentListArray); die();
+
 		$dataArray['componentList'] = json_encode($componentListArray);
 		// return ajax json data
 		if (!empty($_GET['getComponents'])) {
@@ -976,10 +1173,18 @@ class DesignController extends RiskController {
 			echo $jsonData;
 			return;
 		}
+		$sureillanceSystems = CHtml::listData(FrameworkContext::model()->findAll([
+			'condition' => 'userId=:userId',
+			'select' => 'frameworkId, name',
+			'params' => [
+				':userId' => Yii::app()->user->id
+			]
+		]), 'frameworkId', 'name');
 		$this->render('componentList', [
 			//'model' => $model,
 			'dataArray'    => $dataArray,
-			'columnsArray' => $formDetailsArray
+			'columnsArray' => $formDetailsArray,
+			'surveillanceSystems' => $sureillanceSystems
 		]);
 	}
 
@@ -1010,12 +1215,13 @@ class DesignController extends RiskController {
 	 */
 	public function actionDuplicateComponent() {
 		Yii::log("actionDuplicateComponent called", "trace", self::LOG_CAT);
-		$component = new ComponentHead;
-		$componentDetails = new ComponentDetails;
 		if (isset($_POST["oldComponentId"]) && $_POST['newComponentName']) {
+			$component = new ComponentHead;
+			$componentDetails = new ComponentDetails;
 			$record = ComponentHead::model()->with("compDetails")->findByPk($_POST['oldComponentId']);
 			$component->componentName = $_POST['newComponentName'];
-			$component->frameworkId = Yii::app()->session['surDesign']['id'];
+			$component->frameworkId = isset($_POST['oldComponentId']) ?
+				$_POST['oldComponentId']: Yii::app()->session['surDesign']['id'];
 			//save the componentHead values
 			$component->save();
 			$componentId = $component->componentId;
@@ -1034,8 +1240,9 @@ class DesignController extends RiskController {
 			echo Yii::t("translation", "Component successfully duplicated");
 		} else {
 			Yii::log("Error duplicating component id:" . $_POST['oldComponentId'], "warning", self::LOG_CAT);
-			echo Yii::t("translation", "A problem occured when duplicating the component ");
+			echo Yii::t("translation", "A problem occurred when duplicating the component ");
 		}
+		return;
 	}
 
 	/**

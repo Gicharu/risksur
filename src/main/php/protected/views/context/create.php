@@ -38,7 +38,7 @@ if(!empty($gridFieldIds)) {
 					'class' => 'btn'
 				],
 				'removeText' => '<span class="ui-icon ui-icon-trash"></span>remove', //uncomment to add remove link
-				'tableLayout' => true,
+				//'tableLayout' => true,
 				'options' => ['limit' => 5]
 			)
 		);

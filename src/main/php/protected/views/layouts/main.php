@@ -22,7 +22,8 @@
 		$baseUrl . "/libraries/DataTables-1.9.4/extras/TableTools/media/css/TableTools.css" => "all",
 		$baseUrl . "/css/jquery.selectBoxIt.css" => "all",
 		$baseUrl . "/libraries/jquery-qtip/jquery.qtip.min.css" => "all",
-		$baseUrl . "/css/risksurstyle.css" => "noMedia", 
+		$baseUrl . "/libraries/chosen_v1.1.0/chosen.css" => "all",
+		$baseUrl . "/css/risksurstyle.css" => "noMedia",
 
 	);
 	// array of javascript include paths
@@ -47,7 +48,7 @@
 		"/js/common.js",
 		"/libraries/jquery-showloading-1.0/jquery.showLoading.js",
 		//"/libraries/jsTimezoneDetect-1.0.4/jstz.min.js",
-		"/libraries/chosen_v1.3.0/chosen.jquery.js",
+		"/libraries/chosen_v1.1.0/chosen.jquery.js",
 		"/libraries/jquery-qtip/jquery.qtip.min.js",
 
 	);
@@ -245,13 +246,13 @@ if (!Yii::app()->user->isGuest) {
 			$activeDesignName = Yii::app()->session['surDesign']['name'] . ' - ';
 			$activeDesignAction = 'Change';
 		}
-		echo "Selected Surveillance System: $activeDesignName <a href='" . Yii::app()->createUrl("context/list") . "'>$activeDesignAction</a>";
+		echo "Selected surveillance system: $activeDesignName <a href='" . Yii::app()->createUrl("context/list") . "'>$activeDesignAction</a>";
 	?>
 	</div>
 	<div id="evalName">
 	<?php
 		if (!empty(Yii::app()->session['evaContext']) && Yii::app()->controller->id == 'evaluation') {
-			echo "Selected Evaluation Context: " . Yii::app()->session['evaContext']['name'];
+			echo "Selected evaluation context: " . Yii::app()->session['evaContext']['name'];
 		}
 	?>
 	</div>
@@ -264,7 +265,7 @@ if (!Yii::app()->user->isGuest) {
 				$activeAttributeName = Yii::app()->session['performanceAttribute']['name'] . ' - ';
 				$activeAttributeAction = 'Change';
 			}
-			echo "Selected Performance Attribute: $activeAttributeName <a href='" . Yii::app()->createUrl("attribute/selectAttribute") . "'>$activeAttributeAction</a>";
+			echo "Selected evaluation attribute: $activeAttributeName <a href='" . Yii::app()->createUrl("attribute/selectAttribute") . "'>$activeAttributeAction</a>";
 		}
 	?>
 	</div>

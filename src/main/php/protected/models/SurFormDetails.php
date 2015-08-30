@@ -11,7 +11,6 @@
  * @license Tracetracker {@link http://www.tracetracker.com}
  */
 class SurFormDetails extends CActiveRecord {
-	public $formId;
 	public $inputName;
 	public $label;
 	public $inputType;
@@ -54,8 +53,8 @@ class SurFormDetails extends CActiveRecord {
 	public function rules() {
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
-		return array(array('formId, inputName, label, inputType, required, showOnComponentList, showOnMultiForm, description, moreInfo, url', 'required'),
-			array('formId', 'numerical', 'integerOnly' => true),
+		return array(array('sectionId, inputName, label, inputType, required, showOnComponentList, showOnMultiForm', 'required'),
+			array('description, moreInfo, url', 'safe'),
 			array('inputName, label, inputType', 'length', 'max' => 50),
 			array('inputName', 'match', 'pattern' => '/^[a-zA-Z0-9]{1,20}$/',
 				'message' => 'input name should not contain spaces or punctuation.'),
@@ -71,7 +70,7 @@ class SurFormDetails extends CActiveRecord {
 	 * @return array
 	 */
 	public function relations() {
-		return array('surFormElements' => array(self::BELONGS_TO, 'SurForm', 'formId'));
+		return array('surFormDetails' => array(self::HAS_MANY, 'ComponentDetails', 'subFormId'));
 	}
 
 	/**
@@ -88,6 +87,6 @@ class SurFormDetails extends CActiveRecord {
 	 * @return array
 	 */
 	public function attributeLabels() {
-		return array('formId' => Yii::t('translation', 'Status'), );
+		return array('sectionId' => Yii::t('translation', 'Section Name'), );
 	}
 }

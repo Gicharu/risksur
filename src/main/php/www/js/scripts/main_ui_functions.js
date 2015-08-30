@@ -478,6 +478,9 @@ var requestHandler = function(event) {
            //console.log(rowId, event.data.link, event.data.refreshLink, table);
             deleteConfirm(rowId, event.data.link, event.data.refreshLink, table);
             break;
+        case 'view':
+            window.location.href = event.data.link + '/id/' + rowId;
+            break;
         default:
             break;
     }

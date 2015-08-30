@@ -27,7 +27,7 @@
 		 * @return void
 		 */
 		public function actionCreate() {
-			$model = new SurFormDetails;
+			$model = new SurFormDetails();
 
 			// Uncomment the following line if AJAX validation is needed
 			// $this->performAjaxValidation($model);
@@ -35,7 +35,7 @@
 			if (isset($_POST['SurFormDetails'])) {
 				$model->attributes = $_POST['SurFormDetails'];
 				// Make the form to be active by default.
-				$model->formId = 1;
+				//$model->formId = 1;
 				Yii::app()->user->setFlash("success", "Form element added successfully");
 				if ($model->save()) {
 					$this->redirect(array('index'));
@@ -68,9 +68,13 @@
 			if (isset($_POST['SurFormDetails'])) {
 				$model->attributes = $_POST['SurFormDetails'];
 				if ($model->save()) {
+					Yii::app()->user->setFlash('success', Yii::t("translation", "Form field updated successfully"));
 					$this->redirect(array('index'));
 					return;
 				}
+				Yii::app()->user->setFlash('error', Yii::t("translation", "There was a problem updating the form field"
+					. " please try again or contact your administrator if the problem persists"));
+
 			}
 
 			$this->render('update', array('model' => $model, ));
@@ -104,17 +108,17 @@
 		 */
 		public function actionIndex() {
 //        $this->layout = '//layouts/column1';
-			$surForms = SurFormDetails::model()->with('surFormElements')->findAll();
+			$surForms = SurFormDetails::model()->findAll();
 			$surFormsArray = array();
 			if (!empty($surForms)) {
 				foreach ($surForms as $surFormKey => $surForm) {
 					$surFormsArray[$surFormKey] = $surForm->getAttributes();
 					// resolve the formId using the surForm table
-					$relations = $surForm->getRelated('surFormElements');
+//					$relations = $surForm->getRelated('surFormElements');
 					$surFormsArray[$surFormKey]['formName'] = '';
-					if (!empty($relations)) {
-						$surFormsArray[$surFormKey]['formName'] = $relations->formName;
-					}
+//					if (!empty($relations)) {
+//						$surFormsArray[$surFormKey]['formName'] = $relations->formName;
+//					}
 				}
 			}
 			//print_r($surFormsArray);
@@ -137,7 +141,7 @@
 			$optArray = array();
 			if (!empty($_GET['subFormId'])) {
 				$subFormId = $_GET['subFormId'];
-				$options = Options::model()->findAll(array("condition" => "elementId = $subFormId", 'select' => 'val, label'));
+				$options = Options::model()->findAll(array("condition" => "componentId = $subFormId", 'select' => 'optionId, label'));
 				if (!empty($options)) {
 					foreach ($options as $opt) {
 						$optArray[] = $opt->getAttributes();

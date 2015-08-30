@@ -87,20 +87,34 @@ class OptionsController extends RiskController {
 	 */
 	public function actionAddOption() {
 		Yii::log("actionIndex OptionsController called", "trace", self::LOG_CAT);
-		$model = new Options;
+		$model = new Options();
 		if (isset($_POST['Options'])) {
 			$model->attributes = $_POST['Options'];
-			if ($model->validate()) {
-				$model->save();
+			if ($model->save()) {
 				Yii::app()->user->setFlash('success', "Option successfully created.");
 				$this->redirect( array( 'options/index' ) );
 			}
+		}
+		// add options via ajax from chosen plugin
+		if(isset($_POST['options'])) {
+			$model->setScenario($_POST['options']['scenario']);
+			unset($_POST['options']['scenario']);
+			$model->attributes = $_POST['options'];
+			if($model->save()) {
+				echo json_encode(ModelToArray::convertModelToArray($model, [$model->tableName() => 'optionId, label']));
+				return;
+			}
+			$model->unsetAttributes();
+			//print_r($model->attributeNames()); die;
+			echo json_encode(['optionId' => '']);
+			return;
+
 		}
 		// Select all values whose inputType is ""Select"
 		$fetchOptions = Yii::app()->db->createCommand()
 			->select('sfd.subFormId, sfd.label')
 			->from('surFormDetails sfd')
-			->where('sfd.inputType ="select"')
+			->where('sfd.inputType ="dropdownlist"')
 			->queryAll();
 
 		$surformdetailsArray = array();
