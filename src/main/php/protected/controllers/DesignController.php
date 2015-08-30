@@ -496,8 +496,12 @@ class DesignController extends RiskController {
 				//'form'        => $form,
 				//'formHeader'  => $formHeader
 			]);
+			return;
 
 		}
+		Yii::app()->user->setFlash('notice', Yii::t("translation", "Please select a surveillance system first"));
+		$this->redirect(['listComponents']);
+		return;
 	}
 
 	private function saveUpdatedComponents() {
