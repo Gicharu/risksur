@@ -25,13 +25,26 @@
 					"bSortable": false,
 					"sWidth": '5%',
 					"sClass": "delMethod",
+					"sDefaultContent": '<button title="Edit" class="bedit">Edit</button>'
+				},
+				{
+					"mData": null,
+					"bSortable": false,
+					"sWidth": '5%',
+					"sClass": "delMethod",
 					"sDefaultContent": '<button title="Delete" class="bdelete">Delete</button>'
 				}
 			],
 			// update the buttons stying after the table data is loaded
 			"fnDrawCallback": function() {
-			$('button.bdelete').button({
-					icons: {primary: "ui-icon-trash"}, text: false});
+				$('button.bdelete').button({
+					icons: {primary: "ui-icon-trash"},
+					text: false
+				});
+				$('button.bedit').button({
+					icons: {primary: "ui-icon-pencil"},
+					text: false
+				});
 			},
 			"bJQueryUI": true,
 			"sPaginationType": "buttons_input",
@@ -49,20 +62,26 @@
 				table: '#evaContext',
 				rowIdentifier: 'evalId'
 			}, requestHandler)
+			.on('click', '.bedit', {
+				operation: 'edit',
+				link: '<?= $this->createUrl("updateEvaContext"); ?>',
+				table: '#evaContext',
+				rowIdentifier: 'evalId'
+			}, requestHandler)
 			.on('click', '.setEvaContext', function() {
 				var table = $("#evaContext").dataTable();
 				var row = table.fnGetPosition(this);
 				var data = table.fnGetData(row[0]);
 				//console.log(data);
 				window.location = '<?= $this->createUrl("setEvaContext"); ?>/id/' +
-				data.evalId + '/name/' + data.evaluationName;
+				data.evalId + '/name/' + data.evaluationName + '/questionId/' + data.questionId;
 			});
 
 	});
 </script>
 <div id="listEvaContext">
 	<p>
-	<?= CHtml::link('New Evaluation Context', $this->createUrl('addEvaContext'), ['class' => 'btn']); ?>
+	<?= CHtml::link('Create new evaluation context', $this->createUrl('addEvaContext'), ['class' => 'btn']); ?>
 	</p>
 	<table id="evaContext" width="100%" class="display">
 		<thead>
@@ -70,6 +89,7 @@
 			<th title = "Evaluation name">Evaluation name</th>
 			<th title = "Surveillance System">Surveillance System</th>
 			<th title = "Evaluation Question">Evaluation Question</th>
+			<th title = "Edit"></th>
 			<th title = "Delete"></th>
 		</tr>
 		</thead>

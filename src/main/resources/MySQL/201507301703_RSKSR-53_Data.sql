@@ -4,7 +4,7 @@ SET
   `id` = 5,
   `sectionId` = 2,
   `parentId` = NULL,
-  `label` = 'What is the state of the diesease in the country?',
+  `label` = 'What is the state of the disease in the country?',
   `inputName` = 'stateOfDisease',
   `inputType` = 'checkboxlist',
   `required` = 1,

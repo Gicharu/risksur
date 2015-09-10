@@ -10,7 +10,7 @@
  *
  */
 
-$this->renderPartial('_page', [
+$this->renderPartial('//system/_page', [
 		'content' => $content,
 		'editAccess' => $editAccess,
 		'editMode' => $editMode

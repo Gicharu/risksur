@@ -18,15 +18,19 @@ class EvalForm extends DForm {
 	}
 
 	/**
-	 * @param $evalId
+	 * @param string $evalId
+	 * @param bool $newRecord
 	 * @return bool
 	 */
-	public function save($evalId) {
+	public function save($evalId, $newRecord = true) {
 		// fetch the form data
 		$evaElements = [];
 		$model = new EvaluationDetails();
 		$transaction = Yii::app()->db->beginTransaction();
 		try{
+			if(!$newRecord) {
+				$model->deleteAll('evalId=:evaId', [':evaId' => $evalId]);
+			}
 			foreach ($this->_properties as $attrNameAndId => $attrVal) {
 				$model->unsetAttributes();
 				$attrParams = explode("_", $attrNameAndId);
@@ -34,7 +38,7 @@ class EvalForm extends DForm {
 				$evaElements['evalElementsId'] = $attrParams[1];
 				$evaElements['value'] = is_array($attrVal) ? json_encode($attrVal): $attrVal;
 				$model->attributes = $evaElements;
-				//var_dump($evaElements);
+				//print_r($model->attributes); die;
 				$model->setIsNewRecord(true);
 				$model->save();
 			}

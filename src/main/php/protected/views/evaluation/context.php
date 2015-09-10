@@ -37,6 +37,18 @@
 						"sZeroRecords": "No surveillance system summary available"
 					}
 				});
+
+				$('#EvalForm_evaType_5').on('change', function() {
+					//console.log($(this).parent().next('div').hide());
+					if($(this).val() == '0') {
+						$(this).parent().next('.row').toggle();
+						$(this).parent().next('.row').children('input').val(0);
+						return true;
+					}
+					$(this).parent().next('.row').children('input').val('');
+					$(this).parent().next('.row').toggle();
+
+				});
 			});
 		</script>
 	</div>

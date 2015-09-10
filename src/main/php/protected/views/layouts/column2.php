@@ -70,10 +70,10 @@
 				      'url'   => ["$currentController/listEvaContext"]],
 				['label' => Yii::t("translation", "Select Evaluation Question"),
 				      'url'   => ["$currentController/selectEvaQuestion"]],
-				['label' => Yii::t("translation", "Select Evaluation Method"),
+				['label' => Yii::t("translation", "Select Evaluation Methods"),
 				      'url'   => ["$currentController/index"], 'items' => [
 					['label' => Yii::t("translation", "Select components"),
-					      'url'   => "#"],
+					      'url'   => ["$currentController/selectComponents"]],
 					['label' => Yii::t("translation", "Select attributes"),
 						  'url'   => ["$currentController/selectEvaAttributes"]],
 					['label' => Yii::t("translation", "Select assessment method"),
@@ -82,8 +82,8 @@
 				],
 				['label' => Yii::t("translation", "Summary of the evaluation protocol"),
 					'url' => ["$currentController/evaSummary"]],
-//				['label' => 'Perform the evaluation', 'url' => ["$currentController/index"]],
-//				['label' => 'How to report on the evaluation results', 'url' => ["$currentController/index"]]
+				['label' => 'Perform the evaluation', 'url' => ["$currentController/performEvaluation"]],
+				['label' => 'How to report on the evaluation results', 'url' => ["$currentController/report"]]
 
 			];
 		}

@@ -28,27 +28,6 @@ class ContextController extends RiskController {
 
 	}
 
-	/**
-	 * actionIntro
-	 */
-	public function actionIntro() {
-		Yii::log("actionIntro ContextController called", "trace", self::LOG_CAT);
-		$this->docName = 'survIntro';
-		if(isset($_POST['pageId'])) {
-			$this->savePage('intro');
-		}
-		$page = $this->getPageContent();
-		if(empty($page)) {
-			throw new CHttpException(404, 'The page requested does not exist');
-		}
-		$this->render('intro', [
-				'content' => $page['content'],
-				'editAccess' => $page['editAccess'],
-				'editMode' => $page['editMode']
-			]
-		);
-
-	}
 
 	/**
 	 * actionIndex
@@ -58,9 +37,9 @@ class ContextController extends RiskController {
 		Yii::log("actionIndex ContextController called", "trace", self::LOG_CAT);
 		$this->docName = 'survIndex';
 		if(isset($_POST['pageId'])) {
-			$this->savePage('index');
+			SystemController::savePage($this->createUrl('index'));
 		}
-		$page = $this->getPageContent();
+		$page = SystemController::getPageContent($this->docName);
 		if(empty($page)) {
 			throw new CHttpException(404, 'The page requested does not exist');
 		}
@@ -72,110 +51,17 @@ class ContextController extends RiskController {
 		);
 	}
 
-	/**
-	 * @return array
-	 */
-	private function getPageContent() {
-		Yii::log("Function getPageContent ContextController called", "trace", self::LOG_CAT);
-		$content = DocPages::model()->find("docName='$this->docName'");
-		if(empty($content)) {
-			return [];
-		}
-		$editAccess = false;
-		if(Yii::app()->rbac->checkAccess('context', 'savePage')) {
-			$editAccess = true;
-		}
-		$editMode = false;
-		if(isset($_POST['page']) && DocPages::model()->count('docId=' . $_POST['page']) > 0) {
-			$editMode = true;
-		}
-		return [
-			'content' => $content,
-			'editAccess' => $editAccess,
-			'editMode' => $editMode
-		];
-	}
 
-	/**
-	 * @param $action
-	 */
-	private function savePage($action) {
-		//var_dump($_POST); die;
-		Yii::log("Function SavePage ContextController called", "trace", self::LOG_CAT);
-		$model = DocPages::model()->findByPk($_POST['pageId']);
-		if (isset($_POST['survContent'])) {
-			$purifier = new CHtmlPurifier();
-			$model->docData = $purifier->purify($_POST['survContent']);
-			if($model->update()) {
-				Yii::app()->user->setFlash('success', 'The page was updated successfully');
-				$this->redirect($action);
-				return;
-			}
-		}
 
-		Yii::app()->user->setFlash('error', 'The page was not updated successfully, contact your administrator');
-		$this->redirect($action);
-		return;
-	}
 
-//	public function actionIndex() {
-//		Yii::log("actionIndex ContextController called", "trace", self::LOG_CAT);
-//		$dataArray = array();
-//		$dataArray['dtHeader'] = "Surveillance design List";
-//		$dataArray['surveillanceList'] = json_encode(array());
-//		//$this->performAjaxValidation($model);
-//
-//		// get list of surveillance designs
-//		$surveillanceList = FrameworkContext::model()->findAll(array(
-//			//'select' => 'pageId, pageName',
-//			'condition' => 'userId=:userId',
-//			'params' => array(
-//				':userId' => Yii::app()->user->id,
-//			),
-//		));
-//		$surveillanceListArray = array();
-//		// format datatable data
-//		foreach ($surveillanceList as $sur) {
-//			$deleteButton = "";
-//			//if (Yii::app()->user->name != $valu['userName']) {
-//			$editButton = "<button id='editComponent" . $sur->frameworkId .
-//				"' type='button' class='bedit' onclick=\"window.location.href ='" .
-//				$this->createUrl('context/edit/', array(
-//						'contextId' => $sur->frameworkId
-//					)
-//				) .
-//				"'\">Edit</button>";
-//			$deleteButton = "<button id='deleteContext" . $sur->frameworkId .
-//				"' type='button' class='bdelete' onclick=\"$('#deleteBox').dialog('open');" .
-//				"deleteConfirm('" . $sur->name . "', '" .
-//				$sur->frameworkId . "')\">Remove</button>";
-//			//}
-//			$surveillanceListArray[] = array(
-//				'frameworkId' => $sur->frameworkId,
-//				'name' => $sur->name,
-//				'userId' => $sur->userId,
-//				'description' => $sur->description,
-//				'editButton' => $editButton,
-//				'deleteButton' => $deleteButton
-//			);
-//		}
-//		$dataArray['surveillanceList'] = json_encode($surveillanceListArray);
-//
-//		if (!empty($_GET['getContext'])) {
-//			$jsonData = json_encode(array("aaData" => $surveillanceListArray));
-//			echo $jsonData;
-//			return;
-//		}
-//	}
 
 
 	/**
 	 * actionlist
-	 *
-	 * @access public
+	 * @param bool $ajax
 	 * @return void
 	 */
-	public function actionlist($ajax = false) {
+	public function actionList($ajax = false) {
 		Yii::log("actionContextList ContextController called", "trace", self::LOG_CAT);
 		$model = new FrameworkContext();
 		$dataArray = [];
@@ -306,9 +192,9 @@ class ContextController extends RiskController {
 				}
 				Yii::app()->user->setFlash('success', 'The surveillance system is now ' .
 					Yii::app()->session['surDesign']['name']);
-				if(isset(Yii::app()->session['referrer']) && false != parse_url(Yii::app()->session['referrer'])) {
+				if(Yii::app()->request->getUrlReferrer()) {
 					//unset(Yii::app()->session['referrer']);
-					$this->redirect(Yii::app()->session['referrer']);
+					$this->redirect(Yii::app()->request->getUrlReferrer());
 					return;
 				}
 			} else {
@@ -316,7 +202,7 @@ class ContextController extends RiskController {
 			}
 
 
-		$this->redirect(['context/index']);
+		$this->redirect('list');
 	}
 
 	/**

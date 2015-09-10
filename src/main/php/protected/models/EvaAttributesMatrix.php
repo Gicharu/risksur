@@ -42,7 +42,7 @@ class EvaAttributesMatrix extends CActiveRecord {
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return [
-			'attribute' => [self::BELONGS_TO, 'EvaAttributes', 'attributeId', 'select' => 'attributeId, name'],
+			'attribute' => [self::BELONGS_TO, 'EvaAttributes', 'attributeId', 'select' => 'attributeId, name, description'],
 			'attributeTypes' => [self::BELONGS_TO, 'EvaAttributeTypes',
 				['attributeType' => 'id'], 'through' => 'attribute'
 			],

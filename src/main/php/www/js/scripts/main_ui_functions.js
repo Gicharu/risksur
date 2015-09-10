@@ -75,46 +75,12 @@ $(function() {
 	/*}*/
 	/*});*/
 
-	$( "#btnAdminVerify" ).button({
-		icons: {
-			primary: "ui-icon-check"
-		},
-		text:false
-	});
-
-	$( "#btnUserPreferences" ).button({
-		icons: {
-			primary: "ui-icon-person"
-		},
-		text:false
-	});
-
-	$( "#btnChangeDashboard" ).button({
-		icons: {
-			primary: "ui-icon-note"
-		},
-		text:false
-	});
 
 	$( "#btnHelp" ).button({
 		icons: {
 			primary: "ui-icon-help"
 		},
 		text:false
-	});
-
-	$( "#btnUpgradeConfig" ).button({
-		icons: {
-		    primary: "ui-icon-arrowreturnthick-1-n"
-		},
-		text:false
-	});
-
-	$('#btnConfig').button({
-		icons: { 
-			primary: "ui-icon-wrench"
-		},
-		text: false
 	});
 
 
@@ -376,57 +342,57 @@ jQuery.extend( jQuery.fn.dataTableExt.oSort, {
 
 // data tables filter on return 
 // to use it example: $('.dataTable').dataTable().fnFilterOnReturn();
-jQuery.fn.dataTableExt.oApi.fnFilterOnReturn = function (oSettings) {
-    var _that = this;
-  
-    this.each(function (i) {
-        $.fn.dataTableExt.iApiIndex = i;
-        var $this = this;
-		/* this code block below is interefing with search function, commented out until further notice */
-		/*var anControl = $('input', _that.fnSettings().aanFeatures.f);*/
-		// fixed the interfering code with this line below
-        var anControl = $(oSettings.nTableWrapper).find('div.dataTables_filter input');
-        anControl.unbind('keyup').bind('keypress', function (e) {
-		//alert(anControl.val());
-		//console.log(_that.fnSettings().aanFeatures.f);
-            if (e.which == 13) {
-                $.fn.dataTableExt.iApiIndex = i;
-                _that.fnFilter(anControl.val());
-            }
-        });
-        return this;
-    });
-    return this;
-};
+//jQuery.fn.dataTableExt.oApi.fnFilterOnReturn = function (oSettings) {
+//    var _that = this;
+//
+//    this.each(function (i) {
+//        $.fn.dataTableExt.iApiIndex = i;
+//        var $this = this;
+//		/* this code block below is interefing with search function, commented out until further notice */
+//		/*var anControl = $('input', _that.fnSettings().aanFeatures.f);*/
+//		// fixed the interfering code with this line below
+//        var anControl = $(oSettings.nTableWrapper).find('div.dataTables_filter input');
+//        anControl.unbind('keyup').bind('keypress', function (e) {
+//		//alert(anControl.val());
+//		//console.log(_that.fnSettings().aanFeatures.f);
+//            if (e.which == 13) {
+//                $.fn.dataTableExt.iApiIndex = i;
+//                _that.fnFilter(anControl.val());
+//            }
+//        });
+//        return this;
+//    });
+//    return this;
+//};
 
 // cancel datatable search filters
-if ( typeof $.fn.dataTable == "function" && typeof $.fn.dataTableExt.fnVersionCheck == "function" && $.fn.dataTableExt.fnVersionCheck('1.9.2')/*older versions should work too*/ )
-{
-    $.fn.dataTableExt.oApi.clearSearch = function ( oSettings )
-    {
- 
-        var table = this;
-         
-        //any browser, must include your own file
-        //var clearSearch = $('<img src="/images/delete.png" style="vertical-align:text-bottom;cursor:pointer;" alt="Delete" title="Delete"/>');
-         
-        //no image file needed, css embedding must be supported by browser
-        var clearSearch = $('<img title="Clear Search" alt="Clear" src="data:image/png;base64, iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAABUElEQVR4Xu2Tz0v6YBzHnboW7lkONzelUrb+gaJDLOjP0EPdpjjacEpZxw4G0a1DIEJ00kP3gi79B3bramGXxH4txfHdvsKeZuDtGTPoVm/4XF7Pw5sPr4cHgxAGfiJBd35bUTabDfkw/yJNV6/SwsJtLpeTJkxV1VVBXGwVS9uXUxcRxEyMZdnl+VSyUdAK64qirHEJ9oLj+RWCmGVQRWEU/OgPKpEI2YizzBKO440ghgVomhZfX94e3s1+BekCQogcRZGl6uFBu1Y/hWfndXh0XG27m0le98Ne8kbu2P9HYcMwvoBlWbjjONi3ZI8lJ7h4kwIgbf2zHm3b7gBApfgk1xyfIYtQTxxjozVAAnFgDjtPz72tXre7OTTNe4oihSgzdzKVIzeYXtJudvfLd/l8fmPCZVmWdvbKraKuXiMcecvOZDIhFHeDofjf7/fPJwL821wu37TMAAAAAElFTkSuQmCC" style="vertical-align:text-bottom;cursor:pointer;" />');
-        $(clearSearch).click( function ()
-                {
-                      table.fnFilter('');
-                });
-        $(oSettings.nTableWrapper).find('div.dataTables_filter').append(clearSearch);
-        $(oSettings.nTableWrapper).find('div.dataTables_filter label').css('margin-right', '-16px');//16px the image width
-        $(oSettings.nTableWrapper).find('div.dataTables_filter input').css('padding-right', '16px');
-    }
- 
-    //auto-execute, no code needs to be added
-    $.fn.dataTable.models.oSettings['aoInitComplete'].push( {
-        "fn": $.fn.dataTableExt.oApi.clearSearch,
-        "sName": 'whatever'
-    } );
-}
+//if ( typeof $.fn.dataTable == "function" && typeof $.fn.dataTableExt.fnVersionCheck == "function" && $.fn.dataTableExt.fnVersionCheck('1.9.2')/*older versions should work too*/ )
+//{
+//    $.fn.dataTableExt.oApi.clearSearch = function ( oSettings )
+//    {
+//
+//        var table = this;
+//
+//        //any browser, must include your own file
+//        //var clearSearch = $('<img src="/images/delete.png" style="vertical-align:text-bottom;cursor:pointer;" alt="Delete" title="Delete"/>');
+//
+//        //no image file needed, css embedding must be supported by browser
+//        var clearSearch = $('<img title="Clear Search" alt="Clear" src="data:image/png;base64, iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAABUElEQVR4Xu2Tz0v6YBzHnboW7lkONzelUrb+gaJDLOjP0EPdpjjacEpZxw4G0a1DIEJ00kP3gi79B3bramGXxH4txfHdvsKeZuDtGTPoVm/4XF7Pw5sPr4cHgxAGfiJBd35bUTabDfkw/yJNV6/SwsJtLpeTJkxV1VVBXGwVS9uXUxcRxEyMZdnl+VSyUdAK64qirHEJ9oLj+RWCmGVQRWEU/OgPKpEI2YizzBKO440ghgVomhZfX94e3s1+BekCQogcRZGl6uFBu1Y/hWfndXh0XG27m0le98Ne8kbu2P9HYcMwvoBlWbjjONi3ZI8lJ7h4kwIgbf2zHm3b7gBApfgk1xyfIYtQTxxjozVAAnFgDjtPz72tXre7OTTNe4oihSgzdzKVIzeYXtJudvfLd/l8fmPCZVmWdvbKraKuXiMcecvOZDIhFHeDofjf7/fPJwL821wu37TMAAAAAElFTkSuQmCC" style="vertical-align:text-bottom;cursor:pointer;" />');
+//        $(clearSearch).click( function ()
+//                {
+//                      table.fnFilter('');
+//                });
+//        $(oSettings.nTableWrapper).find('div.dataTables_filter').append(clearSearch);
+//        $(oSettings.nTableWrapper).find('div.dataTables_filter label').css('margin-right', '-16px');//16px the image width
+//        $(oSettings.nTableWrapper).find('div.dataTables_filter input').css('padding-right', '16px');
+//    }
+//
+//    //auto-execute, no code needs to be added
+//    $.fn.dataTable.models.oSettings['aoInitComplete'].push( {
+//        "fn": $.fn.dataTableExt.oApi.clearSearch,
+//        "sName": 'whatever'
+//    } );
+//}
 // This function clears the dataTables displayed on the graph section
 clearDataTables = function(tableIds) {
     var tableToClear = {};

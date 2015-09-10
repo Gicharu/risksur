@@ -4,6 +4,8 @@
  * User: james
  * Date: 5/13/15
  * Time: 12:41 PM
+ * @var $this EvaluationController
+ * @var $page Array
  */
 ?>
 <script type="text/javascript">
@@ -51,6 +53,14 @@
 	});
 </script>
 <div id="attrDesc" title="Evaluation attribute description"></div>
+<?php
+$this->renderPartial('//system/_page', [
+	'content' => $page['content'],
+	'editAccess' => $page['editAccess'],
+	'editMode' => $page['editMode']
+]);
+?>
+
 <div id="attributesContainer">
 	<?php
 	foreach($evaAttributes as $attrType => $attribs) {

@@ -1,8 +1,8 @@
 <?php
 
 class DesignForm extends DForm {
-	private $_rules = array();
-	protected $_properties = array();
+	private $_rules = [];
+	protected $_properties = [];
 	private $_dynamicLabels = [];
 	private $_propertyDataMap = [];
 
@@ -41,6 +41,9 @@ class DesignForm extends DForm {
 		//}
 	}
 
+	/**
+	 * @param array $properties
+	 */
 	public function unsetProperties(array $properties) {
 		foreach($properties as $property) {
 			unset($this->_properties[$property]);
@@ -71,6 +74,10 @@ class DesignForm extends DForm {
 	}
 
 
+	/**
+	 * @param $propertyName
+	 * @return mixed
+	 */
 	private function getFieldId($propertyName) {
 		$fieldNameAndId = explode('_', $propertyName);
 		return $fieldNameAndId[1];
@@ -98,7 +105,7 @@ class DesignForm extends DForm {
 	 * @return array
 	 */
 	public function attributeLabels() {
-		$attributeLabels = array();
+		$attributeLabels = [];
 		if (!empty ($this->_dynamicLabels)) {
 			$attributeLabels = $this->_dynamicLabels;
 		}
@@ -113,5 +120,9 @@ class DesignForm extends DForm {
 			parent::attributeNames(),
 			array_keys($this->_properties)
 		);
+	}
+
+	public function componentNumber($value) {
+		print_r($value); die;
 	}
 }

@@ -46,6 +46,11 @@ abstract class RiskController extends CController {
 		);
 	}
 
+	public function setPageTitle($value) {
+		parent::setPageTitle(Yii::app()->name . ' - ' . $value);
+
+	}
+
 	/**
 	 * renderPartial 
 	 * 

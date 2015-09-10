@@ -6,14 +6,13 @@
  * @property string $id
  * @property integer $evaluationId
  * @property integer $evaAttribute
- * @property string $expertise
- * @property string $methodDescription
- * @property string $dataAvailability
- * @property string $references
+ * @property string $assessmentMethod
+ * @property integer $dataAvailable
+ * @property string $customAssessmentMethod
+ * The followings are the available model relations:
+ * @property EvaAttributesAssessmentMethods $assessmentMethod0
  */
 class EvaAssessmentMethods extends CActiveRecord {
-
-	public $evaAttributeName;
 	/**
 	 * @return string the associated database table name
 	 */
@@ -28,10 +27,11 @@ class EvaAssessmentMethods extends CActiveRecord {
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return [
-			['evaluationId, evaAttribute, expertise, methodDescription, dataAvailability', 'required'],
-			['evaluationId, evaAttribute', 'numerical', 'integerOnly' => true],
-			['dataAvailability', 'length', 'max' => 22],
-			['references', 'safe']
+			['evaluationId, evaAttribute, dataAvailable', 'required'],
+			['customAssessmentMethod', 'safe'],
+			['evaluationId, evaAttribute, dataAvailable', 'numerical', 'integerOnly' => true],
+			['assessmentMethod', 'length', 'max' => 11],
+
 		];
 	}
 
@@ -42,7 +42,7 @@ class EvaAssessmentMethods extends CActiveRecord {
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return [
-			'evaluationAttributes' => [self::BELONGS_TO, 'EvaAttributes', 'evaAttribute', 'select' => 'name']
+			'evaAttrAssMethods' => [self::BELONGS_TO, 'EvaAttributesAssessmentMethods', 'assessmentMethod'],
 		];
 	}
 
@@ -51,16 +51,13 @@ class EvaAssessmentMethods extends CActiveRecord {
 	 */
 	public function attributeLabels() {
 		return [
-			'id'                => 'ID',
-			'evaluationId'      => 'Evaluation',
-			'evaAttribute'      => 'Evaluation Attribute',
-			'expertise'         => 'Expertise',
-			'methodDescription' => 'Method Description',
-			'dataAvailability'  => 'Data Availability?',
-			'references'        => 'References',
+			'id'                     => 'ID',
+			'evaluationId'           => 'Evaluation',
+			'evaAttribute'           => 'Evaluation Attribute',
+			'assessmentMethod'       => 'Assessment Method',
+			'customAssessmentMethod' => 'Custom Assessment Method',
 		];
 	}
-
 
 	/**
 	 * Returns the static model of the specified AR class.
@@ -71,35 +68,4 @@ class EvaAssessmentMethods extends CActiveRecord {
 	public static function model($className = __CLASS__) {
 		return parent::model($className);
 	}
-
-	/**
-	 * afterFind
-	 */
-	protected function afterFind() {
-		$expertiseArray = explode(',', $this->expertise);
-		$this->expertise = $expertiseArray;
-		return parent::afterFind();
-	}
-
-	/**
-	 * afterValidate
-	 */
-	protected function afterValidate() {
-		if(isset($this->expertise)) {
-			$expertiseString = implode(',', $this->expertise);
-			$this->expertise = $expertiseString;
-
-		}
-		return parent::afterValidate();
-	}
-
-	/**
-	 * afterSave
-	 */
-	protected function afterSave() {
-		$expertiseArray = explode(',', $this->expertise);
-		$this->expertise = $expertiseArray;
-		return parent::afterSave();
-	}
-
 }
