@@ -152,7 +152,8 @@ $.fn.dataTableExt.oApi.fnReloadAjax = function ( oSettings, sNewSource, fnCallba
         /* Callback user function - for event handlers etc */
         if ( typeof fnCallback == 'function' && fnCallback != null )
         {
-            fnCallback( oSettings );
+            fnCallback( json );
+            //fnCallback( oSettings );
         }
     }, oSettings );
 };

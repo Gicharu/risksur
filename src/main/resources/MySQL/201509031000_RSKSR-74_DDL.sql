@@ -19,3 +19,15 @@ CREATE TABLE IF NOT EXISTS `evaAttributesAssessmentMethods` (
 --
 ALTER TABLE `evaAttributesAssessmentMethods`
 ADD CONSTRAINT `fk_evaAttribute` FOREIGN KEY (`evaAttribute`) REFERENCES `evaAttributes` (`attributeId`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+CREATE TABLE `economicMethods` (
+  `id` INT (11) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `econMethod` INT (11) UNSIGNED NOT NULL,
+  `name` VARCHAR (30) NOT NULL,
+  `description` TEXT NOT NULL,
+  `reference` TEXT,
+  PRIMARY KEY (`id`)
+) CHARSET = utf8 ;
+
+ALTER TABLE `evaluationHeader`
+ADD COLUMN `econEvaMethods` TEXT NULL AFTER `evaAttributes`;

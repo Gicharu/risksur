@@ -27,7 +27,8 @@ class EvaAssessmentMethods extends CActiveRecord {
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return [
-			['evaluationId, evaAttribute, dataAvailable', 'required'],
+			['evaluationId, evaAttribute, dataAvailable', 'required', 'on' => 'default'],
+			['evaluationId, evaAttribute, customAssessmentMethod', 'required', 'on' => 'customMethod'],
 			['customAssessmentMethod', 'safe'],
 			['evaluationId, evaAttribute, dataAvailable', 'numerical', 'integerOnly' => true],
 			['assessmentMethod', 'length', 'max' => 11],
@@ -43,6 +44,7 @@ class EvaAssessmentMethods extends CActiveRecord {
 		// class name for the relations automatically generated below.
 		return [
 			'evaAttrAssMethods' => [self::BELONGS_TO, 'EvaAttributesAssessmentMethods', 'assessmentMethod'],
+			'evaluationAttributes' => [self::BELONGS_TO, 'EvaAttributes', 'evaAttribute'],
 		];
 	}
 

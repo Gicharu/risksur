@@ -22,10 +22,20 @@ $this->renderPartial('_detailsTable', ['evaDetails' => $evaDetails, 'tools' => t
 			"aaData": <?= json_encode($evaAssMethods); ?>,
 			"aoColumns": [
 				{"mData": "evaluationAttributes.name"},
-				{"mData": "methodDescription"},
+				{"mData": "evaAttrAssMethods.description"},
 				{
-					"mData": "dataAvailability", "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-							$(nTd).html(dataAvailabilityMap[sData]);
+					"mData": "dataAvailable", "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+						switch (sData) {
+							case '0':
+								$(nTd).html('No');
+								break;
+							case '1':
+								$(nTd).html('Yes');
+								break;
+							default:
+								$(nTd).html('Data collection needed');
+
+						}
 					}
 
 				}

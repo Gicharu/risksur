@@ -22,14 +22,15 @@ class EvaluationController extends RiskController {
 	 * init
 	 */
 	public function init() {
-		$this->frameworkId = isset(Yii::app()->session['surDesign']['id']) ?
-			Yii::app()->session['surDesign']['id'] : null;
-		$this->evaContextId = isset(Yii::app()->session['evaContext']['id']) ?
-			Yii::app()->session['evaContext']['id'] : null;
-		$this->objectiveId = isset(Yii::app()->session['surveillanceObjective']['id']) ?
-			Yii::app()->session['surveillanceObjective']['id'] : null;
-		$this->evaQuestionId = isset(Yii::app()->session['evaContext']['id']) ?
-			Yii::app()->session['evaContext']['id'] : null;
+		$session = Yii::app()->session;
+		$this->frameworkId = isset($session['surDesign']['id']) ?
+			$session['surDesign']['id'] : null;
+		$this->evaContextId = isset($session['evaContext']['id']) ?
+			$session['evaContext']['id'] : null;
+		$this->objectiveId = isset($session['surveillanceObjective']['id']) ?
+			$session['surveillanceObjective']['id'] : null;
+		$this->evaQuestionId = isset($session['evaContext']['questionId']) ?
+			$session['evaContext']['questionId'] : null;
 
 	}
 
@@ -42,6 +43,7 @@ class EvaluationController extends RiskController {
 			strtolower('selectCriteriaMethod') => 'selectCriteriaMethod',
 			strtolower('selectEvaAttributes')  => 'selectEvaAttributes',
 			strtolower('selectEvaAssMethod')   => 'selectEvaAssMethod',
+			strtolower('selectEconEvaMethods')   => 'selectEconEvaMethods',
 
 		];
 		$objectiveActions = [
@@ -253,8 +255,11 @@ class EvaluationController extends RiskController {
 			$model = EvaluationHeader::model()->findByPk($this->evaContextId);
 			$model->questionId = $_POST['EvaluationQuestion']['question'];
 			$model->update();
-			Yii::app()->session['evaContext']['questionId'] = $_POST['EvaluationQuestion']['question'];
-			//print_r(Yii::app()->session['evalQuestion']); die;
+			$session = Yii::app()->session;
+			$sessionEvaParams = $session['evaContext'];
+			//print_r(Yii::app()->session['evaContext']); die;
+			$sessionEvaParams['questionId'] = $model->questionId;
+			$session['evaContext'] = $sessionEvaParams;
 			$this->redirect('selectEvaAttributes');
 			return;
 		}
@@ -706,14 +711,22 @@ class EvaluationController extends RiskController {
 		$evaAttributeMapCriteria->addInCondition('attributeId', $evaAttributes);
 		$evaAttributeMap = CHtml::listData(EvaAttributes::model()->findAll($evaAttributeMapCriteria),
 			'attributeId', 'name');
-		$assessModel = new EvaAssessmentMethods();
+		$assessModel = new EvaAssessmentMethods('default');
 		$assessModel->evaluationId = $this->evaContextId;
 		if(isset($id)) {
 			// check if assessment method(s) exist
 			$assessMethods = ModelToArray::convertModelToArray(EvaAttributesAssessmentMethods::model()
 				->with('evaAssessmentMethods')
 				->findAll('t.evaAttribute=:attribute', [':attribute' => $id]));
-			echo json_encode(['aaData' => $assessMethods]);
+			// Check if there is any custom method
+			$customMethod = ModelToArray::convertModelToArray($assessModel
+				->find('evaluationId=:evaId AND customAssessmentMethod IS NOT NULL',
+					[':evaId' => $this->evaContextId]));
+//			$response = $assessModel;
+//			if(!is_null($customMethod)) {
+//				$response = array_merge($assessMethods, $customMethod);
+//			}
+			echo json_encode(['aaData' => $assessMethods, 'customMethod' => $customMethod]);
 			return;
 
 		}
@@ -724,15 +737,29 @@ class EvaluationController extends RiskController {
 				$assessModel->deleteAll('evaluationId=:evalId', [':evalId' => $this->evaContextId]);
 				foreach ($_POST['EvaAssessmentMethods'] as $row) {
 					$assessModel->attributes = $row;
-					$assessModel->save();
+					if(isset($_POST['EvaAssessmentMethods']['customAssessmentMethod']) &&
+						$_POST['EvaAssessmentMethods']['customAssessmentMethod'] != '')  {
+						$assessModel->setScenario('customMethod');
+						$assessModel->customAssessmentMethod = $_POST['EvaAssessmentMethods']['customAssessmentMethod'];
+						//print_r($assessModel); die;
+						$assessModel->save();
+						$assessModel->setScenario('default');
+						break;
+					}
+					if(isset($assessModel->assessmentMethod)) {
+						$assessModel->save();
+					}
 
 				}
-				$transaction->commit();
+				if(!$assessModel->hasErrors()) {
+					$transaction->commit();
 
-				if (isset($_POST['next'])) {
-					Yii::app()->user->setFlash('success', 'Assessment method(s) saved successfully');
-					$this->redirect('evaSummary');
-					return;
+					if (isset($_POST['next'])) {
+						Yii::app()->user->setFlash('success', 'Assessment method(s) saved successfully');
+						$this->redirect('evaSummary');
+						return;
+					}
+
 				}
 
 			} catch (Exception $e) {
@@ -741,22 +768,99 @@ class EvaluationController extends RiskController {
 					' please try again or contact your administrator if the problem persists');
 			}
 		}
+		if (isset($_POST['pageId'])) {
+			SystemController::savePage('selectEvaAssMethod');
+		}
+		$this->docName = 'evaAssMethods';
+		$page = SystemController::getPageContent($this->docName);
 		$this->render('selectEvaAssMethod', [
 			'assessModel' => $assessModel,
 			'evaAttributeMap' => $evaAttributeMap,
-			//'setEvaAttribute' =>
+			'page' => $page
 		]);
+	}
+
+	public function actionSelectEconEvaMethods() {
+		// Get relevant questions
+		$econQuestions = (array) json_decode(ModelToArray::convertModelToArray(EvaQuestionGroups::model()
+			->find('section=:sec', [':sec' => 'econEvaMethods']))['questions']);
+		// Group 1 ===> Cost-effectiveness analysis
+		// Group 2 ===> Cost-benefit analysis
+		// Group 3 ===> Cost-benefit analysis & Cost-benefit analysis
+		$econMethodGroup = null;
+		//echo $this->evaQuestionId; die;
+		foreach($econQuestions as $groupKey => $questionGroups) {
+			if(isset(array_flip($questionGroups)[$this->evaQuestionId])) {
+				$econMethodGroup = $groupKey;
+				break;
+			}
+		}
+		if(!isset($econMethodGroup)) {
+			Yii::app()->user->setFlash('notice', 'The evaluation question selected for this evaluation context does not' .
+				'have any economic evaluation methods');
+			$this->redirect('evaSummary');
+		}
+		// Get evaluation context model
+		$evaModel = EvaluationHeader::model()->findByPk($this->evaContextId);
+		if(isset($_POST['save']) || isset($_POST['next'])) {
+			if(isset($_POST['EvaluationHeader'])) {
+				$selectedMethods = [];
+				foreach($_POST['EvaluationHeader'] as $selectedMethod) {
+					$selectedMethods[] = $selectedMethod['econEvaMethods'];
+				}
+				$evaModel->econEvaMethods = json_encode($selectedMethods);
+
+
+			} else {
+				$evaModel->econEvaMethods = null;
+			}
+			if($evaModel->save()) {
+				Yii::app()->user->setFlash('success', 'Economic evaluation method(s) saved successfully');
+
+				if(isset($_POST['next'])) {
+					$this->redirect('evaSummary');
+					return;
+				}
+			} elseif(!$evaModel->hasErrors()) {
+				Yii::app()->user->setFlash('error', 'An error occurred while saving the economic evaluation' .
+					' method(s), please try again or contact your administrator if the problem persists');
+			}
+		}
+
+		// Get economic evaluation methods based on the group of the question
+		$rsEconMethods = EconomicMethods::model()
+			->with('econMethodGroup')
+			->findAll('econMethod=:econGroup', [':econGroup' => $econMethodGroup]);
+		//print_r($rsEconMethods); die;
+		$econMethods = json_encode(ModelToArray::convertModelToArray($rsEconMethods));
+
+		if (isset($_POST['pageId'])) {
+			SystemController::savePage('selectEconEvaMethods');
+		}
+		$this->docName = 'econEvaMethods';
+		$page = SystemController::getPageContent($this->docName);
+
+		$this->render('selectEconEvaMethods', [
+			'page' => $page,
+			'econMethods' => $econMethods,
+			'evaModel' => $evaModel
+		]);
+
+
+
+
 	}
 
 	/**
 	 * actionEvaSummary
 	 */
 	public function actionEvaSummary() {
+		$this->setPageTitle('Evaluation Summary');
 		$evaDetails = $this->getEvaDetails();
 		$evaAssMethods = ModelToArray::convertModelToArray(EvaAssessmentMethods::model()
-			->with('evaluationAttributes')
-			->findAll(['select' => 'evaAttribute, methodDescription, dataAvailability']));
-//		print_r($evaAssMethods); die;
+			->with('evaluationAttributes', 'evaAttrAssMethods')
+			->findAll());
+		//print_r($evaAssMethods); die;
 		$this->render('evaSummary', [
 			'evaDetails'    => $evaDetails,
 			'evaAssMethods' => $evaAssMethods
