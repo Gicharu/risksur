@@ -11,7 +11,7 @@ $this->menu = [
 ];
 ?>
 
-<h1>Evaluation Attributes Assessment Methods</h1>
+<h3>Evaluation Attributes Assessment Methods</h3>
 
 <script type="text/javascript">
 
@@ -76,8 +76,8 @@ $this->menu = [
 	<table id="evaAssMethods" width="100%" class="display">
 		<thead>
 		<tr>
-			<th title="Label">Evaluation attribute</th>
-			<th title="Link">Method name</th>
+			<th title="Evaluation attribute">Evaluation attribute</th>
+			<th title="Method name">Method name</th>
 			<th title="Description">Description</th>
 			<th title="Data required">Data required</th>
 			<th title="Expertise required">Expertise required</th>

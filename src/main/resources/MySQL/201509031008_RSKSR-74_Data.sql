@@ -32,7 +32,15 @@ INSERT INTO `roles_has_permissions` (`permissions_id`, `roles_id`) VALUES
   (101, 2),
   (102, 1),
   (102, 2),
-  (102, 3);
+  (102, 3),
+  (103, 1),
+  (103, 2),
+  (104, 1),
+  (104, 2),
+  (105, 1),
+  (105, 2),
+  (106, 1),
+  (106, 2);
 
 
 UPDATE `permissions`
@@ -157,8 +165,11 @@ VALUES
   ('actionCreate', 'C/A to add new evaluation assessment methods', 'adminattributesassessmentmethods', 'create'),
   ('actionUpdate', 'C/A to update evaluation assessment methods', 'adminattributesassessmentmethods', 'update'),
   ('actionDelete', 'C/A to delete evaluation assessment methods', 'adminattributesassessmentmethods', 'delete'),
-  ('actionSelectEconEvaMethods', 'C/A to select economic evaluation methods', 'evaluation', 'selectEconEvaMethods');
-
+  ('actionSelectEconEvaMethods', 'C/A to select economic evaluation methods', 'evaluation', 'selectEconEvaMethods'),
+  ('actionCreate', 'C/A to add new economic method', 'admineconomicmethods', 'create'),
+  ('actionIndex', 'C/A to list economic methods', 'admineconomicmethods', 'index'),
+  ('actionUpdate', 'C/A to update economic methods', 'admineconomicmethods', 'update'),
+  ('actionDelete', 'C/A to delete economic methods', 'admineconomicmethods', 'delete');
 TRUNCATE TABLE `docPages`;
 --
 -- Dumping data for table `docPages`
