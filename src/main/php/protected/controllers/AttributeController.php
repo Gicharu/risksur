@@ -135,10 +135,11 @@ class AttributeController extends RiskController {
 
 	/**
 	 * actionSelectAttribute
+	 * @param $id mixed
 	 * @access public
-	 * @return void
+	 * @return array
 	 */
-	public function actionSelectAttribute() {
+	public static function actionSelectAttribute($id = null) {
 		Yii::log("actionSelectAttribute called", "trace", self::LOG_CAT);
 		//$model = new NewDesign;
 		$attributesArray = array();
@@ -150,31 +151,15 @@ class AttributeController extends RiskController {
 			$attributesArray[$data->attributeId] = $data->name;
 		}
 
-		if (!empty($_POST['attributeSelected']) && !empty($attributesArray[$_POST['attributeSelected']])) {
+		if (isset($attributesArray[$id])) {
 			Yii::app()->session->add('performanceAttribute', array(
-				'id'   => $_POST['attributeSelected'],
-				'name' => $attributesArray[$_POST['attributeSelected']]
+				'id'   => $id,
+				'name' => $attributesArray[$id]
 			));
-			echo "Attribute successfully selected";
-			return;
+			Yii::app()->user->setFlash('success', "Attribute successfully selected");
+			Yii::app()->request->redirect(Yii::app()->request->getUrlReferrer());
 		}
-		//add the surveilance design to the session
-		//if (count($selectedDesign) == 1) {
-		//Yii::app()->session->add('surDesign', array(
-		//'id' => $_GET['designId'],
-		//'name' => $selectedDesign[0]->name,
-		//'goalId' => $selectedDesign[0]->goalId
-		//));
-		//} else {
-		//Yii::app()->session->remove('surDesign');
-		//}
-		//print_r($selectedDesign);
-		//print_r($_SESSION);
-
-		$this->render('selectAttribute', array(
-			//'model' => $model,
-			'dataArray' => $dataArray
-		));
+		return $attributesArray;
 	}
 
 	/**

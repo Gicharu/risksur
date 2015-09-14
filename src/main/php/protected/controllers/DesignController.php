@@ -1094,7 +1094,7 @@ class DesignController extends RiskController {
 	 * @access public
 	 * @return void
 	 */
-	public function actionListComponents() {
+	public function actionListComponents($getComponents = null) {
 		Yii::log("actionListComponents DesignController called", "trace", self::LOG_CAT);
 		//$model = new ComponentHead;
 		$dataArray = [];
@@ -1104,76 +1104,21 @@ class DesignController extends RiskController {
 		$formDetailsArray = [];
 
 		if (!empty(Yii::app()->session['surDesign'])) {
-			// get list of surveillance designs
-			$componentList = ComponentHead::model()->with("compDetails")->findAll([
-				//'select' => 'pageId, pageName',
-				'condition' => 'frameworkId=:frameworkId',
-				'params'    => [
-					':frameworkId' => Yii::app()->session['surDesign']['id'],
-				],
-			]);
-			$formDetails = SurFormDetails::model()->findAll([
-				//'select' => 'pageId, pageName',
-				'condition' => 'showOnComponentList=:showOnList',
-				'params'    => [
-					':showOnList' => true,
-				],
-			]);
-			$selectOptions = CHtml::listData(Options::model()->findAll([
-				'condition' => 'componentId IS NOT NULL'
-			]), 'optionId', 'label');
-
-
-			//print_r($selectOptions); die;
-
-			// format dataTable data
-			$count = 0;
-			foreach ($componentList as $com) {
-
-				$duplicateButton = "<button id='duplicateComponent" . $com->componentId .
-					"' type='button' class='bcopy' onclick=\"$('#copyBox').dialog('open');" .
-					"duplicatePopup('" . $com->componentId . "', '" .
-					$com->componentName . "')\">Duplicate</button>";
-				$componentListArray[$count] = [
-					'componentId'  => $com->componentId,
-					'frameworkId'  => $com->frameworkId,
-					'name'          => $com->componentName,
-					'targetSpecies' => '',
-					'targetSector' => '',
-					'dataColPoint' => '',
-					'diseaseType'  => '',
-					'sampleType'   => '',
-					//'description' => $com->comments,
-					//'duplicateButton' => $duplicateButton,
-				];
-				foreach ($formDetails as $formInput) {
-					$formDetailsArray[$formInput->inputName] = $formInput->label;
-					foreach ($com->compDetails as $data) {
-						//$subDetails[$data->inputName] = $data->value;
-						if($formInput->subFormId == $data->subFormId) {
-							$componentListArray[$count][$formInput->inputName] = $data->value;
-							if ($formInput->inputType == "dropdownlist" && isset($selectOptions[$data->value])) {
-								$componentListArray[$count][$formInput->inputName] = $selectOptions[$data->value];
-							}
-
-						}
-
-					}
-				}
-				$count++;
-
-			}
+			$componentData = self::getComponentData();
+			$componentListArray = $componentData['componentListArray'];
+			$formDetailsArray = $componentData['formDetailsArray'];
 		}
+
 		//print_r($componentListArray); die();
 
 		$dataArray['componentList'] = json_encode($componentListArray);
 		// return ajax json data
-		if (!empty($_GET['getComponents'])) {
+		if (isset($getComponents)) {
 			$jsonData = json_encode(["aaData" => $componentListArray]);
 			echo $jsonData;
 			return;
 		}
-		$sureillanceSystems = CHtml::listData(FrameworkContext::model()->findAll([
+		$surveillanceSystems = CHtml::listData(FrameworkContext::model()->findAll([
 			'condition' => 'userId=:userId',
 			'select' => 'frameworkId, name',
 			'params' => [
@@ -1184,8 +1129,71 @@ class DesignController extends RiskController {
 			//'model' => $model,
 			'dataArray'    => $dataArray,
 			'columnsArray' => $formDetailsArray,
-			'surveillanceSystems' => $sureillanceSystems
+			'surveillanceSystems' => $surveillanceSystems
 		]);
+	}
+
+
+	public static function getComponentData($componentsOnly = false) {
+		$componentListArray = [];
+		$formDetailsArray = [];
+		// get list of surveillance designs
+		$componentList = ComponentHead::model()->with("compDetails")->findAll([
+			//'select' => 'pageId, pageName',
+			'condition' => 'frameworkId=:frameworkId',
+			'params'    => [
+				':frameworkId' => Yii::app()->session['surDesign']['id'],
+			],
+		]);
+		$formDetails = SurFormDetails::model()->findAll([
+			//'select' => 'pageId, pageName',
+			'condition' => 'showOnComponentList=:showOnList',
+			'params'    => [
+				':showOnList' => true,
+			],
+		]);
+		$selectOptions = CHtml::listData(Options::model()->findAll([
+			'condition' => 'componentId IS NOT NULL'
+		]), 'optionId', 'label');
+
+
+		//print_r($selectOptions); die;
+
+		// format dataTable data
+		$count = 0;
+		foreach ($componentList as $com) {
+			$componentListArray[$count] = [
+				'componentId'  => $com->componentId,
+				'frameworkId'  => $com->frameworkId,
+				'name'          => $com->componentName,
+				'targetSpecies' => '',
+				'targetSector' => '',
+				'dataColPoint' => '',
+				'diseaseType'  => '',
+				'sampleType'   => '',
+				'studyType'   => '',
+			];
+			foreach ($formDetails as $formInput) {
+				$formDetailsArray[$formInput->inputName] = $formInput->label;
+				foreach ($com->compDetails as $data) {
+					//$subDetails[$data->inputName] = $data->value;
+					if($formInput->subFormId == $data->subFormId) {
+						$componentListArray[$count][$formInput->inputName] = $data->value;
+						if ($formInput->inputType == "dropdownlist" && isset($selectOptions[$data->value])) {
+							$componentListArray[$count][$formInput->inputName] = $selectOptions[$data->value];
+						}
+
+					}
+
+				}
+			}
+			$count++;
+
+		}
+		return $componentsOnly ? $componentListArray : [
+			'componentListArray' => $componentListArray,
+			'formDetailsArray' => $formDetailsArray
+		];
 	}
 
 	/**

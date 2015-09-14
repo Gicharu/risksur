@@ -185,7 +185,7 @@ class SiteController extends CController {
 		}
 		if (!Yii::app()->user->isGuest) {
 			$this->redirect(array(
-				'context/list'
+				'system/index'
 			));
 		}
 		$model = new LoginForm;
@@ -219,7 +219,7 @@ class SiteController extends CController {
 			if ($model->validate() && $model->login()) { // || Yii::app()->user->login($identity)) {
 				// if nodeId provided set the selectedTix session variable to skip the select node page
 				$this->redirect(array(
-					'context/intro'
+					'system/index'
 				));
 				return;
 			}

@@ -115,6 +115,7 @@ $this->renderPartial('_page', [
 	<?php //echo $form->error($evaluationModel, 'evaAttributes'); ?>
 
 	<div class="row buttons">
+		<?= CHtml::submitButton('Save', ['name' => 'saveEvaAttr']); ?>
 		<?= CHtml::submitButton('Next', ['name' => 'saveEvaAttr']); ?>
 
 	</div>

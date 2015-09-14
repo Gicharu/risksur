@@ -10,7 +10,9 @@ $this->menu = [
 	['label' => 'Manage Economic Evaluation Methods', 'url' => ['admineva/listEvaMethods']],
 	['label' => 'Manage Evaluation Context Form', 'url' => ['admineva/listEvaContext']],
 	['label' => 'Manage Evaluation Questions', 'url' => ['adminevaquestion/index']],
-	['label' => 'Manage Evaluation Attribute Relevance', 'url' => ['adminattributerelevance/index']]
+	['label' => 'Manage Evaluation Attribute Relevance', 'url' => ['adminattributerelevance/index']],
+	['label' => 'Manage Evaluation Assessment Methods', 'url' => ['adminattributesassessmentmethods/index']],
+	['label' => 'Manage Economic Methods', 'url' => ['admineconomicmethods/index']]
 ];
 ?>
 

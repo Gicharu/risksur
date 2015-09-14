@@ -69,7 +69,7 @@ $(function(){
 			//{"mDataProp": "description", "bVisible": true, "sWidth": "6%"},
 			//{"mDataProp": "editButton", "bVisible": true, "sWidth": "6%"},
 			//{"mData": "deleteButton", "bSortable": false, "bVisible": true, "sWidth": "8%" },
-			{"mDataProp": "name",  "bVisible": true, sClass: "showDetails clickable underline"},
+			{"mDataProp": "name", sClass: "showDetails clickable underline"},
 			<?php 
 				foreach ($columnsArray as $key => $val) {
 					echo '{"mDataProp": "' . $key . '"},';

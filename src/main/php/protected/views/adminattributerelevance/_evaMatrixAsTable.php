@@ -27,6 +27,7 @@
 	$rsQuestionGrp = EvaQuestionGroups::model()->find(['select' => 'questions']);
 	$questionsArray = array_keys((array) json_decode($rsQuestionGrp->questions));
 	$groups = array_combine($questionsArray, range(1, count($questionsArray)));
+	$groups[6] = 'Risk based'; //Group 6
 	?>
 	<?php echo CHtml::activeDropDownList($model,"[$index]evaQuestionGroup", $groups, ['empty' => 'Select one']); ?>
 	<?php echo CHtml::error($model,"[$index]evaQuestionGroup"); ?>
