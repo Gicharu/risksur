@@ -568,6 +568,11 @@ class EvaluationController extends RiskController {
 		// check if the context supports component selection
 		$rsEvaluationType = EvaluationDetails::model()->find('evalElementsId=:element AND evalId=:evaId',
 			[':element' => 5, ':evaId' => $this->evaContextId]);
+		if(!isset($rsEvaluationType)) {
+			Yii::app()->user->setFlash('notice', 'PLease update the evaluation context');
+			$this->redirect('listEvaContext');
+
+		}
 		if(isset($rsEvaluationType) && $rsEvaluationType->value == 0) {
 			Yii::app()->user->setFlash('notice', 'The evaluation context is system based hence no components are needed');
 			$this->redirect('selectEvaAttributes');
@@ -1235,7 +1240,7 @@ class EvaluationController extends RiskController {
 				'required' => $element->required,
 				'type'     => $element->inputType,
 				'class'    => $highlightClass,
-				'title'    => $element->elementMetaData,
+				'title'    => UtilModel::urlToLink($element->elementMetaData),
 				'data-field' => $element->evalElementsId
 
 			];

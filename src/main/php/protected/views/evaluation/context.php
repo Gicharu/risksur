@@ -13,12 +13,19 @@
 		<script type="text/javascript">
 			$(document).ready(function() {
 				$('[title!=""]').qtip({
+					overwrite: true,
 					content: {
-						title: 'Info'
+						title: {
+							text: 'Info',
+							button: 'Close'
+						}
 					},
 					style: {
 						widget: true,
 						def: false
+					},
+					hide: {
+						event: 'click'
 					}
 				});
 				var surSummary = $("#surSummary").dataTable({
