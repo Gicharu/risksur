@@ -44,6 +44,7 @@ class EvaluationController extends RiskController {
 			strtolower('selectEvaAttributes')  => 'selectEvaAttributes',
 			strtolower('selectEvaAssMethod')   => 'selectEvaAssMethod',
 			strtolower('selectEconEvaMethods')   => 'selectEconEvaMethods',
+			strtolower('evaSummary')   => 'evaSummary',
 
 		];
 		$objectiveActions = [
@@ -860,10 +861,25 @@ class EvaluationController extends RiskController {
 		$evaAssMethods = ModelToArray::convertModelToArray(EvaAssessmentMethods::model()
 			->with('evaluationAttributes', 'evaAttrAssMethods')
 			->findAll());
-		//print_r($evaAssMethods); die;
+		$econEvaMethods = [];
+		$selectedEconEvaMethods = [];
+		$rsEconMethods = ModelToArray::convertModelToArray(EvaluationHeader::model()
+			->findByPk($this->evaContextId,
+				['condition' => 'econEvaMethods IS NOT NULL', 'select' => 'econEvaMethods']));
+		if(isset($rsEconMethods['econEvaMethods'])) {
+			$selectedEconEvaMethods = json_decode($rsEconMethods['econEvaMethods']);
+			$econEvaMethodsCriteria = new CDbCriteria();
+			$econEvaMethodsCriteria->addInCondition('t.id', $selectedEconEvaMethods);
+			$econEvaMethodsCriteria->with = 'econMethodGroup';
+			$econEvaMethods = ModelToArray::convertModelToArray(EconomicMethods::model()
+				->findAll($econEvaMethodsCriteria));
+
+		}
+		//print_r($econEvaMethods); die;
 		$this->render('evaSummary', [
 			'evaDetails'    => $evaDetails,
-			'evaAssMethods' => $evaAssMethods
+			'evaAssMethods' => $evaAssMethods,
+			'econEvaMethods' => $econEvaMethods
 		]);
 	}
 
@@ -1191,6 +1207,7 @@ class EvaluationController extends RiskController {
 			if (isset($attributeArray[$element->evalElementsId])) {
 				$highlightClass = "attributeHighlight";
 			}
+
 			$labels[$attributeId] = $element->label;
 			// add the elements to the CForm array
 			$elements['elements']['evaContext']['elements'][$attributeId] = [
@@ -1198,7 +1215,9 @@ class EvaluationController extends RiskController {
 				'required' => $element->required,
 				'type'     => $element->inputType,
 				'class'    => $highlightClass,
-				'title'    => $element->elementMetaData
+				'title'    => $element->elementMetaData,
+				'data-field' => $element->evalElementsId
+
 			];
 			// Add an image icon that will be displayed on the ui to show more info
 			$button = CHtml::image('', '', [
@@ -1242,6 +1261,10 @@ class EvaluationController extends RiskController {
 				// add the dropdown items to the element
 				$elements['elements']['evaContext']['elements'][$attributeId]['items'] = $items;
 				$elements['elements']['evaContext']['elements'][$attributeId]['prompt'] = 'Choose one';
+			}
+			if($element->inputName == 'currentCost' || $element->inputName == 'budgetLimit') {
+
+				$elements['elements']['evaContext']['elements'][$attributeId]['class'] = 'update-able';
 			}
 		}
 		$elements['buttons'] = [

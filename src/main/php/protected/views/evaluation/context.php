@@ -50,6 +50,26 @@
 
 				});
 			});
+			$('.update-able').chosen({
+				create_option: function(term){
+					var chosen = this;
+					var options = {
+						label: term,
+						elementId: $(chosen.form_field).data('field'),
+						scenario: 'addElementField'
+					};
+					$.post('<?= $this->createUrl("options/addOption"); ?>', {options}, function(data){
+						if(data.optionId != '') {
+							chosen.append_option({
+								value: data.optionId,
+								text: data.label
+							});
+
+						}
+					}, 'json');
+				},
+				skip_no_results: true
+			});
 		</script>
 	</div>
 	<div class="contentRight">
