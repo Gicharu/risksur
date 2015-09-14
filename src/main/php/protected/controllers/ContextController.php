@@ -159,47 +159,51 @@ class ContextController extends RiskController {
 	public function actionView($id) {
 		Yii::log("actionView ContextController called", "trace", self::LOG_CAT);
 		$dataArray = [];
-			$contextId = $id;
-			$selectedDesign = FrameworkContext::model()->find([
-				//'select' => 'pageId, pageName',
-				'condition' => 'frameworkId=:frameworkId AND userId=:userId',
-				'params' => [
-					':frameworkId' => $contextId,
-					':userId' => Yii::app()->user->id,
-				],
+		$contextId = $id;
+		$selectedDesign = FrameworkContext::model()->find([
+			//'select' => 'pageId, pageName',
+			'condition' => 'frameworkId=:frameworkId AND userId=:userId',
+			'params' => [
+				':frameworkId' => $contextId,
+				':userId' => Yii::app()->user->id,
+			],
+		]);
+		$survObjCriteria = new CDbCriteria();
+		$survObjCriteria->with = ['data', 'options'];
+		$survObjCriteria->select = 'inputName';
+		$survObjCriteria->condition = "inputName='survObj' AND data.frameworkId=" . $contextId .
+			" AND options.optionId=data.value";
+
+		$rsSurveillanceObjective = FrameworkFields::model()->find($survObjCriteria);
+		$dataArray['selectedDesign'] = $selectedDesign;
+		//add the surveillance context to the session
+		unset(Yii::app()->session['surDesign']);
+		unset(Yii::app()->session['evaContext']);
+		if (count($selectedDesign) == 1) {
+			Yii::app()->session->add('surDesign', [
+				'id' => $contextId,
+				'name' => $selectedDesign->name
 			]);
-			$survObjCriteria = new CDbCriteria();
-			$survObjCriteria->with = ['data', 'options'];
-			$survObjCriteria->select = 'inputName';
-			$survObjCriteria->condition = "inputName='survObj' AND data.frameworkId=" . $contextId .
-				" AND options.optionId=data.value";
-
-			$rsSurveillanceObjective = FrameworkFields::model()->find($survObjCriteria);
-			$dataArray['selectedDesign'] = $selectedDesign;
-			//add the surveillance context to the session
-			if (count($selectedDesign) == 1) {
-				Yii::app()->session->add('surDesign', [
-					'id' => $contextId,
-					'name' => $selectedDesign->name
+			unset(Yii::app()->session['surveillanceObjective']);
+			if(isset($rsSurveillanceObjective)) {
+				Yii::app()->session->add('surveillanceObjective', [
+					'id' => $rsSurveillanceObjective->data[0]['value'],
+					'name' => $rsSurveillanceObjective->options[0]['label'],
+					'fieldId' => $rsSurveillanceObjective->id
 				]);
-				if(isset($rsSurveillanceObjective)) {
-					Yii::app()->session->add('surveillanceObjective', [
-						'id' => $rsSurveillanceObjective->data[0]['value'],
-						'name' => $rsSurveillanceObjective->options[0]['label'],
-						'fieldId' => $rsSurveillanceObjective->id
-					]);
 
-				}
-				Yii::app()->user->setFlash('success', 'The surveillance system is now ' .
-					Yii::app()->session['surDesign']['name']);
-				if(Yii::app()->request->getUrlReferrer()) {
-					//unset(Yii::app()->session['referrer']);
-					$this->redirect(Yii::app()->request->getUrlReferrer());
-					return;
-				}
-			} else {
-				Yii::app()->session->remove('surDesign');
 			}
+			Yii::app()->user->setFlash('success', 'The surveillance system is now ' .
+				Yii::app()->session['surDesign']['name']);
+			if(Yii::app()->request->getUrlReferrer()) {
+				//print_r(Yii::app()->session); die;
+				//unset(Yii::app()->session['referrer']);
+				$this->redirect(Yii::app()->request->getUrlReferrer());
+				return;
+			}
+		} else {
+			Yii::app()->session->remove('surDesign');
+		}
 
 
 		$this->redirect('list');
@@ -618,6 +622,7 @@ class ContextController extends RiskController {
 				$surveillanceDataModel->deleteAll($deleteCriteria);
 				//var_dump($surveillanceDataModel); die;
 				$transaction->commit();
+				$this->redirect('list/id/' . $frameWorkModel->id);
 				//die;
 			}
 		} catch (Exception $e) {

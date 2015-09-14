@@ -31,6 +31,7 @@ class EvaluationController extends RiskController {
 			$session['surveillanceObjective']['id'] : null;
 		$this->evaQuestionId = isset($session['evaContext']['questionId']) ?
 			$session['evaContext']['questionId'] : null;
+		//print_r($session['evaContext']);print_r($this); die;
 
 	}
 
@@ -52,16 +53,23 @@ class EvaluationController extends RiskController {
 			strtolower('selectEvaAttributes')  => 'selectEvaAttributes',
 			strtolower('selectEvaAssMethod')   => 'selectEvaAssMethod',
 		];
+		$contextQuestionActions = [
+			strtolower('selectEvaAttributes') => 'selectEvaAttributes'
+		];
 		//var_dump(isset($contextActions[$action->id]), $action->id); die;
 
-		if (isset($contextActions[$action->id]) && !isset($this->evaContextId)) {
-			Yii::app()->user->setFlash('notice', 'Please select or create an evaluation context before proceeding');
-			$this->redirect('listEvaContext');
-		}
 		if (isset($objectiveActions[$action->id]) && !isset($this->objectiveId)) {
 			Yii::app()->user->setFlash('notice', 'The current surveillance system does not have a surveillance objective please update it');
 			$this->redirect(['context/list']);
 			//return true;
+		}
+		if (isset($contextActions[$action->id]) && !isset($this->evaContextId)) {
+			Yii::app()->user->setFlash('notice', 'Please select or create an evaluation context before proceeding');
+			$this->redirect('listEvaContext');
+		}
+		if (isset($contextQuestionActions[$action->id]) && !isset($this->evaQuestionId)) {
+			Yii::app()->user->setFlash('notice', 'Please select a question for your evaluation context before proceeding');
+			$this->redirect('selectEvaQuestion');
 		}
 		return true;
 	}
@@ -557,6 +565,14 @@ class EvaluationController extends RiskController {
 	 */
 	public function actionSelectComponents() {
 		$this->setPageTitle('Select components');
+		// check if the context supports component selection
+		$rsEvaluationType = EvaluationDetails::model()->find('evalElementsId=:element AND evalId=:evaId',
+			[':element' => 5, ':evaId' => $this->evaContextId]);
+		if(isset($rsEvaluationType) && $rsEvaluationType->value == 0) {
+			Yii::app()->user->setFlash('notice', 'The evaluation context is system based hence no components are needed');
+			$this->redirect('selectEvaAttributes');
+
+		}
 		$model = new DesignForm();
 		$elements = ContextController::getDefaultElements();
 		$rules = [];
@@ -680,8 +696,10 @@ class EvaluationController extends RiskController {
 				json_encode($_POST['EvaluationHeader']['evaAttributes']) : null;
 			if ($evaluationModel->validate() && $evaluationModel->update(['evaAttributes'])) {
 				Yii::app()->user->setFlash('success', 'Evaluation attributes saved successfully');
-				$this->redirect('selectEvaAssMethod');
-				return;
+				if($_POST['saveEvaAttr'] == 'Next') {
+					$this->redirect('selectEvaAssMethod');
+					return;
+				}
 
 			}
 			//var_dump($_POST, $evaluationModel); die;
@@ -975,9 +993,11 @@ class EvaluationController extends RiskController {
 				Yii::app()->user->setFlash('success', Yii::t("translation", "Evaluation protocol created successfully"));
 				$this->redirect(['selectEvaQuestion']);
 				return;
+			} elseif(!$evaluationHeader->hasErrors() && !$model->hasErrors()) {
+				Yii::app()->user->setFlash('error', Yii::t("translation", "An error occurred when creating the " .
+					"evaluation, please try again or contact your administrator if the problem persists"));
+
 			}
-			Yii::app()->user->setFlash('error', Yii::t("translation", "An error occurred when creating the " .
-				"evaluation, please try again or contact your administrator if the problem persists"));
 
 		}
 

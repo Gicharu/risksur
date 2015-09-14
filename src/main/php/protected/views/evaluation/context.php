@@ -40,13 +40,13 @@
 
 				$('#EvalForm_evaType_5').on('change', function() {
 					//console.log($(this).parent().next('div').hide());
-					if($(this).val() == '0') {
-						$(this).parent().next('.row').toggle();
-						$(this).parent().next('.row').children('input').val(0);
+					if($(this).val() == '1') {
+						$(this).parent().next('.row').show();
+						$(this).parent().next('.row').children('input').val('');
 						return true;
 					}
-					$(this).parent().next('.row').children('input').val('');
-					$(this).parent().next('.row').toggle();
+					$(this).parent().next('.row').children('input').val('0');
+					$(this).parent().next('.row').hide();
 
 				});
 			});

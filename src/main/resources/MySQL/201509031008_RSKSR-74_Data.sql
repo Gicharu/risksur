@@ -1,46 +1,25 @@
 INSERT INTO `programpages` (`pageId`, `pageName`, `path`, `parentId`, `menuOrder`, `target`, `active`, `comments`) VALUES
   (18, 'Home', 'system/index', 0, 1, NULL, 1, NULL);
 
+
+UPDATE `programpages` SET `pageId` = 2,`pageName` = 'Design Tool',`path` = 'design/index',`parentId` = 0,`menuOrder` = 3,`target` = '',`active` = 1,`comments` = NULL WHERE `programpages`.`pageId` = 2;
+UPDATE `programpages` SET `pageId` = 3,`pageName` = 'Evaluation Tool',`path` = 'evaluation/evaPage',`parentId` = 0,`menuOrder` = 4,`target` = '',`active` = 1,`comments` = NULL WHERE `programpages`.`pageId` = 3;
+UPDATE `programpages` SET `pageId` = 6,`pageName` = 'Statistical Tools',`path` = 'stage.tracetracker.com/epitools',`parentId` = 0,`menuOrder` = 5,`target` = '_blank',`active` = 1,`comments` = NULL WHERE `programpages`.`pageId` = 6;
+UPDATE `programpages` SET `pageId` = 8,`pageName` = 'Admin',`path` = '',`parentId` = 0,`menuOrder` = 6,`target` = '',`active` = 1,`comments` = NULL WHERE `programpages`.`pageId` = 8;
+UPDATE `programpages` SET `pageId` = 9,`pageName` = 'noMenu',`path` = '',`parentId` = 0,`menuOrder` = 14,`target` = '',`active` = 1,`comments` = NULL WHERE `programpages`.`pageId` = 9;
+UPDATE `programpages` SET `pageId` = 10,`pageName` = 'Manage Goals',`path` = 'admin/listGoals',`parentId` = 8,`menuOrder` = 15,`target` = '',`active` = 1,`comments` = NULL WHERE `programpages`.`pageId` = 10;
+UPDATE `programpages` SET `pageId` = 11,`pageName` = 'Manage Component Forms',`path` = 'surformdetails/index',`parentId` = 8,`menuOrder` = 16,`target` = NULL,`active` = 1,`comments` = NULL WHERE `programpages`.`pageId` = 11;
+UPDATE `programpages` SET `pageId` = 12,`pageName` = 'Manage Select Options',`path` = 'options/index',`parentId` = 8,`menuOrder` = 15,`target` = '',`active` = 1,`comments` = NULL WHERE `programpages`.`pageId` = 12;
+UPDATE `programpages` SET `pageId` = 13,`pageName` = 'Manage Users',`path` = 'users/index',`parentId` = 8,`menuOrder` = 16,`target` = '',`active` = 1,`comments` = NULL WHERE `programpages`.`pageId` = 13;
+UPDATE `programpages` SET `pageId` = 14,`pageName` = 'Manage Attributes',`path` = 'attribute/index',`parentId` = 8,`menuOrder` = 17,`target` = '',`active` = 1,`comments` = NULL WHERE `programpages`.`pageId` = 14;
+UPDATE `programpages` SET `pageId` = 15,`pageName` = 'Surveillance System',`path` = 'context/index',`parentId` = 0,`menuOrder` = 2,`target` = NULL,`active` = 1,`comments` = NULL WHERE `programpages`.`pageId` = 15;
+UPDATE `programpages` SET `pageId` = 17,`pageName` = 'Manage Evaluation Tool',`path` = 'admineva/index',`parentId` = 8,`menuOrder` = 18,`target` = NULL,`active` = 1,`comments` = NULL WHERE `programpages`.`pageId` = 17;
+UPDATE `programpages` SET `pageId` = 18,`pageName` = 'Home',`path` = 'system/index',`parentId` = 0,`menuOrder` = 1,`target` = NULL,`active` = 1,`comments` = NULL WHERE `programpages`.`pageId` = 18;
+
 INSERT INTO `pages_has_roles` (`pageId`, `roleId`) VALUES
   (18, 1),
   (18, 2),
   (18, 3);
-
-INSERT INTO `roles_has_permissions` (`permissions_id`, `roles_id`) VALUES
-  (71, 1),
-  (71, 2),
-  (71, 3),
-  (93, 1),
-  (93, 2),
-  (93, 3),
-  (94, 1),
-  (94, 2),
-  (94, 3),
-  (95, 1),
-  (95, 2),
-  (95, 3),
-  (96, 1),
-  (96, 2),
-  (96, 3),
-  (97, 1),
-  (97, 2),
-  (98, 1),
-  (98, 2),
-  (100, 1),
-  (100, 2),
-  (101, 1),
-  (101, 2),
-  (102, 1),
-  (102, 2),
-  (102, 3),
-  (103, 1),
-  (103, 2),
-  (104, 1),
-  (104, 2),
-  (105, 1),
-  (105, 2),
-  (106, 1),
-  (106, 2);
 
 
 UPDATE `permissions`
@@ -48,6 +27,10 @@ SET `id` = 71,`name` = 'actionIndex',`description` = 'C/A to display intro page'
 
 INSERT IGNORE INTO `permissions` (`id`, `name`, `description`, `controller`, `action`, `bizrule`) VALUES
   (88, 'actionGetQuestionGroups', 'C/A to rerieve question groups', 'adminattributerelevance', 'getQuestionGroups', '');
+
+INSERT IGNORE INTO `roles_has_permissions` (`permissions_id`, `roles_id`) VALUES
+  (88, 1),
+  (88, 2);
 
 
 TRUNCATE TABLE `evaCriteria`;
@@ -192,10 +175,91 @@ INSERT INTO `docPages` (`docId`, `docName`, `docData`) VALUES
 
 UPDATE `evalElements` SET `options` = NULL WHERE `evalElementsId` = '9';
 UPDATE `evalElements` SET `options` = NULL WHERE `evalElementsId` = '10';
+TRUNCATE TABLE `evaQuestionGroups`;
+INSERT INTO `evaQuestionGroups` (`groupId`, `section`, `questions`)
+VALUES
+  (
+    1,
+    'evaCriteriaMethod',
+    '{\"1\":[1,12,3,6,7,15,18,10,9,4,5,14,8,43],\"2\":[11,4],\"3\":[2,12,6,7,15,18,10,9,5,14,8],\"4\":[5,6,7,14,15,18,8,10,9],\"5\":[13]}'
+  ),
+  (
+    2,
+    'evaComponents',
+    '{\"1\":[1,3,5,6,7,11,4],\"2\":[2,12,14,15,18,8,9,10]}'
+  ),
+  (
+    3,
+    'econEvaMethods',
+    '{\"1\":[5,6,7],\"2\":[14,15,18],\"3\":[8,9,10]}'
+  ) ;
 
+
+
+DROP TABLE IF EXISTS `evaAssessmentMethods`;
+
+CREATE TABLE `evaAssessmentMethods` (
+
+  `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+
+  `evaluationId` INT(11) NOT NULL,
+
+  `evaAttribute` INT(11) NOT NULL,
+
+  `assessmentMethod` INT(11) UNSIGNED DEFAULT NULL,
+
+  `dataAvailable` INT(1) NOT NULL,
+
+  `customAssessmentMethod` TEXT CHARACTER SET utf8,
+
+  PRIMARY KEY (`id`),
+
+  KEY `fk_assessmentMethod` (`assessmentMethod`),
+
+  CONSTRAINT `fk_assessmentMethod` FOREIGN KEY (`assessmentMethod`) REFERENCES `evaAttributesAssessmentMethods` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+
+) ENGINE=INNODB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 INSERT INTO `options` (`optionId`, `frameworkFieldId`, `componentId`, `elementId`, `val`, `label`) VALUES
   (104, NULL, NULL, 9, NULL, 'Yes'),
   (105, NULL, NULL, 9, NULL, 'No'),
   (106, NULL, NULL, 10, NULL, 'No'),
   (107, NULL, NULL, 10, NULL, 'Yes');
+
+
+
+INSERT INTO `roles_has_permissions` (`permissions_id`, `roles_id`) VALUES
+#   (71, 1),
+#   (71, 2),
+#   (71, 3),
+  (93, 1),
+  (93, 2),
+  (93, 3),
+  (94, 1),
+  (94, 2),
+  (94, 3),
+  (95, 1),
+  (95, 2),
+  (95, 3),
+  (96, 1),
+  (96, 2),
+  (96, 3),
+  (97, 1),
+  (97, 2),
+  (98, 1),
+  (98, 2),
+  (99, 1),
+  (99, 2),
+  (100, 1),
+  (100, 2),
+  (101, 1),
+  (101, 2),
+  (101, 3),
+  (102, 1),
+  (102, 2),
+  (103, 1),
+  (103, 2),
+  (104, 1),
+  (104, 2),
+  (105, 1),
+  (105, 2);
