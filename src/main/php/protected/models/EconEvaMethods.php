@@ -88,4 +88,13 @@ class EconEvaMethods extends CActiveRecord {
 	public static function model($className = __CLASS__) {
 		return parent::model($className);
 	}
+
+	protected function afterDelete() {
+		if(parent::afterDelete()) {
+			$model = EvaQuestionGroups::model('section=:section', [':section' => 'econEvaMethods']);
+			$model->method = $this->id;
+			$model->setScenario('delete');
+			$model->save();
+		}
+	}
 }

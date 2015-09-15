@@ -55,7 +55,6 @@ class AdmineconomicmethodsController extends RiskController {
 
 	/**
 	 * Deletes a particular model.
-	 * If deletion is successful, the browser will be redirected to the 'admin' page.
 	 * @param integer $id the ID of the model to be deleted
 	 */
 	public function actionDelete($id) {

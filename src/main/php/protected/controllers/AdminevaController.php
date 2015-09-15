@@ -25,6 +25,7 @@ class AdminevaController extends RiskController {
 	 */
 	public function init() {
 		$this->configuration = Yii::app()->tsettings;
+		$this->setPageTitle('Manage evaluation tool');
 	}
 
 	public function actionIndex() {
