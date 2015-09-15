@@ -559,12 +559,14 @@ class ContextController extends RiskController {
 	public function wizardFinished($event) {
 		$surveillanceDataModel = new FrameworkFieldData();
 		$frameWorkModel = new FrameworkContext();
-		if(isset(Yii::app()->session['surveillanceId'])) {
-			$frameWorkModel = FrameworkContext::model()->findByPk(Yii::app()->session['surveillanceId']);
+		$frameWorkData = $event->getData();
+		//print_r($frameWorkData['surveillanceModel']['frameworkId']); die;
+		if(isset($frameWorkData['surveillanceModel']['frameworkId'])) {
+			$frameWorkModel = FrameworkContext::model()->findByPk($frameWorkData['surveillanceModel']['frameworkId']);
 			$surveillanceDataModel->setScenario('update');
 		}
-		$frameWorkData = $event->getData();
 		$frameWorkModel->attributes = $frameWorkData['surveillanceModel'];
+		//var_dump($frameWorkModel->validate()); die;
 		$transaction = Yii::app()->db->beginTransaction();
 		$dataKeys = [];
 		try {
@@ -617,18 +619,20 @@ class ContextController extends RiskController {
 					}
 
 				}
+				//print_r($frameWorkModel); die;
+				//print_r($dataKeys);
 				$deleteCriteria = new CDbCriteria();
+				$deleteCriteria->condition = 'frameworkId=' . $frameWorkModel->frameworkId;
 				$deleteCriteria->addNotInCondition('id', $dataKeys);
+				//print_r($deleteCriteria); die;
 				$surveillanceDataModel->deleteAll($deleteCriteria);
-				//var_dump($surveillanceDataModel); die;
 				$transaction->commit();
-				$this->redirect('list/id/' . $frameWorkModel->id);
-				//die;
+
 			}
 		} catch (Exception $e) {
-			$transaction->rollBack();
 			Yii::log($e->getMessage() . 'error when saving a surveillance system error code [' . $e->getCode() . ']',
 				'error', self::LOG_CAT);
+			$transaction->rollBack();
 			$event->sender->reset();
 			Yii::app()->end();
 			Yii::app()->user->setFlash('error', 'There was a problem saving the surveillance system, please try ' .
@@ -637,13 +641,15 @@ class ContextController extends RiskController {
 
 		}
 		//die('hapa');
-
+		unset(Yii::app()->session['surveillanceObjective']);
+		unset(Yii::app()->session['surDesign']);
+		unset(Yii::app()->session['evaContext']);
 		$this->render('finished', compact('event'));
 		$event->sender->reset();
 		Yii::app()->end();
 	}
-
 	public function actionCreate($step=null) {
+
 		unset(Yii::app()->session['surveillanceId']);
 		$this->process($step);
 	}
