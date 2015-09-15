@@ -53,7 +53,7 @@ class FrameworkContext extends CActiveRecord {
 	public function rules() {
 		return array(
 			array(
-				'name, description, userId',
+				'name, userId',
 				'required'
 			),
 			array(
