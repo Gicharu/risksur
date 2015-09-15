@@ -14,6 +14,6 @@ $this->menu = [
 ];
 ?>
 
-	<h3>Update <?= $model->name; ?> economic method </h3>
+	<h3>Update <?= $model->name; ?> economic approach </h3>
 
 <?php $this->renderPartial('_form', ['model' => $model]); ?>

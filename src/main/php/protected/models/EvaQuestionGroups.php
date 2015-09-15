@@ -8,6 +8,8 @@
  * @property string $questions
  */
 class EvaQuestionGroups extends CActiveRecord {
+
+	public $method;
 	/**
 	 * @return string the associated database table name
 	 */
@@ -22,11 +24,9 @@ class EvaQuestionGroups extends CActiveRecord {
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return [
-			['section, questions', 'required'],
+			['section, questions, method', 'required'],
 			['section', 'length', 'max' => 80],
 			// The following rule is used by search().
-			// @todo Please remove those attributes that should not be searched.
-			['groupId, section, questions', 'safe', 'on' => 'search'],
 		];
 	}
 
@@ -48,32 +48,11 @@ class EvaQuestionGroups extends CActiveRecord {
 			'groupId'   => 'Group',
 			'section'   => 'Section',
 			'questions' => 'Questions',
+			'method' => 'Economic method',
 		];
 	}
 
-	/**
-	 * Retrieves a list of models based on the current search/filter conditions.
-	 * Typical usecase:
-	 * - Initialize the model fields with values from filter form.
-	 * - Execute this method to get CActiveDataProvider instance which will filter
-	 * models according to data in model fields.
-	 * - Pass data provider to CGridView, CListView or any similar widget.
-	 * @return CActiveDataProvider the data provider that can return the models
-	 * based on the search/filter conditions.
-	 */
-	public function search() {
-		// @todo Please modify the following code to remove attributes that should not be searched.
-
-		$criteria = new CDbCriteria;
-
-		$criteria->compare('groupId', $this->groupId, true);
-		$criteria->compare('section', $this->section, true);
-		$criteria->compare('questions', $this->questions, true);
-
-		return new CActiveDataProvider($this, [
-			'criteria' => $criteria,
-		]);
-	}
+	
 
 	/**
 	 * Returns the static model of the specified AR class.
@@ -83,5 +62,27 @@ class EvaQuestionGroups extends CActiveRecord {
 	 */
 	public static function model($className = __CLASS__) {
 		return parent::model($className);
+	}
+
+	/**
+	 * @return bool
+	 */
+	protected function beforeSave() {
+		if(parent::beforeSave()) {
+			$rsMethods = $this->find('section=:section', [':section' => 'econEvaMethods']);
+			$this->groupId = $rsMethods->groupId;
+			$currentQuestions = json_decode($rsMethods->questions, true);
+			//if(isset($currentQuestions[$this->method])) {
+			$currentQuestions[$this->method] = $this->questions;
+			if($this->scenario == 'delete') {
+				unset($currentQuestions[$this->method]);
+			}
+			$this->questions = json_encode($currentQuestions);
+
+			return true;
+
+		}
+
+
 	}
 }

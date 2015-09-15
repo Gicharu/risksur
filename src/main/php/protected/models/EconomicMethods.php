@@ -48,13 +48,21 @@ class EconomicMethods extends CActiveRecord {
 	public function attributeLabels() {
 		return [
 			'id'          => 'ID',
-			'econMethod'  => 'Econ Method',
+			'econMethod'  => 'Economic Method',
 			'name'        => 'Name',
 			'description' => 'Description',
 			'reference'   => 'Reference',
 		];
 	}
 
+	/**
+	 *
+	 */
+	protected function afterFind() {
+		$this->description = UtilModel::urlToLink($this->description);
+		parent::afterFind();
+
+	}
 
 	/**
 	 * Returns the static model of the specified AR class.

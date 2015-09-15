@@ -356,8 +356,10 @@ class EvaluationController extends RiskController {
 		$tableData['Evaluation Question'] = '';
 		$tableData['Assessment Criteria'] = '';
 		$counter = 1;
+		//print_r($surQuestionWithCriteria); die;
 		foreach ($surQuestionWithCriteria as $questionWithCriteria) {
-			$tableData['Evaluation Question'] = $questionWithCriteria->question->question;
+			$tableData['Evaluation Question'] = $questionWithCriteria->question->questionNumber . ' ' .
+				$questionWithCriteria->question->question;
 			$tableData['Assessment Criteria'] .= $questionWithCriteria->criteria->criteria_name;
 			if ($counter < count($surQuestionWithCriteria)) {
 				$tableData['Assessment Criteria'] .= ' and ';
@@ -885,12 +887,12 @@ class EvaluationController extends RiskController {
 			->with('evaluationAttributes', 'evaAttrAssMethods')
 			->findAll());
 		$econEvaMethods = [];
-		$selectedEconEvaMethods = [];
-		$rsEconMethods = ModelToArray::convertModelToArray(EvaluationHeader::model()
+		$evaAttributes = [];
+		$rsEvaHeader = ModelToArray::convertModelToArray(EvaluationHeader::model()
 			->findByPk($this->evaContextId,
-				['condition' => 'econEvaMethods IS NOT NULL', 'select' => 'econEvaMethods']));
-		if(isset($rsEconMethods['econEvaMethods'])) {
-			$selectedEconEvaMethods = json_decode($rsEconMethods['econEvaMethods']);
+				['select' => 'econEvaMethods, evaAttributes']));
+		if(isset($rsEvaHeader['econEvaMethods'])) {
+			$selectedEconEvaMethods = json_decode($rsEvaHeader['econEvaMethods']);
 			$econEvaMethodsCriteria = new CDbCriteria();
 			$econEvaMethodsCriteria->addInCondition('t.id', $selectedEconEvaMethods);
 			$econEvaMethodsCriteria->with = 'econMethodGroup';
@@ -898,11 +900,20 @@ class EvaluationController extends RiskController {
 				->findAll($econEvaMethodsCriteria));
 
 		}
-		//print_r($econEvaMethods); die;
+		if(isset($rsEvaHeader['evaAttributes'])) {
+			$selectedEvaAttributes = json_decode($rsEvaHeader['evaAttributes'], true);
+			$evaAttributesCriteria = new CDbCriteria();
+			$evaAttributesCriteria->addInCondition('attributeId', $selectedEvaAttributes);
+			$evaAttributesCriteria->with = 'attributeTypes';
+			$evaAttributes = ModelToArray::convertModelToArray(EvaAttributes::model()
+				->findAll($evaAttributesCriteria));
+		}
+		//print_r(json_encode($evaAttributes)); die;
 		$this->render('evaSummary', [
 			'evaDetails'    => $evaDetails,
 			'evaAssMethods' => $evaAssMethods,
-			'econEvaMethods' => $econEvaMethods
+			'econEvaMethods' => $econEvaMethods,
+			'evaAttributes' => $evaAttributes
 		]);
 	}
 

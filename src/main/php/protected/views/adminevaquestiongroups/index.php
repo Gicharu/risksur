@@ -1,30 +1,32 @@
 <?php
-/* @var $this AdmineconomicmethodsController */
+/* @var $this AdminevaquestiongroupsController */
 /* @var $dataProvider CActiveDataProvider */
 
-$this->breadcrumbs=array(
-	'Economic Methods',
-);
+$this->breadcrumbs = [
+	'Eva Question Groups',
+];
 
-$this->menu=array(
-	array('label'=>'Add Economic Approach', 'url'=>array('create')),
-);
+$this->menu = [
+	['label' => 'Add Association', 'url' => ['create']],
+];
 ?>
+
+<h3>Evaluation question - economic method association</h3>
+<p> This section allows you to associate existing economic methods with evaluation question i.e link evaluation
+	questions to economic methods</p>
 
 <script type="text/javascript">
 
 
 	$(function () {
-		$("#econMethods").dataTable({
+		$("#evaQuestionGroups").dataTable({
 			"sDom": '<"H"rlf>t<"F"ip>',
 			"sAjaxSource": '<?= $this->createUrl("index", ["ajax" => 1]) ?>',
 			"aoColumns": [
-				{"mDataProp": "econMethodGroup.buttonName"},
-				{"mDataProp": "name"},
-				{"mDataProp": "description"},
-				{"mDataProp": "reference"},
+				{"mData": "methodName"},
+				{"mData": "questions"},
 				{
-					"mDataProp": null, "bSortable": false, sClass: "editMethod",
+					"mData": null, "bSortable": false, sClass: "editMethod",
 					sDefaultContent: '<button title="Edit" class="bedit">Edit</button>'
 				},
 				{
@@ -54,28 +56,26 @@ $this->menu=array(
 			.on('click', '.bedit', {
 				operation: 'edit',
 				link: '<?= $this->createUrl("update"); ?>',
-				table: '#econMethods',
-				rowIdentifier: 'id'
+				table: '#evaQuestionGroups',
+				rowIdentifier: 'methodId'
 			}, requestHandler)
 			.on('click', '.bdelete', {
 				operation: 'delete',
 				link: '<?= $this->createUrl("delete"); ?>',
-				table: '#econMethods',
+				table: '#evaQuestionGroups',
 				refreshLink: '<?= $this->createUrl("index") . '/ajax/1'; ?>',
-				rowIdentifier: 'id'
+				rowIdentifier: 'methodId'
 			}, requestHandler);
 
 	});
 </script>
-<div id="listEconMethods">
+<div id="listEvaQuestionGroups">
 
-	<table id="econMethods" width="100%" class="display">
+	<table id="evaQuestionGroups" width="100%" class="display">
 		<thead>
 		<tr>
 			<th title="Economic method">Economic method</th>
-			<th title="Approach name">Approach name</th>
-			<th title="Description">Description</th>
-			<th title="Reference">Reference</th>
+			<th title="Link">Evaluation questions</th>
 			<th title="Edit"></th>
 			<th title="Delete"></th>
 		</tr>

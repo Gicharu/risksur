@@ -7,6 +7,7 @@
  * @var $evaDetails array
  * @var $evaAssMethods array
  * @var $econEvaMethods array
+ * @var $evaAttributes array
  * @var $this EvaluationController
  */
 $this->renderPartial('_detailsTable', ['evaDetails' => $evaDetails, 'tools' => true]);
@@ -117,8 +118,61 @@ $this->renderPartial('_detailsTable', ['evaDetails' => $evaDetails, 'tools' => t
 
 		});
 
+		$("#evaAttributes").dataTable({
+			"sDom": '<"H"rlTf>t<"F"ip>',
+			"aaData": <?= json_encode($evaAttributes); ?>,
+			"aoColumns": [
+				{"mData": "attributeTypes.name"},
+				{"mData": "name"},
+				{"mData": "description"}
+			],
+			"bJQueryUI": true,
+			"sPaginationType": "buttons_input",
+			"oTableTools": {
+				"sSwfPath": "<?php echo Yii::app()->request->baseUrl; ?>/js/copy_csv_xls_pdf.swf",
+				"aButtons": [
+					{
+						"sExtends": "print",
+						"sButtonText": "<?php echo Yii::t('translation', 'Print')?>",
+						"sMessage": '<p class="printHeader">Evaluation Attributes</p>',
+						"bShowAll": false
+					},
+					{
+						"sExtends": "pdf",
+						"sButtonText": "<?php echo Yii::t('translation', 'Save')?>",
+						"fnClick":  function( nButton, oConfig, flash ) {
+							flash.setFileName( "Evaluation_Attributes_" + getTitle() + ".pdf" );
+							this.fnSetText( flash,
+								"title:"+ this.fnGetTitle(oConfig) +"\n"+
+								"message:"+ oConfig.sPdfMessage +"\n"+
+								"colWidth:"+ this.fnCalcColRatios(oConfig) +"\n"+
+								"orientation:"+ oConfig.sPdfOrientation +"\n"+
+								"size:"+ oConfig.sPdfSize +"\n"+
+								"--/TableToolsOpts--\n" +
+								this.fnGetTableData(oConfig)
+							);
+						}
+
+					}
+				]
+			}
+
+		});
+
 	});
 </script>
+<table id="evaAttributes" class="tableStyle" width="100%" border="0" cellspacing="0" cellpadding="0">
+	<thead>
+	<tr>
+		<th title = "Attribute Type">Attribute Type</th>
+		<th title = "Attribute Name">Attribute Name</th>
+		<th title = "Description">Description</th>
+	</tr>
+	</thead>
+	<tbody>
+	</tbody>
+</table>
+<p></p>
 <table id="evaAssMethods" class="tableStyle" width="100%" border="0" cellspacing="0" cellpadding="0">
 	<thead>
 	<tr>
