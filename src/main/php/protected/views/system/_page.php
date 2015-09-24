@@ -35,6 +35,10 @@ if ($editAccess) {
 				'toolbar' => true,
 				'buttonSource' => true,
 				'iframe' => false,
+				'linkAnchor' => true,
+				 'allowedAttr' =>  [
+					 ['p', 'id']
+				 ],
 				//'autosave' => $this->createUrl('savePage'),
 				//'autosaveOnChange' => true,
 //				'autosaveFields' => [

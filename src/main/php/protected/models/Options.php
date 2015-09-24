@@ -10,6 +10,8 @@
  * @license Tracetracker {@link http://www.tracetracker.com}
  */
 class Options extends CActiveRecord {
+
+
 	/**
 	 * @return array relational rules.
 	 */
@@ -43,7 +45,7 @@ class Options extends CActiveRecord {
 	 * tableName 
 	 * 
 	 * @access public
-	 * @return array
+	 * @return string
 	 */
 	public function tableName() {
 		return 'options';
@@ -68,8 +70,20 @@ class Options extends CActiveRecord {
 	public function rules() {
 		return [
 			[
-				'label, elementId',
+				'label',
 				'required'
+			],
+			[
+				'frameworkFieldId',
+				'required', 'on' => 'addFrameworkField'
+			],
+			[
+				'componentId',
+				'required', 'on' => 'addComponentField'
+			],
+			[
+				'elementId',
+				'required', 'on' => 'addElementField'
 			]
 		];
 	}

@@ -202,6 +202,7 @@ return CMap::mergeArray($configArray, array(
 				"<span class='ui-icon ui-icon-alert' style='float: left; margin-right: .3em;'></span>",
 			'footerErrorSummary' => "</p></div></div>",
 			'AdminUrl' => (isset($_SERVER['HTTP_HOST'])) ? $_SERVER['HTTP_HOST'] : exec("hostname"),
+			//'menu' => []
 			// 'wwwPath' => $wwwPath,
 		),
 		//'runtimePath' => sys_get_temp_dir(),

@@ -22,7 +22,8 @@
 		$baseUrl . "/libraries/DataTables-1.9.4/extras/TableTools/media/css/TableTools.css" => "all",
 		$baseUrl . "/css/jquery.selectBoxIt.css" => "all",
 		$baseUrl . "/libraries/jquery-qtip/jquery.qtip.min.css" => "all",
-		$baseUrl . "/css/risksurstyle.css" => "noMedia", 
+		$baseUrl . "/libraries/chosen_v1.1.0/chosen.css" => "all",
+		$baseUrl . "/css/risksurstyle.css" => "noMedia",
 
 	);
 	// array of javascript include paths
@@ -47,7 +48,7 @@
 		"/js/common.js",
 		"/libraries/jquery-showloading-1.0/jquery.showLoading.js",
 		//"/libraries/jsTimezoneDetect-1.0.4/jstz.min.js",
-		"/libraries/chosen_v1.3.0/chosen.jquery.js",
+		"/libraries/chosen_v1.1.0/chosen.jquery.js",
 		"/libraries/jquery-qtip/jquery.qtip.min.js",
 
 	);
@@ -123,6 +124,7 @@ function addNewDesign() {
 }
 var baseUrl = "<?php echo $baseUrl; ?>" + '/index.php/';
 $(function(){
+	$('.chozen').chosen();
 	$("#menu").menu({
 		position: {at: "left bottom"}
 	});
@@ -232,39 +234,67 @@ if (!Yii::app()->user->isGuest) {
 
 	<div id="header">
 		<div id="logo">
-			<a href='<?= Yii::app()->createUrl("context/intro"); ?>'>
+			<a href='<?= Yii::app()->createUrl("system/index"); ?>'>
 				<img src="<?php echo $baseUrl; ?>/<?php echo $storySettings->logopath;?>"
 					 alt="link to landing page" />
 			</a>
 		</div>
 	<div id="designName">
 	<?php
-		$activeDesignAction = 'Select';
-		$activeDesignName = '';
-		if (!empty(Yii::app()->session['surDesign'])) {
-			$activeDesignName = Yii::app()->session['surDesign']['name'] . ' - ';
-			$activeDesignAction = 'Change';
-		}
-		echo "Selected Surveillance System: $activeDesignName <a href='" . Yii::app()->createUrl("context/list") . "'>$activeDesignAction</a>";
+	$activeDesignAction = 'Select';
+	$activeSurSystem = '';
+	$surSystemOptions = [
+		'class' => 'chozen',
+		'empty' => 'Select one...',
+		'data-placeholder' => 'Select one',
+		'id' => 'systemSelector',
+		'onchange' => "if(\$(this).val() !== '') {window.location='" .
+			Yii::app()->createUrl('context/view') . "/id/' + $(this).val()}"
+	];
+	if (!empty(Yii::app()->session['surDesign'])) {
+		$activeSurSystem = Yii::app()->session['surDesign']['id'];
+		//$activeDesignAction = 'Change';
+		unset($surSystemOptions['empty'], $surSystemOptions['data-placeholder']);
+	}
+	$surSystemCriteria = new CDbCriteria();
+	$surSystemCriteria->select = 'frameworkId, name';
+	$surSystemCriteria->condition = 'userId=:user';
+	$surSystemCriteria->params = [
+		':user' => Yii::app()->user->id
+	];
+		//echo "Selected surveillance system: $activeSurSystem <a href='" . Yii::app()->createUrl("context/list") . "'>$activeDesignAction</a>";
+		echo CHtml::label('Current surveillance system: ', 'systemSelector');
+		echo CHtml::dropDownList('systemSelector', $activeSurSystem,
+			CHtml::listData(FrameworkContext::model()->findAll($surSystemCriteria
+			), 'frameworkId', 'name'), $surSystemOptions);
 	?>
 	</div>
 	<div id="evalName">
 	<?php
 		if (!empty(Yii::app()->session['evaContext']) && Yii::app()->controller->id == 'evaluation') {
-			echo "Selected Evaluation Context: " . Yii::app()->session['evaContext']['name'];
+			echo "Selected evaluation context: " . Yii::app()->session['evaContext']['name'];
 		}
 	?>
 	</div>
 	<div id="attributeSelected">
 	<?php
 		if (Yii::app()->controller->id <> 'evaluation') {
-			$activeAttributeName = '';
-			$activeAttributeAction = 'Select';
+			$perfOptions = [
+				'class' => 'chozen',
+				'empty' => 'Select one...',
+				'data-placeholder' => 'Select one',
+				'id' => 'perfSelector',
+				'onchange' => "if(\$(this).val() !== '') {window.location='" .
+					Yii::app()->createUrl('attribute/selectAttribute') . "/id/' + $(this).val() }"
+			];
+			$activeAttributeId = '';
 			if (!empty(Yii::app()->session['performanceAttribute'])) {
-				$activeAttributeName = Yii::app()->session['performanceAttribute']['name'] . ' - ';
-				$activeAttributeAction = 'Change';
+				$activeAttributeId = Yii::app()->session['performanceAttribute']['id'];
+				unset($perfOptions['empty'], $perfOptions['data-placeholder']);
 			}
-			echo "Selected Performance Attribute: $activeAttributeName <a href='" . Yii::app()->createUrl("attribute/selectAttribute") . "'>$activeAttributeAction</a>";
+			echo CHtml::label('Current performance attribute: ', 'perfSelector');
+			echo CHtml::dropDownList('perfSelector', $activeAttributeId,
+				AttributeController::actionSelectAttribute(), $perfOptions);
 		}
 	?>
 	</div>

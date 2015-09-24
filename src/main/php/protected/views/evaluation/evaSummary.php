@@ -6,6 +6,8 @@
  * Time: 11:03 PM
  * @var $evaDetails array
  * @var $evaAssMethods array
+ * @var $econEvaMethods array
+ * @var $evaAttributes array
  * @var $this EvaluationController
  */
 $this->renderPartial('_detailsTable', ['evaDetails' => $evaDetails, 'tools' => true]);
@@ -22,11 +24,21 @@ $this->renderPartial('_detailsTable', ['evaDetails' => $evaDetails, 'tools' => t
 			"aaData": <?= json_encode($evaAssMethods); ?>,
 			"aoColumns": [
 				{"mData": "evaluationAttributes.name"},
-				{"mData": "methodDescription"},
+				{"mData": "evaAttrAssMethods.description"},
 				{
-					"mData": "dataAvailability", "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-							$(nTd).html(dataAvailabilityMap[sData]);
+					"mData": "dataAvailable", "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+					switch (sData) {
+						case '0':
+							$(nTd).html('No');
+							break;
+						case '1':
+							$(nTd).html('Yes');
+							break;
+						default:
+							$(nTd).html('Data collection needed');
+
 					}
+				}
 
 				}
 
@@ -43,14 +55,8 @@ $this->renderPartial('_detailsTable', ['evaDetails' => $evaDetails, 'tools' => t
 						"bShowAll": false
 					},
 					{
-						"sExtends": "collection",
+						"sExtends": "pdf",
 						"sButtonText": "<?php echo Yii::t('translation', 'Save')?>",
-						"aButtons" : [ {
-							"sExtends": "pdf",
-							oSelectorOpts: {
-								page: 'current'
-							},
-							"sButtonText": "PDF",
 							"fnClick":  function( nButton, oConfig, flash ) {
 								flash.setFileName( "Evaluation_Assessment_Methods_" + getTitle() + ".pdf" );
 								this.fnSetText( flash,
@@ -63,22 +69,90 @@ $this->renderPartial('_detailsTable', ['evaDetails' => $evaDetails, 'tools' => t
 									this.fnGetTableData(oConfig)
 								);
 							}
-						},
-							{
-								"sExtends": "csv",
-								"sButtonText": "Excel (CSV)",
-								"sCharSet": "utf16le",
-								oSelectorOpts: {
-									page: 'current'
-								},
-								"fnClick": function ( nButton, oConfig, oFlash ) {
-									oFlash.setFileName( "Evaluation_Assessment_Methods_" + getTitle() + ".csv" );
-									this.fnSetText( oFlash,	"" + this.fnGetTableData(oConfig)
-									);
-								},
-							}
-						],
+
+					}
+				]
+			}
+
+		});
+		$("#econEvaMethods").dataTable({
+			"sDom": '<"H"rlTf>t<"F"ip>',
+			"aaData": <?= json_encode($econEvaMethods); ?>,
+			"aoColumns": [
+				{"mData": "econMethodGroup.buttonName"},
+				{"mData": "name"},
+				{"mData": "description"},
+				{"mData": "reference"},
+
+			],
+			"bJQueryUI": true,
+			"sPaginationType": "buttons_input",
+			"oTableTools": {
+				"sSwfPath": "<?php echo Yii::app()->request->baseUrl; ?>/js/copy_csv_xls_pdf.swf",
+				"aButtons": [
+					{
+						"sExtends": "print",
+						"sButtonText": "<?php echo Yii::t('translation', 'Print')?>",
+						"sMessage": '<p class="printHeader">Economic evaluation Methods</p>',
 						"bShowAll": false
+					},
+					{
+						"sExtends": "pdf",
+						"sButtonText": "<?php echo Yii::t('translation', 'Save')?>",
+						"fnClick":  function( nButton, oConfig, flash ) {
+							flash.setFileName( "Economic_evaluation_methods_" + getTitle() + ".pdf" );
+							this.fnSetText( flash,
+								"title:"+ this.fnGetTitle(oConfig) +"\n"+
+								"message:"+ oConfig.sPdfMessage +"\n"+
+								"colWidth:"+ this.fnCalcColRatios(oConfig) +"\n"+
+								"orientation:"+ oConfig.sPdfOrientation +"\n"+
+								"size:"+ oConfig.sPdfSize +"\n"+
+								"--/TableToolsOpts--\n" +
+								this.fnGetTableData(oConfig)
+							);
+						}
+
+					}
+				]
+			}
+
+		});
+
+		$("#evaAttributes").dataTable({
+			"sDom": '<"H"rlTf>t<"F"ip>',
+			"aaData": <?= json_encode($evaAttributes); ?>,
+			"aoColumns": [
+				{"mData": "attributeTypes.name"},
+				{"mData": "name"},
+				{"mData": "description"}
+			],
+			"bJQueryUI": true,
+			"sPaginationType": "buttons_input",
+			"oTableTools": {
+				"sSwfPath": "<?php echo Yii::app()->request->baseUrl; ?>/js/copy_csv_xls_pdf.swf",
+				"aButtons": [
+					{
+						"sExtends": "print",
+						"sButtonText": "<?php echo Yii::t('translation', 'Print')?>",
+						"sMessage": '<p class="printHeader">Evaluation Attributes</p>',
+						"bShowAll": false
+					},
+					{
+						"sExtends": "pdf",
+						"sButtonText": "<?php echo Yii::t('translation', 'Save')?>",
+						"fnClick":  function( nButton, oConfig, flash ) {
+							flash.setFileName( "Evaluation_Attributes_" + getTitle() + ".pdf" );
+							this.fnSetText( flash,
+								"title:"+ this.fnGetTitle(oConfig) +"\n"+
+								"message:"+ oConfig.sPdfMessage +"\n"+
+								"colWidth:"+ this.fnCalcColRatios(oConfig) +"\n"+
+								"orientation:"+ oConfig.sPdfOrientation +"\n"+
+								"size:"+ oConfig.sPdfSize +"\n"+
+								"--/TableToolsOpts--\n" +
+								this.fnGetTableData(oConfig)
+							);
+						}
+
 					}
 				]
 			}
@@ -87,12 +161,37 @@ $this->renderPartial('_detailsTable', ['evaDetails' => $evaDetails, 'tools' => t
 
 	});
 </script>
+<table id="evaAttributes" class="tableStyle" width="100%" border="0" cellspacing="0" cellpadding="0">
+	<thead>
+	<tr>
+		<th title = "Attribute Type">Attribute Type</th>
+		<th title = "Attribute Name">Attribute Name</th>
+		<th title = "Description">Description</th>
+	</tr>
+	</thead>
+	<tbody>
+	</tbody>
+</table>
+<p></p>
 <table id="evaAssMethods" class="tableStyle" width="100%" border="0" cellspacing="0" cellpadding="0">
 	<thead>
 	<tr>
 		<th title = "Attribute Name">Attribute Name</th>
 		<th title = "Assessment Method">Assessment Method</th>
 		<th title = "Data collection needed">Data collection needed</th>
+	</tr>
+	</thead>
+	<tbody>
+	</tbody>
+</table>
+<p></p>
+<table id="econEvaMethods" class="tableStyle" width="100%" border="0" cellspacing="0" cellpadding="0">
+	<thead>
+	<tr>
+		<th title = "Economic method">Economic method</th>
+		<th title = "Economic approach">Economic approach</th>
+		<th title = "Description">Description</th>
+		<th title = "Reference">Reference</th>
 	</tr>
 	</thead>
 	<tbody>

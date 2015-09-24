@@ -17,35 +17,39 @@
 				['label'  => Yii::t("translation", "New Surveillance System"), 'url' => ['create'],
 					'active' => strstr('create', $currentView)],
 				['label'  => Yii::t("translation", "List Existing Systems"), 'url' => ['list'],
-					'active' => strstr('list', $currentView)],
-				['label'       => Yii::t("translation", "List Components"), 'url' => ['design/listComponents'],
-					'itemOptions' => ['id' => 'showComponents']],
+					'active' => strstr('list', $currentView)]
+//				['label'       => Yii::t("translation", "List Components"), 'url' => ['design/listComponents'],
+//					'itemOptions' => ['id' => 'showComponents']],
 			];
 		}
 		// Setup Design controller side menus
 		if (Yii::app()->controller->id == 'design') {
 
-			$this->menu = array(
-				array('label'       => Yii::t("translation", "Design Component"), 'url' => array('addComponent'),
-					'itemOptions' => array(
-						'id' => 'addComponent'
-					),
-					'active' => strstr('addComponent', $currentView),
-				),
-				array('label'  => Yii::t("translation", "Add Components"),
-					'url' => array('addMultipleComponents'), 'itemOptions' => array(
+			$this->menu = [
+				['label'       => Yii::t("translation", "Introduction"), 'url' => ['index'],
+					'itemOptions' => [
+						'id' => 'index'
+					],
+					'active' => strstr('index', $currentView),
+				],
+				['label'  => Yii::t("translation", "Add Components"),
+					'url' => ['addMultipleComponents'], 'itemOptions' => [
 					'id' => 'addMultipleComponents'
-				),
+				],
 					'active' => strstr('addMultipleComponents', $currentView),
-				),
-				array('label' => Yii::t("translation", "List Components"), 'url' => array('listComponents'),
-					'itemOptions' => array(
+				],
+				['label' => Yii::t("translation", "List Components"), 'url' => ['listComponents'],
+					'itemOptions' => [
 						'id' => 'showComponents'
-					),
+					],
 					'active' => strstr('listComponents', $currentView),
-				),
-				//array('label'=>'Manage SurFormDetails', 'url'=>array('admin')),
-			);
+					'items' => [
+						['label' => Yii::t("translation", "Add details"),
+						 'url'   => ['getDesignElements']],
+					]
+				],
+				['label'=>'Reports', 'url'=> ['reports']],
+			];
 		}
 		//Evaluation controller side menus
 
@@ -66,20 +70,22 @@
 				      'url'   => ["$currentController/listEvaContext"]],
 				['label' => Yii::t("translation", "Select Evaluation Question"),
 				      'url'   => ["$currentController/selectEvaQuestion"]],
-				['label' => Yii::t("translation", "Select Evaluation Method"),
-				      'url'   => ["$currentController/index"], 'items' => [
+				['label' => Yii::t("translation", "Select Evaluation Methods"),
+				      'url'   => "#", 'items' => [
 					['label' => Yii::t("translation", "Select components"),
-					      'url'   => "#"],
+					      'url'   => ["$currentController/selectComponents"]],
 					['label' => Yii::t("translation", "Select attributes"),
 						  'url'   => ["$currentController/selectEvaAttributes"]],
-					['label' => Yii::t("translation", "Select assessment method"),
+					['label' => Yii::t("translation", "Select assessment methods"),
 					 'url'   => ["$currentController/selectEvaAssMethod"]],
+					['label' => Yii::t("translation", "Select economic methods"),
+					 'url'   => ["$currentController/selectEconEvaMethods"]],
 				],
 				],
 				['label' => Yii::t("translation", "Summary of the evaluation protocol"),
 					'url' => ["$currentController/evaSummary"]],
-//				['label' => 'Perform the evaluation', 'url' => ["$currentController/index"]],
-//				['label' => 'How to report on the evaluation results', 'url' => ["$currentController/index"]]
+				['label' => 'Perform the evaluation', 'url' => ["$currentController/performEvaluation"]],
+				['label' => 'How to report on the evaluation results', 'url' => ["$currentController/report"]]
 
 			];
 		}

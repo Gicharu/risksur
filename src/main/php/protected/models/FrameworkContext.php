@@ -53,7 +53,7 @@ class FrameworkContext extends CActiveRecord {
 	public function rules() {
 		return array(
 			array(
-				'name, description, userId',
+				'name, userId',
 				'required'
 			),
 			array(
@@ -69,10 +69,24 @@ class FrameworkContext extends CActiveRecord {
 	 * @return array
 	 */
 	public function relations() {
-		return array(
+		return [
 			//'goal' => array( self::BELONGS_TO, 'GoalData', 'goalId' ),
-			'designHead' => array( self::HAS_MANY, 'FrameworkDetails', 'frameworkDetailsId' ),
-		);
+			'designHead' => [ self::HAS_MANY, 'FrameworkDetails', 'frameworkDetailsId' ],
+			'data' => [
+				self::HAS_MANY,
+				'FrameworkFieldData',
+				'frameworkId',
+				'select' => 'frameworkFieldId, value'
+			],
+			'fields' => [
+				self::HAS_MANY,
+				'FrameworkFields',
+				['frameworkFieldId' => 'id'],
+				'through' => 'data',
+				'select' => 'inputName, inputType',
+				//'condition' => "inputName='hazardName' OR inputName='survObj'"
+			],
+		];
 	}
 	/**
 	 * attributeLabels

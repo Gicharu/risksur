@@ -33,9 +33,9 @@ class AttributeController extends RiskController {
 		Yii::log("actionIndex AttributeController called", "trace", self::LOG_CAT);
 		$dataArray = array();
 		$dataArray['dtHeader'] = "Manage Attributes"; // Set page title when printing the datatable
-		$attributesList = ModelToArray::convertModelToArray(Attributes::model()
-			->with('evaAttributeTypes')
-			->findAll(['select' => 'attributeId, name, description']));
+		$attributesList = ModelToArray::convertModelToArray(EvaAttributes::model()
+			->with('attributeTypes')
+			->findAll(['select' => 'attributeId, name, description, attributeType']));
 		// Format datatable data. Define the Edit & Delete buttons
 
 		$dataArray['attributesList'] = json_encode($attributesList);
@@ -55,7 +55,7 @@ class AttributeController extends RiskController {
 	 */
 	public function actionAddAttribute() {
 		Yii::log("actionIndex AttributesController called", "trace", self::LOG_CAT);
-		$model = new Attributes('create');
+		$model = new EvaAttributes('create');
 		if (isset($_POST['Attributes'])) {
 			$model->attributes = $_POST['Attributes'];
 			if (isset($_POST['ajax']) && $_POST['ajax'] == 'newAttribute') {
@@ -81,7 +81,7 @@ class AttributeController extends RiskController {
 	public function actionEditAttribute($id) {
 		Yii::log("actionEditAttribute AttributeController called", "trace", self::LOG_CAT);
 		// fetch the form data, search using the "attributeId" sent from the listing.
-		$model = Attributes::model()->findByPk($id);
+		$model = EvaAttributes::model()->findByPk($id);
 		if ($model === null) {
 			Yii::app()->user->setFlash('error', Yii::t("translation", "The attribute does not exist"));
 			$this->redirect(['attribute/index']);
@@ -121,7 +121,7 @@ class AttributeController extends RiskController {
 			echo Yii::t("translation", "Cannot delete Attribute. The attribute has a relation to a form element." .
 				" Delete the relation first then try deleting the attribute.");
 		} else {
-			$record = Attributes::model()->findByPk($id);
+			$record = EvaAttributes::model()->findByPk($id);
 			if (!$record->delete()) {
 				Yii::log("Error deleting Attribute: " . $id, "error", self::LOG_CAT);
 				echo Yii::t("translation", "A problem occurred when deleting the Attribute ") . $id .
@@ -135,46 +135,31 @@ class AttributeController extends RiskController {
 
 	/**
 	 * actionSelectAttribute
+	 * @param $id mixed
 	 * @access public
-	 * @return void
+	 * @return array
 	 */
-	public function actionSelectAttribute() {
+	public static function actionSelectAttribute($id = null) {
 		Yii::log("actionSelectAttribute called", "trace", self::LOG_CAT);
 		//$model = new NewDesign;
 		$attributesArray = array();
 		$dataArray = array();
-		$attributeData = Attributes::model()->findAll();
+		$attributeData = EvaAttributes::model()->findAll();
 		// create array options for attribute dropdown
 		foreach ($attributeData as $data) {
 			$dataArray['attributeList'][$data->attributeId] = $data->name;
 			$attributesArray[$data->attributeId] = $data->name;
 		}
 
-		if (!empty($_POST['attributeSelected']) && !empty($attributesArray[$_POST['attributeSelected']])) {
+		if (isset($attributesArray[$id])) {
 			Yii::app()->session->add('performanceAttribute', array(
-				'id'   => $_POST['attributeSelected'],
-				'name' => $attributesArray[$_POST['attributeSelected']]
+				'id'   => $id,
+				'name' => $attributesArray[$id]
 			));
-			echo "Attribute successfully selected";
-			return;
+			Yii::app()->user->setFlash('success', "Attribute successfully selected");
+			Yii::app()->request->redirect(Yii::app()->request->getUrlReferrer());
 		}
-		//add the surveilance design to the session
-		//if (count($selectedDesign) == 1) {
-		//Yii::app()->session->add('surDesign', array(
-		//'id' => $_GET['designId'],
-		//'name' => $selectedDesign[0]->name,
-		//'goalId' => $selectedDesign[0]->goalId
-		//));
-		//} else {
-		//Yii::app()->session->remove('surDesign');
-		//}
-		//print_r($selectedDesign);
-		//print_r($_SESSION);
-
-		$this->render('selectAttribute', array(
-			//'model' => $model,
-			'dataArray' => $dataArray
-		));
+		return $attributesArray;
 	}
 
 	/**
@@ -185,7 +170,7 @@ class AttributeController extends RiskController {
 	public function actionAddRelation() {
 		Yii::log("actionaddRelation AttributeController called", "trace", self::LOG_CAT);
 		$formRelationModel = new AttributeFormRelation();
-		$attributeModel = new Attributes();
+		$attributeModel = new EvaAttributes();
 		$surFormDetailsModel = new SurFormDetails();
 		if (isset($_POST['AttributeFormRelation'])) {
 			$formRelationModel->attributes = $_POST['AttributeFormRelation'];
@@ -228,30 +213,28 @@ class AttributeController extends RiskController {
 	 */
 	public function actionListRelations() {
 		Yii::log("actionListRelations AttributeController called", "trace", self::LOG_CAT);
-		$model = new AttributeFormRelation;
+		$model = new AttributeFormRelation();
 		$dataArray = array();
 		$dataArray['dtHeader'] = "Manage Attribute-Form Relations"; // Set page title when printing the datatable
-		$relationsList = Yii::app()->db->createCommand()
-			->select('attributeId, subFormId')
-			->from('attributeFormRelation')
-			->queryAll();
-		$relationsArray = array();
+		$relationsList = $model->with(['attributes', 'subForm'])->findAll(['select' => 'attributeId, subFormId']);
+		$relationsArray = [];
 		// Format datatable data. Define the Edit & Delete buttons
 		foreach ($relationsList as $key => $relation) {
 			//get the attribute name to be displayed
-			$queryAttributes = Attributes::model()->findAll('attributeId="' . $relation['attributeId'] . '"');
+		//print_r($relation); die;
+			//$queryAttributes = EvaAttributes::model()->findAll('attributeId="' . $relation['attributeId'] . '"');
 
 			//get the suform input name to be displayed
-			$querySurformDetails = SurFormDetails::model()->findAll('subFormId="' . $relation['subFormId'] . '"');
+			//$querySurformDetails = SurFormDetails::model()->findAll('subFormId="' . $relation['subFormId'] . '"');
 
-			$deleteButton = "<button id='deleteRelation" . $relation['attributeId'] .
+			$deleteButton = "<button id='deleteRelation" . $relation->attributeId .
 				"' type='button' class='bdelete' onclick=\"$('#deleteBox').dialog('open');" .
-				"deleteConfirm('" . $queryAttributes[0]['name'] . " <-> " . $querySurformDetails[0]['inputName'] . "', '" .
+				"deleteConfirm('" . $relation->attributes->name . " <-> " . $relation->subForm->inputName . "', '" .
 				$relation['attributeId'] . "," . $relation['subFormId'] . "')\">Remove</button>";
 			// Pack the data to be sent to the view
 			$relationsArray[] = array(
-				'Attribute'    => $queryAttributes[0]['name'],
-				'FormElement'  => $querySurformDetails[0]['inputName'],
+				'Attribute'    => $relation->attributes->name,
+				'FormElement'  => $relation->subForm->inputName,
 				//'editButton' => $editButton,
 				'deleteButton' => $deleteButton
 			);

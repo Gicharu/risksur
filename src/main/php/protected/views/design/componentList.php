@@ -1,4 +1,7 @@
-	<script type="text/javascript">
+<?php
+//print_r($columnsArray); die;
+?>
+<script type="text/javascript">
 $(function(){
 	clist = $('#componentList').dataTable({
 		"sDom": '<"H"rlTf>t<"F"ip>',
@@ -66,10 +69,10 @@ $(function(){
 			//{"mDataProp": "description", "bVisible": true, "sWidth": "6%"},
 			//{"mDataProp": "editButton", "bVisible": true, "sWidth": "6%"},
 			//{"mData": "deleteButton", "bSortable": false, "bVisible": true, "sWidth": "8%" },
-			{"mDataProp": "name",  "bVisible": true, sClass: "showDetails clickable underline"},
+			{"mDataProp": "name", sClass: "showDetails clickable underline"},
 			<?php 
 				foreach ($columnsArray as $key => $val) {
-					echo '{"mDataProp": "' . $key . '", "bVisible": true},';
+					echo '{"mDataProp": "' . $key . '"},';
 				}
 			?>
 			{
@@ -88,7 +91,8 @@ $(function(){
 				"mDataProp": null,
 				"bSortable": false,
 				"sWidth": '5%',
-				"sDefaultContent": '<button class="bdelete">Delete</button>'			},
+				"sDefaultContent": '<button class="bdelete">Delete</button>'
+			}
 		],
 		// update the buttons stying after the table data is loaded
 		"fnDrawCallback": function() {
@@ -105,6 +109,10 @@ $(function(){
 		//"iDisplayLength": 10,
 
 	})
+		.on('click', '.bcopy', function() {
+			console.log('open');
+			$('#copyBox').dialog('open');
+		})
 		.on('click', '.bdelete', {
 			operation: 'delete',
 			link: '<?= $this->createUrl("deleteComponent"); ?>',
@@ -119,8 +127,8 @@ $(function(){
 			rowIdentifier: 'componentId'
 		}, requestHandler);
 	// click event to show component details
-	$('.showDetails').die('click').live('click', function() {
-		var aPos = clist.fnGetPosition(this); /* Get current  row pos */
+	$('.showDetails').on('click', function() {
+		var aPos = clist.fnGetPosiion(this); /* Get current  row pos */
 		//console.log(aPos);
 		var aData = clist.fnGetData(aPos[0]); /* Get the full row     */
 		//console.log(aData);
@@ -176,7 +184,8 @@ $(function(){
 	// process the duplicate function
 	duplicateComponent = function() {
 		if ( $('#newComponentName').val().length > 0) {
-			var oldCompId = $('#componentId').val();
+			var oldCompId = $('#surSystem').val();
+
 			var newCompName = $('#newComponentName').val();
 			updateTips("");
 			$("#copyBox").dialog("close");
@@ -217,7 +226,8 @@ $(function(){
 		$('#componentId').val(oldComponentId);
 	}
 	</script>
-<div id="listComponent" width="100%">
+<div id="listComponent">
+	<?= CHtml::link('Edit multiple components', 'editMultipleComponents', ['class' => 'btn']); ?>
 	<table id="componentList" width="100%" border="0" cellspacing="0" cellpadding="0">
 		<thead>
 		<tr>
@@ -240,10 +250,24 @@ $(function(){
 <div id="copyBox" title="Duplicate Component">
 	<span id="headerCopyBox">Duplicate component</span>
 	<p class="validateTips" style="font-size:11px;color:red"></p>
+	<form id="copyBoxForm">
+		<div class="row">
 
-	<form id="copyBoxForm" width="100%">
-		<label for="name">New component Name</label>
-		<input type="text" name="newComponentName" id="newComponentName" value="" class="text ui-widget-content ui-corner-all" placeholder="New Name"/>
+			<label for="surSystem">Surveillance system</label>
+			<?= CHtml::dropDownList('surSystem', '', $surveillanceSystems); ?>
+		</div>
+		<div class="row">
+
+			<label for="newCompoentName">New component Name</label>
+			<?= CHtml::textField('newComponentName', '', [
+				'id' => 'newComponentName',
+				'class' => 'text ui-widget-content ui-corner-all',
+				'placeholder' => 'New name'
+
+			]);
+			?>
+		</div>
+
 		<input type="hidden" name="componentId" id="componentId" value="" class="text ui-widget-content ui-corner-all"/>
 		<!-- Allow form submission with keyboard without duplicating the dialog button -->
 		<!--<input type="submit" tabindex="-1" style="position:absolute; top:-1000px">-->

@@ -22,10 +22,10 @@ class EvaAttributeTypes extends CActiveRecord {
 	public function rules() {
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
-		return array(
-			array('name', 'required'),
-			array('name', 'length', 'max' => 20),
-		);
+		return [
+			['name', 'required'],
+			['name', 'length', 'max' => 20],
+		];
 	}
 
 	/**
@@ -34,19 +34,19 @@ class EvaAttributeTypes extends CActiveRecord {
 	public function relations() {
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
-		return array(
-			'evaAttributes' => array(self::HAS_MANY, 'Attributes', 'attributeType'),
-		);
+		return [
+			'evaAttributes' => [self::HAS_MANY, 'Attributes', 'attributeType'],
+		];
 	}
 
 	/**
 	 * @return array customized attribute labels (name=>label)
 	 */
 	public function attributeLabels() {
-		return array(
+		return [
 			'id'   => 'ID',
 			'name' => 'Name',
-		);
+		];
 	}
 
 	/**

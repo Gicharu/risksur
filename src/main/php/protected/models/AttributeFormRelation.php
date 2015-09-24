@@ -33,6 +33,13 @@ class AttributeFormRelation extends CActiveRecord {
 		return 'attributeFormRelation';
 	}
 
+	public function relations() {
+		return [
+			'attributes' => [self::BELONGS_TO, 'EvaAttributes', 'attributeId'],
+			'subForm' => [self::BELONGS_TO, 'SurFormDetails', 'subFormId']
+
+		];
+	}
 	/**
 	 * rules 
 	 * 

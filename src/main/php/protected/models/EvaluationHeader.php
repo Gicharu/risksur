@@ -9,6 +9,18 @@
  * @author Chirag Doshi <chirag@tracetracker.com>
  * @license Tracetracker {@link http://www.tracetracker.com}
  * @SuppressWarnings checkUnusedVariables
+ * The followings are the available columns in table 'evaluationHeader':
+ * @property integer $evalId
+ * @property string $evaluationName
+ * @property integer $frameworkId
+ * @property string $questionId
+ * @property string $components
+ * @property string $evaAttributes
+ * @property string $econEvaMethods
+ * @property integer $userId
+ *
+ * The followings are the available model relations:
+ * @property EvaluationDetails[] $evaluationDetails
  */
 class EvaluationHeader extends CActiveRecord {
 	//public $evaluationName, $evaluationDescription, $frameworkId, $userId, $evalId;

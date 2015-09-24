@@ -7,10 +7,13 @@
  * @var $this AdminEvaController
  */
 $this->menu = [
-	['label' => 'Manage Economic Evaluation Methods', 'url' => ['admineva/listEvaMethods']],
 	['label' => 'Manage Evaluation Context Form', 'url' => ['admineva/listEvaContext']],
 	['label' => 'Manage Evaluation Questions', 'url' => ['adminevaquestion/index']],
-	['label' => 'Manage Evaluation Attribute Relevance', 'url' => ['adminattributerelevance/index']]
+	['label' => 'Manage Evaluation Attribute Relevance', 'url' => ['adminattributerelevance/index']],
+	['label' => 'Manage Evaluation Assessment Methods', 'url' => ['adminattributesassessmentmethods/index']],
+	['label' => 'Manage Economic Evaluation Methods', 'url' => ['admineva/listEvaMethods']],
+	['label' => 'Manage Evaluation Method & Question Link', 'url' => ['adminevaquestiongroups/index']],
+	['label' => 'Manage Economic Evaluation Approaches', 'url' => ['admineconomicmethods/index']]
 ];
 ?>
 

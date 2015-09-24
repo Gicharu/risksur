@@ -57,7 +57,7 @@ $(function(){
 						oFlash.setFileName( "Attributes_List_" + getTitle() + ".csv" );
 							this.fnSetText( oFlash,	"" + this.fnGetTableData(oConfig)
 							);
-						},
+						}
 					}
 					],
 					"bShowAll": false
@@ -67,10 +67,10 @@ $(function(){
 		"bProcessing": true,
 		"aaData": <?php echo $dataArray['attributesList']; ?>,
 		"aoColumns": [
-		{"mDataProp": "evaAttributeTypes.name"  },
-		{"mDataProp": "name"},
-		{"mDataProp": "description" },
-		{"mDataProp": null, "bSortable": false,
+		{"mData": "attributeTypes.name"  },
+		{"mData": "name"},
+		{"mData": "description" },
+		{"mData": null, "bSortable": false,
 			"sDefaultContent": '<button title="Edit" class="bedit">Edit</button>' },
 		{"mData": null, "bSortable": false,
 			"sDefaultContent": '<button title="Delete" class="bdelete">Delete</button>' }
@@ -104,46 +104,6 @@ $(function(){
 		.rowGrouping();
 });
 
-	deleteConfirm = function(confirmMsg, deleteVal) {
-	$('#deleteBox').html("<p>Are you sure you want to delete '" + confirmMsg + "' </p>");
-	$("#deleteBox").dialog('option', 'buttons', {
-		"Confirm" : function() {
-			// console.log(confirmMsg + ":" + deleteVal);
-				$(this).dialog("close");
-				  var opt = {'loadMsg': 'Processing delete attribute'};
-				$("#listAttributes").showLoading(opt);
-				$.ajax({type: 'POST',
-					url: <?php echo "'" . CController::createUrl('attribute/deleteAttribute') . "'"; ?>,
-					data: {delId:deleteVal},
-					success: function(data){
-						var checkSuccess = /successfully/i;
-						if (checkSuccess.test(data)) {
-							// add process message
-							$("#ajaxFlashMsg").html(data);
-							$("#ajaxFlashMsgWrapper").attr('class', 'flash-success').show();
-							$("#ajaxFlashMsgWrapper").animate({opacity: 1.0}, 3000).fadeOut("slow");
-						} else{
-							// add process message
-							$("#ajaxFlashMsg").html(data);
-							$("#ajaxFlashMsgWrapper").attr('class', 'flash-error').show();
-						}
-						slist.fnReloadAjax("index/getAttributes/1");
-						$("#listAttributes").hideLoading();
-					},
-						error: function(data){
-							$("#ajaxFlashMsg").html("Error occured while deleting data");
-							$("#ajaxFlashMsgWrapper").attr('class', 'flash-error').show();
-							//console.log("error occured while posting data" + data);
-							$("#listAttributes").hideLoading();
-						},
-							dataType: "text"
-				});
-		},
-			"Cancel" : function() {
-				$(this).dialog("close");
-			}
-	});
-}
 </script>
 <div id="listAttributes">
 	

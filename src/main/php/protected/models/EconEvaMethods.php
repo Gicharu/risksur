@@ -22,13 +22,13 @@ class EconEvaMethods extends CActiveRecord {
 	public function rules() {
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
-		return array(
-			array('buttonName, link', 'required'),
-			array('link', 'url'),
-			array('description', 'safe')
+		return [
+			['buttonName, link', 'required'],
+			['link', 'url'],
+			['description', 'safe']
 			// The following rule is used by search().
 
-		);
+		];
 	}
 
 	/**
@@ -37,19 +37,21 @@ class EconEvaMethods extends CActiveRecord {
 	public function relations() {
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
-		return array();
+		return [
+			'econMethods' => [self::HAS_MANY, 'EconomicMethods', 'econMethod'],
+		];
 	}
 
 	/**
 	 * @return array customized attribute labels (name=>label)
 	 */
 	public function attributeLabels() {
-		return array(
+		return [
 			'id'          => 'ID',
 			'buttonName'  => 'Button Label',
 			'link'        => 'Method Link',
 			'description' => 'Description',
-		);
+		];
 	}
 
 	/**
@@ -72,9 +74,9 @@ class EconEvaMethods extends CActiveRecord {
 		$criteria->compare('link', $this->link, true);
 		$criteria->compare('description', $this->description, true);
 
-		return new CActiveDataProvider($this, array(
+		return new CActiveDataProvider($this, [
 			'criteria' => $criteria,
-		));
+		]);
 	}
 
 	/**
@@ -85,5 +87,14 @@ class EconEvaMethods extends CActiveRecord {
 	 */
 	public static function model($className = __CLASS__) {
 		return parent::model($className);
+	}
+
+	protected function afterDelete() {
+		if(parent::afterDelete()) {
+			$model = EvaQuestionGroups::model('section=:section', [':section' => 'econEvaMethods']);
+			$model->method = $this->id;
+			$model->setScenario('delete');
+			$model->save();
+		}
 	}
 }

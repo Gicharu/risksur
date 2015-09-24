@@ -5,48 +5,161 @@
  * Date: 7/27/15
  * Time: 11:43 AM
  * @var $assessModel EvaAssessmentMethods
+ * @var $evaAttributeMap Array
+ * @var $form CActiveForm
+ * @var $this EvaluationController
+ * @var $page array
  */
+//var_dump($setEvaAttribute);
 ?>
-<script type="text/javascript">
-	$(function() {
-		$('.tabular-input-container, .tabular-input-add, .tabular-input-remove').remove();
-	});
-</script>
+	<script type="text/javascript">
+		function initTable() {
+
+			return $("#evaAssessmentMethods").dataTable({
+				//"sDom": '<"H"rlf>t<"F"ip>',
+				"aoColumns": [
+					{
+						"mData": null, "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+						//EvaluationHeader[evaAttributes][]
+						var checkBox = $('<input>').attr({
+							"type": 'checkBox',
+							"name": 'EvaAssessmentMethods[' + iRow + '][assessmentMethod]',
+							"class": 'dtCheck',
+							"value": oData.id
+						});
+						if (typeof oData.evaAssessmentMethods != 'undefined') {
+							oData.evaAssessmentMethods.forEach(function (method) {
+								console.log(method);
+								if (method.evaAttribute == oData.evaAttribute) {
+									$(checkBox).attr('checked', 'checked');
+								}
+							});
+						}
+						$(nTd)
+							.html(checkBox)
+							.addClass('center')
+							.append($('<input>').attr({
+								"type": 'hidden',
+								"name": 'EvaAssessmentMethods[' + iRow + '][evaAttribute]',
+								"value": oData.evaAttribute
+							}))
+							.append($('<input>').attr({
+								"type": 'hidden',
+								"name": 'EvaAssessmentMethods[' + iRow + '][evaluationId]',
+								"value": '<?= $assessModel->evaluationId; ?>'
+							}));
+					}, "sWidth": '5%', "bSortable": false
+
+
+					},
+					{"mData": "name"},
+					{
+						"mData": null, "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+						var description = '<ul><li><b> Description: </b>' + oData.description +
+							'</li><li><b> Data required: </b>' + oData.dataRequired +
+							'</li><li><b> Expertise required: </b>' + oData.expertiseRequired + '</li></ul>';
+						$(nTd).html(description)
+					}
+					},
+					{
+						"mData": null, "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+						var radiolist = '<input class="dtCheck" type="radio" name="EvaAssessmentMethods[' + iRow +
+							'][dataAvailable]" value="1" id="dataAv1">Yes' +
+							'<br /><input class="dtCheck" type="radio" name="EvaAssessmentMethods[' + iRow +
+							'][dataAvailable]" value="0" id="dataAv0">No' +
+							'<br /> <input class="dtCheck" type="radio" name="EvaAssessmentMethods[' + iRow +
+							'][dataAvailable]" value="2" id="dataAv2">Data collection needed';
+						$(nTd).html(radiolist);
+						if(oData.evaAssessmentMethods !== null) {
+							oData.evaAssessmentMethods.forEach(function(method) {
+								if(method.dataAvailable !== null) {
+									$('#dataAv' + method.dataAvailable).attr('checked', 'checked');
+
+								}
+							})
+						}
+					}
+					},
+					{"mData": "reference"}
+				],
+//			"aaSorting": [[0,'desc']],
+				"bJQueryUI": true,
+				"sPaginationType": "buttons_input",
+				"bRetrieve": true
+
+			});
+		}
+		function loadMethods() {
+			var element = $('#evaAttribute').val();
+			if (element != '') {
+				var evaMethodsTable = initTable();
+				evaMethodsTable.fnReloadAjax('<?= $this->createUrl("selectEvaAssMethod"); ?>/id/' + element, customAssData);
+				$('.row').toggle();
+			}
+			//$('.row').toggle();
+		}
+		function customAssData(data) {
+			//console.log(data.customMethod.isEmptyObject());
+			if(data.customMethod !== null && typeof data.customMethod.customAssessmentMethod != 'undefined') {
+				$('#EvaAssessmentMethods_customAssessmentMethod').val(data.customMethod.customAssessmentMethod);
+			}
+		}
+		//var evaMethodsTable;
+		$(function () {
+			initTable();
+			$('#evaAttribute').on('change', loadMethods);
+			loadMethods();
+		});
+	</script>
 <?php
+$this->renderPartial('_page', [
+	'editMode'   => $page['editMode'],
+	'editAccess' => $page['editAccess'],
+	'content'    => $page['content'],
+]);
 echo CHtml::tag('div', ['class' => 'form'], false, false);
 //echo CHtml::beginForm();
-$form = $this->beginWidget('CActiveForm', array(
-	'id' => 'assessMethod-form',
-	'enableAjaxValidation' => true,
-));
+echo CHtml::label('Evaluation Attribute', 'evaAttribute');
+echo Chtml::dropDownList('evaAttribute', $assessModel->evaAttribute, $evaAttributeMap, [
+	'id'               => 'evaAttribute',
+	'class'            => 'chozen',
+	'data-placeholder' => 'Select attribute',
+	'empty'            => ''
+]);
+$form = $this->beginWidget('CActiveForm', [
+	'id'                   => 'assessMethod-form',
+	'enableAjaxValidation' => false,
+	'enableClientValidation' => true,
+	'clientOptions' => [
+		'validateOnSubmit' => true,
+	]
+]);
+?>
+	<p>
+		<?php
+		echo $form->errorSummary([$assessModel],
+			Yii::app()->params['headerErrorSummary'], Yii::app()->params['footerErrorSummary']);
+		?>
+	</p>
+	<table id="evaAssessmentMethods" class="tableStyle" width="100%" border="0" cellspacing="0" cellpadding="0">
+		<thead>
+		<tr>
+			<th title=""></th>
+			<th title="Method Name">Method Name</th>
+			<th title="Description, data and expertise required">Description, data and expertise required</th>
+			<th title="Data available">Data available</th>
+			<th title="References">References</th>
+		</tr>
+		</thead>
+		<tbody>
+		</tbody>
+	</table>
 
-$this->widget('ext.widgets.tabularinput.XTabularInput',array(
-	'models'=> $assessModel,
-	//'inputLimit'=>10, // comment in to limit the number of input rows
-	'containerTagName'=>'table',
-	'headerTagName'=>'thead',
-	'header'=>'
-        <tr>
-            <td>'.CHtml::activeLabelEX(EvaAssessmentMethods::model(),'evaAttribute').'</td>
-            <td>'.CHtml::activeLabelEX(EvaAssessmentMethods::model(),'methodDescription').'</td>
-            <td>'.CHtml::activeLabelEX(EvaAssessmentMethods::model(),'expertise').'</td>
-            <td>'.CHtml::activeLabelEX(EvaAssessmentMethods::model(),'dataAvailability').'</td>
-            <td>'.CHtml::activeLabelEX(EvaAssessmentMethods::model(),'references').'</td>
-            <td></td>
-        </tr>
-    ',
-	//'inputContainerTagName'=>'tbody',
-	'inputTagName'=>'tr',
-	'inputView'=>'_assessmentMethodAsTable',
-	//'inputUrl'=>$this->createUrl('request/addTabularInputsAsTable'),
-	//'addTemplate'=>'<tbody><tr><td colspan="3">{link}</td></tr></tbody>',
-	//'addLabel'=>Yii::t('ui','Add new row'),
-	//'addHtmlOptions'=>array('class'=>'blue pill full-width'),
-	//'removeTemplate'=>'<td>{link}</td>',
-	//'removeLabel'=>Yii::t('ui','Delete'),
-	//'removeHtmlOptions'=>array('class'=>'red pill'),
-));
-echo CHtml::submitButton('Next');
+<?php
+echo CHtml::tag('div', ['class' => 'row', 'style' => 'display:none'], $form->labelEx($assessModel, 'customAssessmentMethod') .
+	$form->textArea($assessModel, 'customAssessmentMethod'));
+echo CHtml::tag('div', ['class' => 'row buttons', 'style' => 'display:none'],
+	CHtml::submitButton('Save', ['name' => 'save']) . CHtml::submitButton('Next', ['name' => 'next']));
 //echo CHtml::endForm();
 $this->endWidget();
 echo CHtml::closeTag('div');

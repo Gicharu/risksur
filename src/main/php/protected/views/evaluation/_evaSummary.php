@@ -22,6 +22,55 @@
 			"bFilter": false,
 			"oLanguage": {
 				"sZeroRecords": "No evaluation summary available"
+			},
+			"oTableTools": {
+				"sSwfPath": "<?php echo Yii::app()->request->baseUrl; ?>/js/copy_csv_xls_pdf.swf",
+				"aButtons": [
+					{
+						"sExtends": "print",
+						"sButtonText": "<?php echo Yii::t('translation', 'Print')?>",
+						"sMessage": '<p class="printHeader">Evaluation summarys</p>',
+						"bShowAll": false
+					},
+					{
+						"sExtends": "collection",
+						"sButtonText": "<?php echo Yii::t('translation', 'Save')?>",
+						"aButtons" : [ {
+							"sExtends": "pdf",
+							oSelectorOpts: {
+								page: 'current'
+							},
+							"sButtonText": "PDF",
+							"fnClick":  function( nButton, oConfig, flash ) {
+								flash.setFileName( "Evaluation_summary_" + getTitle() + ".pdf" );
+								this.fnSetText( flash,
+									"title:"+ this.fnGetTitle(oConfig) +"\n"+
+									"message:"+ oConfig.sPdfMessage +"\n"+
+									"colWidth:"+ this.fnCalcColRatios(oConfig) +"\n"+
+									"orientation:"+ oConfig.sPdfOrientation +"\n"+
+									"size:"+ oConfig.sPdfSize +"\n"+
+									"--/TableToolsOpts--\n" +
+									this.fnGetTableData(oConfig)
+								);
+							}
+						},
+							{
+								"sExtends": "csv",
+								"sButtonText": "Excel (CSV)",
+								"sCharSet": "utf16le",
+								oSelectorOpts: {
+									page: 'current'
+								},
+								"fnClick": function ( nButton, oConfig, oFlash ) {
+									oFlash.setFileName( "Evaluation_Assessment_Methods_" + getTitle() + ".csv" );
+									this.fnSetText( oFlash,	"" + this.fnGetTableData(oConfig)
+									);
+								},
+							}
+						],
+						"bShowAll": false
+					}
+				]
 			}
 		});
 		$.ajax({

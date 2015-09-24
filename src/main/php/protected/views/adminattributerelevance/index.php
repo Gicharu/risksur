@@ -11,8 +11,8 @@
 ?>
 <script type="text/javascript">
 	var relevanceArray = ['Do not include', 'Low', 'Meduim', 'High'];
-$(function() {
-	$("#evaAttributeRelevance").dataTable({
+	$(function() {
+		$("#evaAttributeRelevance").dataTable({
 			"sDom": '<"H"rlf>t<"F"ip>',
 			"aaData": <?= json_encode($model); ?>,
 			"aoColumns": [
@@ -40,7 +40,7 @@ $(function() {
 			],
 			// update the buttons stying after the table data is loaded
 			"fnDrawCallback": function() {
-		$('button.bdelete').button({
+				$('button.bdelete').button({
 					icons: {primary: "ui-icon-trash"}, text: false});
 				$('button.bedit').button({
 					icons: {primary: "ui-icon-pencil"}, text: false});
@@ -69,11 +69,11 @@ $(function() {
 				rowIdentifier: 'id'
 			}, requestHandler);
 
-	$('#questionGroups').dialog({
-		autoOpen: false,
-		width: 800,
-		position: { my: "left top", at: "left top", of: window }
-	});
+		$('#questionGroups').dialog({
+			autoOpen: false,
+			width: 800,
+			position: { my: "left top", at: "left top", of: window }
+		});
 //	$( "div.listAttributeRelevance #yw0" ).accordion();
 //
 	});
