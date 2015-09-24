@@ -462,7 +462,7 @@ class EvaluationController extends RiskController {
 	public function actionEvaAttributes($descId = 0) {
 		Yii::log("actionEvaAttributes called", "trace", self::LOG_CAT);
 		if ($descId > 0) {
-			$description = Attributes::model()->findByPk($descId, ['select' => 'description']);
+			$description = EvaAttributes::model()->findByPk($descId, ['select' => 'description']);
 			//print_r($description); die;
 			// The Regular Expression filter
 //			$regExUrl = '/(http|https|ftp|ftps)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?/';
@@ -478,10 +478,10 @@ class EvaluationController extends RiskController {
 			echo json_encode(['description' => "<p>$attrDescription</p>"]);
 			return;
 		}
-		$evaAttributes = CHtml::listData(Attributes::model()
-			->with('evaAttributeTypes')
+		$evaAttributes = CHtml::listData(EvaAttributes::model()
+			->with('attributeTypes')
 			->findAll(), 'attributeId', 'name', function ($attribute) {
-			return $attribute->evaAttributeTypes->name;
+			return $attribute->attributeTypes->name;
 		}); //die;
 
 		$tableColumns = CHtml::listData(EvaAttributeTypes::model()->findAll(), 'id', 'name');
