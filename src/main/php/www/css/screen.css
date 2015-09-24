@@ -11,7 +11,7 @@
 
 ----------------------------------------------------------------------- */
 
-/* reset.css 
+ reset.css
 html {margin:0;padding:0;border:0;}
 body, div, span, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, code, del, dfn, em, img, q, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, dialog, figure, footer, header, hgroup, nav, section {margin:0;padding:0;border:0;font-size:100%;font:inherit;vertical-align:baseline;}
 article, aside, details, figcaption, figure, dialog, footer, header, hgroup, menu, nav, section {display:block;}
@@ -24,7 +24,7 @@ blockquote, q {quotes:"" "";}
 a img {border:none;}
 :focus {outline:0;}*/
 
-/* typography.css 
+/* typography.css */
 html {font-size:100.01%;}
 body {font-size:75%;color:#222;background:#fff;font-family:"Helvetica Neue", Arial, Helvetica, sans-serif;}
 h1, h2, h3, h4, h5, h6 {font-weight:normal;color:#111;}
@@ -86,18 +86,18 @@ caption {background:#eee;}
     padding: 0.5em;
 }
 .last {margin-right:0;}
-/*
+
 .span-1 {width:30px;}
 .span-2 {width:70px;}
 .span-3 {width:110px;}
 .span-4 {width:150px;}
-*/
+
 .span-5 {
-    
+
     /*width:190px;  *//*Yii default*/
     width: 15%;
 }
-/*
+
 .span-6 {width:230px;}
 .span-7 {width:270px;}
 .span-8 {width:310px;}
@@ -111,12 +111,12 @@ caption {background:#eee;}
 .span-16 {width:630px;}
 .span-17 {width:670px;}
 .span-18 {width:710px;}
-*/
+
 .span-19 {
     /*width:750px;  *//*Yii default*/
     width: 80%;
 }
-/*
+
 .span-20 {width:790px;}
 .span-21 {width:830px;}
 .span-22 {width:870px;}
@@ -252,4 +252,4 @@ hr {background:#ddd;color:#ddd;clear:both;float:none;width:100%;height:1px;margi
 hr.space {background:#fff;color:#fff;visibility:hidden;}
 .clearfix:after, .container:after {content:"\0020";display:block;height:0;clear:both;visibility:hidden;overflow:hidden;}
 .clearfix, .container {display:block;}
-.clear {clear:both;}*/
+.clear {clear:both;}

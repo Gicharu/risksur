@@ -146,9 +146,9 @@ class EvaluationController extends RiskController {
 		}
 
 		$this->render('_page', [
-				'content'    => $page['content'],
+				'content' => $page['content'],
 				'editAccess' => $page['editAccess'],
-				'editMode'   => $page['editMode']
+				'editMode' => $page['editMode']
 			]
 		);
 	}
@@ -160,17 +160,17 @@ class EvaluationController extends RiskController {
 	public function actionEvaConcept() {
 		Yii::log("actionEvaConcept called", "trace", self::LOG_CAT);
 		$this->docName = 'evaConcepts';
-		if (isset($_POST['pageId'])) {
+		if(isset($_POST['pageId'])) {
 			$this->savePage('evaConcept');
 		}
 		$page = $this->getPageContent();
-		if (empty($page)) {
+		if(empty($page)) {
 			Yii::app()->user->setFlash('notice', 'This page is missing some information');
 		}
 		$this->render('_page', [
-				'content'    => $page['content'],
+				'content' => $page['content'],
 				'editAccess' => $page['editAccess'],
-				'editMode'   => $page['editMode']
+				'editMode' => $page['editMode']
 			]
 		);
 
@@ -182,21 +182,21 @@ class EvaluationController extends RiskController {
 	private function getPageContent() {
 		Yii::log("Function getPageContent ContextController called", "trace", self::LOG_CAT);
 		$content = DocPages::model()->find("docName='$this->docName'");
-		if (empty($content)) {
+		if(empty($content)) {
 			return [];
 		}
 		$editAccess = false;
-		if (Yii::app()->rbac->checkAccess('context', 'savePage')) {
+		if(Yii::app()->rbac->checkAccess('context', 'savePage')) {
 			$editAccess = true;
 		}
 		$editMode = false;
-		if (isset($_POST['page']) && DocPages::model()->count('docId=' . $_POST['page']) > 0) {
+		if(isset($_POST['page']) && DocPages::model()->count('docId=' . $_POST['page']) > 0) {
 			$editMode = true;
 		}
 		return [
-			'content'    => $content,
+			'content' => $content,
 			'editAccess' => $editAccess,
-			'editMode'   => $editMode
+			'editMode' => $editMode
 		];
 	}
 
@@ -210,7 +210,7 @@ class EvaluationController extends RiskController {
 		if (isset($_POST['survContent'])) {
 			$purifier = new CHtmlPurifier();
 			$model->docData = $purifier->purify($_POST['survContent']);
-			if ($model->update()) {
+			if($model->update()) {
 				Yii::app()->user->setFlash('success', 'The page was updated successfully');
 				$this->redirect($action);
 				return;
@@ -377,44 +377,55 @@ class EvaluationController extends RiskController {
 	public function actionEvaQuestionWizard() {
 		Yii::log("actionEvaQuestionWizard called", "trace", self::LOG_CAT);
 		$this->setPageTitle('Evaluation question wizard');
+		$this->layout = '//layouts/column3';
 		$model = new EvaluationQuestion();
 		$elements = ContextController::getDefaultElements();
 		$questionId = '';
+		$menu = [];
 		if (empty($_POST['EvaluationQuestion'])) {
-			$questions = $model->with('evalQuestionAnswers')->findAll("flag='primary'");
-			//print_r($questions[0]['evalQuestionAnswers']); die;
+			$questions = $model->with('evalQuestionAnswers')->find("flag='primary'");
+			unset(Yii::app()->session['leftMenu']);
+			$menu[$questions->evalQuestionId]['label'] = $questions->question;
+			//var_dump($questions); die;
 
 		} else {
 			//print_r($_POST); die;
 			$questionId = $_POST['EvaluationQuestion']['question'];
-			$questions = $model->with('evalQuestionAnswers')->findAllByPk($questionId);
-			//print_r($questions); die;
+			$questions = $model->with('evalQuestionAnswers')->findByPk($questionId);
+			//var_dump($questions); die();
+			$rsMenu = EvalQuestionAnswers::model()
+				->with('evalQuestion')
+				->find('t.evalQuestionId=:id AND nextQuestion=:next', [':id' => $questions->parentQuestion, ':next' => $questions->evalQuestionId]);
+			$menu = CHtml::tag('li', [], "Q: " . $rsMenu->evalQuestion->question . "<br /> A: "  . $rsMenu->optionName);
+			Yii::app()->session['leftMenu'] .= $menu;
+			//print_r(Yii::app()->session['leftMenu']); die;
 		}
-		if (!empty($questions[0]->flag) && 'final' == $questions[0]->flag) {
+		if (isset($questions->flag) && 'final' == $questions->flag) {
 			Yii::app()->user->setFlash('success', 'A question has been selected as per your previous choices');
 			$this->redirect(['evaluation/evalQuestionList', 'questionId' => $questionId]);
 		}
 		$link = '';
 		//var_dump($questions[0]['evalQuestionAnswers'], 'fdsf'); //die;
-		foreach ($questions[0]['evalQuestionAnswers'] as $answerKey => $answer) {
+		foreach ($questions->evalQuestionAnswers as $answerKey => $answer) {
 			if (!empty($answer->url)) {
 				$link = CHtml::link($answer->optionName, $this->createUrl($answer->url));
+				if($answer->url == 'epitools') {
+					$link = CHtml::link($answer->optionName, Yii::app()->params['other']['epitoolsUrl'], ['target' => '_blank']);
+				}
 				//$questions[0]['evalQuestionAnswers'][$answerKey]->unsetAttributes();
 			}
 		}
 		$elements['elements'] = [
-			'<h3>' . $questions[0]->question . '</h3>',
+			'<h4>' . $questions->question . '</h4>',
 			'question' => [
 				'type'         => 'radiolist',
 				'style'        => 'width:1em;',
 				'labelOptions' => ['style' => 'display:inline'],
-				'items'        => $model->getItems($questions[0]['evalQuestionAnswers'])
+				'items'        => $model->getItems($questions['evalQuestionAnswers']),
+				'label' => '',
+				'afterRequiredLabel' => ''
 			]
 		];
-		if (!empty($link)) {
-			array_push($elements['elements'], $link);
-		}
-		//print_r($questions[0]['evalQuestionAnswers']); die('pooop');
 		$elements['buttons'] = [
 			'back'   => [
 				'type'    => 'button',
@@ -429,6 +440,17 @@ class EvaluationController extends RiskController {
 
 			]
 		];
+		if(isset($questions->flag) && 'end' == $questions->flag) {
+			unset($elements['elements']['question']);
+			unset($elements['buttons']);
+			$link = '<br />' .
+				CHtml::link('Click here to select an evaluation question', $this->createUrl('evalQuestionList'));
+		}
+
+		if (!empty($link)) {
+			array_push($elements['elements'], $link);
+		}
+		//print_r($questions[0]['evalQuestionAnswers']); die('pooop');
 		$form = new CForm($elements, $model);
 		$this->render('evalQuestion', compact('form'));
 	}
@@ -440,7 +462,7 @@ class EvaluationController extends RiskController {
 	public function actionEvaAttributes($descId = 0) {
 		Yii::log("actionEvaAttributes called", "trace", self::LOG_CAT);
 		if ($descId > 0) {
-			$description = Attributes::model()->findByPk($descId, ['select' => 'description']);
+			$description = EvaAttributes::model()->findByPk($descId, ['select' => 'description']);
 			//print_r($description); die;
 			// The Regular Expression filter
 //			$regExUrl = '/(http|https|ftp|ftps)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?/';
@@ -456,10 +478,10 @@ class EvaluationController extends RiskController {
 			echo json_encode(['description' => "<p>$attrDescription</p>"]);
 			return;
 		}
-		$evaAttributes = CHtml::listData(Attributes::model()
-			->with('evaAttributeTypes')
+		$evaAttributes = CHtml::listData(EvaAttributes::model()
+			->with('attributeTypes')
 			->findAll(), 'attributeId', 'name', function ($attribute) {
-			return $attribute->evaAttributeTypes->name;
+			return $attribute->attributeTypes->name;
 		}); //die;
 
 		$tableColumns = CHtml::listData(EvaAttributeTypes::model()->findAll(), 'id', 'name');
@@ -1264,12 +1286,12 @@ class EvaluationController extends RiskController {
 				'onClick' => '$("#moreInfoDialog").html($("#popupData' . $element->evalElementsId . '").html());$("#moreInfoDialog").dialog("open")'
 			]);
 			// Add the image icon and information to the layout/ui
-			if (!empty($element->moreInfo) && !empty($element->url) && !empty($element->description)) {
-				$elements['elements']['evaContext']['elements'][$attributeId]['layout'] = '{label}<div class="componentImagePopup">' . $button .
-					'</div>{hint} {input}' . '<div id="popupData' . $element->evalElementsId . '" style="display:none">' . $valu->moreInfo . '</div>' .
-					'<div class="componentDataPopup">' . $element->description .
-					' <br/> <a href=' . $element->url . ' target=_blank>' . $element->url . '</a></div> {error}';
-			}
+//			if (!empty($element->moreInfo) && !empty($element->url) && !empty($element->description)) {
+//				$elements['elements']['evaContext']['elements'][$attributeId]['layout'] = '{label}<div class="componentImagePopup">' . $button .
+//					'</div>{hint} {input}' . '<div id="popupData' . $element->evalElementsId . '" style="display:none">' . $element->moreInfo . '</div>' .
+//					'<div class="componentDataPopup">' . $element->description .
+//					' <br/> <a href=' . $element->url . ' target=_blank>' . $element->url . '</a></div> {error}';
+//			}
 
 			// add the values to the form
 			if (!empty($componentData[$attributeId])) {
