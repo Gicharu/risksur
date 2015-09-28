@@ -161,6 +161,9 @@ $this->renderPartial('_detailsTable', ['evaDetails' => $evaDetails, 'tools' => t
 
 	});
 </script>
+<span class="widgetTitle">
+	Evaluation Attributes
+</span>
 <table id="evaAttributes" class="tableStyle" width="100%" border="0" cellspacing="0" cellpadding="0">
 	<thead>
 	<tr>
@@ -173,6 +176,9 @@ $this->renderPartial('_detailsTable', ['evaDetails' => $evaDetails, 'tools' => t
 	</tbody>
 </table>
 <p></p>
+<span class="widgetTitle">
+	Evaluation Assessment Methods
+</span>
 <table id="evaAssMethods" class="tableStyle" width="100%" border="0" cellspacing="0" cellpadding="0">
 	<thead>
 	<tr>
@@ -185,6 +191,9 @@ $this->renderPartial('_detailsTable', ['evaDetails' => $evaDetails, 'tools' => t
 	</tbody>
 </table>
 <p></p>
+<span class="widgetTitle">
+	Evaluation Economic methods
+</span>
 <table id="econEvaMethods" class="tableStyle" width="100%" border="0" cellspacing="0" cellpadding="0">
 	<thead>
 	<tr>

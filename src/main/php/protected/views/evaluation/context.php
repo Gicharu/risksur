@@ -2,10 +2,20 @@
 /**
  * @var $form CForm
  * @var $dataArray array
+ * @var $page array
  */
 ?>
 <div class="contentContainer">
 	<h3><?php echo $dataArray['formType']; ?> Evaluation Context</h3>
+	<p>
+		<?php
+		$this->renderPartial('//system/_page', [
+		'content' => $page['content'],
+		'editAccess' => $page['editAccess'],
+		'editMode' => $page['editMode']
+		]);
+		?>
+	</p>
 	<div class="contentLeft">
 		<div class="form">
 			<?= $form->render(); ?>

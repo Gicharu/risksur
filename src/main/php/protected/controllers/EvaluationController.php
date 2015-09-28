@@ -38,7 +38,7 @@ class EvaluationController extends RiskController {
 	protected function beforeAction($action) {
 		$contextActions = [
 			strtolower('selectEvaQuestion')    => 'selectEvaQuestion',
-			strtolower('evaQuestionList')      => 'selectEvaQuestion',
+			strtolower('evalQuestionList')      => 'evalQuestionList',
 			strtolower('evaQuestionWizard')    => 'evaQuestionWizard',
 			strtolower('selectComponents')     => 'selectComponents',
 			strtolower('selectCriteriaMethod') => 'selectCriteriaMethod',
@@ -57,15 +57,15 @@ class EvaluationController extends RiskController {
 			strtolower('selectEvaAttributes') => 'selectEvaAttributes'
 		];
 		//var_dump(isset($contextActions[$action->id]), $action->id); die;
+		if (isset($contextActions[$action->id]) && !isset($this->evaContextId)) {
+			Yii::app()->user->setFlash('notice', 'Please select or create an evaluation context before proceeding');
+			$this->redirect('listEvaContext');
+		}
 
 		if (isset($objectiveActions[$action->id]) && !isset($this->objectiveId)) {
 			Yii::app()->user->setFlash('notice', 'The current surveillance system does not have a surveillance objective please update it');
 			$this->redirect(['context/list']);
 			//return true;
-		}
-		if (isset($contextActions[$action->id]) && !isset($this->evaContextId)) {
-			Yii::app()->user->setFlash('notice', 'Please select or create an evaluation context before proceeding');
-			$this->redirect('listEvaContext');
 		}
 		if (isset($contextQuestionActions[$action->id]) && !isset($this->evaQuestionId)) {
 			Yii::app()->user->setFlash('notice', 'Please select a question for your evaluation context before proceeding');
@@ -138,14 +138,15 @@ class EvaluationController extends RiskController {
 		Yii::log("actionEvaPage called", "trace", self::LOG_CAT);
 		$this->docName = 'evaPage';
 		if (isset($_POST['pageId'])) {
-			$this->savePage('evaPage');
+			SystemController::savePage('evaMethods');
 		}
-		$page = $this->getPageContent();
+
+		$page = SystemController::getPageContent($this->docName);
 		if (empty($page)) {
 			Yii::app()->user->setFlash('notice', 'This page is missing some information');
 		}
 
-		$this->render('_page', [
+		$this->render('//system/_page', [
 				'content' => $page['content'],
 				'editAccess' => $page['editAccess'],
 				'editMode' => $page['editMode']
@@ -161,9 +162,9 @@ class EvaluationController extends RiskController {
 		Yii::log("actionEvaConcept called", "trace", self::LOG_CAT);
 		$this->docName = 'evaConcepts';
 		if(isset($_POST['pageId'])) {
-			$this->savePage('evaConcept');
+			SystemController::savePage('evaConcept');
 		}
-		$page = $this->getPageContent();
+		$page = SystemController::getPageContent($this->docName);
 		if(empty($page)) {
 			Yii::app()->user->setFlash('notice', 'This page is missing some information');
 		}
@@ -179,48 +180,48 @@ class EvaluationController extends RiskController {
 	/**
 	 * @return array
 	 */
-	private function getPageContent() {
-		Yii::log("Function getPageContent ContextController called", "trace", self::LOG_CAT);
-		$content = DocPages::model()->find("docName='$this->docName'");
-		if(empty($content)) {
-			return [];
-		}
-		$editAccess = false;
-		if(Yii::app()->rbac->checkAccess('context', 'savePage')) {
-			$editAccess = true;
-		}
-		$editMode = false;
-		if(isset($_POST['page']) && DocPages::model()->count('docId=' . $_POST['page']) > 0) {
-			$editMode = true;
-		}
-		return [
-			'content' => $content,
-			'editAccess' => $editAccess,
-			'editMode' => $editMode
-		];
-	}
+//	private function getPageContent() {
+//		Yii::log("Function getPageContent ContextController called", "trace", self::LOG_CAT);
+//		$content = DocPages::model()->find("docName='$this->docName'");
+//		if(empty($content)) {
+//			return [];
+//		}
+//		$editAccess = false;
+//		if(Yii::app()->rbac->checkAccess('context', 'savePage')) {
+//			$editAccess = true;
+//		}
+//		$editMode = false;
+//		if(isset($_POST['page']) && DocPages::model()->count('docId=' . $_POST['page']) > 0) {
+//			$editMode = true;
+//		}
+//		return [
+//			'content' => $content,
+//			'editAccess' => $editAccess,
+//			'editMode' => $editMode
+//		];
+//	}
 
 	/**
 	 * @param $action
 	 */
-	private function savePage($action) {
-		//var_dump($_POST); die;
-		Yii::log("Function SavePage ContextController called", "trace", self::LOG_CAT);
-		$model = DocPages::model()->findByPk($_POST['pageId']);
-		if (isset($_POST['survContent'])) {
-			$purifier = new CHtmlPurifier();
-			$model->docData = $purifier->purify($_POST['survContent']);
-			if($model->update()) {
-				Yii::app()->user->setFlash('success', 'The page was updated successfully');
-				$this->redirect($action);
-				return;
-			}
-		}
-
-		Yii::app()->user->setFlash('error', 'The page was not updated successfully, contact your administrator');
-		$this->redirect($action);
-		return;
-	}
+//	private function savePage($action) {
+//		//var_dump($_POST); die;
+//		Yii::log("Function SavePage ContextController called", "trace", self::LOG_CAT);
+//		$model = DocPages::model()->findByPk($_POST['pageId']);
+//		if (isset($_POST['survContent'])) {
+//			$purifier = new CHtmlPurifier();
+//			$model->docData = $purifier->purify($_POST['survContent']);
+//			if($model->update()) {
+//				Yii::app()->user->setFlash('success', 'The page was updated successfully');
+//				$this->redirect($action);
+//				return;
+//			}
+//		}
+//
+//		Yii::app()->user->setFlash('error', 'The page was not updated successfully, contact your administrator');
+//		$this->redirect($action);
+//		return;
+//	}
 
 	/**
 	 * actionEvaMethods
@@ -228,9 +229,15 @@ class EvaluationController extends RiskController {
 	public function actionEvaMethods() {
 		Yii::log("actionEvaMethods called", "trace", self::LOG_CAT);
 		$this->setPageTitle(Yii::app()->name . ' - Economic evaluation methods');
+		$this->docName = 'evaMethods';
+		if (isset($_POST['pageId'])) {
+			SystemController::savePage('evaMethods');
+		}
+
+		$page = SystemController::getPageContent($this->docName);
 		$dataProvider = new CActiveDataProvider('EconEvaMethods');
 		//print_r($dataProvider->getData()); die;
-		$this->render('evaMethods', ['dataProvider' => $dataProvider]);
+		$this->render('evaMethods', ['dataProvider' => $dataProvider, 'page' => $page]);
 	}
 
 
@@ -242,9 +249,9 @@ class EvaluationController extends RiskController {
 		$this->setPageTitle('Select evaluation question');
 		$this->docName = 'evaQuestion';
 		if (isset($_POST['pageId'])) {
-			$this->savePage('selectEvaQuestion');
+			SystemController::savePage('selectEvaQuestion');
 		}
-		$page = $this->getPageContent();
+		$page = SystemController::getPageContent($this->docName);
 		if (empty($page)) {
 			Yii::app()->user->setFlash('notice', 'This page is missing some information');
 		}
@@ -257,7 +264,7 @@ class EvaluationController extends RiskController {
 	 * actionEvalQuestionList
 	 * @param string $questionId
 	 */
-	public function actionEvalQuestionList($questionId = null) {
+	public function actionEvalQuestionList($questionId = '') {
 		Yii::log("actionEvalQuestionList called", "trace", self::LOG_CAT);
 		$this->setPageTitle('Select evaluation question');
 		$model = EvaluationHeader::model()->findByPk($this->evaContextId);
@@ -899,7 +906,7 @@ class EvaluationController extends RiskController {
 		}
 		if(!isset($econMethodGroup)) {
 			Yii::app()->user->setFlash('notice', 'The evaluation question selected for this evaluation context does not' .
-				'have any economic evaluation methods');
+				' have any economic evaluation methods');
 			$this->redirect('evaSummary');
 		}
 		// Get evaluation context model
@@ -941,11 +948,13 @@ class EvaluationController extends RiskController {
 		}
 		$this->docName = 'econEvaMethods';
 		$page = SystemController::getPageContent($this->docName);
+		$evaDetails = $this->getEvaDetails();
 
 		$this->render('selectEconEvaMethods', [
 			'page' => $page,
 			'econMethods' => $econMethods,
-			'evaModel' => $evaModel
+			'evaModel' => $evaModel,
+			'evaDetails' => $evaDetails
 		]);
 
 
@@ -1019,7 +1028,13 @@ class EvaluationController extends RiskController {
 			return;
 
 		}
-		$this->render('listEvaContext');
+		$this->docName = 'listEvaContext';
+		if (isset($_POST['pageId'])) {
+			SystemController::savePage('listEvaContext');
+		}
+
+		$page = SystemController::getPageContent($this->docName);
+		$this->render('listEvaContext', compact('page'));
 	}
 
 	private function replaceNullQuestion($array) {
@@ -1082,7 +1097,7 @@ class EvaluationController extends RiskController {
 					'id'   => $evaluationHeader->evalId,
 					'name' => $evaluationHeader->evaluationName,
 				]);
-				Yii::app()->user->setFlash('success', Yii::t("translation", "Evaluation protocol created successfully"));
+				Yii::app()->user->setFlash('success', Yii::t("translation", "Evaluation context created successfully"));
 				$this->redirect(['selectEvaQuestion']);
 				return;
 			} elseif(!$evaluationHeader->hasErrors() && !$model->hasErrors()) {
@@ -1092,11 +1107,18 @@ class EvaluationController extends RiskController {
 			}
 
 		}
+		$this->docName = 'addEvaContext';
+		if (isset($_POST['pageId'])) {
+			SystemController::savePage('addEvaContext');
+		}
+
+		$page = SystemController::getPageContent($this->docName);
 
 		$this->render('context', [
 			'model'     => $model,
 			'dataArray' => $dataArray,
-			'form'      => $form
+			'form'      => $form,
+			'page' => $page
 		]);
 	}
 
