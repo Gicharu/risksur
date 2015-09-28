@@ -39,6 +39,7 @@ if ($editAccess) {
 				 'allowedAttr' =>  [
 					 ['p', 'id']
 				 ],
+				'placeholder' => 'Enter some text...',
 				//'autosave' => $this->createUrl('savePage'),
 				//'autosaveOnChange' => true,
 //				'autosaveFields' => [

@@ -8,7 +8,7 @@
  * @var $page Array
  */
 
-$this->renderPartial('_page', [
+$this->renderPartial('//system/_page', [
 		'content' => $page['content'],
 		'editAccess' => $page['editAccess'],
 		'editMode' => $page['editMode']

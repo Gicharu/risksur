@@ -271,31 +271,34 @@ if (!Yii::app()->user->isGuest) {
 	</div>
 	<div id="evalName">
 	<?php
-		if (!empty(Yii::app()->session['evaContext']) && Yii::app()->controller->id == 'evaluation') {
-			echo "Selected evaluation context: " . Yii::app()->session['evaContext']['name'];
+		if (Yii::app()->controller->id == 'evaluation') {
+			$evaContext = "Current evaluation context: ";
+			$evaContext .= isset(Yii::app()->session['evaContext']['name']) ?
+				Yii::app()->session['evaContext']['name'] : "None";
+			echo $evaContext;
 		}
 	?>
 	</div>
 	<div id="attributeSelected">
 	<?php
-		if (Yii::app()->controller->id <> 'evaluation') {
-			$perfOptions = [
-				'class' => 'chozen',
-				'empty' => 'Select one...',
-				'data-placeholder' => 'Select one',
-				'id' => 'perfSelector',
-				'onchange' => "if(\$(this).val() !== '') {window.location='" .
-					Yii::app()->createUrl('attribute/selectAttribute') . "/id/' + $(this).val() }"
-			];
-			$activeAttributeId = '';
-			if (!empty(Yii::app()->session['performanceAttribute'])) {
-				$activeAttributeId = Yii::app()->session['performanceAttribute']['id'];
-				unset($perfOptions['empty'], $perfOptions['data-placeholder']);
-			}
-			echo CHtml::label('Current performance attribute: ', 'perfSelector');
-			echo CHtml::dropDownList('perfSelector', $activeAttributeId,
-				AttributeController::actionSelectAttribute(), $perfOptions);
-		}
+//		if (Yii::app()->controller->id <> 'evaluation') {
+//			$perfOptions = [
+//				'class' => 'chozen',
+//				'empty' => 'Select one...',
+//				'data-placeholder' => 'Select one',
+//				'id' => 'perfSelector',
+//				'onchange' => "if(\$(this).val() !== '') {window.location='" .
+//					Yii::app()->createUrl('attribute/selectAttribute') . "/id/' + $(this).val() }"
+//			];
+//			$activeAttributeId = '';
+//			if (!empty(Yii::app()->session['performanceAttribute'])) {
+//				$activeAttributeId = Yii::app()->session['performanceAttribute']['id'];
+//				unset($perfOptions['empty'], $perfOptions['data-placeholder']);
+//			}
+//			echo CHtml::label('Current performance attribute: ', 'perfSelector');
+//			echo CHtml::dropDownList('perfSelector', $activeAttributeId,
+//				AttributeController::actionSelectAttribute(), $perfOptions);
+//		}
 	?>
 	</div>
 	</div><!-- header -->

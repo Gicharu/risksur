@@ -83,8 +83,9 @@
 
 
 <div id="evaSummaryContainer">
-
+	<span class="widgetTitle">Evaluation summary</span>
 	<table id="evaSummary" class="tableStyle"
 	       width="100%" border="0" cellspacing="0" cellpadding="0">
 	</table>
 </div>
+<p></p>
