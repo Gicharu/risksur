@@ -76,7 +76,7 @@ class EvaluationElements extends CActiveRecord {
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return [
-			'options0' => [self::HAS_MANY, 'Options', 'elementId'],
+			'options' => [self::HAS_MANY, 'Options', 'elementId'],
 			'data' => [self::HAS_MANY, 'EvaluationDetails', 'evalElementsId']
 		];
 	}

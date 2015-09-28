@@ -46,8 +46,8 @@
 				});
 
 				$('#EvalForm_evaType_5').on('change', function() {
-					//console.log($(this).parent().next('div').hide());
-					if($(this).val() == '1') {
+					//console.log($(this).children('option').filter(':selected').text());
+					if($(this).children('option').filter(':selected').text() == 'Component') {
 						$(this).parent().next('.row').show();
 						$(this).parent().next('.row').children('input').val('');
 						return true;

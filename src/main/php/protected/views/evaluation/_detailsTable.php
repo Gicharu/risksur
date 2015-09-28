@@ -8,22 +8,24 @@
  * @var $evaDetails array
  * @var $tools true
  */
+//print_r($evaDetails); die;
+
 ?>
 <script type="text/javascript">
 	$(function(){
 		$("#evaSummary").dataTable({
 			"bAutoWidth" : false,
 			"bInfo": false,
-			"bLengthChange": false,
 			"aaData": <?= json_encode($evaDetails); ?>,
 			"aoColumns": [
 				{ "sTitle": "" },
 				{ "sTitle": "" }
 			],
+			"iDisplayLength": 50,
 			<?php
 			if(isset($tools)) {
 			?>
-			"sDom": '<"H"rlTf>t<"F"ip>',
+			"sDom": '<"H"rTf>t<"F"ip>',
 			"oTableTools": {
 				"sSwfPath": "<?php echo Yii::app()->request->baseUrl; ?>/js/copy_csv_xls_pdf.swf",
 				"aButtons": [
