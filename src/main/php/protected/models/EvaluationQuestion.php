@@ -38,7 +38,12 @@ class EvaluationQuestion extends CActiveRecord {
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
-			'evalQuestionAnswers' => array(self::HAS_MANY, 'EvalQuestionAnswers', 'evalQuestionId'),
+			'evalQuestionAnswers' => [self::HAS_MANY, 'EvalQuestionAnswers', 'evalQuestionId'],
+			'evaCriteriaMethod' => [self::HAS_MANY, 'EvaQuestionHasCriteriaAndMethod', 'questionId'],
+			'methods' => [self::HAS_MANY, 'EvaMethods', ['methodId' => 'evaMethodId'],
+				'through' => 'evaCriteriaMethod'],
+			'criteria' => [self::HAS_MANY, 'EvaCriteria', ['criteriaId' => 'criteriaId'],
+				'through' => 'evaCriteriaMethod']
 		);
 	}
 

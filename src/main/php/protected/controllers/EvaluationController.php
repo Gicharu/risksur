@@ -267,49 +267,78 @@ class EvaluationController extends RiskController {
 	public function actionEvalQuestionList($questionId = '') {
 		Yii::log("actionEvalQuestionList called", "trace", self::LOG_CAT);
 		$this->setPageTitle('Select evaluation question');
-		if (!empty($_POST['EvaluationQuestion']['question'])) {
-			$model = EvaluationHeader::model()->findByPk($this->evaContextId);
-			$model->questionId = $_POST['EvaluationQuestion']['question'];
+		$model = EvaluationHeader::model()->findByPk($this->evaContextId);
+		//print_r($_POST); die;
+		if (!empty($_POST['EvaluationHeader']['questionId'])) {
+			$model->questionId = $_POST['EvaluationHeader']['questionId'];
 			$model->update();
 			$session = Yii::app()->session;
 			$sessionEvaParams = $session['evaContext'];
 			//print_r(Yii::app()->session['evaContext']); die;
 			$sessionEvaParams['questionId'] = $model->questionId;
 			$session['evaContext'] = $sessionEvaParams;
-			$this->redirect('selectEvaAttributes');
-			return;
+			Yii::app()->user->setFlash('success', 'Evaluation question saved successfully');
+			if(isset($_POST['next'])) {
+				$this->redirect('selectComponents');
+				return;
+			}
 		}
-		$model = new EvaluationQuestion();
+//		$model = new EvaluationQuestion();
 		$questionCriteria = new CDbCriteria();
 		$questionCriteria->select = "*, CAST(`questionNumber` as SIGNED) AS castedColumn";
 		$questionCriteria->condition = "flag='final'";
 		$questionCriteria->order = 'castedColumn ASC, questionNumber ASC';
-		$questionsRs = $model->findAll($questionCriteria);
+//		$questionsRs = EvaQuestionHasCriteriaAndMethod::model()->with(['question', 'method', 'criteria'])->findAll();
+		$questionsRs = EvaluationQuestion::model()->with(['methods', 'criteria'])->findAll($questionCriteria);
+		//print_r($questionsRs); die;
+		$questionArray = [];
+		foreach($questionsRs as $questionData) {
+			$questionArray[$questionData->evalQuestionId] = [
+				'questionId' => $questionData->evalQuestionId,
+				'questionNumber' => $questionData->questionNumber,
+				'question' => $questionData->question,
+				'method' => '',
+				'criteria' => '',
+			];
+			foreach($questionData->methods as $evaMethod) {
+				$questionArray[$questionData->evalQuestionId]['method'] .=  $evaMethod->name . ', ' ;
+
+			}
+			foreach($questionData->criteria as $evaCriteria) {
+				$questionArray[$questionData->evalQuestionId]['criteria'] .= $evaCriteria->name . ', ';
+
+			}
+			$questionArray[$questionData->evalQuestionId]['criteria'] = rtrim($questionArray[$questionData->evalQuestionId]['criteria'], ", ");
+			$questionArray[$questionData->evalQuestionId]['method'] = rtrim($questionArray[$questionData->evalQuestionId]['method'], ", ");
+		}
 		$currentQuestion = EvaluationHeader::model()->findByPk($this->evaContextId);
 		$model->question = $currentQuestion->questionId;
 		$elements = ContextController::getDefaultElements();
-		$elements['title'] = '<h3>Evaluation question pick list </h3>';
+		$elements['title'] = '<h3>Select Evaluation Question</h3>';
 		$elements['elements'] = [
-			'question' => [
-				'type'      => 'radiolist',
-				'separator' => '<br>',
-				'style'     => 'width:1em;',
-				'template'  => '<span class="rb">{input} {label}</span>',
-				'items'     => CHtml::listData($questionsRs, 'evalQuestionId',
-					function ($qOption) {
-						return CHtml::encode($qOption->questionNumber . ' ' . $qOption->question);
-					})
-			]
+			'<table id="questionSelect" width="100%" border="0" cellspacing="0" cellpadding="0">',
+			'<thead><tr></tr><th></th><th>Question Number</th><th>Question</th><th>Evaluation Criteria</th>' .
+			'<th>Evaluation Method</th></tr></thead>',
+			'<tbody></tbody>',
+			'</table>',
 		];
-		$elements['buttons'] = ContextController::getButtons(["name" => "save", "label" => 'Next'],
-			'evaluation/evalQuestionList');
-		unset($elements['buttons']['cancel']);
-		if (!empty($questionId)) {
+		$elements['buttons'] = [
+			"save" =>  ["label" => 'Save', 'type' => 'submit'],
+			'next' => ['label' => 'Next', 'type' => 'submit']
+		];
+		if (isset($questionId)) {
 			$model->question = $questionId;
 		}
+		if(!isset($model->questionId)) {
+			$model->questionId = '';
+		}
 		$form = new CForm($elements, $model);
-//		print_r($form['question']); die;
-		$this->render('evaQuestionList', ['form' => $form]);
+		//var_dump($form); die;
+		$this->render('evaQuestionList', [
+			'form' => $form,
+			'questionId' => $model->questionId,
+			'questions' => $questionArray
+		]);
 	}
 
 	/**
@@ -533,11 +562,12 @@ class EvaluationController extends RiskController {
 		//print_r($groupArray); print_r(Yii::app()->session['evaContext']); die;
 		//var_dump(Yii::app()->session['evalQuestion'], Yii::app()->session['evaContext']['questionId']); die;
 		foreach ($groupArray as $group => $questionsArray) {
-			if (isset(array_flip($questionsArray)[Yii::app()->session['evaContext']['questionId']])) {
+			if (isset(array_flip($questionsArray)[$this->evaQuestionId])) {
 				$groupKey[] = $group;
 				//break;
 			}
 		}
+		// check if we are considering risk based options?
 		return $groupKey;
 	}
 
@@ -550,10 +580,7 @@ class EvaluationController extends RiskController {
 		$detailsCriteria->with = ['frameworks', 'evaMethods', 'evaCriteria'];
 		$model = ModelToArray::convertModelToArray(EvaluationHeader::model()
 			->findByPk($this->evaContextId, $detailsCriteria));
-		$evaluationDataCriteria = new CDbCriteria();
-		$evaluationDataCriteria->condition = "inputName='riskBasedOpts' AND data.evalId=" . $this->evaContextId;
-		$evaluationDataCriteria->with = 'data';
-		$evaluationDataModel = EvaluationElements::model()->find($evaluationDataCriteria);
+
 		$evaMethods = '';
 		$evaCriteria = '';
 		array_walk($model['evaMethods'], function ($item) use (&$evaMethods) {
@@ -567,7 +594,7 @@ class EvaluationController extends RiskController {
 		$components = '';
 		if (isset($model['components'])) {
 			$componentArray = ModelToArray::convertModelToArray(
-				ComponentHead::model()->findAllByPk(json_decode($model['components'])));
+				ComponentHead::model()->findAllByPk(json_decode($model['components'], true)));
 			array_walk($componentArray, function ($item) use (&$components) {
 				$components .= $item['componentName'] . ',';
 			});
@@ -585,9 +612,32 @@ class EvaluationController extends RiskController {
 		$evaDetails[] = ['Evaluation question', $model['question']['question']];
 		$evaDetails[] = ['Evaluation criteria', $model['evaCriteria']];
 		$evaDetails[] = ['Evaluation method', $model['evaMethods']];
-		$evaDetails[] = ['Whether risk based approach used',
-			is_null($evaluationDataModel) ? 'N/A' :
-				json_decode($evaluationDataModel->options)[$evaluationDataModel->data[0]['value']]]; //$evaDetailsArray;
+		$evaluationDataCriteria = new CDbCriteria();
+		$evaluationDataCriteria->condition = "data.evalId=" . $this->evaContextId;
+		$evaluationDataCriteria->with = ['data', 'options'];
+		$evaluationDataModel = EvaluationElements::model()->findAll($evaluationDataCriteria);
+
+		foreach($evaluationDataModel as $evaluationData) {
+			if($evaluationData->inputType == 'dropdownlist' &&
+				isset($evaluationData->options[0])) {
+				foreach ($evaluationData->options as $option) {
+//					print_r($option->optionId);
+//					var_dump($evaluationData->data[0]->value);
+//					die;
+					if($option->optionId == $evaluationData->data[0]->value) {
+						$evaDetails[] = [$evaluationData->label, $option->label];
+					}
+				}
+
+			} else {
+				$evaDetails[] = [$evaluationData->label, $evaluationData->data[0]->value];
+			}
+		}
+//		/print_r($evaDetails); die;
+//		$evaDetails[] = ['Whether risk based approach used',
+//			is_null($evaluationDataModel) ? 'N/A' :
+//				json_decode($evaluationDataModel->options)[$evaluationDataModel->data[0]['value']]];
+				//$evaDetailsArray;
 		return $evaDetails;
 	}
 
@@ -597,29 +647,30 @@ class EvaluationController extends RiskController {
 	public function actionSelectComponents() {
 		$this->setPageTitle('Select components');
 		// check if the context supports component selection
-		$rsEvaluationType = EvaluationDetails::model()->find('evalElementsId=:element AND evalId=:evaId',
+		$rsEvaluationType = EvaluationDetails::model()
+			->with('options')
+			->find('evalElementsId=:element AND evalId=:evaId',
 			[':element' => 5, ':evaId' => $this->evaContextId]);
 		if(!isset($rsEvaluationType)) {
 			Yii::app()->user->setFlash('notice', 'PLease update the evaluation context');
 			$this->redirect('listEvaContext');
 
 		}
-		if(isset($rsEvaluationType) && $rsEvaluationType->value == 0) {
-			Yii::app()->user->setFlash('notice', 'You are planning to evaluate at system level hence no selection' .
-				' of components is required');
+		//print_r($rsEvaluationType); die;
+		if(isset($rsEvaluationType->options) && $rsEvaluationType->options->label == 'System') {
+			Yii::app()->user->setFlash('notice', 'The evaluation context is system based hence no components are needed');
 			$this->redirect('selectEvaAttributes');
 
 		}
 		$model = new DesignForm();
 		$elements = ContextController::getDefaultElements();
 		$rules = [];
-		$evaDetails = $this->getEvaDetails();
 		$componentsCriteria = new CDbCriteria();
 		$componentsCriteria->select = 'componentId, componentName';
 		$componentsCriteria->condition = 'frameworkId=:framework';
 		$componentsCriteria->params = [':framework' => $this->frameworkId];
+		$elements['title'] = '<h3>Select Components</h3>';
 		$elements['elements'] = [
-			'<fieldset><legend>Select Components</legend>',
 			'<p> Please select the components you would like to include in your evaluation from the components' .
 			' included in this system using the table below.  If the components you want to include are not listed' .
 			' in this table please go back and enter the information about your components into the ' .
@@ -629,7 +680,6 @@ class EvaluationController extends RiskController {
 			'<th>Study type</th></tr></thead>',
 			'<tbody></tbody>',
 			'</table>',
-			'</fieldset>'
 		];
 		$rules[] = ['components', 'required'];
 		$evaModel = EvaluationHeader::model()->find('evalId=:evalId', [':evalId' => $this->evaContextId]);
@@ -685,7 +735,9 @@ class EvaluationController extends RiskController {
 			}
 		}
 		$selectedComponents = is_null($evaModel->components) ? [] : json_decode($evaModel->components);
-		//var_dump($selectedComponents); //die;
+		//Get evaluation summary
+		$evaDetails = $this->getEvaDetails();
+
 		$this->docName = 'selectComponents';
 		if (isset($_POST['pageId'])) {
 			SystemController::savePage('selectComponents');
@@ -716,6 +768,7 @@ class EvaluationController extends RiskController {
 		$groupsArray = json_decode($groups->questions);
 		$group = $this->getQuestionGroup($groupsArray);
 		//var_dump($group); die;
+
 		$attributesCriteria = new CDbCriteria();
 		$attributesCriteria->with = ['attributeTypes', 'attribute'];
 		$attributesCriteria->order = 'relevance DESC';
@@ -1168,12 +1221,12 @@ class EvaluationController extends RiskController {
 	public function actionGetSurveillanceSummary() {
 		$surveillanceCriteria = new CDbCriteria();
 		$surveillanceCriteria->condition = 'frameworkId=' . $this->frameworkId;
-		$surveillanceRs = FrameworkFields::model()->with('data', 'options')->findAll();
+		$surveillanceRs = FrameworkFields::model()->with('data', 'options')->findAll($surveillanceCriteria);
 		$surveillanceFields = [
 			'hazardName'       => 'Hazard Name',
 			'survobj'          => 'Surveillance objective',
 			'geographicalArea' => 'Geographical area',
-			'stateOfDisease'   => 'State of disease',
+			'stateOfDisease'   => 'Hazard situation',
 			'legalReq'         => 'Legal Requirements',
 		];
 //		$evaDetails[] = ['Evaluation Name', $model['evaluationName']];
@@ -1201,9 +1254,21 @@ class EvaluationController extends RiskController {
 
 			}
 		}
+		$surveillanceComponents = CHtml::link('add surveillance components', ['design/addMultipleComponents']);
+		// Get surveillance components
+		$rsComponents = ComponentHead::model()->findAll('frameworkId=:framework', [':framework' => $this->frameworkId]);
+		if(isset($rsComponents[0])) {
+			$surveillanceComponents = '';
+			foreach($rsComponents as $component) {
+				$surveillanceComponents .= $component->componentName . ', ';
+			}
+			$surveillanceComponents = rtrim($surveillanceComponents, ', ');
+		}
+
+		$surveillanceSummary[] = ['Surveillance components', $surveillanceComponents];
 		//print_r($surveillanceSummary); die;
 
-		echo json_encode(["aaData" => $surveillanceSummary], JSON_UNESCAPED_SLASHES);
+		echo json_encode(["aaData" => array_values($surveillanceSummary)], JSON_UNESCAPED_SLASHES);
 		return;
 
 
@@ -1330,15 +1395,12 @@ class EvaluationController extends RiskController {
 			}
 			//add the dropdown parameters
 			if ($element->inputType == 'dropdownlist') {
-				$items = json_decode($element->options);
-				if (!isset($element->options)) {
-					$items = CHtml::listData(Options::model()->findAll([
-						'condition' => 'elementId=:elementId',
-						'params'    => [
-							':elementId' => $element->evalElementsId
-						],
-					]), 'optionId', 'label');
-				}
+				$items = CHtml::listData(Options::model()->findAll([
+					'condition' => 'elementId=:elementId',
+					'params'    => [
+						':elementId' => $element->evalElementsId
+					],
+				]), 'optionId', 'label');
 				// add the dropdown items to the element
 				$elements['elements']['evaContext']['elements'][$attributeId]['items'] = $items;
 				$elements['elements']['evaContext']['elements'][$attributeId]['prompt'] = 'Choose one';

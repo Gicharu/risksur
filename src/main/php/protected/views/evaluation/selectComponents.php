@@ -40,7 +40,7 @@ echo CHtml::tag('div', ['class' => 'form'], $form->render());
 							class: 'dtCheck',
 							value: oData.componentId
 						});
-						console.log(selectedComponents[oData.componentId]);
+						//console.log(selectedComponents[oData.componentId]);
 						if(typeof selectedComponents[oData.componentId] != 'undefined') {
 							$(checkBox).attr('checked', 'checked');
 						}
