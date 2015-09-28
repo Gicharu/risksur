@@ -5,6 +5,7 @@
  * Date: 7/19/15
  * Time: 2:00 PM
  * @var $this EvaluationController
+ * @var $page Array
  */
 ?>
 <script type="text/javascript">
@@ -80,6 +81,15 @@
 	});
 </script>
 <div id="listEvaContext">
+	<p>
+	<?php
+	$this->renderPartial('//system/_page', [
+		'content' => $page['content'],
+		'editAccess' => $page['editAccess'],
+		'editMode' => $page['editMode']
+	]);
+	?>
+	</p>
 	<p>
 	<?= CHtml::link('Create new evaluation context', $this->createUrl('addEvaContext'), ['class' => 'btn']); ?>
 	</p>

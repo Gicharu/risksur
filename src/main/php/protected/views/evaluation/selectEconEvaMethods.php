@@ -8,9 +8,13 @@
  * @var $evaModel EvaluationHeader
  * @var $page array
  * @var $econMethods array
+ * @var $evaDetails array
  * @var $form CActiveForm
  */
-
+if(!$page['editMode']) {
+	$this->renderPartial('_detailsTable', ['evaDetails' => $evaDetails]);
+	echo CHtml::tag('p');
+}
 $this->renderPartial('_page', [
 	'editMode'   => $page['editMode'],
 	'editAccess' => $page['editAccess'],
@@ -46,8 +50,8 @@ $this->renderPartial('_page', [
 				},
 				{"mData": "econMethodGroup.buttonName"},
 				{"mData": "name"},
-				{"mData": "description"},
-				{"mData": "reference"}
+				{"mData": "description", "sWidth": '30%'},
+				{"mData": "reference", "sWidth": '25%'}
 			],
 			"bJQueryUI": true,
 			"sPaginationType": "buttons_input",

@@ -67,16 +67,19 @@
 					]
 				],
 				['label' => Yii::t("translation", "Describe Evaluation Context"),
-				      'url'   => ["$currentController/listEvaContext"]],
+				 'url'   => ["$currentController/listEvaContext"]],
 				['label' => Yii::t("translation", "Select Evaluation Question"),
-				      'url'   => ["$currentController/selectEvaQuestion"]],
+				 'url'   => ["$currentController/selectEvaQuestion"],  'items' => [
+					['label' => 'Guidance pathway', 'url' => ["$currentController/evaQuestionWizard"]],
+					['label' => 'Evaluation question pick list', 'url' => ["$currentController/evalQuestionList"]],
+				]],
 				['label' => Yii::t("translation", "Select Evaluation Methods"),
 				      'url'   => "#", 'items' => [
 					['label' => Yii::t("translation", "Select components"),
 					      'url'   => ["$currentController/selectComponents"]],
 					['label' => Yii::t("translation", "Select attributes"),
 						  'url'   => ["$currentController/selectEvaAttributes"]],
-					['label' => Yii::t("translation", "Select assessment methods"),
+					['label' => Yii::t("translation", "Select attribute assessment methods"),
 					 'url'   => ["$currentController/selectEvaAssMethod"]],
 					['label' => Yii::t("translation", "Select economic methods"),
 					 'url'   => ["$currentController/selectEconEvaMethods"]],

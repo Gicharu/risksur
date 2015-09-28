@@ -1,8 +1,3 @@
-<script type="text/javascript">
-	$(function(){
-		$("a.buttonLink").button();
-	});
-</script>
 <?php
 /**
  * Created by PhpStorm.
@@ -10,8 +5,20 @@
  * Date: 5/11/15
  * Time: 3:45 PM
  * @var $this EvaluationController
+ * @var $page Array
  */
-
+?>
+<script type="text/javascript">
+	$(function(){
+		$("a.buttonLink").button();
+	});
+</script>
+<?php
+$this->renderPartial('//system/_page', [
+	'content' => $page['content'],
+	'editAccess' => $page['editAccess'],
+	'editMode' => $page['editMode']
+]);
 
 $this->widget('zii.widgets.grid.CGridView', array(
 	'columns' => array(
