@@ -1,4 +1,3 @@
-INSERT INTO `docPages` (`docName`, `docData`) VALUES ('evaMethods', 'Text here...');
 
 UPDATE `evalElements` SET `inputType` = 'textarea' WHERE `evalElementsId` = '1';
 UPDATE `evalElements` SET `inputType` = 'textarea' WHERE `evalElementsId` = '3';
