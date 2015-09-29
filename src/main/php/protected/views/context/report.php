@@ -4,24 +4,27 @@
  * User: james
  * Date: 6/2/15
  * Time: 11:34 AM
+ * @var $surveillanceReport array
  */
 ?>
 <script type="text/javascript">
 	$(document).ready(function() {
-		var evaSummary = $("#evaSummary").dataTable({
+		var survReport = $("#surveillanceReport").dataTable({
+			"sDom": '<"H"rTf>t<"F"ip>',
 			"bProcessing": true,
 			"aoColumns": [
-				{ "sClass": 'bold' },
-				null
+				{"mData": "sectionName", "bVisible": false},
+				{"mData": "field"},
+				{"mData": "data"}
 			],
 //			bDestroy: true,
 			bPaginate: false,
 			"bJQueryUI": true,
-//			"sPaginationType": "buttons_input",
+			"aaData": <?= json_encode($surveillanceReport); ?>,
 			"bLengthChange": false,
 			"bFilter": false,
 			"oLanguage": {
-				"sZeroRecords": "No evaluation summary available"
+				"sZeroRecords": "No surveillance summary available"
 			},
 			"oTableTools": {
 				"sSwfPath": "<?php echo Yii::app()->request->baseUrl; ?>/js/copy_csv_xls_pdf.swf",
@@ -29,7 +32,7 @@
 					{
 						"sExtends": "print",
 						"sButtonText": "<?php echo Yii::t('translation', 'Print')?>",
-						"sMessage": '<p class="printHeader">Evaluation Report</p>',
+						"sMessage": '<p class="printHeader">Surveillance Report</p>',
 						"bShowAll": false
 					},
 					{
@@ -40,9 +43,10 @@
 							oSelectorOpts: {
 								page: 'current'
 							},
+							"mColumns": "visible",
 							"sButtonText": "PDF",
 							"fnClick":  function( nButton, oConfig, flash ) {
-								flash.setFileName( "Evaluation_report_" + getTitle() + ".pdf" );
+								flash.setFileName( "Surveillance_report_" + getTitle() + ".pdf" );
 								this.fnSetText( flash,
 									"title:"+ this.fnGetTitle(oConfig) +"\n"+
 									"message:"+ oConfig.sPdfMessage +"\n"+
@@ -62,37 +66,25 @@
 									page: 'current'
 								},
 								"fnClick": function ( nButton, oConfig, oFlash ) {
-									oFlash.setFileName( "Evaluation_report_" + getTitle() + ".csv" );
+									oFlash.setFileName( "Surveillance_report_" + getTitle() + ".csv" );
 									this.fnSetText( oFlash,	"" + this.fnGetTableData(oConfig)
 									);
 								}
 							}
-						],
-						"bShowAll": false
+						]
 					}
 				]
 			}
-		});
-		$.ajax({
-			url: "<?= $this->createUrl('evaluation/getEvaSummary'); ?>",
-			dataType: 'json',
-			success: function(data) {
-				var rowData = [];
-				var propNames = Object.keys(data);
-				for(var name in propNames) {
-					rowData[name] = [propNames[name], data[propNames[name]]];
-				}
-				evaSummary.fnAddData(rowData);
-			}
+		}).rowGrouping();
 
-		});
 	});
 </script>
-<table id="evaSummary" cellspacing="0" width="100%">
+<table id="surveillanceReport" cellspacing="0" width="100%">
 	<thead>
 	<tr>
 		<th></th>
-		<th></th>
+		<th>Field</th>
+		<th>Value</th>
 	</tr>
 	</thead>
 	<tbody></tbody>

@@ -644,10 +644,14 @@ class ContextController extends RiskController {
 		unset(Yii::app()->session['surveillanceObjective']);
 		unset(Yii::app()->session['surDesign']);
 		unset(Yii::app()->session['evaContext']);
-		$this->render('finished', compact('event'));
 		$event->sender->reset();
-		Yii::app()->end();
+//		Yii::app()->end();
+		$this->redirect(['report', 'systemId' => $frameWorkModel->frameworkId]);
 	}
+
+	/**
+	 * @param null $step
+	 */
 	public function actionCreate($step=null) {
 
 		unset(Yii::app()->session['surveillanceId']);
@@ -715,13 +719,80 @@ class ContextController extends RiskController {
 		//die;
 	}
 
+	public function actionReport($systemId = null) {
+		if(isset($systemId)) {
+			$surveillanceCriteria = new CDbCriteria();
+			$surveillanceCriteria->order = 'frameworkFields.sectionId ASC, frameworkFields.order ASC';
+			$surveillanceCriteria->condition = 'survData.frameworkId=:framework';
+			$surveillanceCriteria->params = [':framework' => $systemId];
+			/**
+			 * @var $rsSurveillance CActiveRecord
+			 */
+			$rsSurveillance = SurveillanceSections::model()->with('survData', 'frameworkFields')->findAll($surveillanceCriteria);
+			if(!isset($rsSurveillance[0])) {
+				Yii::app()
+					->user
+					->setFlash('notice', 'The surveillance system you have selected has no data, please update it');
+				$this->redirect('list');
+				return;
+			}
+			//print_r($rsSurveillance); die;
+			$surveillanceReport = [];
+			$sectionKey = 0;
+			foreach($rsSurveillance as $section) {
+				foreach ($section->frameworkFields as $field) {
+					$surveillanceReport[$sectionKey]['sectionName'] = '1.' . $section->sectionId .
+						' ' . $section->sectionName;
+					$surveillanceReport[$sectionKey]['field'] = isset($field->label) ?
+						$field->label : $rsSurveillance[$sectionKey]->getAttributeLabel($field->inputName);
+					foreach ($section->survData as $fieldData) {
+						if($field->id == $fieldData->frameworkFieldId) {
+							$surveillanceReport[$sectionKey]['data'] = $fieldData->value;
+							if(DForm::isJson($fieldData->value)) {
+								//print_r(json_decode($fieldData->value, true)); die;
+								$optionsCriteria = new CDbCriteria();
+								$optionsArray = json_decode($fieldData->value);
+								//var_dump($optionsArray); //die;
+								if(is_array($optionsArray)) {
+									$optionsCriteria->addInCondition('optionId', $optionsArray);
+
+								}
+								if(is_int($optionsArray)) {
+									$optionsCriteria->addCondition('optionId=:option');
+									$optionsCriteria->params = [':option' => $optionsArray];
+								}
+								$optionsCriteria->select = 'label';
+
+								$rsOptions = ModelToArray::convertModelToArray(Options::model()
+									->findAll($optionsCriteria), ['options' => 'label']);
+
+								$options = '';
+								array_walk($rsOptions, function ($opt) use (&$options) {
+									$options .= $opt['label'] . ', ';
+								});
+								$options = rtrim($options, ', ');
+								$surveillanceReport[$sectionKey]['data'] = $options;
+								//print_r($rsOptions); die;
+							}
+							break;
+						}
+					}
+
+				$sectionKey++;
+				}
+			}
+			$this->render('report', ['surveillanceReport' => $surveillanceReport]);
+			return;
+		}
+	}
+
 	/**
 	 * @param null $step
 	 * @param null $id
 	 */
 	public function actionUpdate($step = null, $id = null) {
-	if (isset($id)) {
-		Yii::app()->session['surveillanceId'] = $id;
+		if (isset($id)) {
+			Yii::app()->session['surveillanceId'] = $id;
 		}
 		$this->process($step);
 	}
