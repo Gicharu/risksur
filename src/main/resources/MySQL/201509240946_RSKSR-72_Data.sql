@@ -32,8 +32,8 @@ INSERT INTO `evalQuestionAnswers` (`id`, `evalQuestionId`, `optionName`, `nextQu
   (13, 21, 'Evaluate the efficiency and/or effectiveness of component', 23, NULL),
   (14, 48, 'Evaluate functional aspects', 11, NULL),
   (15, 21, 'To evaluate the strengths and weaknesses of the structure, function and processes of the component of system', 13, NULL),
-  (16, 22, 'Yes, effectivness has been evaluated', 47, NULL),
-  (17, 22, 'No, effectivness has not been evaluated', 49, NULL),
+  (16, 22, 'Yes, effectiveness has been evaluated', 47, NULL),
+  (17, 22, 'No, effectiveness has not been evaluated', 49, NULL),
   (18, 32, 'YES, functional aspects will be assessed', 4, NULL),
   (19, 32, 'No functional aspects will not be assessed', 3, NULL),
   (20, 28, 'Cost only', 30, NULL),
@@ -48,7 +48,7 @@ INSERT INTO `evalQuestionAnswers` (`id`, `evalQuestionId`, `optionName`, `nextQu
   (33, 35, 'YES there is a cost ceiling', 8, NULL),
   (35, 35, 'No, there is no budget constraint', 14, NULL),
   (36, 30, 'YES, the components achieve a specified technical effectiveness target', 2, NULL),
-  (37, 30, 'NO, there is no specified technical effectivness target or the effectiveness of components has not been assesed', 52, NULL),
+  (37, 30, 'NO, there is no specified technical effectiveness target or the effectiveness of components has not been assesed', 52, NULL),
   (38, 37, 'YES there is a cost ceiling', 9, NULL),
   (39, 37, 'No, there is no budget constraint', 18, NULL),
   (40, 41, 'System level', 17, NULL),
@@ -68,7 +68,7 @@ INSERT INTO `evalQuestionAnswers` (`id`, `evalQuestionId`, `optionName`, `nextQu
   (55, 27, 'YES the components to be compared have the same objective', 44, NULL),
   (56, 44, 'Cost and benefits', 34, NULL),
   (59, 31, 'Assess whether components achieve a specified technical effectiveness', 24, NULL),
-  (60, 31, 'NO, technical effectivness target will not be specified.', 35, NULL),
+  (60, 31, 'NO, technical effectieveness target will not be specified.', 35, NULL),
   (61, 24, 'Effectiveness of components is known', 2, NULL),
   (62, 24, 'Effectiveness of components has not yet been assessed', 12, NULL),
   (64, 52, 'Assess costs', NULL, 'epitools'),
@@ -85,14 +85,16 @@ INSERT INTO `evalQuestionAnswers` (`id`, `evalQuestionId`, `optionName`, `nextQu
   (80, 21, 'To evaluate the functional aspects of the component that may influence its effectiveness.', 56, NULL),
   (82, 56, 'Yes effectiveness has been assessed', 11, NULL),
   (83, 56, 'No effectiveness has not been assessed', 57, NULL),
-  (85, 57, 'Evaluate only functinal aspects', 11, NULL),
-  (86, 57, 'Evaluate effectivness before functional aspects', 3, NULL),
+  (85, 57, 'Evaluate only functional aspects', 11, NULL),
+  (86, 57, 'Evaluate effectiveness before functional aspects', 3, NULL),
   (87, 57, 'Evaluate effectiveness and functional aspects at the same time', 4, NULL),
   (88, 17, 'Re-design surveillance to improve its performance', 58, NULL),
   (89, 58, 'Yes, the system has been evaluated', NULL, 'design/listComponents'),
   (91, 58, 'No, the system has not been evaluated', 59, NULL),
   (92, 59, 'Re-design surveillance system', NULL, 'design/listComponents'),
-  (93, 59, 'Carry out an evaluation', 42, '');
+  (93, 59, 'Carry out an evaluation', 42, ''),
+  (94, 47, 'Yes, functional aspects have been evaluated', NULL,  'design/listcomponents'),
+  (95, 47, 'No, functional aspects have not been evaluated', 48,  '');
 
 --
 -- Truncate table before insert `evaluationQuestion`
@@ -159,3 +161,18 @@ INSERT INTO `evaluationQuestion` (`evalQuestionId`, `question`, `questionNumber`
   (58, 'Have you evaluated the system', NULL, 17, NULL),
   (59, 'You can use the re-design tool but carrying out an evaluation first may help to identify how best to improve your system \r\n<br />\r\nDo you want to use the re-design tool or carry out an evaluation?', NULL, 58, NULL);
 SET FOREIGN_KEY_CHECKS=1;
+
+# INSERT INTO `evalQuestionAnswers` (`id`, `evalQuestionId`, `optionName`, `nextQuestion`, `flashQuestion`, `url`) VALUES
+#   (94, 47, 'Yes, functional aspects have been evaluated', NULL, NULL, 'design/listcomponents'),
+#   (95, 47, 'No, functional aspects have not been evaluated', 48, NULL, '');
+
+INSERT IGNORE INTO `permissions` (`id`, `name`, `description`, `controller`, `action`, `bizrule`) VALUES
+  (81, 'actionIndex', 'C/A to display evaluation questions', 'adminevaquestion', 'index', ''),
+  (82, 'actionUpdate', 'C/A to update evaluation questions', 'adminevaquestion', 'update', '');
+
+
+INSERT IGNORE INTO `roles_has_permissions` (`permissions_id`, `roles_id`) VALUES
+  (81, 1),
+  (81, 2),
+  (82, 1),
+  (82, 2);

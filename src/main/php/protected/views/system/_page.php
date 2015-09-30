@@ -11,13 +11,19 @@
  */
 if ($editAccess) {
 
+	$submitUrl = $this->createUrl($this->action->id);
+	if(isset($_GET['id'])) {
+		$submitUrl = $this->createUrl($this->action->id, ['id' => $_GET['id']]);
+	}
+	if(!$editMode) {
+	echo CHtml::htmlButton(Yii::t('translation', 'Edit'), array(
+		'submit' => $submitUrl,
+		'params' => ['page' => $content->docId],
+		'type' => 'submit',
+		'style' => 'float:right;'
+	));
 
-		echo CHtml::htmlButton(Yii::t('translation', 'Edit'), array(
-			'submit' => $this->createUrl($this->action->id),
-			'params' => ['page' => $content->docId],
-			'type' => 'submit',
-			'style' => 'float:right;'
-		));
+	}
 
 	if($editMode) {
 		Yii::import('ext.imperavi-redactor-widget.ImperaviRedactorWidget');
@@ -36,9 +42,9 @@ if ($editAccess) {
 				'buttonSource' => true,
 				'iframe' => false,
 				'linkAnchor' => true,
-				 'allowedAttr' =>  [
-					 ['p', 'id']
-				 ],
+				'allowedAttr' =>  [
+					['p', 'id']
+				],
 				'placeholder' => 'Enter some text...',
 				//'autosave' => $this->createUrl('savePage'),
 				//'autosaveOnChange' => true,
@@ -73,7 +79,7 @@ if ($editAccess) {
 			),
 
 		));
-		echo CHtml::form($this->createUrl($this->action->id));
+		echo CHtml::form($submitUrl);
 		echo CHtml::textArea('survContent', $content->docData, ['id' => 'survContent']);
 		echo CHtml::hiddenField('pageId', $content->docId);
 		echo CHtml::submitButton(Yii::t('translation', 'Save'));

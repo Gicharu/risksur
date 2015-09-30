@@ -429,11 +429,16 @@ class EvaluationController extends RiskController {
 			$questionId = $_POST['EvaluationQuestion']['question'];
 			$questions = $model->with('evalQuestionAnswers')->findByPk($questionId);
 			//var_dump($questions); die();
-			$rsMenu = EvalQuestionAnswers::model()
-				->with('evalQuestion')
-				->find('t.evalQuestionId=:id AND nextQuestion=:next', [':id' => $questions->parentQuestion, ':next' => $questions->evalQuestionId]);
-			$menu = CHtml::tag('li', [], "Q: " . $rsMenu->evalQuestion->question . "<br /> A: "  . $rsMenu->optionName);
-			Yii::app()->session['leftMenu'] .= $menu;
+			if($questions->flag !== 'final') {
+				$rsMenu = EvalQuestionAnswers::model()
+					->with('evalQuestion')
+					->find('t.evalQuestionId=:id OR nextQuestion=:next', [':id' => $questions->parentQuestion, ':next' => $questions->evalQuestionId]);
+				//print_r($rsMenu); die;
+				$menu = CHtml::tag('li', [], "Q: " . $rsMenu->evalQuestion->question .
+					"<br /> A: "  . $rsMenu->optionName);
+				Yii::app()->session['leftMenu'] .= $menu;
+
+			}
 			//print_r(Yii::app()->session['leftMenu']); die;
 		}
 		if (isset($questions->flag) && 'final' == $questions->flag) {
@@ -1125,6 +1130,9 @@ class EvaluationController extends RiskController {
 	public function actionUpdateEvaContext($id) {
 		Yii::log("actionUpdateEvaContext called", "trace", self::LOG_CAT);
 		$this->setPageTitle('Update Evaluation Context');
+		if (isset($_POST['pageId'])) {
+			SystemController::savePage($this->createUrl('updateEvaContext', ['id' => $id]));
+		}
 		$evaluationHeader = EvaluationHeader::model()->with('evalDetails')->find('t.evalId=:evaId', [':evaId' => $id]);
 		//$this->frameworkId = Yii::app()->session['surDesign']['id'];
 		$dataArray = [];
@@ -1190,11 +1198,15 @@ class EvaluationController extends RiskController {
 				"evaluation context, please try again or contact your administrator if the problem persists"));
 
 		}
+		$this->docName = 'addEvaContext';
 
+
+		$page = SystemController::getPageContent($this->docName);
 		$this->render('context', [
 			'model'     => $model,
 			'dataArray' => $dataArray,
-			'form'      => $form
+			'form'      => $form,
+			'page'  => $page
 		]);
 	}
 

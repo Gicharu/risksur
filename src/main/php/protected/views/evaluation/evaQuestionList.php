@@ -12,7 +12,7 @@
 ?>
 
 <script type="text/javascript">
-	var selectedQuestion = <?= $questionId; ?>;
+	var selectedQuestion = <?= isset($_GET['questionId']) ? $_GET['questionId'] : ''; ?>;
 	$(document).ready(function() {
 		$(function() {
 			$('#questionSelect').dataTable({
