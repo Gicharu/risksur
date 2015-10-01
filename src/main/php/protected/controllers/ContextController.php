@@ -721,14 +721,20 @@ class ContextController extends RiskController {
 
 	public function actionReport($systemId = null) {
 		if(isset($systemId)) {
-			$surveillanceCriteria = new CDbCriteria();
-			$surveillanceCriteria->order = 'frameworkFields.sectionId ASC, frameworkFields.order ASC';
-			$surveillanceCriteria->condition = 'survData.frameworkId=:framework';
-			$surveillanceCriteria->params = [':framework' => $systemId];
-			/**
-			 * @var $rsSurveillance CActiveRecord
-			 */
-			$rsSurveillance = SurveillanceSections::model()->with('survData', 'frameworkFields')->findAll($surveillanceCriteria);
+			$rsSurveillance = Yii::app()->db->createCommand()
+				->select('s.sectionId, s.sectionName, ff.id, ff.sectionId, ff.order AS childCount, ff.parentId, ff.label, ff.inputName, fd.frameworkFieldId, fd.value, grid.label AS parentLabel')
+				->from('surveillanceSections s')
+				//->join('tbl_profile p', 'u.id=p.user_id')
+				->leftJoin('frameworkFields ff', 'ff.sectionId = s.sectionId')
+				->leftJoin('frameworkFieldData fd', 'fd.frameworkFieldId = ff.id')
+				->leftJoin('frameworkFields grid', 'grid.id = ff.parentId')
+
+				->where('fd.frameworkId = :framework ', [':framework' => $systemId])
+				->order('ff.sectionId ASC, ff.order ASC')
+				->queryAll();
+//			print_r($rsSurveillance); die;
+
+
 			if(!isset($rsSurveillance[0])) {
 				Yii::app()
 					->user
@@ -736,50 +742,60 @@ class ContextController extends RiskController {
 				$this->redirect('list');
 				return;
 			}
-			//print_r($rsSurveillance); die;
 			$surveillanceReport = [];
 			$sectionKey = 0;
+			$parentLabelCount = 1;
+			$oldParentLabel = '';
 			foreach($rsSurveillance as $section) {
-				foreach ($section->frameworkFields as $field) {
-					$surveillanceReport[$sectionKey]['sectionName'] = '1.' . $section->sectionId .
-						' ' . $section->sectionName;
-					$surveillanceReport[$sectionKey]['field'] = isset($field->label) ?
-						$field->label : $rsSurveillance[$sectionKey]->getAttributeLabel($field->inputName);
-					foreach ($section->survData as $fieldData) {
-						if($field->id == $fieldData->frameworkFieldId) {
-							$surveillanceReport[$sectionKey]['data'] = $fieldData->value;
-							if(DForm::isJson($fieldData->value)) {
-								//print_r(json_decode($fieldData->value, true)); die;
-								$optionsCriteria = new CDbCriteria();
-								$optionsArray = json_decode($fieldData->value);
-								//var_dump($optionsArray); //die;
-								if(is_array($optionsArray)) {
-									$optionsCriteria->addInCondition('optionId', $optionsArray);
+				//foreach ($section->frameworkFields as $field) {}
+				$surveillanceReport[$sectionKey]['sectionName'] = '1.' . $section['sectionId'] .
+					' ' . $section['sectionName'];
+				$surveillanceReport[$sectionKey]['parentLabel'] =  " ";
+				$surveillanceReport[$sectionKey]['parenLabelIndex'] =  $parentLabelCount;
+//				if(isset($section['parentLabel'])) {
+//					$surveillanceReport[$sectionKey]['parentLabel'] = $section['parentLabel'];
+//					if($section['parentLabel'] == $oldParentLabel && $section['childCount'] != $parentLabelCount) {
+//						$parentLabelCount++;
+//
+//					}
+//				}
+				$surveillanceReport[$sectionKey]['field'] = isset($section['label']) ?
+					$section['label'] : SurveillanceSections::model()->getAttributeLabel($section['inputName']);
+				//foreach ($section->survData as $fieldData) {}
+				//if($field->id == $fieldData->frameworkFieldId) {}
+				$surveillanceReport[$sectionKey]['data'] = $section['value'];
+				if(DForm::isJson($section['value'])) {
+					//print_r(json_decode($fieldData->value, true)); die;
+					$optionsCriteria = new CDbCriteria();
+					$optionsArray = json_decode($section['value']);
+					//var_dump($optionsArray); //die;
+					if(is_array($optionsArray)) {
+						$optionsCriteria->addInCondition('optionId', $optionsArray);
 
-								}
-								if(is_int($optionsArray)) {
-									$optionsCriteria->addCondition('optionId=:option');
-									$optionsCriteria->params = [':option' => $optionsArray];
-								}
-								$optionsCriteria->select = 'label';
-
-								$rsOptions = ModelToArray::convertModelToArray(Options::model()
-									->findAll($optionsCriteria), ['options' => 'label']);
-
-								$options = '';
-								array_walk($rsOptions, function ($opt) use (&$options) {
-									$options .= $opt['label'] . ', ';
-								});
-								$options = rtrim($options, ', ');
-								$surveillanceReport[$sectionKey]['data'] = $options;
-								//print_r($rsOptions); die;
-							}
-							break;
-						}
 					}
+					if(is_int($optionsArray)) {
+						$optionsCriteria->addCondition('optionId=:option');
+						$optionsCriteria->params = [':option' => $optionsArray];
+					}
+					$optionsCriteria->select = 'label';
+
+					$rsOptions = ModelToArray::convertModelToArray(Options::model()
+						->findAll($optionsCriteria), ['options' => 'label']);
+
+					$options = '';
+					array_walk($rsOptions, function ($opt) use (&$options) {
+						$options .= $opt['label'] . ', ';
+					});
+					$options = rtrim($options, ', ');
+					$surveillanceReport[$sectionKey]['data'] = $options;
+					//print_r($rsOptions); die;
+				}
 
 				$sectionKey++;
-				}
+//				if(!isset($section['parentLabel']) || $oldParentLabel != $section['parentLabel']) {
+//					$parentLabelCount = 1;
+//				}
+//				$oldParentLabel = $section['parentLabel'];
 			}
 			$this->render('report', ['surveillanceReport' => $surveillanceReport]);
 			return;

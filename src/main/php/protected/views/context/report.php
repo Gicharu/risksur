@@ -13,11 +13,13 @@
 			"sDom": '<"H"rTf>t<"F"ip>',
 			"bProcessing": true,
 			"aoColumns": [
-				{"mData": "sectionName", "bVisible": false},
-				{"mData": "field"},
-				{"mData": "data"}
+				{"mDataProp": "sectionName", "bVisible": false},
+				{"mDataProp": "parentLabel", "bVisible": false},
+//				{"mDataProp": "parenLabelIndex", "bVisible": false},
+				{"mDataProp": "field"},
+				{"mDataProp": "data"}
 			],
-//			bDestroy: true,
+			//"aaSorting": [[2,'asc']],
 			bPaginate: false,
 			"bJQueryUI": true,
 			"aaData": <?= json_encode($surveillanceReport); ?>,
@@ -75,13 +77,15 @@
 					}
 				]
 			}
-		}).rowGrouping();
+		}).rowGrouping({ iGroupingColumnIndex2: 1}); //
 
 	});
 </script>
-<table id="surveillanceReport" cellspacing="0" width="100%">
+<table id="surveillanceReport" cellspacing="0" cellpadding="0" border="0" width="100%" class="display">
 	<thead>
 	<tr>
+<!--		<th></th>-->
+		<th></th>
 		<th></th>
 		<th>Field</th>
 		<th>Value</th>

@@ -629,6 +629,9 @@ height: 230px;
 .dataTables_wrapper table td {
     padding: 4px 10px;
 }
+.subgroup {
+    background-color: #ACACA8;
+}
 /* End required mark css */
 table {
     border: 1px solid #a6c9e2;
