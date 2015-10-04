@@ -20,9 +20,9 @@ class Options extends CActiveRecord {
 		// class name for the relations automatically generated below.
 		return [
 			'element'        => [self::BELONGS_TO, 'EvaluationElements', 'elementId',
-				'joinType' => 'INNER JOIN'],
-			'component'      => [self::BELONGS_TO, 'ComponentDetails', 'componentId',
-				'joinType' => 'INNER JOIN'],
+				'joinType' => 'INNER JOIN', 'select' => 'evalElementsId, label'],
+			'component'      => [self::BELONGS_TO, 'SurFormDetails', 'componentId',
+				'joinType' => 'INNER JOIN', 'select' => 'subFormId, label'],
 			'frameworkField' => [self::BELONGS_TO, 'FrameworkFields', 'frameworkFieldId',
 				'joinType' => 'INNER JOIN',
 				'select' => 'label, id'
@@ -121,5 +121,20 @@ class Options extends CActiveRecord {
 			}
 		}
 		return $options;
+	}
+
+	public function setCustomScenario($id) {
+		switch($id) {
+			case 1:
+				$this->setScenario('addFrameworkField');
+				break;
+			case 2:
+				$this->setScenario('addComponentField');
+				break;
+			default:
+				$this->setScenario('addElementField');
+
+		}
+
 	}
 }

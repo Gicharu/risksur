@@ -14,31 +14,32 @@
 	$cols = count($formHeader->getElements()) + 1;
 	foreach ($formHeader->getElements() as $element) {
 		//$headerTd .= "<td>" . CHtml::label($element->label, false) . "</td>";
-		$headerTd .= '<td>' . CHtml::activeLabelEx($form->getModel(), $element->name) . '</td>';
+		$headerTd .= '<th>' . CHtml::activeLabelEx($form->getModel(), $element->name) . '</th>';
 	}
 
-$headerTd .= "<td width='3%'>" . CHtml::htmlButton(Yii::t('translation', 'Copy First Row'), [
-		'onClick' =><<<END
-js:var rowIndex = 0; 
-var data = $(".tabular-input-container tr").eq(rowIndex).find("input[type=text],textarea,select").serializeArray(); 
-$(".tabular-input-container tr").each(function (a) {
-	if (a != rowIndex) { 
-		$(this).find("input[type=text],textarea,select").each(function(i, element) {
-			// don't copy the component name, first element
-			if(i != 0) {
-				// set the value to the first row element value
-				$(this).val(data[i]['value']);
-			}
-		});
-	}
-});
-END
-,
-		'title' =>'Copy First Row',
-		'type' => 'button',
-		'id' => 'copyRow'
-	]
-) . "</td>";
+$headerTd .= "<th></th>";
+//$headerTd .= "<th>" . CHtml::htmlButton(Yii::t('translation', 'Copy First Row'), [
+//		'onClick' =><<<END
+//js:var rowIndex = 0;
+//var data = $(".tabular-input-container tr").eq(rowIndex).find("input[type=text],textarea,select").serializeArray();
+//$(".tabular-input-container tr").each(function (a) {
+//	if (a != rowIndex) {
+//		$(this).find("input[type=text],textarea,select").each(function(i, element) {
+//			// don't copy the component name, first element
+//			if(i != 0) {
+//				// set the value to the first row element value
+//				$(this).val(data[i]['value']);
+//			}
+//		});
+//	}
+//});
+//END
+//,
+//		'title' =>'Copy First Row',
+//		'type' => 'button',
+//		'id' => 'copyRow'
+//	]
+//) . "</th>";
 
 ?>
 <script type="text/javascript">
@@ -50,18 +51,18 @@ $(function() {
 		text:false
 	});
 
-	var $inputs = $('#DesignForm :input');
-	$inputs.each(function() {
-		if($(this).hasClass('error')) {
-			$('<div class="errorMessage">This field is required</div>').appendTo($(this).parent());
-		}
-		$(this).on('blur', function() {
-			if(this.value !== '' && $(this).hasClass('error')) {
-				$(this).removeClass('error');
-				$(this).next().remove();
-			}
-		});
-	});
+//	var $inputs = $('#DesignForm :input');
+//	$inputs.each(function() {
+//		if($(this).hasClass('error')) {
+//			$('<div class="errorMessage">This field is required</div>').appendTo($(this).parent());
+//		}
+//		$(this).on('blur', function() {
+//			if(this.value !== '' && $(this).hasClass('error')) {
+//				$(this).removeClass('error');
+//				$(this).next().remove();
+//			}
+//		});
+//	});
 
 	$('select')
 		.on('chosen:ready', function(chosen) {
@@ -72,8 +73,8 @@ $(function() {
 				overwrite: true,
 				content: {
 					title: {
-						text: 'Info',
-						button: 'Close'
+						text: 'Info'
+//						button: 'Close'
 					}
 				},
 				style: {
@@ -81,7 +82,7 @@ $(function() {
 					def: false
 				},
 				hide: {
-					event: 'click'
+//					event: 'click'
 				}
 			});
 		})
@@ -111,6 +112,8 @@ $(function() {
 });
 </script>
 <div class="form">
+	<div class="row">
+
 	<?php
 		$this->widget('ext.widgets.tabularinput.XTabularInput', [
 			'models' => $modelArray,
@@ -131,6 +134,7 @@ $(function() {
 			'removeHtmlOptions' => ['class' => 'trashIcon']
 		]);
 	?>
+	</div>
 </div>
 <?php
 	echo $formHeader->renderButtons();

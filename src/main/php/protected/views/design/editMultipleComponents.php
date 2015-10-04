@@ -45,17 +45,15 @@ echo $formHead->renderEnd();
 					overwrite: true,
 					content: {
 						title: {
-							text: 'Info',
-							button: 'Close'
+							text: 'Info'
+//							button: 'Close'
 						}
 					},
 					style: {
 						widget: true,
 						def: false
-					},
-					hide: {
-						event: 'click'
 					}
+
 				});
 			})
 			.chosen({

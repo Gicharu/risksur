@@ -9,12 +9,13 @@ $(function(){
 		"sSwfPath": "<?php echo Yii::app()->request->baseUrl; ?>/js/copy_csv_xls_pdf.swf",
 			"aButtons": [
 				//"print",
-				{
-					"sExtends": "print",
-					"sButtonText": "<?php echo Yii::t('translation', 'Print')?>",
-					"sMessage": '<p class="printHeader"><?php echo $dataArray["dtHeader"]; ?></p>',
-					"bShowAll": false
-				},
+//				{
+//					"sExtends": "print",
+//					"sButtonText": "<?php //echo Yii::t('translation', 'Print')?>//",
+//					"sMessage": '<p class="printHeader"><?php //echo $dataArray["dtHeader"]; ?>//</p>',
+//					"bShowAll": false
+//
+//				},
 				{
 					
 					"sExtends": "collection",
@@ -24,19 +25,26 @@ $(function(){
 						oSelectorOpts: {
 							page: 'current'
 						},
+						"mColumns": 'visible',
 						"sButtonText": "PDF",
 						"fnClick":  function( nButton, oConfig, flash ) {
-								flash.setFileName( "Component Listing_" + getTitle() + ".pdf" );
-								this.fnSetText( flash,
-									"title:"+ this.fnGetTitle(oConfig) +"\n"+
-									"message:"+ oConfig.sPdfMessage +"\n"+
-									"colWidth:"+ this.fnCalcColRatios(oConfig) +"\n"+
-									"orientation:"+ oConfig.sPdfOrientation +"\n"+
-									"size:"+ oConfig.sPdfSize +"\n"+
-									"--/TableToolsOpts--\n" +
-									this.fnGetTableData(oConfig)
-								);
-								}
+							flash.setFileName( "Component Listing_" + getTitle() + ".pdf" );
+							var compTable = $(this.dom.table).dataTable();
+							var compSettings = compTable.fnSettings();
+							var	compTableCols = compSettings.aoColumns.length;
+							compSettings.aoColumns[(compTableCols - 1)].bVisible = false;
+							compSettings.aoColumns[(compTableCols - 2)].bVisible = false;
+							//console.log(compSettings.aoColumns[5].bVisible, oConfig);
+							this.fnSetText( flash,
+								"title:"+ this.fnGetTitle(oConfig) +"\n"+
+								"message:"+ oConfig.sPdfMessage +"\n"+
+								"colWidth:"+ this.fnCalcColRatios(oConfig) +"\n"+
+								"orientation:"+ oConfig.sPdfOrientation +"\n"+
+								"size:"+ oConfig.sPdfSize +"\n"+
+								"--/TableToolsOpts--\n" +
+								this.fnGetTableData(oConfig)
+							);
+						}
 					},
 					{
 						"sExtends": "csv",
@@ -45,11 +53,17 @@ $(function(){
 						oSelectorOpts: {
 							page: 'current'
 						},
+						"mColumns": "visible",
 						"fnClick": function ( nButton, oConfig, oFlash ) {
 						oFlash.setFileName( "Component Listing_" + getTitle() + ".csv" );
+							var compTable = $(this.dom.table).dataTable();
+							var compSettings = compTable.fnSettings();
+							var	compTableCols = compSettings.aoColumns.length;
+							compSettings.aoColumns[(compTableCols - 1)].bVisible = false;
+							compSettings.aoColumns[(compTableCols - 2)].bVisible = false;
 							this.fnSetText( oFlash,	"" + this.fnGetTableData(oConfig)
 							);
-						},
+						}
 					}
 					],
 					"bShowAll": false
@@ -64,23 +78,19 @@ $(function(){
 		"aaData": <?php echo $dataArray['componentList']; ?>,
 			//"bAutoWidth" : true,
 		"aoColumns": [
-			//{"mDataProp": "name",  "bVisible": true, sClass: "showDetails clickable underline", "sWidth": "20%"},
-			//{"mDataProp": "description", "bVisible": true, "sWidth": "40%"},
-			//{"mDataProp": "description", "bVisible": true, "sWidth": "6%"},
-			//{"mDataProp": "editButton", "bVisible": true, "sWidth": "6%"},
-			//{"mData": "deleteButton", "bSortable": false, "bVisible": true, "sWidth": "8%" },
+
 			{"mDataProp": "name", sClass: "showDetails clickable underline"},
 			<?php 
 				foreach ($columnsArray as $key => $val) {
 					echo '{"mDataProp": "' . $key . '"},';
 				}
 			?>
-			{
-				"mDataProp": null,
-				"bSortable": false,
-				"sWidth": '5%',
-				"sDefaultContent": '<button class="bcopy">Duplicate</button>'
-			},
+//			{
+//				"mDataProp": null,
+//				"bSortable": false,
+//				"sWidth": '5%',
+//				"sDefaultContent": '<button class="bcopy">Duplicate</button>'
+//			},
 			{
 				"mDataProp": null,
 				"bSortable": false,
@@ -237,7 +247,7 @@ $(function(){
 					echo '<th title = "' . $val . '">' . $val . '</th>';
 				}
 			?>
-			<th title = "Duplicate">Duplicate</th>
+<!--			<th title = "Duplicate">Duplicate</th>-->
 			<th title = "Edit">Edit</th>
 			<th title = "Delete">Delete</th>
 		</tr>

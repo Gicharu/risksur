@@ -5,10 +5,11 @@
  * The followings are the available columns in table 'surveillanceSections':
  * @property string $sectionId
  * @property string $sectionName
+ * @property string $description
  * The followings are the available model relations:
  * @property FrameworkFields[] $frameworkFields
  */
-class SurveillanceSections extends CActiveRecord {
+ class SurveillanceSections extends CActiveRecord {
 	/**
 	 * @return string the associated database table name
 	 */
@@ -22,10 +23,11 @@ class SurveillanceSections extends CActiveRecord {
 	public function rules() {
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
-		return array(
-			array('sectionName', 'required'),
-			array('sectionName', 'length', 'max' => 30),
-		);
+		return [
+			['sectionName', 'required'],
+			['sectionName', 'length', 'max' => 30],
+			['description', 'safe'],
+		];
 	}
 
 	/**
@@ -64,5 +66,10 @@ class SurveillanceSections extends CActiveRecord {
 	 */
 	public static function model($className = __CLASS__) {
 		return parent::model($className);
+	}
+
+	public function __sleep() {
+		die('poop');
+		return $this->attributes;
 	}
 }
