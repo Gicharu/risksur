@@ -742,23 +742,30 @@ class ContextController extends RiskController {
 				$this->redirect('list');
 				return;
 			}
-			$surveillanceReport = [];
+			$rsSurvHead = FrameworkContext::model()->findByPk($systemId);
 			$sectionKey = 0;
-			$parentLabelCount = 1;
-			$oldParentLabel = '';
+			$labelCount = 0;
+			$oldLabel = '';
+			$surveillanceReport[200]['sectionName'] = " ";
+			$surveillanceReport[200]['parentLabel'] = " ";
+			$surveillanceReport[200]['labelIndex'] = $labelCount;
+			$surveillanceReport[200]['field'] = "Surveillance Name";
+			$surveillanceReport[200]['data'] = $rsSurvHead->name;
 			foreach($rsSurveillance as $section) {
 				//foreach ($section->frameworkFields as $field) {}
 				$surveillanceReport[$sectionKey]['sectionName'] = '1.' . $section['sectionId'] .
 					' ' . $section['sectionName'];
 				$surveillanceReport[$sectionKey]['parentLabel'] =  " ";
-				$surveillanceReport[$sectionKey]['parenLabelIndex'] =  $parentLabelCount;
-//				if(isset($section['parentLabel'])) {
-//					$surveillanceReport[$sectionKey]['parentLabel'] = $section['parentLabel'];
-//					if($section['parentLabel'] == $oldParentLabel && $section['childCount'] != $parentLabelCount) {
-//						$parentLabelCount++;
-//
-//					}
-//				}
+				$surveillanceReport[$sectionKey]['labelIndex'] =  $labelCount;
+
+				//$surveillanceReport[$sectionKey]['parenLabelIndex'] =  $parentLabelCount;
+				if(isset($section['parentLabel'])) {
+					$surveillanceReport[$sectionKey]['parentLabel'] = $section['parentLabel'];
+
+				}
+				if($section['label'] == $oldLabel) {
+					$surveillanceReport[$sectionKey]['labelIndex'] =  ++$labelCount;
+				}
 				$surveillanceReport[$sectionKey]['field'] = isset($section['label']) ?
 					$section['label'] : SurveillanceSections::model()->getAttributeLabel($section['inputName']);
 				//foreach ($section->survData as $fieldData) {}
@@ -795,9 +802,10 @@ class ContextController extends RiskController {
 //				if(!isset($section['parentLabel']) || $oldParentLabel != $section['parentLabel']) {
 //					$parentLabelCount = 1;
 //				}
-//				$oldParentLabel = $section['parentLabel'];
+				$oldLabel = $section['label'];
 			}
-			$this->render('report', ['surveillanceReport' => $surveillanceReport]);
+			//print_r($surveillanceReport); die;
+			$this->render('report', ['surveillanceReport' => array_values($surveillanceReport)]);
 			return;
 		}
 	}

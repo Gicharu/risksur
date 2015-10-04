@@ -19,7 +19,7 @@
 				{"mDataProp": "field"},
 				{"mDataProp": "data"}
 			],
-			//"aaSorting": [[2,'asc']],
+			"aaSorting": [[1,'asc']],
 			bPaginate: false,
 			"bJQueryUI": true,
 			"aaData": <?= json_encode($surveillanceReport); ?>,
