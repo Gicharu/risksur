@@ -34,15 +34,15 @@ class SurveillanceSections extends CActiveRecord {
 	public function relations() {
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
-		return array(
-			'frameworkFields' => array(self::HAS_MANY, 'FrameworkFields', 'sectionId'),
-			'survData' => array(self::HAS_MANY, 'FrameworkFieldData', array('id' => 'frameworkFieldId'),
-				'through' => 'frameworkFields'),
-			'designFields' => array(self::HAS_MANY, 'SurFormDetails', 'sectionId',
-				'order' => '`sectionNumber` ASC, `order` ASC'),
-			'designData' => array(self::HAS_MANY, 'ComponentDetails', array('subFormId' => 'subFormId'),
-				'through' => 'designFields'),
-		);
+		return [
+			'frameworkFields' => [self::HAS_MANY, 'FrameworkFields', 'sectionId'],
+			'survData' => [self::HAS_MANY, 'FrameworkFieldData', ['id' => 'frameworkFieldId'],
+				'through' => 'frameworkFields', 'join' => ''],
+			'designFields' => [self::HAS_MANY, 'SurFormDetails', 'sectionId',
+				'order' => '`sectionNumber` ASC, `order` ASC'],
+			'designData' => [self::HAS_MANY, 'ComponentDetails', ['subFormId' => 'subFormId'],
+				'through' => 'designFields']
+		];
 	}
 
 	/**
