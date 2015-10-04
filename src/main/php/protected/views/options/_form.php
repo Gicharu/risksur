@@ -1,31 +1,40 @@
+<?php
+/**
+ * @var $form CActiveForm
+ * @var $dropDownAttribute string
+ * @var $model CActiveRecord
+ */
+?>
 <script type="text/javascript">
 	$(function() {
 		$("#bd").attr('style', '');
 	});
 </script>
 <div class="form">
-<?php $form = $this->beginWidget('CActiveForm', array(
+<?php $form = $this->beginWidget('CActiveForm', [
 	'enableClientValidation' => true,
-)); ?>
-<?php echo $form->errorSummary(array(
+	'clientOptions' => [
+		'validateOnSubmit' => true
+	]
+]); ?>
+<?php echo $form->errorSummary([
 	$model
-), Yii::app()->params['headerErrorSummary'], Yii::app()->params['footerErrorSummary']); ?>
+], Yii::app()->params['headerErrorSummary'], Yii::app()->params['footerErrorSummary']); ?>
 	<?php
+	$this->menu = [['label' => 'View options', 'url' => ['options/index']]];
+	$this->menu = [['label' => 'Manage options home', 'url' => ['options/home']]];
+
 	if (isset($dataArray['formType']) && $dataArray['formType'] == "Edit") {
-		$this->menu = array(array('label' => 'View Options', 'url' => array('options/index')), array('label' => 'Add Option', 'url' => array('options/addOption')));
-		$buttonText = "Update Option";
-		$dataArray['elementName'];
-	} else {
-		$this->menu = array(array('label' => 'View Options', 'url' => array('options/index')));
-		$buttonText = "Save Option";
-	}?>
+		$this->menu[] = ['label' => 'Add option', 'url' => ['options/addOption']];
+	}
+
+	?>
 	<div class="row">
-		<?php echo $form->labelEx($model, 'elementId'); ?>
-		<?php echo $form->dropDownList($model, 'elementId', $surformdetailsArray, array(
-			'id' => 'elementId',
-			'selected' => isset($dataArray['elementName']) ? $dataArray['elementName'] : "",
-			)); ?>
-		<?php echo $form->error($model, 'elementId'); ?>
+		<?php echo $form->labelEx($model, $dropDownAttribute); ?>
+		<?php echo $form->dropDownList($model, $dropDownAttribute, $formElements, [
+			'class' => 'chozen',
+			]); ?>
+		<?php echo $form->error($model, $dropDownAttribute); ?>
 	</div>
 	<div class="row">
 		<?php echo $form->labelEx($model, 'label'); ?>
@@ -33,10 +42,10 @@
 		<?php echo $form->error($model, 'label'); ?>
 	</div>
 	<div class="row buttons">
-		<?php echo CHtml::htmlButton($buttonText, array(
+		<?php echo CHtml::htmlButton($model->isNewRecord ? 'Save' : 'Update', [
 	'id' => 'save',
 	'type' => 'submit'
-)); ?>
+]); ?>
 	</div>
 <?php $this->endWidget(); ?>
 </div>

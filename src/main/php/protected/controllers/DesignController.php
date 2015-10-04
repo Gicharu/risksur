@@ -304,62 +304,66 @@ class DesignController extends RiskController {
 			$form = new CForm($elements, $model);
 			$formHeader = new CForm($elements, $model);
 			// ajax request to add a new row
-			if ($form->submitted('DesignForm')) {
+			if ($form->submitted('newComponent')) {
+					$modelArray = [];
+				foreach (range(0, count($_POST['DesignForm'])-1) as $index) {
+					$modelArray[$index] = $model;
+				}
 				//print_r($form->model); die;
-				//$items=$this->getItemsToUpdate();
-				if (isset($_POST['DesignForm'])) {
-					$valid = true;
-					foreach ($_POST['DesignForm'] as $i => $item) {
-						$data = new DesignForm();
-						$data->setProperties($returnArray['dynamicDataAttributes']);
-
-						// generate the components form
-
-						if (isset($_POST['DesignForm'][$i])) {
-//									$data->attributes = $item; //$_POST['ComponentsForm'][$i];
-							$data->setAttributes($item, false); //$_POST['ComponentsForm'][$i];
-							$valid = $data->validate() && $valid;
-							//add the models with attributes to the model array
-							$postedModelArray[] = $data;
-						}
+				$modelErrors = CJSON::decode(CActiveForm::validateTabular($modelArray));
+				$valid = true;
+				if(!empty($modelErrors)) {
+					$valid = false;
+					$errorArray = [];
+					foreach ($modelErrors as $errorKey => $error) {
+						//print_r($error); die;
+						$keyArray = explode('_', $errorKey);
+						$errorArray[$keyArray[2]] = 'Row ' . $keyArray[1] . ' ' . $error[0];
 					}
-					//	die;
-					if ($valid) { // all items are valid
-						//print_r($form->getModel()); die();
-						foreach ($_POST['DesignForm'] as $i => $item) {
-							$data = new DesignForm();
-							$data->setProperties($returnArray['dynamicDataAttributes']);
-							//$data->attributes = $item;
-							$data->setAttributes($item, false);
+					$model->addErrors($errorArray);
+						//die;
 
-							$component->setIsNewRecord(true);
-							$component->componentId = null;
-							$component->componentName = $val = $data->componentName;
-							$component->frameworkId = Yii::app()->session['surDesign']['id'];
-							//save the componentHead values
-							//var_dump($data); die;
-							$component->save();
-							$componentId = $component->componentId;
-							// fetch the form data
-							foreach ($item as $key => $val) {
-								//ignore the attribute arrays
-								if (!is_array($key) && !is_array($val)) {
-									if ($key != "componentName") {
-										$componentDetails->setIsNewRecord(true);
-										$componentDetails->componentDetailId = null;
-										$componentDetails->componentId = $componentId;
-										$params = explode("_", $key);
-										$componentDetails->subFormId = $params[1];
-										$componentDetails->value = $val;
-										$componentDetails->save();
-									}
+				}
+//				print_r($_POST['DesignForm']);
+//				print_r($valid); die;
+				//$items=$this->getItemsToUpdate();
+				if ($valid) {
+					foreach ($_POST['DesignForm'] as $i => $row) {
+
+						$model->setAttributes($row); //$_POST['ComponentsForm'][$i];
+//						$valid = $model->validate() && $valid;
+						//add the models with attributes to the model array
+						$postedModelArray[] = $model;
+
+						$component->setIsNewRecord(true);
+						$component->componentId = null;
+						$component->componentName = $val = $model->componentName;
+						$component->frameworkId = Yii::app()->session['surDesign']['id'];
+						//save the componentHead values
+						//var_dump($data); die;
+						$component->save();
+						$componentId = $component->componentId;
+						// fetch the form data
+						foreach ($model->getAttributes() as $key => $val) {
+							//ignore the attribute arrays
+							if (!is_array($key) && !is_array($val)) {
+								if ($key != "componentName") {
+									$componentDetails->setIsNewRecord(true);
+									$componentDetails->componentDetailId = null;
+									$componentDetails->componentId = $componentId;
+									$params = explode("_", $key);
+									$componentDetails->subFormId = $params[1];
+									$componentDetails->value = $val;
+									$componentDetails->save();
 								}
 							}
 						}
-						Yii::app()->user->setFlash('success', Yii::t("translation", "Components successfully created"));
-
-						$this->redirect(['getDesignElements']);
 					}
+					//	die;
+					Yii::app()->user->setFlash('success', Yii::t("translation", "Components successfully created"));
+
+					$this->redirect(['listComponents']);
+
 				}
 			}
 			// check if there was a post and the muliple forms are invalid
@@ -368,7 +372,7 @@ class DesignController extends RiskController {
 				// number of model records to show by default on the view
 				$modelArray[] = $model;
 			}
-			if (isset($_POST['DesignForm']) && !$valid) {
+			if (isset($postedModelArray[0])) {
 				$modelArray = $postedModelArray;
 			}
 
@@ -397,7 +401,7 @@ class DesignController extends RiskController {
 			return;
 		}
 		Yii::app()->user->setFlash('notice', Yii::t("translation", "Please select a surveillance system first"));
-		$this->redirect(['design/listComponents']);
+		$this->redirect('listComponents');
 		return;
 	}
 
@@ -442,6 +446,7 @@ class DesignController extends RiskController {
 				$rules = [];
 				$attributes = [];
 				$componentInputName = 'componentName_' . $component->componentId;
+				//echo $componentInputName;
 				//$elements['elements'][$componentKey]['elements']['type'] = 'form';
 				$elements['elements'][$componentKey]['elements'][$componentInputName] = [
 					'label'    => 'Component Name',
@@ -482,9 +487,11 @@ class DesignController extends RiskController {
 				$modelArray[$componentKey]->setProperties($attributes);
 				$modelArray[$componentKey]->setRules($rules);
 				$modelArray[$componentKey]->setAttributeLabels($labels);
-				if(empty($tableHeader)) {
-					$tableHeader = '<td>' . implode('</td><td>', $labels) . '</td>';
-				}
+
+
+			}
+			foreach(array_flip($labels) as $label) {
+				$tableHeader .= '<th>' . CHtml::activeLabelEx($modelArray[0], $label) . '</th>';
 
 			}
 
@@ -891,6 +898,8 @@ class DesignController extends RiskController {
 					'enableAjaxValidation' => true,
 					'clientOptions' => [
 						'validateOnSubmit' => true,
+						'validateOnChange' => true,
+						'validateOnType' => false,
 					]
 			];
 			//print_r($getForm); die();

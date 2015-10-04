@@ -546,7 +546,7 @@ class ContextController extends RiskController {
 
 	/**
 	 * Raised when the wizard detects an invalid step
-	 * @param WizardEvent The event
+	 * @param WizardEvent $event
 	 */
 	public function wizardInvalidStep($event) {
 		Yii::app()->user->setFlash('notice', $event->step.' is not a valid step in this wizard');
@@ -1009,51 +1009,61 @@ class ContextController extends RiskController {
 		} else {
 			// get id's of fields that belong to the grid
 			//$gridFieldsCriteria->select = 'id';
-			$childFields = ModelToArray::convertModelToArray(FrameworkFields::model()->findAll($gridFieldsCriteria),
-				['frameworkFields' => 'id, inputName, label, inputType, required, multiple']);
+			$childFields = ModelToArray::convertModelToArray(FrameworkFields::model()->with('data')->findAll($gridFieldsCriteria));
+//				['frameworkFields' => 'id, inputName, label, inputType, required, multiple']);
+			//print_r($childFields); die;
 			$gridFieldsIds = array_map(function($item) {
 				return $item['id'];
 			}, $childFields);
 			// get grid data
 			$fieldDataCriteria = new CDbCriteria();
 			$fieldDataCriteria->addInCondition('frameworkFieldId', $gridFieldsIds);
-			$gridFields = FrameworkFieldData::model()->with('frameworkFields')->findAll($fieldDataCriteria);
+			$gridFields = FrameworkFieldData::model()->findAll($fieldDataCriteria);
 			if(empty($gridFields)) {
 				$dForm->setScenario('insert');
 				//print_r($dForm); die;
 				return self::generateGridElements($fieldId, $dForm);
 			}
-//				print_r($childFields); die;
-			foreach($childFields as $child) {
-				$gridFieldsNames[$child['id']] = $child['inputName'] . '_' . $child['id'];
-				$gridParams[$child['inputName'] . '_' . $child['id']]['id'] = $child['id'];
-				$labels[$child['inputName'] . '_' . $child['id']] = $child['label'];
-				$gridParams[$child['inputName'] . '_' . $child['id']]['inputType'] = $child['inputType'];
-				$gridParams[$child['inputName'] . '_' . $child['id']]['required'] = $child['required'];
-				$gridParams[$child['inputName'] . '_' . $child['id']]['multiple'] = $child['multiple'];
-			}
-			//$gridFields =  FrameworkFields::model()->findAll($gridFieldsCriteria);
 
-			$k = 0;
 			$dFormGrid = [];
-			$dFormGrid[$k] = new DForm();
-			foreach($gridFields as $gridFieldData) {
 
-				if(count($gridFieldsIds) == count($dFormGrid[$k]->attributes)) {
-					$k++;
-					$dFormGrid[$k] = new DForm();
-				}
-				//echo $gridFieldsNames[$gridFieldData->frameworkFieldId];
-				$dFormGrid[$k]->setPropertyName($gridFieldsNames[$gridFieldData->frameworkFieldId],
-					$gridFieldData->value);
-				if(DForm::isJson($gridFieldData->value)) {
-					$dFormGrid[$k]->setPropertyName($gridFieldsNames[$gridFieldData->frameworkFieldId],
-						json_decode($gridFieldData->value));
-
-				}
-				$cols[$gridFieldData->frameworkFieldId] = $gridFieldData->frameworkFieldId;
+			foreach($childFields as $child) {
+				$elementId = $child['inputName'] . '_' . $child['id'];
+				$gridFieldsNames[$child['id']] = $elementId;
+				$gridParams[$elementId]['id'] = $child['id'];
+				$labels[$elementId] = $child['label'];
+				$gridParams[$elementId]['inputType'] = $child['inputType'];
+				$gridParams[$elementId]['required'] = $child['required'];
+				$gridParams[$elementId]['multiple'] = $child['multiple'];
 			}
-			//$inputs = '';
+			//$dFormGrid[$k] = new DForm();
+			foreach($childFields as $child) {
+				if(isset($child['data'][0])) {
+					foreach ($child['data'] as $key => $data) {
+						if(!isset($dFormGrid[$key])) {
+							$dFormGrid[$key] = new DForm();
+						}
+
+						$elementId = $child['inputName'] . '_' . $child['id'];
+						foreach ($gridFieldsNames as $gridElement) {
+							if (empty($dFormGrid[$key]->attributes[$gridElement])) {
+								//echo "new $key $gridElement \n";
+								//print_r($dFormGrid[$key]);
+//
+								$dFormGrid[$key]->setPropertyName($gridElement);
+							}
+							//var_dump($dFormGrid[$key]->$gridElement);
+						}
+
+						$dFormGrid[$key]->$elementId  = $data['value'];
+						if (DForm::isJson($data['value'])) {
+							$dFormGrid[$key]->$elementId = json_decode($data['value']);
+						}
+
+					}
+				}
+			}
+
 			foreach($dFormGrid as $key => $gridItems) {
 				$inputs .= '<tr class="copy' . $fieldId . '">';
 				foreach($gridItems->attributeNames() as $attr) {

@@ -20,8 +20,7 @@
 			<?= '1.' . $event->sender->getCurrentStep() . ' ' .  $event->sender->getStepLabel(); ?>
 			</div>
 				<?php } ?>
-			<p></p>
-			<?= $sectionInfo->description; ?>
+			<p><?= $sectionInfo->description; ?></p>
 
 			<?php
 			echo $this->renderPartial('_form', array('form' => $form, 'event' => $event));

@@ -12,7 +12,9 @@
 class OptionsController extends RiskController {
 	public $page;
 	private	$configuration;
+	private $optionsMask;
 	const LOG_CAT = "ctrl.OptionsController";
+	private $docName;
 
 	/**
 	 * @var string the default layout for the views. Defaults to '//layouts/column2', meaning
@@ -29,54 +31,68 @@ class OptionsController extends RiskController {
 	 */
 	public function init() {
 		$this->configuration = Yii::app()->tsettings;
+		$this->optionsMask = [
+			'relationNames' => [
+				1 => 'frameworkField',
+				2 => 'component',
+				3 => 'element'
+			],
+			'joinLabels' => [
+				1 => ['id', 'label'],
+				2 => ['subFormId', 'label'],
+				3 => ['evalElementsId', 'label']
+			],
+			'formFieldsModels' => [
+				1 => 'FrameworkFields',
+				2 => 'SurFormDetails',
+				3 => 'EvaluationElements'
+			]
+		];
+
+	}
+
+	public function actionHome() {
+		$this->docName = 'optionsHome';
+		if (isset($_POST['pageId'])) {
+			SystemController::savePage('home');
+		}
+		$page = SystemController::getPageContent($this->docName);
+		$this->render('home', ['page' => $page]);
 	}
 
 	/**
 	 * actionIndex 
-	 * 
-	 * @access public
+	 * @param $id string
+	 * @param $ajax bool
 	 * @return void
 	 */
-	public function actionIndex($id) {
+	public function actionIndex($id, $ajax = false) {
 		Yii::log("actionIndex AdminController called", "trace", self::LOG_CAT);
-		$model = new Options;
 		$dataArray = [];
 		$dataArray['dtHeader'] = "Manage Options"; // Set page title when printing the datatable
 		// Get list of options 
 		// $optionsList = Options::model()->findAll(array(
 		// 	'select' => 'optionId, label',
 		// ));
-		$optionsMask = [
-			'relationNames' => [
-				0 => 'frameworkField',
-				1 => 'component',
-				2 => 'element'
-			],
-			'joinLabels' => [
-				0 => 'label',
-				1 => 'label',
-				2 => 'label'
-			]
-		];
-		$dataArray['optsCategory'] = $optionsMask['relationNames'][0] . '.' . $optionsMask['joinLabels'][0];
+		$dataArray['firstColumn'] = $this->optionsMask['relationNames'][$id];
 		$optionsListCriteria = new CDbCriteria();
 		$optionsListCriteria->select = 'optionId, label';
-		$optionsListCriteria->with = $optionsMask['relationNames'][$id];
+		$optionsListCriteria->with = $this->optionsMask['relationNames'][$id];
 		$optionsList = ModelToArray::convertModelToArray(Options::model()->findAll($optionsListCriteria));
 		//print_r($optionsList); die;
-		$optionsListArray = array();
+		$optionsListArray = [];
 		// Format datatable data. Define the Edit & Delete buttons
 
-		$dataArray['optionsList'] =  json_encode($optionsList);
-		if (!empty($_GET['getOptions'])) {
-			$jsonData = json_encode(array("aaData" => $optionsListArray));
+		if ($ajax) {
+			$jsonData = json_encode(["aaData" => $optionsList]);
 			echo $jsonData;
 			return;
 		}
-		$this->render('index', array(
-			'model' => $model,
+		$dataArray['optionsList'] =  json_encode($optionsList);
+		$this->render('index', [
+			'id' => $id,
 			'dataArray' => $dataArray,
-		));
+		]);
 	}
 
 	/**
@@ -85,108 +101,112 @@ class OptionsController extends RiskController {
 	 * @access public
 	 * @return void
 	 */
-	public function actionAddOption() {
+	public function actionAddOption($id) {
 		Yii::log("actionIndex OptionsController called", "trace", self::LOG_CAT);
 		$model = new Options();
+		$model->setCustomScenario($id);
 		if (isset($_POST['Options'])) {
 			$model->attributes = $_POST['Options'];
+			//print_r($model); die;
 			if ($model->save()) {
-				Yii::app()->user->setFlash('success', "Option successfully created.");
-				$this->redirect( array( 'options/index' ) );
+				Yii::app()->user->setFlash('success', "Option successfully added.");
+				$this->redirect( ['options/index/id/'. $id]);
 			}
+			if(!$model->hasErrors()) {
+				Yii::app()->user->setFlash('error', "An error occurred while adding the option, please contact your administrator.");
+
+			}
+
 		}
 		// add options via ajax from chosen plugin
-		if(isset($_POST['options'])) {
-			$model->setScenario($_POST['options']['scenario']);
-			unset($_POST['options']['scenario']);
-			$model->attributes = $_POST['options'];
-			if($model->save()) {
-				echo json_encode(ModelToArray::convertModelToArray($model, [$model->tableName() => 'optionId, label']));
-				return;
-			}
-			$model->unsetAttributes();
-			//print_r($model->attributeNames()); die;
-			echo json_encode(['optionId' => '']);
-			return;
+//		if(isset($_POST['options'])) {
+//			$model->setScenario($_POST['options']['scenario']);
+//			unset($_POST['options']['scenario']);
+//			$model->attributes = $_POST['options'];
+//			if($model->save()) {
+//				echo json_encode(ModelToArray::convertModelToArray($model, [$model->tableName() => 'optionId, label']));
+//				return;
+//			}
+//			$model->unsetAttributes();
+//			//print_r($model->attributeNames()); die;
+//			echo json_encode(['optionId' => '']);
+//			return;
+//
+//		}
 
-		}
+//		echo get_class($this->optionsMask['formFieldsModels'][$id]);
 		// Select all values whose inputType is ""Select"
-		$fetchOptions = Yii::app()->db->createCommand()
-			->select('sfd.subFormId, sfd.label')
-			->from('surFormDetails sfd')
-			->where('sfd.inputType ="dropdownlist"')
-			->queryAll();
+		$formElementsCriteria = new CDbCriteria();
+		$formElementsCriteria->condition = "inputType='dropdownlist'";
+		//$formElementsModel = new {$this->optionsMask['formFieldsModels'][$id]};
 
-		$surformdetailsArray = array();
-		// Pack data to send to view
-		foreach ($fetchOptions as $key => $value) {
-			$surformdetailsArray[$value['subFormId']] = $value['label']; 
-		}
+		$fetchOptions = CActiveRecord::model($this->optionsMask['formFieldsModels'][$id])->findAll($formElementsCriteria);
+		$formElements = CHtml::listData($fetchOptions, $this->optionsMask['joinLabels'][$id][0],
+			$this->optionsMask['joinLabels'][$id][1]);
+		//print_r($formElements); die;
 
-		$this->render('add', array(
+		$this->render('add', [
 			'model' => $model,
-			'surformdetailsArray' => $surformdetailsArray
-		));
+			'dropDownAttribute' => $this->optionsMask['relationNames'][$id] . 'Id',
+			'formElements' => $formElements
+		]);
+	}
+
+	/**
+	 * @param $id
+	 * @return array
+	 */
+	private function getDropDownElements($id) {
+		$formElementsCriteria = new CDbCriteria();
+		$formElementsCriteria->condition = "inputType='dropdownlist'";
+		//$formElementsModel = new {$this->optionsMask['formFieldsModels'][$id]};
+
+		$fetchOptions = CActiveRecord::model($this->optionsMask['formFieldsModels'][$id])
+			->findAll($formElementsCriteria);
+		$formElements = CHtml::listData($fetchOptions, $this->optionsMask['joinLabels'][$id][0],
+			$this->optionsMask['joinLabels'][$id][1]);
+		return $formElements;
 	}
 
 	/**
 	 * actionEditOption
-	 * 
-	 * @access public
+	 * @param $id
+	 * @param $type string
 	 * @return void
 	 */
-	public function actionEditOption($id) {
+	public function actionEditOption($id, $type) {
 		Yii::log("actionEditOption OptionsController called", "trace", self::LOG_CAT);
-		$model = new Options();
 		$dataArray = [];
-		$dataArray['formType'] = "Edit";
-
-		if (empty($id)) {
-			Yii::app()->user->setFlash('notice', Yii::t("translation", "Please select an option to edit"));
-			$this->redirect(['options/index']);
-			return;
-		}
 		// fetch the form data, search using the "optionId" sent from the listing.
 		$model = Options::model()->findByPk($id);
+		$formFieldType = array_flip($this->optionsMask['relationNames'])[$type];
 		if ($model === null) {
-			Yii::app()->user->setFlash('error', Yii::t("translation", "The option does not exist"));
-			$this->redirect(['options/index']);
+			Yii::app()->user->setFlash('error', Yii::t("translation", "That option does not exist"));
+			$this->redirect(['options/index/id/' . $formFieldType]);
 			return;
 		}
-		$fetchElementName = Yii::app()->db->createCommand()
-			->select('sfd.label')
-			->from('surFormDetails sfd')
-			->where('sfd.subFormId =' . $model['elementId']  )
-			->queryAll();
 
-		// Pick the selected Option's elementId. This will be displayed as the default in the dropdown
-		$dataArray['elementName'] = $fetchElementName[0]['label'];
+		$model->setCustomScenario($formFieldType);
 		if ( isset( $_POST['Options'] ) ) {
 			$model->attributes = $_POST['Options'];
 			// Validate and save the data
-			if ( $model->validate() ) {
-				$model->update();
+			if ($model->save() ) {
 				Yii::app()->user->setFlash('success', Yii::t("translation", "Option successfully updated"));
-				$this->redirect(['index']);
+				$this->redirect(['options/index/id/' . $formFieldType]);
+			} elseif (!$model->hasErrors()) {
+				Yii::app()->user->setFlash('error', Yii::t("translation", "An error occurred while updating the" .
+					" option, please contact your administrator"));
+
 			}
 		}
 
 		// Fetch all options and send them to the view to be displayed in the dropdown
-		$fetchOptions = Yii::app()->db->createCommand()
-			->select('sfd.subFormId, sfd.label')
-			->from('surFormDetails sfd')
-			->where('sfd.inputType ="select"')
-			->queryAll();
 
-		$surformdetailsArray = array();
-		foreach ($fetchOptions as $key => $value) {
-			$surformdetailsArray[$value['subFormId']] = $value['label']; 
-		}
-		$this->render('edit', array(
+		$this->render('edit', [
 			'model' => $model,
-			'dataArray' => $dataArray,
-			'surformdetailsArray' => $surformdetailsArray
-		));
+			'formElements' => $this->getDropDownElements($formFieldType),
+			'dropDownAttribute' => $type . 'Id'
+		]);
 	}
 
 	/**
@@ -195,19 +215,18 @@ class OptionsController extends RiskController {
 	 * @access public
 	 * @return void
 	 */
-	public function actionDeleteOption() {
+	public function actionDeleteOption($id) {
 		Yii::log("actionDeleteOption OptionsController called", "trace", self::LOG_CAT);
-		if (isset($_POST["delId"])) {
-				$record = Options::model()->findByPk($_POST['delId']);
-			if (!$record->delete()) {
-				$errorMessage = "Error No:" . ldap_errno($ds) . "Error:" . ldap_error($ds);
-				Yii::log("Error deleting Option: " . $errorMessage, "warning", self::LOG_CAT);
-				echo Yii::t("translation", "A problem occured when deleting the Option ") . $_POST['delId'];
+
+		$record = Options::model()->findByPk($id)->delete();
+			if (!$record) {
+				Yii::log("Error deleting Option: " . $id, "warning", self::LOG_CAT);
+
+				echo Yii::t("translation", "A problem occurred when deleting the Option ");
 			} else {
 				echo Yii::t("translation", "The Option has been successfully deleted");
 			}
-		}
 	}
 
 }
-?>
+

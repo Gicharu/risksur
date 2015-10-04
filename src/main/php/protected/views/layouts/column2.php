@@ -43,10 +43,10 @@
 						'id' => 'showComponents'
 					],
 					'active' => strstr('listComponents', $currentView),
-					'items' => [
-						['label' => Yii::t("translation", "Add details"),
-						 'url'   => ['getDesignElements']],
-					]
+//					'items' => [
+//						['label' => Yii::t("translation", "Add details"),
+//						 'url'   => ['getDesignElements']],
+//					]
 				],
 				['label'=>'Reports', 'url'=> ['reports']],
 			];

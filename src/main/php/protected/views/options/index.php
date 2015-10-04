@@ -1,5 +1,12 @@
 <?php
-$this->menu = [['label' => 'Add Option', 'url' => ['options/addOption']],];
+/**
+ * @var $this OptionsController
+ * @var $dataArray array
+ */
+$this->menu = [
+	['label' => 'Add option', 'url' => ['options/addOption/id/' . $id]],
+	['label' => 'Manage options home', 'url' => ['options/home']]
+];
 ?>
 <script type="text/javascript">
 	$(function(){
@@ -9,7 +16,7 @@ $this->menu = [['label' => 'Add Option', 'url' => ['options/addOption']],];
 			"bProcessing": true,
 			"aaData": <?= $dataArray['optionsList']; ?>,
 			"aoColumns": [
-				{"mDataProp": '<?= $dataArray["optsCategory"]; ?>' },
+				{"mDataProp": '<?= $dataArray["firstColumn"]; ?>.label' },
 				{"mDataProp": "label" },
 				{"mDataProp": null, "bSortable": false, "sDefaultContent": '<button class="bedit">Edit</button>'},
 				{"mData": null, "bSortable": false, "sDefaultContent": '<button class="bdelete">Delete</button>'}
@@ -35,21 +42,21 @@ $this->menu = [['label' => 'Add Option', 'url' => ['options/addOption']],];
 			.rowGrouping()
 			.on('click', '.bedit', {
 				operation: 'edit',
-				link: '<?= $this->createUrl("editOption"); ?>',
+				link: '<?= $this->createUrl("options/editOption/type/" . $dataArray["firstColumn"]); ?>',
 				table: '#optionsList',
 				rowIdentifier: 'optionId'
 			}, requestHandler)
 			.on('click', '.bdelete', {
 				operation: 'delete',
 				link: '<?= $this->createUrl("deleteOption"); ?>',
-				refreshLink: '<?= $this->createUrl("index"); ?>',
+				refreshLink: '<?= $this->createUrl("index", ["id" => $_GET['id'], 'ajax' => true]); ?>',
 				table: '#optionsList',
 				rowIdentifier: 'optionId'
 			}, requestHandler);
 	});
 
 </script>
-<div id="listOptions" width="100%">
+<div id="listOptions">
 	
 	<table id="optionsList" width="100%" border="0" cellspacing="0" cellpadding="0">
 		<thead>
