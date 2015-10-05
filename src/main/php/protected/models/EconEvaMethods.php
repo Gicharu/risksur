@@ -89,6 +89,14 @@ class EconEvaMethods extends CActiveRecord {
 		return parent::model($className);
 	}
 
+
+	protected function afterFind() {
+		$this->link = UtilModel::urlToLink($this->link);
+		parent::afterFind();
+
+	}
+
+
 	protected function afterDelete() {
 		if(parent::afterDelete()) {
 			$model = EvaQuestionGroups::model('section=:section', [':section' => 'econEvaMethods']);

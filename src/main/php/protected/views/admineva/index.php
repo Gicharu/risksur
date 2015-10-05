@@ -5,6 +5,7 @@
  * Date: 7/16/15
  * Time: 10:29 AM
  * @var $this AdminEvaController
+ * @var $page array
  */
 $this->menu = [
 	['label' => 'Manage Evaluation Context Form', 'url' => ['admineva/listEvaContext']],
@@ -15,10 +16,9 @@ $this->menu = [
 	['label' => 'Manage Evaluation Method & Question Link', 'url' => ['adminevaquestiongroups/index']],
 	['label' => 'Manage Economic Evaluation Approaches', 'url' => ['admineconomicmethods/index']]
 ];
-?>
 
-<h3> Manage Evaluation Tool</h3>
-<p>
-	This section allows you to view, add, update and delete various components of the evaluation tool. Select
-	a section form the left to begin.
-</p>
+$this->renderPartial('//system/_page', [
+	'content' => $page['content'],
+	'editAccess' => $page['editAccess'],
+	'editMode' => $page['editMode']
+]);

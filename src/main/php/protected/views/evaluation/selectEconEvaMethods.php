@@ -50,8 +50,8 @@ $this->renderPartial('_page', [
 				},
 				{"mData": "econMethodGroup.buttonName"},
 				{"mData": "name"},
-				{"mData": "description", "sWidth": '30%'},
-				{"mData": "reference", "sWidth": '25%'}
+				{"mData": "description", "sWidth": '40%'},
+				{"mData": "reference", "sWidth": '20%'}
 			],
 			"bJQueryUI": true,
 			"sPaginationType": "buttons_input",

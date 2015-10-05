@@ -9,8 +9,8 @@ $this->breadcrumbs = [
 ];
 
 $this->menu = [
-	['label' => 'List Economic Methods', 'url' => ['index']],
-	['label' => 'Create Economic Methods', 'url' => ['create']],
+	['label' => 'List Economic Approaches', 'url' => ['index']],
+	['label' => 'Add Economic Approach', 'url' => ['create']],
 ];
 ?>
 

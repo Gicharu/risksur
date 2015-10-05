@@ -11,6 +11,8 @@
  */
 class EvaluationController extends RiskController {
 	const LOG_CAT = "ctrl.EvaluationController";
+	const RISK_BASED_ELEMENT_ID = 7;
+	const RISK_BASED_OPTS_GROUP = 6;
 	public $layout = '//layouts/column2';
 	private $frameworkId;
 	private $evaContextId;
@@ -264,7 +266,7 @@ class EvaluationController extends RiskController {
 	 * actionEvalQuestionList
 	 * @param string $questionId
 	 */
-	public function actionEvalQuestionList($questionId = '') {
+	public function actionEvalQuestionList($questionId = null) {
 		Yii::log("actionEvalQuestionList called", "trace", self::LOG_CAT);
 		$this->setPageTitle('Select evaluation question');
 		$model = EvaluationHeader::model()->findByPk($this->evaContextId);
@@ -327,17 +329,23 @@ class EvaluationController extends RiskController {
 			'next' => ['label' => 'Next', 'type' => 'submit']
 		];
 		if (isset($questionId)) {
-			$model->question = $questionId;
+			$model->questionId = $questionId;
+		} else {
+			$model->questionId = 0;
 		}
-		if(!isset($model->questionId)) {
-			$model->questionId = '';
-		}
+
+
 		$form = new CForm($elements, $model);
-		//var_dump($form); die;
+		$this->docName = 'evalQuestionList';
+		if (isset($_POST['pageId'])) {
+			SystemController::savePage('evalQuestionList');
+		}
+		$page = SystemController::getPageContent($this->docName);
 		$this->render('evaQuestionList', [
 			'form' => $form,
 			'questionId' => $model->questionId,
-			'questions' => $questionArray
+			'questions' => $questionArray,
+			'page' => $page
 		]);
 	}
 
@@ -434,9 +442,12 @@ class EvaluationController extends RiskController {
 					->with('evalQuestion')
 					->find('t.evalQuestionId=:id OR nextQuestion=:next', [':id' => $questions->parentQuestion, ':next' => $questions->evalQuestionId]);
 				//print_r($rsMenu); die;
-				$menu = CHtml::tag('li', [], "Q: " . $rsMenu->evalQuestion->question .
-					"<br /> A: "  . $rsMenu->optionName);
+				$menu = CHtml::tag('li', [], "Q: " . addslashes($rsMenu->evalQuestion->question) . "<br /> A: "  . $rsMenu->optionName);
 				Yii::app()->session['leftMenu'] .= $menu;
+				if(isset($rsMenu->flashQuestion)) {
+					Yii::app()->user->setFlash('notice', $rsMenu->flashQuestion);
+
+				}
 
 			}
 			//print_r(Yii::app()->session['leftMenu']); die;
@@ -618,7 +629,7 @@ class EvaluationController extends RiskController {
 		$evaDetails[] = ['Evaluation criteria', $model['evaCriteria']];
 		$evaDetails[] = ['Evaluation method', $model['evaMethods']];
 		$evaluationDataCriteria = new CDbCriteria();
-		$evaluationDataCriteria->condition = "data.evalId=" . $this->evaContextId;
+		$evaluationDataCriteria->condition = "data.evalId=" . $this->evaContextId . " AND t.inputName <> 'componentNo'";
 		$evaluationDataCriteria->with = ['data', 'options'];
 		$evaluationDataModel = EvaluationElements::model()->findAll($evaluationDataCriteria);
 
@@ -663,7 +674,8 @@ class EvaluationController extends RiskController {
 		}
 		//print_r($rsEvaluationType); die;
 		if(isset($rsEvaluationType->options) && $rsEvaluationType->options->label == 'System') {
-			Yii::app()->user->setFlash('notice', 'The evaluation context is system based hence no components are needed');
+			Yii::app()->user->setFlash('notice', 'You are planning to evaluate at system level hence no selection' .
+				' of components is required');
 			$this->redirect('selectEvaAttributes');
 
 		}
@@ -679,7 +691,7 @@ class EvaluationController extends RiskController {
 			'<p> Please select the components you would like to include in your evaluation from the components' .
 			' included in this system using the table below.  If the components you want to include are not listed' .
 			' in this table please go back and enter the information about your components into the ' .
-			CHtml::link('add components', 'listEvaContext') . ' screen. </p>',
+			CHtml::link('add components', ['design/addMultipleComponents']) . ' screen. </p>',
 			'<table id="componentsDisplay" width="100%" border="0" cellspacing="0" cellpadding="0">',
 			'<thead><tr></tr><th></th><th>Component Name</th><th>Target Species</th><th>Data collection point</th>' .
 			'<th>Study type</th></tr></thead>',
@@ -763,17 +775,20 @@ class EvaluationController extends RiskController {
 		$evaDetails = $this->getEvaDetails();
 		$this->docName = 'evaAttributes';
 		if (isset($_POST['pageId'])) {
-			$this->savePage('selectEvaAttributes');
+			SystemController::savePage('selectEvaAttributes');
 		}
-		$page = $this->getPageContent();
-		if (!isset($page)) {
-			Yii::app()->user->setFlash('notice', 'This page is missing some information');
-		}
+		$page = SystemController::getPageContent($this->docName);
+
 		$groups = EvaQuestionGroups::model()->find("section='evaCriteriaMethod'");
 		$groupsArray = json_decode($groups->questions);
 		$group = $this->getQuestionGroup($groupsArray);
-		//var_dump($group); die;
-
+		// check if risk based options should be included
+		$rsRiskBased = EvaluationDetails::model()->with('options')->find('evalId=:eva AND evalElementsId=:elemId',
+			[':eva' => $this->evaContextId, ':elemId' => self::RISK_BASED_ELEMENT_ID]);
+		if(isset($rsRiskBased->options) && $rsRiskBased->options->label == 'Yes') {
+			array_push($group, self::RISK_BASED_OPTS_GROUP);
+		}
+//		var_dump($group); die;
 		$attributesCriteria = new CDbCriteria();
 		$attributesCriteria->with = ['attributeTypes', 'attribute'];
 		$attributesCriteria->order = 'relevance DESC';
@@ -783,7 +798,7 @@ class EvaluationController extends RiskController {
 		$attributes = ModelToArray::convertModelToArray(EvaAttributesMatrix::model()->findAll($attributesCriteria));
 		$evaluationModel = EvaluationHeader::model()->findByPk($this->evaContextId, ['select' => 'evalId, evaAttributes']);
 		//print_r($attributes); die;
-		$evaAttributes = isset($evaluationModel->evaAttributes) ? json_decode($evaluationModel->evaAttributes) : [];
+		//$evaAttributes = isset($evaluationModel->evaAttributes) ? json_decode($evaluationModel->evaAttributes) : [];
 		$evaluationModel->scenario = 'selectEvaAttributes';
 		if (isset($_POST['saveEvaAttr'])) {
 //			$evaluationModel->evaAttributes = json_encode($_POST['EvaluationHeader']['evaAttributes']);
@@ -895,6 +910,7 @@ class EvaluationController extends RiskController {
 	}
 
 	public function actionSelectEconEvaMethods() {
+		$this->setPageTitle('Select economic analysis technique');
 		// Get relevant questions
 		$econQuestions = (array) json_decode(ModelToArray::convertModelToArray(EvaQuestionGroups::model()
 			->find('section=:sec', [':sec' => 'econEvaMethods']))['questions']);
@@ -998,12 +1014,18 @@ class EvaluationController extends RiskController {
 			$evaAttributes = ModelToArray::convertModelToArray(EvaAttributes::model()
 				->findAll($evaAttributesCriteria));
 		}
+		$this->docName = 'evaSummary';
+		if (isset($_POST['pageId'])) {
+			SystemController::savePage('evaSummary');
+		}
+		$page = SystemController::getPageContent($this->docName);
 		//print_r(json_encode($evaAttributes)); die;
 		$this->render('evaSummary', [
 			'evaDetails'    => $evaDetails,
 			'evaAssMethods' => $evaAssMethods,
 			'econEvaMethods' => $econEvaMethods,
-			'evaAttributes' => $evaAttributes
+			'evaAttributes' => $evaAttributes,
+			'page' => $page
 		]);
 	}
 
@@ -1361,6 +1383,9 @@ class EvaluationController extends RiskController {
 			$dynamicDataAttributes[$attributeId] = '';
 			$validation = $element->required ? 'required' : 'safe';
 			$rules[] = [$attributeId, $validation];
+			if($element->inputName == 'componentNo') {
+				$rules[] = [$attributeId, 'numerical'];
+			}
 			$highlightClass = "";
 			if (isset($attributeArray[$element->evalElementsId])) {
 				$highlightClass = "attributeHighlight";

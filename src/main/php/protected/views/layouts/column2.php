@@ -81,7 +81,7 @@
 						  'url'   => ["$currentController/selectEvaAttributes"]],
 					['label' => Yii::t("translation", "Select attribute assessment methods"),
 					 'url'   => ["$currentController/selectEvaAssMethod"]],
-					['label' => Yii::t("translation", "Select economic methods"),
+					['label' => Yii::t("translation", "Select economic analysis technique"),
 					 'url'   => ["$currentController/selectEconEvaMethods"]],
 				],
 				],

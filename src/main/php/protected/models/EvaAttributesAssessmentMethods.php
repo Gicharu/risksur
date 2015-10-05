@@ -72,4 +72,15 @@ class EvaAttributesAssessmentMethods extends CActiveRecord {
 	public static function model($className = __CLASS__) {
 		return parent::model($className);
 	}
+
+	/**
+	 * afterFind
+	 */
+	protected function afterFind() {
+		$this->description = UtilModel::urlToLink($this->description);
+		$this->dataRequired = UtilModel::urlToLink($this->dataRequired);
+		$this->expertiseRequired = UtilModel::urlToLink($this->expertiseRequired);
+		parent::afterFind();
+
+	}
 }

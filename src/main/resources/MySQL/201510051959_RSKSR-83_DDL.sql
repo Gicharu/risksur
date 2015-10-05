@@ -1,0 +1,1 @@
+ALTER TABLE `evalQuestionAnswers` CHANGE `flashQuestion` `flashQuestion` TEXT NULL;
