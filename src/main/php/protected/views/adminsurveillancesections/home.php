@@ -9,7 +9,7 @@
 
 $this->menu = [
 	['label'=>'Manage wizard information', 'url'=> ['index']],
-	['label'=>'Manage surveillance form fields', 'url'=> ['options/index/id/1']],
+//	['label'=>'Manage surveillance form fields', 'url'=> ['options/index/id/1']],
 	['label'=>'Manage surveillance drop down options', 'url'=> ['options/index/id/1']],
 ];
 ?>

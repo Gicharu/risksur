@@ -6,13 +6,14 @@
  * Time: 2:36 PM
  * @var $form CForm
  * @var $questions Array
+ * @var $page Array
  * @var $questionId string
  */
 //var_dump($questions); die;
 ?>
 
 <script type="text/javascript">
-	var selectedQuestion = <?= isset($_GET['questionId']) ? $_GET['questionId'] : ''; ?>;
+	var selectedQuestion = <?= isset($_GET['questionId']) ? $_GET['questionId'] : $questionId; ?>;
 	$(document).ready(function() {
 		$(function() {
 			$('#questionSelect').dataTable({
@@ -111,4 +112,13 @@
 
 });
 </script>
-<?= CHtml::tag('div', ['class' => 'form'], $form->render()); ?>
+<?php
+echo CHtml::tag('div', ['class' => 'form'], false, false);
+$this->renderPartial('//system/_page', [
+	'content' => $page['content'],
+	'editAccess' => $page['editAccess'],
+	'editMode' => $page['editMode']
+]);
+echo $form->render();
+echo CHtml::closeTag('div');
+?>

@@ -7,9 +7,9 @@
  * @license TraceTracker {@link http://www.tracetracker.com}
  */
 class AdminevaController extends RiskController {
-	//public $page;
-	private	$configuration;
 	const LOG_CAT = "ctrl.adminevaController";
+	public $docName;
+	private	$configuration;
 
 	/**
 	 * @var string the default layout for the views. Defaults to '//layouts/column2', meaning
@@ -29,7 +29,13 @@ class AdminevaController extends RiskController {
 	}
 
 	public function actionIndex() {
-		$this->render('index');
+		$this->docName = 'adminEvaHome';
+		if (isset($_POST['pageId'])) {
+			SystemController::savePage('index');
+		}
+		$page = SystemController::getPageContent($this->docName);
+
+		$this->render('index', compact('page'));
 	}
 
 	/**

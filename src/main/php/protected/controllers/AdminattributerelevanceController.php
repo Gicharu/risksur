@@ -150,9 +150,14 @@ class AdminattributerelevanceController extends RiskController {
 		$rsQuestionGroups = EvaQuestionGroups::model()->find("section='evaCriteriaMethod'");
 		$questionGroups = json_decode($rsQuestionGroups->questions);
 		//Get questions
-		$rsQuestions = EvaluationQuestion::model()->findAll("flag='final'");
+		$rsQuestions = EvaluationQuestion::model()->findAll(
+			['condition' => "flag='final'"],
+			['select' => "*, CAST(`questionNumber` as SIGNED) AS castedColumn"]
+			);
 		$panels = [];
 		foreach( $questionGroups as $group => $questions ) {
+			//print_r($questions); die;
+			//asort($questions);
 			$panels['Group ' . $group] = '<ul class="rb">';
 			foreach( $rsQuestions as $evaQuestion) {
 				if(in_array($evaQuestion->evalQuestionId, $questions)) {

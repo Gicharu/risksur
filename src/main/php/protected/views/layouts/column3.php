@@ -10,7 +10,7 @@ $this->beginContent('//layouts/main');
 	<script type="text/javascript">
 		$(function(){
 			$('ul.operations').menu();
-			var listItem = '<?= Yii::app()->session["leftMenu"]; ?>';
+			var listItem = "<?= Yii::app()->session["leftMenu"]; ?>";
 			if(listItem.length > 0) {
 				$('#path').append(listItem);
 			}
@@ -92,7 +92,7 @@ $this->beginContent('//layouts/main');
 					 'url'   => ["$currentController/selectEvaAttributes"]],
 					['label' => Yii::t("translation", "Select attribute assessment methods"),
 					 'url'   => ["$currentController/selectEvaAssMethod"]],
-					['label' => Yii::t("translation", "Select economic methods"),
+					['label' => Yii::t("translation", "Select economic analysis technique"),
 					 'url'   => ["$currentController/selectEconEvaMethods"]],
 				],
 				],
