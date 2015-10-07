@@ -313,8 +313,8 @@ class EvaluationController extends RiskController {
 			$questionArray[$questionData->evalQuestionId]['criteria'] = rtrim($questionArray[$questionData->evalQuestionId]['criteria'], ", ");
 			$questionArray[$questionData->evalQuestionId]['method'] = rtrim($questionArray[$questionData->evalQuestionId]['method'], ", ");
 		}
-		$currentQuestion = EvaluationHeader::model()->findByPk($this->evaContextId);
-		$model->question = $currentQuestion->questionId;
+//		$currentQuestion = EvaluationHeader::model()->findByPk($this->evaContextId);
+//		$model->question = $currentQuestion->questionId;
 		$elements = ContextController::getDefaultElements();
 		$elements['title'] = '<h3>Select Evaluation Question</h3>';
 		$elements['elements'] = [
@@ -330,7 +330,8 @@ class EvaluationController extends RiskController {
 		];
 		if (isset($questionId)) {
 			$model->questionId = $questionId;
-		} else {
+		}
+		if(!isset($model->questionId)) {
 			$model->questionId = 0;
 		}
 
@@ -855,33 +856,39 @@ class EvaluationController extends RiskController {
 //			if(!is_null($customMethod)) {
 //				$response = array_merge($assessMethods, $customMethod);
 //			}
+			//print_r($assessMethods); die;
 			echo json_encode(['aaData' => $assessMethods, 'customMethod' => $customMethod]);
 			return;
 
 		}
 		if (isset($_POST['EvaAssessmentMethods'])) {
-			//print_r($_POST); die;
 			$transaction = Yii::app()->db->beginTransaction();
 			try {
 				$assessModel->deleteAll('evaluationId=:evalId', [':evalId' => $this->evaContextId]);
 				foreach ($_POST['EvaAssessmentMethods'] as $row) {
-					$assessModel->attributes = $row;
-					if(isset($_POST['EvaAssessmentMethods']['customAssessmentMethod']) &&
-						$_POST['EvaAssessmentMethods']['customAssessmentMethod'] != '')  {
-						$assessModel->setScenario('customMethod');
-						$assessModel->customAssessmentMethod = $_POST['EvaAssessmentMethods']['customAssessmentMethod'];
-						//print_r($assessModel); die;
-						$assessModel->save();
-						$assessModel->setScenario('default');
-						break;
-					}
-					if(isset($assessModel->assessmentMethod)) {
-						$assessModel->save();
+					if($row != '') {
+						$assessModel->attributes = $row;
+						if($_POST['EvaAssessmentMethods']['customAssessmentMethod'] != '')  {
+
+							$assessModel->setScenario('customMethod');
+							$assessModel->customAssessmentMethod = $_POST['EvaAssessmentMethods']['customAssessmentMethod'];
+							$assessModel->unsetAttributes(['assessmentMethod']);
+							$assessModel->save();
+							$assessModel->setScenario('default');
+							break;
+						}
+						if(isset($assessModel->assessmentMethod)) {
+							$assessModel->setIsNewRecord(true);
+							$assessModel->id = null;
+							$assessModel->save();
+						}
+
 					}
 
 				}
 				if(!$assessModel->hasErrors()) {
 					$transaction->commit();
+					//print_r($_POST); die;
 
 					if (isset($_POST['next'])) {
 						Yii::app()->user->setFlash('success', 'Assessment method(s) saved successfully');
@@ -912,20 +919,21 @@ class EvaluationController extends RiskController {
 	public function actionSelectEconEvaMethods() {
 		$this->setPageTitle('Select economic analysis technique');
 		// Get relevant questions
-		$econQuestions = (array) json_decode(ModelToArray::convertModelToArray(EvaQuestionGroups::model()
-			->find('section=:sec', [':sec' => 'econEvaMethods']))['questions']);
+
+		$econQuestions = json_decode(ModelToArray::convertModelToArray(EvaQuestionGroups::model()
+			->find('section=:sec', [':sec' => 'econEvaMethods']))['questions'], true);
 		// Group 1 ===> Cost-effectiveness analysis
 		// Group 2 ===> Cost-benefit analysis
 		// Group 3 ===> Cost-benefit analysis & Cost-benefit analysis
-		$econMethodGroup = null;
+		$econMethodGroup = [];
 		//echo $this->evaQuestionId; die;
 		foreach($econQuestions as $groupKey => $questionGroups) {
 			if(isset(array_flip($questionGroups)[$this->evaQuestionId])) {
-				$econMethodGroup = $groupKey;
-				break;
+				$econMethodGroup[] = $groupKey;
+				//break;
 			}
 		}
-		if(!isset($econMethodGroup)) {
+		if(!isset($econMethodGroup[0])) {
 			Yii::app()->user->setFlash('notice', 'The evaluation question selected for this evaluation context does not' .
 				' have any economic evaluation methods');
 			$this->redirect('evaSummary');
@@ -958,9 +966,10 @@ class EvaluationController extends RiskController {
 		}
 
 		// Get economic evaluation methods based on the group of the question
-		$rsEconMethods = EconomicMethods::model()
-			->with('econMethodGroup')
-			->findAll('econMethod=:econGroup', [':econGroup' => $econMethodGroup]);
+		$econMethodsCriteria = new CDbCriteria();
+		$econMethodsCriteria->with = 'econMethodGroup';
+		$econMethodsCriteria->addInCondition('econMethod', $econMethodGroup);
+		$rsEconMethods = EconomicMethods::model()->findAll($econMethodsCriteria);
 		//print_r($rsEconMethods); die;
 		$econMethods = json_encode(ModelToArray::convertModelToArray($rsEconMethods));
 
@@ -991,7 +1000,8 @@ class EvaluationController extends RiskController {
 		$evaDetails = $this->getEvaDetails();
 		$evaAssMethods = ModelToArray::convertModelToArray(EvaAssessmentMethods::model()
 			->with('evaluationAttributes', 'evaAttrAssMethods')
-			->findAll());
+			->findAll('evaluationId=:evaId', [':evaId' => $this->evaContextId]));
+		//print_r($evaAssMethods); die;
 		$econEvaMethods = [];
 		$evaAttributes = [];
 		$rsEvaHeader = ModelToArray::convertModelToArray(EvaluationHeader::model()

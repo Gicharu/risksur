@@ -24,7 +24,15 @@
 			"aaData": <?= json_encode($evaAssMethods); ?>,
 			"aoColumns": [
 				{"mData": "evaluationAttributes.name"},
-				{"mData": "evaAttrAssMethods.description"},
+				{
+					"mData": null, "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+					var description = '<ul><li><b> Description: </b>' + oData.evaAttrAssMethods.description +
+						'</li><li><b> Data required: </b>' + oData.evaAttrAssMethods.dataRequired +
+						'</li><li><b> Expertise required: </b>' + oData.evaAttrAssMethods.expertiseRequired + '</li></ul>';
+					$(nTd).html(description)
+				}
+				},
+			//	{"mData": "evaAttrAssMethods.description"},
 				{
 					"mData": "dataAvailable", "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
 					switch (sData) {
@@ -263,13 +271,13 @@ $this->renderPartial('_detailsTable', ['evaDetails' => $evaDetails, 'tools' => t
 </table>
 <p></p>
 <span class="widgetTitle">
-	Evaluation Economic methods
+	Evaluation Economic Analysis Techniques
 </span>
 <table id="econEvaMethods" class="tableStyle" width="100%" border="0" cellspacing="0" cellpadding="0">
 	<thead>
 	<tr>
 		<th title = "Economic method">Economic method</th>
-		<th title = "Economic approach">Economic approach</th>
+		<th title = "Economic analysis technique">Economic analysis technique</th>
 		<th title = "Description">Description</th>
 		<th title = "Reference">Reference</th>
 	</tr>

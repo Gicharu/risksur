@@ -14,7 +14,7 @@ $this->menu = [
 	['label' => 'Manage Evaluation Assessment Methods', 'url' => ['adminattributesassessmentmethods/index']],
 	['label' => 'Manage Economic Evaluation Methods', 'url' => ['admineva/listEvaMethods']],
 	['label' => 'Manage Evaluation Method & Question Link', 'url' => ['adminevaquestiongroups/index']],
-	['label' => 'Manage Economic Evaluation Approaches', 'url' => ['admineconomicmethods/index']]
+	['label' => 'Manage Economic Economic Analysis Techniques', 'url' => ['admineconomicmethods/index']]
 ];
 
 $this->renderPartial('//system/_page', [

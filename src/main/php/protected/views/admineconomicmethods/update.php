@@ -9,11 +9,11 @@ $this->breadcrumbs = [
 ];
 
 $this->menu = [
-	['label' => 'List Economic Approaches', 'url' => ['index']],
-	['label' => 'Add Economic Approach', 'url' => ['create']],
+	['label' => 'List Economic Analysis Techniques', 'url' => ['index']],
+	['label' => 'Add Economic Analysis Technique', 'url' => ['create']],
 ];
 ?>
 
-	<h3>Update <?= $model->name; ?> economic approach </h3>
+	<h3>Update <?= $model->name; ?> economic analysis technique </h3>
 
 <?php $this->renderPartial('_form', ['model' => $model]); ?>

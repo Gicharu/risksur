@@ -29,8 +29,8 @@
 						});
 						if (typeof oData.evaAssessmentMethods != 'undefined') {
 							oData.evaAssessmentMethods.forEach(function (method) {
-								console.log(method);
-								if (method.evaAttribute == oData.evaAttribute) {
+								if (method.evaAttribute == oData.evaAttribute &&
+									method.evaluationId == <?= $assessModel->evaluationId ?>) {
 									$(checkBox).attr('checked', 'checked');
 								}
 							});
@@ -70,10 +70,18 @@
 							'<br /> <input class="dtCheck" type="radio" name="EvaAssessmentMethods[' + iRow +
 							'][dataAvailable]" value="2" id="dataAv2">Data collection needed';
 						$(nTd).html(radiolist);
-						if(oData.evaAssessmentMethods !== null) {
+						if(typeof oData.evaAssessmentMethods != 'undefined') {
 							oData.evaAssessmentMethods.forEach(function(method) {
-								if(method.dataAvailable !== null) {
-									$('#dataAv' + method.dataAvailable).attr('checked', 'checked');
+								console.log(method.dataAvailable);
+								if(method.dataAvailable !== null &&
+									method.evaluationId == <?= $assessModel->evaluationId ?>) {
+
+									$(nTd).children().each(function() {
+										console.log($(this).attr('type'));
+										if($(this).attr('type') == 'radio' && $(this).val() == method.dataAvailable) {
+											$(this).attr('checked', true);
+										}
+									});
 
 								}
 							})

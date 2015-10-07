@@ -83,7 +83,7 @@ $form = $this->beginWidget('CActiveForm', [
 		<tr>
 			<th title=""></th>
 			<th title="Economic Method">Economic Method</th>
-			<th title="Economic approach">Economic approach</th>
+			<th title="Economic analysis technique">Economic analysis technique</th>
 			<th title="Description">Description</th>
 			<th title="References">References</th>
 		</tr>

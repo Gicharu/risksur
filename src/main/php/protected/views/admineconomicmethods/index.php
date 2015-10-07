@@ -7,7 +7,7 @@ $this->breadcrumbs=array(
 );
 
 $this->menu=array(
-	array('label'=>'Add Economic Approach', 'url'=>array('create')),
+	array('label'=>'Add economic analysis technique', 'url'=>array('create')),
 );
 ?>
 
@@ -68,12 +68,12 @@ $this->menu=array(
 	});
 </script>
 <div id="listEconMethods">
-
+	<h3> Economic analysis techniques</h3>
 	<table id="econMethods" width="100%" class="display">
 		<thead>
 		<tr>
 			<th title="Economic method">Economic method</th>
-			<th title="Approach name">Approach name</th>
+			<th title="Technique name">Technique name</th>
 			<th title="Description">Description</th>
 			<th title="Reference">Reference</th>
 			<th title="Edit"></th>

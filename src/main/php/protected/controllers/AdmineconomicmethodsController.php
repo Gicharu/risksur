@@ -21,6 +21,7 @@ class AdmineconomicmethodsController extends RiskController {
 		if (isset($_POST['EconomicMethods'])) {
 			$model->attributes = $_POST['EconomicMethods'];
 			if ($model->save()) {
+				Yii::app()->user->setFlash('success', 'Economic analysis technique added successfully');
 				$this->redirect(['index']);
 			}
 		}
@@ -44,6 +45,7 @@ class AdmineconomicmethodsController extends RiskController {
 		if (isset($_POST['EconomicMethods'])) {
 			$model->attributes = $_POST['EconomicMethods'];
 			if ($model->save()) {
+				Yii::app()->user->setFlash('success', 'Economic analysis technique updated successfully');
 				$this->redirect(['index']);
 			}
 		}
@@ -59,10 +61,10 @@ class AdmineconomicmethodsController extends RiskController {
 	 */
 	public function actionDelete($id) {
 		if ($this->loadModel($id)->delete()) {
-			echo 'Economic method deleted successfully';
+			echo 'Economic analysis technique deleted successfully';
 			return;
 		}
-		echo 'An error occurred when deleting the economic method';
+		echo 'An error occurred when deleting the economic analysis technique';
 		return;
 	}
 
