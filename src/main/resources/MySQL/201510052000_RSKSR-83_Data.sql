@@ -4,23 +4,7 @@ INSERT INTO `docPages` (`docName`, `docData`) VALUES
 ('evalQuestionList', 0x3c703e436f6e74656e7420686572653c2f703e),
 ('evaSummary', 0x3c703e436f6e74656e7420686572653c2f703e);
 
-INSERT INTO `permissions` (
-  `name`,
-  `description`,
-  `controller`,
-  `action`
-)
-VALUES
-  (
-    'actionAddEvaContext',
-    'C/A to add evaluation context form field',
-    'admineva',
-    'addEvaContext'
-  ) ;
 
-INSERT INTO `roles_has_permissions` (`permissions_id`, `roles_id`) VALUES
-  (115, 1),
-  (115, 2);
 
 -- phpMyAdmin SQL Dump
 -- version 4.0.10deb1
@@ -194,3 +178,30 @@ INSERT INTO `evaluationQuestion` (`evalQuestionId`, `question`, `questionNumber`
   (60, 'What criteria would you like to include in your evaluation', NULL, 27, NULL),
   (61, 'How can you measure benefits', NULL, 60, NULL);
 SET FOREIGN_KEY_CHECKS=1;
+
+
+INSERT IGNORE INTO `permissions` (`id`, `name`, `description`, `controller`, `action`, `bizrule`) VALUES
+  (110, 'actionReport', 'C/A to generate surveillance system report', 'context', 'report', ''),
+  (111, 'actionIndex', 'C/A to list surveillance sections', 'adminsurveillancesections', 'index', ''),
+  (112, 'actionHome', 'C/A to surveillance sections ADMIN home page', 'adminsurveillancesections', 'home', ''),
+  (113, 'actionUpdate', 'C/A to update surveillance sections description', 'adminsurveillancesections', 'update', ''),
+  (114, 'actionHome', 'C/A to options home page', 'options', 'home', ''),
+  (115, 'actionAddEvaContext', 'C/A to add evaluation context form field', 'admineva', 'addEvaContext', '');
+
+
+INSERT IGNORE INTO `roles_has_permissions` (`permissions_id`, `roles_id`) VALUES
+  (110, 2),
+  (110, 3),
+  (111, 1),
+  (111, 2),
+  (112, 1),
+  (112, 2),
+  (113, 1),
+  (113, 2),
+  (114, 1),
+  (114, 2),
+  (115, 1),
+  (115, 2);
+
+INSERT IGNORE INTO `programpages` (`pageId`, `pageName`, `path`, `parentId`, `menuOrder`, `target`, `active`, `comments`) VALUES
+  (20, 'Manage Surveillance Tool', 'adminsurveillancesections/home', 8, 19, NULL, 1, NULL);
