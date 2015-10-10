@@ -70,7 +70,18 @@ class SystemController extends RiskController {
 		$model = DocPages::model()->findByPk($_POST['pageId']);
 		if (isset($_POST['survContent'])) {
 			$purifier = new CHtmlPurifier();
+			$purifier->options = [
+				'URI.AllowedSchemes'=> [
+				'http' => true,
+				'https' => true,
+				],
+				'Attr.AllowedFrameTargets' => ['_blank', '_self'],
+				'HTML.AllowedAttributes' => ['img.src', 'a.id', 'a.name', 'a.href', 'a.target']
+			];
+//			echo $_POST['survContent'];
+
 			$model->docData = $purifier->purify($_POST['survContent']);
+//			echo $model->docData; die;
 			if($model->update()) {
 				Yii::app()->user->setFlash('success', 'The page was updated successfully');
 				Yii::app()->request->redirect($action);

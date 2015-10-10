@@ -41,20 +41,20 @@ if ($editAccess) {
 				'toolbar' => true,
 				'buttonSource' => true,
 				'iframe' => false,
-				'linkAnchor' => true,
+				'linkNofollow' => true,
 				'allowedAttr' =>  [
-					['p', 'id']
+					['p', 'id'], ['a', ['name', 'target']], ['img', ['src', 'alt']]
 				],
 				'placeholder' => 'Enter some text...',
-				//'autosave' => $this->createUrl('savePage'),
+				'pastePlainText' => true,
 				//'autosaveOnChange' => true,
 //				'autosaveFields' => [
 //					'pageId' => $content->docId,
 //					'ajax' => 1
 //				],
-				'autosaveCallback' => 'js:function(json) {
-					//console.log(json);
-				}',
+//				'autosaveCallback' => 'js:function(json) {
+//					//console.log(json);
+//				}',
 				'focus' => true,
 				'imageUpload' => 'imageUpload',
 				//'imageManagerJson' => '/images/images.json',

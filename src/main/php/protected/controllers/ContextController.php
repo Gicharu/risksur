@@ -1063,9 +1063,9 @@ class ContextController extends RiskController {
 					}
 				}
 			}
-
+			$copyClass = '';
 			foreach($dFormGrid as $key => $gridItems) {
-				$inputs .= '<tr class="copy' . $fieldId . '">';
+				$inputs .= '<tr class="copy' . $fieldId . ' ' . $copyClass . '">';
 				foreach($gridItems->attributeNames() as $attr) {
 				//var_dump($gridItems[$attr]); die;
 					$inputs .= '<td>';
@@ -1087,6 +1087,7 @@ class ContextController extends RiskController {
 					$inputs .= '</td>';
 				}
 				$inputs .= '</tr>';
+				$copyClass = 'copy1';
 			}
 			//echo $inputs; die;
 

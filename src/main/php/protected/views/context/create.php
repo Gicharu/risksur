@@ -34,11 +34,13 @@ if(!empty($gridFieldIds)) {
 			array(
 				'id' => 'copyLink-' . $fieldId,
 				'removeHtmlOptions' => [
-					'class' => 'btn'
+					'class' => 'btn',
 				],
-				'removeText' => '<span class="ui-icon ui-icon-trash"></span>remove', //uncomment to add remove link
-				//'tableLayout' => true,
-				'options' => ['limit' => 5]
+				'options' => [
+//					'removeText' => '<span class="ui-icon ui-icon-trash"></span>remove', //uncomment to add remove link
+					'append' => '<td><a class="remove ui-icon ui-icon-trash" href="#" onclick="$(this).parent().parent().remove(); return false">remove</a>',
+					'limit' => 5
+				]
 			)
 		);
 	}

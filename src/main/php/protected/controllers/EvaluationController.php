@@ -140,7 +140,7 @@ class EvaluationController extends RiskController {
 		Yii::log("actionEvaPage called", "trace", self::LOG_CAT);
 		$this->docName = 'evaPage';
 		if (isset($_POST['pageId'])) {
-			SystemController::savePage('evaMethods');
+			SystemController::savePage($this->docName);
 		}
 
 		$page = SystemController::getPageContent($this->docName);
@@ -237,6 +237,7 @@ class EvaluationController extends RiskController {
 		}
 
 		$page = SystemController::getPageContent($this->docName);
+		EconEvaMethods::model()->scenario = 'nolink';
 		$dataProvider = new CActiveDataProvider('EconEvaMethods');
 		//print_r($dataProvider->getData()); die;
 		$this->render('evaMethods', ['dataProvider' => $dataProvider, 'page' => $page]);

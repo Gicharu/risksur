@@ -59,7 +59,9 @@ class EconomicMethods extends CActiveRecord {
 	 *
 	 */
 	protected function afterFind() {
+
 		$this->description = UtilModel::urlToLink($this->description);
+
 		parent::afterFind();
 
 	}

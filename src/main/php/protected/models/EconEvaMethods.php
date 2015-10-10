@@ -91,7 +91,10 @@ class EconEvaMethods extends CActiveRecord {
 
 
 	protected function afterFind() {
-		$this->link = UtilModel::urlToLink($this->link);
+		if(self::model()->scenario != 'nolink') {
+			$this->link = UtilModel::urlToLink($this->link);
+
+		}
 		parent::afterFind();
 
 	}

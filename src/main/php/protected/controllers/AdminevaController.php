@@ -186,6 +186,7 @@ class AdminevaController extends RiskController {
 		$config = self::getEvaMethodsFormConfig();
 		$buttonParam = ['name' => 'update', 'label' => 'Update'];
 		$config['buttons'] = ContextController::getButtons($buttonParam, 'admin/listEvaMethods');
+		EconEvaMethods::model()->scenario = 'nolink';
 		$model = EconEvaMethods::model()->findByPk($id);
 		if(is_null($model)) {
 			Yii::app()->user->setFlash('notice', 'That economic evaluation method does not exist.');
