@@ -28,8 +28,13 @@ class DesignController extends RiskController {
 	/**
 	 * actionIndex
 	 */
-	public function actionIndex() {
+	public function actionIndex($download = false) {
 		//$this->setPageTitle($this->id . 'Introduction');
+		if($download) {
+			$fullPath = Yii::getPathOfAlias('webroot') . "/exceltool/RISKSUR_SurvDesFramework_PublicDRAFT.xlsm";
+			return Yii::app()->request->sendFile('RISKSUR_SurvDesFramework_PublicDRAFT.xlsm', file_get_contents($fullPath));
+
+		}
 		Yii::log("actionIndex DesignController called", "trace", self::LOG_CAT);
 		$this->docName = 'desIndex';
 		if(isset($_POST['pageId'])) {

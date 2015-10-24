@@ -15,7 +15,9 @@ $this->renderPartial('//system/_page', [
 	'editAccess' => $page['editAccess'],
 	'editMode' => $page['editMode']
 ]);
-echo CHtml::link('Download excel tool', Yii::app()->baseUrl . '/exceltool/RISKSUR_SurvDesFramework_PublicDRAFT.xlsm');
+echo CHtml::tag('p');
+echo CHtml::link('Download excel tool', ['design/index', 'download' => true], ['class' => 'btn', 'target' => '_blank']);
+echo CHtml::closeTag('p');
 echo CHtml::tag('div', ['class' => 'row'], false, false);
 
 echo CHtml::label('Select a surveillance system', 'systemSelect');
