@@ -108,7 +108,7 @@
 		 */
 		public function actionIndex() {
 //        $this->layout = '//layouts/column1';
-			$surForms = SurFormDetails::model()->findAll();
+			$surForms = SurFormDetails::model()->findAll('sectionId=:section', [':section' => 8]);
 			$surFormsArray = array();
 			if (!empty($surForms)) {
 				foreach ($surForms as $surFormKey => $surForm) {

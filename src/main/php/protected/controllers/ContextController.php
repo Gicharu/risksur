@@ -311,9 +311,13 @@ class ContextController extends RiskController {
 					'onStart' => 'wizardStart',
 					'onFinished'=>'wizardFinished',
 					'onInvalidStep'=>'wizardInvalidStep',
-					'onSaveDraft'=>'wizardSaveDraft'
+					'onSaveDraft'=>'wizardSaveDraft',
+					'onReset'=>'wizardReset'
 
-				]
+				],
+				'draftSavedUrl' => ['context/list'],
+//				'saveDraftButton' => 'save',
+				'resetButton' => 'reset'
 			]
 		];
 	}
@@ -340,9 +344,9 @@ class ContextController extends RiskController {
 		$surveillanceFieldsModel = FrameworkFields::model()->findAll($fieldsCriteria);
 		$dForm = new DForm($this->getScenario());
 
+		$surveillanceModel = new FrameworkContext();
 		$elements = $this->getDefaultElements();
 		if($event->sender->getCurrentStep() === 1) {
-			$surveillanceModel = new FrameworkContext();
 			$surveillanceModel->userId = Yii::app()->user->id;
 			if($dForm->scenario == 'update') {
 				$surveillanceModel = FrameworkContext::model()->findByPk(Yii::app()->session['surveillanceId']);
@@ -435,6 +439,8 @@ class ContextController extends RiskController {
 					Options::model()->getContextFieldOptions($field->id);
 				$elements['elements']['contextFields']['elements'][$attributeName]['class'] =
 					'checkboxlist';
+				$elements['elements']['contextFields']['elements'][$attributeName]['title'] =
+					'title';
 				$elements['elements']['contextFields']['elements'][] = '<div class="clear"></div>';
 			}
 			if(isset($specialInputs[$field->inputType]) && empty($field->label)) {
@@ -540,6 +546,9 @@ class ContextController extends RiskController {
 
 	}
 
+	/**
+	 * @param $event
+	 */
 	public function wizardStart($event) {
 		$event->handled = true;
 	}
@@ -550,6 +559,20 @@ class ContextController extends RiskController {
 	 */
 	public function wizardInvalidStep($event) {
 		Yii::app()->user->setFlash('notice', $event->step.' is not a valid step in this wizard');
+	}
+
+	/**
+	 * Raised when the cancel button is clicked
+	 * @param $event
+	 */
+	public function wizardReset($event) {
+		$event->sender->reset();
+		$this->redirect('list');
+		Yii::app()->end();
+	}
+
+	public function wizardSaveDraft($event) {
+		die($event);
 	}
 
 
@@ -646,6 +669,8 @@ class ContextController extends RiskController {
 		unset(Yii::app()->session['evaContext']);
 		$event->sender->reset();
 //		Yii::app()->end();
+		Yii::app()->user->setFlash('success', 'Surveillance system characterisation is now complete, you have' .
+			' characterised this surveillance system as:');
 		$this->redirect(['report', 'systemId' => $frameWorkModel->frameworkId]);
 	}
 
@@ -658,69 +683,14 @@ class ContextController extends RiskController {
 		$this->process($step);
 	}
 
-	public function generateOverviewTable($event) {
+	public function actionReport($systemId = null, $ajax = null) {
+		$surveillanceReport = [];
 
-		echo '<table id="survTable" width="100%" border="0" cellspacing="0" cellpadding="0">' .
-			'<thead><tr><th></th><th></th></tr></thead><tbody>';
-		//print_r($event->data); die;
-		echo '<tr>';
-		echo '<td>Name</td>';
-		echo '<td>' .  $event->data['surveillanceModel']['name'] . '</td>';
-		echo '<tr>';
-		echo '<tr>';
-		echo '<td>Description</td>';
-		echo '<td>' .  $event->data['surveillanceModel']['description'] . '</td>';
-		echo '</tr>';
-		$surveillanceCriteria = new CDbCriteria();
-		$surveillanceCriteria->order = 'frameworkFields.sectionId ASC, frameworkFields.order ASC';
-		$rsSurveillance = SurveillanceSections::model()->with('survData', 'frameworkFields')->findAll($surveillanceCriteria);
-		//print_r($rsSurveillance); die;
-		foreach ($rsSurveillance as $surveillanceData) {
-			echo '<tr>';
-			echo CHtml::tag('td', ['colspan' => 2], '<b>' . $surveillanceData->sectionName . '</b>');
-			echo '</tr>';
-			foreach ($surveillanceData->frameworkFields as $field) {
-				if($field->inputType == 'label' || $field->inputType == 'grid') {
-					echo '<tr>';
-					echo CHtml::tag('td', ['colspan' => 2], '<b>' . $field->label . '</b>');
-					echo '</tr>';
-					continue;
-				}
-				echo '<tr>';
-				echo '<td>';
-				echo isset($field->label) ?
-					$field->label : FrameworkFields::model()->generateAttributeLabel($field->inputName);
-				echo '</td>';
-				foreach($surveillanceData->survData as $data) {
-					if(isset($data->frameworkFieldId) && $data->frameworkFieldId == $field->id) {
-						$dataValue = $data->value;
-
-						if($field->inputType == 'checkboxlist' || $field->inputType == 'dropdownlist' ||
-							$field->inputType == 'radiolist') {
-							$opts = '';
-							$optionsRs = Options::model()->findAllByPk(json_decode($data->value), '', ['select' => 'label']);
-							foreach($optionsRs as $optionValue) {
-								$opts .= $optionValue->label . ', ';
-							}
-							$dataValue = rtrim($opts, ", ");
-							//print_r($dataValue); die;
-						}
-						echo '<td>';
-						echo $dataValue;
-						echo '</td>';
-					}
-
-				}
-
+		if(isset($ajax)) {
+			if($systemId == -1) {
+				echo json_encode(['aaData' => []]);
+				return;
 			}
-			echo '</tr>';
-		}
-		echo '</table>';
-		//die;
-	}
-
-	public function actionReport($systemId = null) {
-		if(isset($systemId)) {
 			$rsSurveillance = Yii::app()->db->createCommand()
 				->select('s.sectionId, s.sectionName, ff.id, ff.sectionId, ff.order AS childCount, ff.parentId, ff.label, ff.inputName, fd.frameworkFieldId, fd.value, grid.label AS parentLabel')
 				->from('surveillanceSections s')
@@ -749,7 +719,7 @@ class ContextController extends RiskController {
 			$surveillanceReport[200]['sectionName'] = " ";
 			$surveillanceReport[200]['parentLabel'] = " ";
 			$surveillanceReport[200]['labelIndex'] = $labelCount;
-			$surveillanceReport[200]['field'] = "Surveillance Name";
+			$surveillanceReport[200]['field'] = "Surveillance System Name";
 			$surveillanceReport[200]['data'] = $rsSurvHead->name;
 			foreach($rsSurveillance as $section) {
 				//foreach ($section->frameworkFields as $field) {}
@@ -804,10 +774,15 @@ class ContextController extends RiskController {
 //				}
 				$oldLabel = $section['label'];
 			}
-			//print_r($surveillanceReport); die;
-			$this->render('report', ['surveillanceReport' => array_values($surveillanceReport)]);
+			echo json_encode(['aaData' => array_values($surveillanceReport)]);
 			return;
+			//print_r($surveillanceReport); die;
 		}
+		$surveillanceSystems = CHtml::listData(FrameworkContext::model()
+			->findAll('userId=:user', [':user' => Yii::app()->user->id]), 'frameworkId', 'name');
+
+		$this->render('report', ['surveillanceSystems' => $surveillanceSystems, 'sysId' => $systemId]);
+		return;
 	}
 
 	/**
@@ -925,10 +900,14 @@ class ContextController extends RiskController {
 				'type' => 'submit',
 				'label' => $buttonName['label'],
 			],
-			'cancel' => [
-				'type' => 'button',
+			'save_draft' => [
+				'type' => 'submit',
+				'label' => 'Save',
+			],
+			'reset' => [
+				'type' => 'submit',
 				'label' => 'Cancel',
-				'onclick' => "window.location='" . Yii::app()->createUrl($url) . "'"
+				//'onclick' => "window.location='" . Yii::app()->createUrl($url) . "'"
 			]
 		];
 	}
@@ -1017,6 +996,7 @@ class ContextController extends RiskController {
 			}, $childFields);
 			// get grid data
 			$fieldDataCriteria = new CDbCriteria();
+			$fieldDataCriteria->condition = 'frameworkId=' . Yii::app()->session['surveillanceId'];
 			$fieldDataCriteria->addInCondition('frameworkFieldId', $gridFieldsIds);
 			$gridFields = FrameworkFieldData::model()->findAll($fieldDataCriteria);
 			if(empty($gridFields)) {
@@ -1086,7 +1066,8 @@ class ContextController extends RiskController {
 					}
 					$inputs .= '</td>';
 				}
-				$inputs .= '</tr>';
+				$inputs .= '<td><a class="remove ui-icon ui-icon-trash" href="#"' .
+					' onclick="$(this).parent().parent().remove(); return false">remove</a></td></tr>';
 				$copyClass = 'copy1';
 			}
 			//echo $inputs; die;

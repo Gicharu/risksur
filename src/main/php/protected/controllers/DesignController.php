@@ -33,18 +33,10 @@ class DesignController extends RiskController {
 		Yii::log("actionIndex DesignController called", "trace", self::LOG_CAT);
 		$this->docName = 'desIndex';
 		if(isset($_POST['pageId'])) {
-			$this->savePage('index');
+			SystemController::savePage($this->createUrl('reports'));
 		}
-		$page = $this->getPageContent();
-		if(empty($page)) {
-			throw new CHttpException(404, 'The page requested does not exist');
-		}
-		$this->render('index', [
-				'content' => $page['content'],
-				'editAccess' => $page['editAccess'],
-				'editMode' => $page['editMode']
-			]
-		);
+		$page = SystemController::getPageContent($this->docName);
+		$this->render('index', ['page' => $page]);
 
 
 	}
@@ -609,7 +601,12 @@ class DesignController extends RiskController {
 			echo json_encode(['aaData' => $reportData], JSON_PRETTY_PRINT);
 			return;
 		}
-		$this->render('reports', ['systemDropdown' => $systemDropdown]);
+		$this->docName = 'detDesign';
+		if(isset($_POST['pageId'])) {
+			SystemController::savePage($this->createUrl('reports'));
+		}
+		$page = SystemController::getPageContent($this->docName);
+		$this->render('reports', ['systemDropdown' => $systemDropdown, 'page' => $page]);
 	}
 
 
@@ -1087,7 +1084,7 @@ class DesignController extends RiskController {
 					}
 				}
 				Yii::app()->user->setFlash('success', Yii::t("translation", "Component successfully updated"));
-				$this->redirect(['getDesignElements']);
+				$this->redirect(['listComponents']);
 			}
 			$this->render('component', [
 				'model'     => $model,

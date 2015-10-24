@@ -76,7 +76,7 @@ class SystemController extends RiskController {
 				'https' => true,
 				],
 				'Attr.AllowedFrameTargets' => ['_blank', '_self'],
-				'HTML.AllowedAttributes' => ['img.src', 'a.id', 'a.name', 'a.href', 'a.target']
+				'HTML.AllowedAttributes' => ['img.src', 'a.id', 'a.name', 'a.href', 'a.target', 'span.style']
 			];
 //			echo $_POST['survContent'];
 

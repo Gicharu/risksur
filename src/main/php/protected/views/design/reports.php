@@ -7,10 +7,21 @@
  *
  * @var $this DesignController
  * @var $systemDropdown array
+ * @var $page array
  */
+echo CHtml::tag('div', ['class' => 'form'], false, false);
+$this->renderPartial('//system/_page', [
+	'content' => $page['content'],
+	'editAccess' => $page['editAccess'],
+	'editMode' => $page['editMode']
+]);
+echo CHtml::link('Download excel tool', Yii::app()->baseUrl . '/exceltool/RISKSUR_SurvDesFramework_PublicDRAFT.xlsm');
+echo CHtml::tag('div', ['class' => 'row'], false, false);
+
 echo CHtml::label('Select a surveillance system', 'systemSelect');
-echo CHtml::tag('br', [], false, false);
-echo CHtml::dropDownList('systemSelect', '', $systemDropdown, ['empty' => 'Select one'])
+echo CHtml::dropDownList('systemSelect', '', $systemDropdown, ['empty' => 'Select one']);
+echo CHtml::closeTag('div');
+
 ?>
 <script>
 	var reportsTable;
@@ -101,3 +112,5 @@ echo CHtml::dropDownList('systemSelect', '', $systemDropdown, ['empty' => 'Selec
 		<tbody></tbody>
 	</table>
 </div>
+<?php
+echo CHtml::closeTag('div');

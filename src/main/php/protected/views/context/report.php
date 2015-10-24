@@ -4,7 +4,9 @@
  * User: james
  * Date: 6/2/15
  * Time: 11:34 AM
- * @var $surveillanceReport array
+ * @var $surveillanceSystems array
+ * @var $this RiskController
+ * @var $sysId string
  */
 ?>
 <script type="text/javascript">
@@ -22,7 +24,8 @@
 			"aaSorting": [[1,'asc']],
 			bPaginate: false,
 			"bJQueryUI": true,
-			"aaData": <?= json_encode($surveillanceReport); ?>,
+			"sAjaxSource": "<?= $this->createUrl('report',
+			['ajax' => 1, 'systemId' => isset($_GET['systemId']) ? $_GET['systemId'] : -1]); ?>",
 			"bLengthChange": false,
 			"bFilter": false,
 			"oLanguage": {
@@ -79,17 +82,32 @@
 			}
 		}).rowGrouping({ iGroupingColumnIndex2: 1}); //
 
+		$('#reportSelect').on('change', function() {
+			if(this.value != '') {
+				survReport.fnReloadAjax('<?= $this->createUrl("report"); ?>' + '/ajax/1/systemId/' + this.value);
+			}
+		})
+
 	});
 </script>
-<table id="surveillanceReport" cellspacing="0" cellpadding="0" border="0" width="100%" class="display">
-	<thead>
-	<tr>
-<!--		<th></th>-->
-		<th></th>
-		<th></th>
-		<th>Field</th>
-		<th>Value</th>
-	</tr>
-	</thead>
-	<tbody></tbody>
-</table>
+<div class="row">
+	<?= CHtml::dropDownList('reportSelect', $sysId, $surveillanceSystems, [
+		'class' => 'chozen',
+		'prompt' => 'Select surveillance system'
+	]);
+	?>
+
+<p></p>
+	<table id="surveillanceReport" cellspacing="0" cellpadding="0" border="0" width="100%" class="display">
+		<thead>
+		<tr>
+			<!--		<th></th>-->
+			<th></th>
+			<th></th>
+			<th>Field</th>
+			<th>Value</th>
+		</tr>
+		</thead>
+		<tbody></tbody>
+	</table>
+</div>
