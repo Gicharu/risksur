@@ -1399,13 +1399,14 @@ div.attrHead a, div.attrHead button span {
 #wzd-menu {
     padding: 0;
     width: 100%;
+    display: table;
 
 }
 
 #wzd-menu li {
     background: #003b78;
     color: #fff;
-    display: inline;
+    display: table-cell;
     font-weight: bold;
     list-style: none;
     margin: 0 20px 0 -1.6em;
@@ -1413,7 +1414,9 @@ div.attrHead a, div.attrHead button span {
     position: relative;
     font-size: 0.9em
 }
-
+#wzd-menu li a {
+    padding-left: 0.1em;
+}
 #wzd-menu li:before {
     content:"";
     display:block; /* reduce the damage in FF3.0 */
@@ -1448,6 +1451,7 @@ div.attrHead a, div.attrHead button span {
     border-style:solid;
     border-color:transparent #fff;
     z-index: 1;
+    padding-right: 0.2em;
 }
 
 #wzd-menu li.wzd-first {

@@ -900,10 +900,10 @@ class ContextController extends RiskController {
 				'type' => 'submit',
 				'label' => $buttonName['label'],
 			],
-			'save_draft' => [
-				'type' => 'submit',
-				'label' => 'Save',
-			],
+//			'save_draft' => [
+//				'type' => 'submit',
+//				'label' => 'Save',
+//			],
 			'reset' => [
 				'type' => 'submit',
 				'label' => 'Cancel',
