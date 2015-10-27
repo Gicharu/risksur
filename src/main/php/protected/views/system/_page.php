@@ -27,60 +27,49 @@ if ($editAccess) {
 
 	if($editMode) {
 		Yii::import('ext.imperavi-redactor-widget.ImperaviRedactorWidget');
-		$this->widget('ImperaviRedactorWidget', array(
+		CController::widget('ImperaviRedactorWidget', [
 			// You can either use it for model attribute
 			//'model' => $model,
 			//'attribute' => 'evaluationDescription',
 
 			// or just for input field
-			//'name' => 'my_input_name',
+//			'name' => 'survContent',
 			'selector' => '#survContent',
 			// Some options, see http://imperavi.com/redactor/docs/
-			'options' => array(
+			'options' => [
 				'lang' => 'en',
 				'toolbar' => true,
 				'buttonSource' => true,
 				'iframe' => false,
-				'linkNofollow' => true,
-				'allowedAttr' =>  [
-					['p', 'id'], ['a', ['name', 'target']], ['img', ['src', 'alt']]
-				],
 				'placeholder' => 'Enter some text...',
 				'pastePlainText' => true,
-				//'autosaveOnChange' => true,
-//				'autosaveFields' => [
-//					'pageId' => $content->docId,
-//					'ajax' => 1
-//				],
-//				'autosaveCallback' => 'js:function(json) {
-//					//console.log(json);
-//				}',
+
 				'focus' => true,
 				'imageUpload' => 'imageUpload',
 				//'imageManagerJson' => '/images/images.json',
 				//'css' => 'wym.css',
-			),
-			'plugins' => array(
-				'fullscreen' => array(
-					'js' => array('fullscreen.js',),
-				),
-				'fontsize' => array(
-					'js' => array('fontsize.js',),
-				),
-				'table' => array(
-					'js' => array('table.js',),
-				),
-				'imagemanager' => array(
-					'js' => array('imagemanager.js',),
-				),
-				'fontcolor' => array(
-					'js' => array('fontcolor.js',),
-				),
-			),
+			],
+			'plugins' => [
+				'fullscreen' => [
+					'js' => ['fullscreen.js',],
+				],
+				'fontsize' => [
+					'js' => ['fontsize.js',],
+				],
+				'table' => [
+					'js' => ['table.js',],
+				],
+				'imagemanager' => [
+					'js' => ['imagemanager.js',],
+				],
+				'fontcolor' => [
+					'js' => ['fontcolor.js',],
+				],
+			],
 
-		));
+		]);
 		echo CHtml::form($submitUrl);
-		echo CHtml::textArea('survContent', $content->docData, ['id' => 'survContent']);
+		echo CHtml::textArea('survContent', $content->docData);
 		echo CHtml::hiddenField('pageId', $content->docId);
 		echo CHtml::submitButton(Yii::t('translation', 'Save'));
 		echo CHtml::endForm();

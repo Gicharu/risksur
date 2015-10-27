@@ -137,12 +137,22 @@ class OptionsController extends RiskController {
 //		echo get_class($this->optionsMask['formFieldsModels'][$id]);
 		// Select all values whose inputType is ""Select"
 		$formElementsCriteria = new CDbCriteria();
-		$formElementsCriteria->condition = "inputType='dropdownlist'";
+		$formElementsCriteria->condition = "t.inputType='dropdownlist'";
+		if($this->optionsMask['formFieldsModels'][$id] == 'FrameworkFields') {
+//			$formElementsCriteria->join = 'LEFT JOIN parentLabel AS frameworkFields ON parentLabel.id = t.parentId';
+			$formElementsCriteria->with = 'parent';
+		}
 		//$formElementsModel = new {$this->optionsMask['formFieldsModels'][$id]};
 
 		$fetchOptions = CActiveRecord::model($this->optionsMask['formFieldsModels'][$id])->findAll($formElementsCriteria);
-		$formElements = CHtml::listData($fetchOptions, $this->optionsMask['joinLabels'][$id][0],
-			$this->optionsMask['joinLabels'][$id][1]);
+		//print_r($fetchOptions); die;
+		$formElements = CHtml::listData($fetchOptions, $this->optionsMask['joinLabels'][$id][0], function($option) use ($id) {
+			if(isset($option->parent)) {
+				return $option->parent->label . ' - ' . $option->{$this->optionsMask['joinLabels'][$id][1]};
+			}
+			return $option->{$this->optionsMask['joinLabels'][$id][1]};
+		}
+		);
 		//print_r($formElements); die;
 
 		$this->render('add', [

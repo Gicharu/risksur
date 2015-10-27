@@ -19,7 +19,7 @@
 		});
 		var optsTable = $("#optsTable").dataTable({
 			bJQueryUI: true,
-			"sDom": '<"H"rlf>t<"F"ip>',
+			"sDom": '<"H"r>t<"F"ip>',
 			"sPaginationType": "buttons_input",
 			"iDisplayLength": 5,
 			"bProcessing": true,
@@ -117,7 +117,7 @@
 	</div>
 	<div class="row">
 		<?php echo $form->labelEx($model, 'description'); ?>
-		<?php echo $form->textArea($model, 'description',array('size' => 50,'maxlength' => 50)); ?>
+		<?php echo $form->textArea($model, 'description'); ?>
 		<?php echo $form->error($model, 'description'); ?>
 	</div>
 <!--	<div class="row">-->

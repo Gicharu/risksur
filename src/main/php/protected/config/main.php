@@ -78,7 +78,6 @@ return CMap::mergeArray($configArray, array(
 		'application.extensions.TTMailer.*',
 		'application.extensions.Encryption.*',
 		'application.extensions.ModelToArray.*',
-//		'application.extensions.WizardBehaviour.*',
 		//'application.extensions.TKmlResource.*',
 		/*'application.extensions.timeout-dialog.*',*/
 		'application.controllers.*',

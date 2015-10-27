@@ -17,9 +17,9 @@
 				['label'  => Yii::t("translation", "New Surveillance System"), 'url' => ['create'],
 					'active' => strstr('create', $currentView)],
 				['label'  => Yii::t("translation", "List Existing Systems"), 'url' => ['list'],
-					'active' => strstr('list', $currentView)]
-//				['label'       => Yii::t("translation", "List Components"), 'url' => ['design/listComponents'],
-//					'itemOptions' => ['id' => 'showComponents']],
+					'active' => strstr('list', $currentView)],
+				['label'       => Yii::t("translation", "Report"), 'url' => ['report'],
+					'active' => strstr('report',  $currentView)],
 			];
 		}
 		// Setup Design controller side menus
@@ -48,7 +48,7 @@
 //						 'url'   => ['getDesignElements']],
 //					]
 				],
-				['label'=>'Reports', 'url'=> ['reports']],
+				['label'=>'Detailed Design', 'url'=> ['reports']],
 			];
 		}
 		//Evaluation controller side menus

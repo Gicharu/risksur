@@ -65,9 +65,9 @@
 			"aaData": <?php echo json_encode($surFormsArray); ?>,
 			"aoColumns": [
 				// {"mData": "formName", "sWidth": "8%"},
-				{"mData": "inputName"},
 				{"mData": "label"},
 				{"mData": "inputType", "sWidth": "9%"},
+				{"mData": "inputName"},
 				{"mData": "required", "fnCreatedCell": function (nTd, sData) {
 					var req = "Yes";
 					if (sData != "1") {
@@ -158,9 +158,9 @@
 		<thead>
 		<tr>
 			<!-- <th title="Status">Status</th> -->
-			<th title="Input Name">Input Name</th>
 			<th title="Label">Label</th>
 			<th title="Input Type">Input Type</th>
+			<th title="Input Name">Input Name</th>
 			<th title="Required">Required</th>
 			<th title="Edit">Edit</th>
 			<th title="Delete">Delete</th>

@@ -7,10 +7,9 @@
 ?>
 	<div class="ui-widget">
 		<div class="ui-widget-header">
-			<p>Surveillance System</p>
+			<h3 style="color:#ffffff">Surveillance System</h3>
 		</div>
 		<div class="ui-widget-content">
-			<p></p>
 			<?= $event->sender->menu->run(); ?>
 			<?php
 			if($event->sender->getCurrentStep() != 1) {
@@ -20,7 +19,8 @@
 			<?= '1.' . $event->sender->getCurrentStep() . ' ' .  $event->sender->getStepLabel(); ?>
 			</div>
 				<?php } ?>
-			<p><?= $sectionInfo->description; ?></p>
+			<br/>
+			<?= $sectionInfo->description; ?>
 
 			<?php
 			echo $this->renderPartial('_form', array('form' => $form, 'event' => $event));

@@ -51,7 +51,7 @@ class DForm extends CFormModel {
 		if($this->scenario == 'update' && $this->_properties[$name] == '') {
 			$frameworkDataCriteria = new CDbCriteria();
 			$frameworkDataCriteria->select = 'id, frameworkId, frameworkFieldId, value';
-			$frameworkDataCriteria->condition = 'frameworkId=' . Yii::app()->session['surveillanceId'];
+			$frameworkDataCriteria->condition = 'frameworkId=' . Yii::app()->session['surDesign']['id'];
 			$fieldId = self::getFieldId($name);
 			$frameworkDataCriteria->addCondition('frameworkFieldId=' . $fieldId);
 			$rsFrameworkData = FrameworkFieldData::model()->findAll($frameworkDataCriteria);
@@ -74,7 +74,7 @@ class DForm extends CFormModel {
 
 	public function getFieldDataId($fieldId) {
 		$fieldDataId = array_keys($this->_propertyDataMap, $fieldId);
-		return empty($fieldDataId) ? null : $fieldDataId[0];
+		return isset($fieldDataId[0]) ? $fieldDataId[0] : null;
 	}
 
 	/**

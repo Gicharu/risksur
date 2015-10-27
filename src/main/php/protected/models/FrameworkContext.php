@@ -13,6 +13,8 @@
 class FrameworkContext extends CActiveRecord {
 	public $name;
 	public $description;
+	public $frameworkId;
+	public $userId;
 	//public $goal;
 	//public $component;
 
@@ -96,7 +98,7 @@ class FrameworkContext extends CActiveRecord {
 	 */
 	public function attributeLabels() {
 		return array(
-			'name' => Yii::t('translation', 'Surveillance Name'),
+			'name' => Yii::t('translation', 'Surveillance System Name'),
 			'description' => Yii::t('translation', 'Surveillance Description'),
 		);
 	}

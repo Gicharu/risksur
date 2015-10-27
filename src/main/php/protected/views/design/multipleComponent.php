@@ -64,12 +64,12 @@ $(function() {
 //		});
 //	});
 
-	$('select')
+	$('body #DesignForm select')
 		.on('chosen:ready', function(chosen) {
 			//console.log($(chosen.currentTarget).attr('oldtitle'));
 			//console.log(chosen);
 			$(chosen.currentTarget.nextSibling).attr('title', $(chosen.currentTarget).attr('title'));
-			$('form [title!=""]').qtip({
+			$('body #DesignForm [title!=""]').qtip({
 				overwrite: true,
 				content: {
 					title: {
@@ -87,25 +87,25 @@ $(function() {
 			});
 		})
 		.chosen({
-			create_option: function(term){
-				var chosen = this;
-				var options = {
-					label: term,
-					componentId: $(chosen.form_field).data('field'),
-					scenario: 'addComponentField'
-				};
-				console.log(options);
-				//return;
-				$.post('<?= $this->createUrl("options/addOption"); ?>', {options}, function(data){
-					if(data.optionId != '') {
-						chosen.append_option({
-							value: data.optionId,
-							text: data.label
-						});
-
-					}
-				}, 'json');
-			},
+//			create_option: function(term){
+//				var chosen = this;
+//				var options = {
+//					label: term,
+//					componentId: $(chosen.form_field).data('field'),
+//					scenario: 'addComponentField'
+//				};
+//				console.log(options);
+//				//return;
+//				$.post('<?//= $this->createUrl("options/addOption"); ?>//', {options}, function(data){
+//					if(data.optionId != '') {
+//						chosen.append_option({
+//							value: data.optionId,
+//							text: data.label
+//						});
+//
+//					}
+//				}, 'json');
+//			},
 			skip_no_results: true
 		});
 
