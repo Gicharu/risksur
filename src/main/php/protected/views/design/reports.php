@@ -57,28 +57,70 @@ echo CHtml::closeTag('div');
 						"sMessage": '<p class="printHeader">Design Tool Report</p>',
 						"bShowAll": true
 					},
+//					{
+//
+//
+//						"sExtends": "pdf",
+//						oSelectorOpts: {
+//							page: 'current'
+//						},
+//						"sButtonText": "PDF",
+//						"mColumns": "visible",
+//						"fnClick": function (nButton, oConfig, flash) {
+//							flash.setFileName("Design Tool Report_" + getTitle() + ".pdf");
+//							this.fnSetText(flash,
+//								"title:" + this.fnGetTitle(oConfig) + "\n" +
+//								"message:" + oConfig.sPdfMessage + "\n" +
+//								"colWidth:" + this.fnCalcColRatios(oConfig) + "\n" +
+//								"orientation:" + oConfig.sPdfOrientation + "\n" +
+//								"size:" + oConfig.sPdfSize + "\n" +
+//								"--/TableToolsOpts--\n" +
+//								this.fnGetTableData(oConfig)
+//							);
+//						},
+//						"bShowAll": true
+//					},
 					{
 
+						"sExtends": "collection",
+						"sButtonText": "<?php echo Yii::t('translation', 'Save')?>",
+						"aButtons" : [ {
+							"sExtends": "pdf",
+							oSelectorOpts: {
+								page: 'current'
+							},
+							"mColumns": 'visible',
+							"sButtonText": "PDF",
+							"fnClick":  function( nButton, oConfig, flash ) {
+								flash.setFileName( "Design Tool Report_" + getTitle() + ".pdf" );
 
-						"sExtends": "pdf",
-						oSelectorOpts: {
-							page: 'current'
+								this.fnSetText( flash,
+									"title:"+ this.fnGetTitle(oConfig) +"\n"+
+									"message:"+ oConfig.sPdfMessage +"\n"+
+									"colWidth:"+ this.fnCalcColRatios(oConfig) +"\n"+
+									"orientation:"+ oConfig.sPdfOrientation +"\n"+
+									"size:"+ oConfig.sPdfSize +"\n"+
+									"--/TableToolsOpts--\n" +
+									this.fnGetTableData(oConfig)
+								);
+							}
 						},
-						"sButtonText": "PDF",
-						"mColumns": "visible",
-						"fnClick": function (nButton, oConfig, flash) {
-							flash.setFileName("Design Tool Report_" + getTitle() + ".pdf");
-							this.fnSetText(flash,
-								"title:" + this.fnGetTitle(oConfig) + "\n" +
-								"message:" + oConfig.sPdfMessage + "\n" +
-								"colWidth:" + this.fnCalcColRatios(oConfig) + "\n" +
-								"orientation:" + oConfig.sPdfOrientation + "\n" +
-								"size:" + oConfig.sPdfSize + "\n" +
-								"--/TableToolsOpts--\n" +
-								this.fnGetTableData(oConfig)
-							);
-						},
-						"bShowAll": true
+							{
+								"sExtends": "csv",
+								"sButtonText": "Excel (CSV)",
+								"sCharSet": "utf16le",
+								oSelectorOpts: {
+									page: 'current'
+								},
+								"mColumns": "visible",
+								"fnClick": function ( nButton, oConfig, oFlash ) {
+									oFlash.setFileName( "Design Tool Report_" + getTitle() + ".csv" );
+									this.fnSetText( oFlash,	"" + this.fnGetTableData(oConfig)
+									);
+								}
+							}
+						],
+						"bShowAll": false
 					}
 				]
 			},

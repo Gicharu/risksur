@@ -180,16 +180,16 @@ $(function(){
 	);
 
 });
-function MM_openBrWindow(theURL,winName,features) { //v2.0
-  window.open(theURL,winName,features);
-}
+//function MM_openBrWindow(theURL,winName,features) { //v2.0
+//  window.open(theURL,winName,features);
+//}
 </script>
-<style type="text/css">
-  /* css to overide some styles */
-	.ui-tabs .ui-tabs-panel { 
-		padding : 2px;
-	}
-</style>
+<!--<style type="text/css">-->
+<!--  /* css to overide some styles */-->
+<!--	.ui-tabs .ui-tabs-panel { -->
+<!--		padding : 2px;-->
+<!--	}-->
+<!--</style>-->
 	<title><?php echo CHtml::encode($this->pageTitle); ?></title>
 </head>
 
@@ -208,7 +208,7 @@ if (!Yii::app()->user->isGuest) {
 		<ul id="login">
 			<li id="ttlogo"><a href='//www.tracetracker.com' target="_blank">
 			<img src="<?= Yii::app()->homeUrl; ?>/images/tt_logo.png"
-				width="129" height="16" alt="trace tracker logo" />
+				width="129" height="16" alt="TraceTracker logo" />
 			</a></li>
 			<li>
 <?php

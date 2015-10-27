@@ -210,94 +210,6 @@ class ContextController extends RiskController {
 	}
 
 	/**
-	 * actionCreate
-	 *
-	 * @access public
-	 * @return void
-	 */
-//		public function actionCreate() {
-//			Yii::log("actionCreate ContextController called", "trace", self::LOG_CAT);
-//			$context = new FrameworkContext();
-//			$dForm = new DynamicFormDetails('create', 'frameworkFields');
-//			$dynamicLabels = array();
-//
-//			$elements = self::getDefaultElements(false);
-//			$elements['elements']['context']['elements'] = self::getElements($context, array('name', 'description'));
-//
-//			$elements['buttons'] = self::getButtons(array(
-//				'name' => 'createContext',
-//				'label' => 'Create'
-//			));
-//			$errorArray = array(
-//				'showErrors' => true,
-//				'showErrorSummary' => true,
-//				'errorSummaryHeader' => Yii::app()->params['headerErrorSummary'],
-//				'errorSummaryFooter' => Yii::app()->params['footerErrorSummary'],
-//			);
-//
-//			$elements['elements']['context']['type'] = 'form';
-//			$elements['elements']['contextFields']['type'] = 'form';
-//			$elements['elements']['context'] = array_merge($elements['elements']['context'], $errorArray);
-//			$elements['elements']['contextFields'] = array_merge($elements['elements']['contextFields'], $errorArray);
-//			$contextFields = $dForm->findAll();
-//			$dynamicDataAttributes = array();
-//			foreach ($contextFields as $field) {
-//				$dynamicDataAttributes[$field->inputName . '-' . $field->id] = $field->inputName;
-//				$dynamicLabels[$field->inputName . '-' . $field->id] = isset($field->label) ? $field->label : $dForm->generateAttributeLabel($field->inputName);
-//				$elements['elements']['contextFields']['elements'][$field->inputName . '-' . $field->id] = array(
-//					'label' => isset($field->label) ? $field->label : $dForm->generateAttributeLabel($field->inputName),
-//					'required' => $field->required,
-//					'type' => $field->inputType
-//				);
-//				if ($field->inputType == 'dropdownlist') {
-//					$elements['elements']['contextFields']['elements'][$field->inputName . '-' . $field->id]['items'] =
-//						Options::model()->getContextFieldOptions($field->id);
-//				}
-//				//$modelData[$field->inputName . '-' . $field->id] = $field->value;
-//			}
-////			print_r($elements); die;
-//			$dForm->_dynamicFields = $dynamicDataAttributes;
-//			$dForm->_dynamicLabels = $dynamicLabels;
-//			$form = new CForm($elements);
-//			$form['context']->model = $context;
-//			$form['contextFields']->model = $dForm;
-//			if ($form->submitted('createContext')) {
-//				$form->loadData();
-//				$frameworkFieldDataModel = new FrameworkFieldData();
-//				$context->userId = Yii::app()->user->id;
-//				if ($context->save(false)) {
-//					$frameworkFieldData = array();
-//					foreach ($_POST['DynamicFormDetails'] as $inputName => $inputVal) {
-//						$inputNameArray = explode('-', $inputName);
-//						$frameworkFieldData[] = array(
-//							'id' => null,
-//							'frameworkId' => $context->primaryKey,
-//							'frameworkFieldId' => $inputNameArray[1],
-//							'value' => $inputVal
-//						);
-//					}
-//					$command = FrameworkFieldData::model()
-//						->getDbConnection()
-//						->getSchema()
-//						->getCommandBuilder()
-//						->createMultipleInsertCommand($frameworkFieldDataModel->tableName(), $frameworkFieldData);
-//					if ($command->execute()) {
-//						Yii::app()->user->setFlash('success', 'Surveillance context updated successfully');
-//					}
-//					$this->redirect('list');
-//					return;
-//
-//				}
-//
-//				Yii::app()->user->setFlash('error', 'A problem occurred while creating the surveillance context, ' .
-//					'please try again or contact the administrator if this persists');
-//
-//			}
-//			$this->render('create', array('form' => $form));
-//
-//		}
-
-	/**
 	 * @return array
 	 */
 	public function behaviors() {
@@ -334,9 +246,18 @@ class ContextController extends RiskController {
 		}
 		return $steps;
 	}
+
+	/**
+	 * @return string
+	 */
 	private function getScenario() {
-		return isset(Yii::app()->session['surveillanceId']) ? 'update' : 'insert';
+		return isset(Yii::app()->session['surDesign']['id']) ? 'update' : 'insert';
 	}
+
+	/**
+	 * @param WizardEvent $event
+	 * @return bool
+	 */
 	public function processSurveillance($event) {
 		$fieldsCriteria = new CDbCriteria();
 		$fieldsCriteria->condition = 'sectionId=' . $event->sender->getCurrentStep();
@@ -349,7 +270,7 @@ class ContextController extends RiskController {
 		if($event->sender->getCurrentStep() === 1) {
 			$surveillanceModel->userId = Yii::app()->user->id;
 			if($dForm->scenario == 'update') {
-				$surveillanceModel = FrameworkContext::model()->findByPk(Yii::app()->session['surveillanceId']);
+				$surveillanceModel = FrameworkContext::model()->findByPk(Yii::app()->session['surDesign']['id']);
 			}
 			$elements['elements']['context']['elements'] = self::getElements($surveillanceModel,
 				['name']);
@@ -475,51 +396,76 @@ class ContextController extends RiskController {
 		$fieldData = [];
 		//$form->loadData();
 		if ($form->submitted('next')) {
-			//print_r($_POST['DForm']); die;
-			if(isset($_POST['DForm'][0])) {
-				// This can be refactored later
-				$dataIdArray = [];
-				foreach($_POST['DForm'] as $row => $rowData ) {
-						//print_r($rowData);
-					foreach($rowData as $attrName => $attrVal) {
-						if(!empty($attrVal)) {
-							if(is_array($attrVal)) {
-								$attrVal = json_encode($attrVal);
-							}
-							$fieldNameAndId = explode('_', $attrName);
-							$dataId = $dForm->getFieldDataId($fieldNameAndId[1]);
-							if(isset($dataId) && isset($dataIdArray[$dataId])) {
-								$dataId = null;
-							}
-							$dataIdArray[$dataId] = $dataId;
-							$fieldData[$row][$attrName]['frameworkFieldId'] = $fieldNameAndId[1];
-							$fieldData[$row][$attrName]['value'] = $attrVal;
-							$fieldData[$row][$attrName]['id'] = $dataId;
-
-						}
-					}
-					//print_r($fieldData); die;
+			$dForm = $form['contextFields']->model;
+			//print_r($form); die;
+			$transaction = Yii::app()->db->beginTransaction();
+			try {
+				if(isset($form['context']->model)) {
+					$surveillanceModel = $form['context']->model;
+					$surveillanceModel->save();
+					Yii::app()->session['surDesign']['id'] = $surveillanceModel->frameworkId;
 				}
-			} else {
-				if($form->validate()) {
-
-					//print_r($dForm->attributes); die;
-					foreach($dForm->attributes as $attrName => $attrVal) {
-						if(!empty($attrVal)) {
-							$fieldNameAndId = explode('_', $attrName);
-							$fieldData[$fieldNameAndId[0]]['frameworkFieldId'] = $fieldNameAndId[1];
-							$val = $attrVal;
-							if(is_array($attrVal)) {
-								$val = json_encode($attrVal);
-							}
-							$fieldData[$fieldNameAndId[0]]['value'] = $val;
-							$fieldData[$fieldNameAndId[0]]['id'] = $dForm->getFieldDataId($fieldNameAndId[1]);
-
+				//var_dump($this->surveillanceId . '   ------>tsergtretgretgerd'); die;
+				if(isset($dForm)) {
+					// This can be refactored later
+					$dataIdArray = [];
+					foreach($dForm->attributes as $attrName => $attrVal ) {
+						$frameworkDataModel = new FrameworkFieldData();
+						//var_dump($event->getStep()); die;
+						if(is_array($attrVal)) {
+							$attrVal = json_encode($attrVal);
 						}
-					}
+						$fieldNameAndId = explode('_', $attrName);
+						$dataId = $dForm->getFieldDataId($fieldNameAndId[1]);
+						//var_dump($dataId); die;
 
+						$dataIdArray[$dataId] = $dataId;
+						$frameworkDataModel->frameworkId = Yii::app()->session['surDesign']['id'];
+						$frameworkDataModel->frameworkFieldId = $fieldNameAndId[1];
+						$frameworkDataModel->value = $attrVal;
+						//print_r($frameworkDataModel->getAttribute('value')); die;
+						if(isset($dataId)) {
+							$frameworkDataModel->setIsNewRecord(false);
+							//$frameworkDataModel->id = $dataId;
+							$frameworkDataModel->updateAll(['value' => $frameworkDataModel->value],
+								'frameworkId=:framework AND frameworkFieldId=:fieldId',
+								[':framework' => $frameworkDataModel->frameworkId,
+								 ':fieldId' => $frameworkDataModel->frameworkFieldId]);
+						} else {
+							$frameworkDataModel->save();
+						}
+
+
+						//print_r($fieldData); die;
+					}
+					$transaction->commit();
 				}
+			} catch(Exception $e) {
+				$transaction->rollback();
+				Yii::log('Error saving surveillance data: ' . $e->getMessage() );
+				die;
 			}
+
+//			else {
+//				if($form->validate()) {
+//
+//					//print_r($dForm->attributes); die;
+//					foreach($dForm->attributes as $attrName => $attrVal) {
+//						if(!empty($attrVal)) {
+//							$fieldNameAndId = explode('_', $attrName);
+//							$fieldData[$fieldNameAndId[0]]['frameworkFieldId'] = $fieldNameAndId[1];
+//							$val = $attrVal;
+//							if(is_array($attrVal)) {
+//								$val = json_encode($attrVal);
+//							}
+//							$fieldData[$fieldNameAndId[0]]['value'] = $val;
+//							$fieldData[$fieldNameAndId[0]]['id'] = $dForm->getFieldDataId($fieldNameAndId[1]);
+//
+//						}
+//					}
+//
+//				}
+//			}
 			//$dForm->fieldId =
 			//$dataToSave = array($dForm->getAttributes());
 			$dataToSave = [$fieldData];
@@ -527,7 +473,7 @@ class ContextController extends RiskController {
 				$event->sender->save($surveillanceModel->getAttributes(), 'surveillanceModel');
 
 			}
-			//print_r($dForm); die;
+			//print_r($event->sender); die;
 			$event->sender->save($dataToSave);
 			//print_r($_SESSION['Wizard.steps']); die;
 			$event->handled = true;
@@ -580,89 +526,89 @@ class ContextController extends RiskController {
 	 * @param $event
 	 */
 	public function wizardFinished($event) {
-		$surveillanceDataModel = new FrameworkFieldData();
-		$frameWorkModel = new FrameworkContext();
-		$frameWorkData = $event->getData();
-		//print_r($frameWorkData['surveillanceModel']['frameworkId']); die;
-		if(isset($frameWorkData['surveillanceModel']['frameworkId'])) {
-			$frameWorkModel = FrameworkContext::model()->findByPk($frameWorkData['surveillanceModel']['frameworkId']);
-			$surveillanceDataModel->setScenario('update');
-		}
-		$frameWorkModel->attributes = $frameWorkData['surveillanceModel'];
-		//var_dump($frameWorkModel->validate()); die;
-		$transaction = Yii::app()->db->beginTransaction();
-		$dataKeys = [];
-		try {
-			if ($frameWorkModel->save()) {
-				//if(true) {
-				//print_r($frameWorkData); die;
-				unset($frameWorkData['surveillanceModel']);
-				//die;
-				foreach ($frameWorkData as $step => $formData) {
-					//print_r($formData);
-					//echo "_______________________________$step";
-					foreach ($formData as $fieldData) {
-						foreach($fieldData as $fieldName => $data) {
-							//print_r($data);
-							if (isset($data['value'])) {
-								$newRecord = is_null($data['id']) ? true : false;
-								$surveillanceDataModel->attributes = $data;
-								$surveillanceDataModel->frameworkId = $frameWorkModel->frameworkId;
-								$surveillanceDataModel->setPrimaryKey($data['id']);
-								$surveillanceDataModel->setIsNewRecord($newRecord);
-								//var_dump($surveillanceDataModel); //die;
-								$surveillanceDataModel->save();
-								if(isset($data['id'])) {
-									$dataKeys[] = $data['id'];
-								} else {
-									$dataKeys[] = $surveillanceDataModel->id;
-								}
-							} else {
-								foreach($data as $field) {
-
-									if(isset($field['value'])) {
-										$newRecord = is_null($field['id']) ? true : false;
-										$surveillanceDataModel->attributes = $field;
-										$surveillanceDataModel->frameworkId = $frameWorkModel->frameworkId;
-										$surveillanceDataModel->setPrimaryKey($field['id']);
-										$surveillanceDataModel->setIsNewRecord($newRecord);
-										$surveillanceDataModel->save();
-										if(isset($data['id'])) {
-											$dataKeys[] = $data['id'];
-										} else {
-											$dataKeys[] = $surveillanceDataModel->id;
-										}
-									}
-								}
-							}
-							//die;
-						}
-
-
-					}
-
-				}
-				//print_r($frameWorkModel); die;
-				//print_r($dataKeys);
-				$deleteCriteria = new CDbCriteria();
-				$deleteCriteria->condition = 'frameworkId=' . $frameWorkModel->frameworkId;
-				$deleteCriteria->addNotInCondition('id', $dataKeys);
-				//print_r($deleteCriteria); die;
-				$surveillanceDataModel->deleteAll($deleteCriteria);
-				$transaction->commit();
-
-			}
-		} catch (Exception $e) {
-			Yii::log($e->getMessage() . 'error when saving a surveillance system error code [' . $e->getCode() . ']',
-				'error', self::LOG_CAT);
-			$transaction->rollBack();
-			$event->sender->reset();
-			Yii::app()->end();
-			Yii::app()->user->setFlash('error', 'There was a problem saving the surveillance system, please try ' .
-				'again or contact your administrator is the problem persists');
-			$this->redirect('create');
-
-		}
+//		$surveillanceDataModel = new FrameworkFieldData();
+//		$frameWorkModel = new FrameworkContext();
+//		$frameWorkData = $event->getData();
+//		//print_r($frameWorkData['surveillanceModel']['frameworkId']); die;
+//		if(isset($frameWorkData['surveillanceModel']['frameworkId'])) {
+//			$frameWorkModel = FrameworkContext::model()->findByPk($frameWorkData['surveillanceModel']['frameworkId']);
+//			$surveillanceDataModel->setScenario('update');
+//		}
+//		$frameWorkModel->attributes = $frameWorkData['surveillanceModel'];
+//		//var_dump($frameWorkModel->validate()); die;
+//		$transaction = Yii::app()->db->beginTransaction();
+//		$dataKeys = [];
+//		try {
+//			if ($frameWorkModel->save()) {
+//				//if(true) {
+//				//print_r($frameWorkData); die;
+//				unset($frameWorkData['surveillanceModel']);
+//				//die;
+//				foreach ($frameWorkData as $step => $formData) {
+//					//print_r($formData);
+//					//echo "_______________________________$step";
+//					foreach ($formData as $fieldData) {
+//						foreach($fieldData as $fieldName => $data) {
+//							//print_r($data);
+//							if (isset($data['value'])) {
+//								$newRecord = is_null($data['id']) ? true : false;
+//								$surveillanceDataModel->attributes = $data;
+//								$surveillanceDataModel->frameworkId = $frameWorkModel->frameworkId;
+//								$surveillanceDataModel->setPrimaryKey($data['id']);
+//								$surveillanceDataModel->setIsNewRecord($newRecord);
+//								//var_dump($surveillanceDataModel); //die;
+//								$surveillanceDataModel->save();
+//								if(isset($data['id'])) {
+//									$dataKeys[] = $data['id'];
+//								} else {
+//									$dataKeys[] = $surveillanceDataModel->id;
+//								}
+//							} else {
+//								foreach($data as $field) {
+//
+//									if(isset($field['value'])) {
+//										$newRecord = is_null($field['id']) ? true : false;
+//										$surveillanceDataModel->attributes = $field;
+//										$surveillanceDataModel->frameworkId = $frameWorkModel->frameworkId;
+//										$surveillanceDataModel->setPrimaryKey($field['id']);
+//										$surveillanceDataModel->setIsNewRecord($newRecord);
+//										$surveillanceDataModel->save();
+//										if(isset($data['id'])) {
+//											$dataKeys[] = $data['id'];
+//										} else {
+//											$dataKeys[] = $surveillanceDataModel->id;
+//										}
+//									}
+//								}
+//							}
+//							//die;
+//						}
+//
+//
+//					}
+//
+//				}
+//				//print_r($frameWorkModel); die;
+//				//print_r($dataKeys);
+//				$deleteCriteria = new CDbCriteria();
+//				$deleteCriteria->condition = 'frameworkId=' . $frameWorkModel->frameworkId;
+//				$deleteCriteria->addNotInCondition('id', $dataKeys);
+//				//print_r($deleteCriteria); die;
+//				$surveillanceDataModel->deleteAll($deleteCriteria);
+//				$transaction->commit();
+//
+//			}
+//		} catch (Exception $e) {
+//			Yii::log($e->getMessage() . 'error when saving a surveillance system error code [' . $e->getCode() . ']',
+//				'error', self::LOG_CAT);
+//			$transaction->rollBack();
+//			$event->sender->reset();
+//			Yii::app()->end();
+//			Yii::app()->user->setFlash('error', 'There was a problem saving the surveillance system, please try ' .
+//				'again or contact your administrator is the problem persists');
+//			$this->redirect('create');
+//
+//		}
 		//die('hapa');
 		unset(Yii::app()->session['surveillanceObjective']);
 		unset(Yii::app()->session['surDesign']);
@@ -671,7 +617,7 @@ class ContextController extends RiskController {
 //		Yii::app()->end();
 		Yii::app()->user->setFlash('success', 'Surveillance system characterisation is now complete, you have' .
 			' characterised this surveillance system as:');
-		$this->redirect(['report', 'systemId' => $frameWorkModel->frameworkId]);
+		$this->redirect(['report', 'systemId' => Yii::app()->session['surDesign']['id']]);
 	}
 
 	/**
@@ -679,7 +625,7 @@ class ContextController extends RiskController {
 	 */
 	public function actionCreate($step=null) {
 
-		unset(Yii::app()->session['surveillanceId']);
+		unset(Yii::app()->session['surDesign']['id']);
 		$this->process($step);
 	}
 
@@ -791,7 +737,7 @@ class ContextController extends RiskController {
 	 */
 	public function actionUpdate($step = null, $id = null) {
 		if (isset($id)) {
-			Yii::app()->session['surveillanceId'] = $id;
+			Yii::app()->session['surDesign'] = ['id' => $id];
 		}
 		$this->process($step);
 	}
@@ -996,7 +942,7 @@ class ContextController extends RiskController {
 			}, $childFields);
 			// get grid data
 			$fieldDataCriteria = new CDbCriteria();
-			$fieldDataCriteria->condition = 'frameworkId=' . Yii::app()->session['surveillanceId'];
+			$fieldDataCriteria->condition = 'frameworkId=' . Yii::app()->session['surDesign']['id'];
 			$fieldDataCriteria->addInCondition('frameworkFieldId', $gridFieldsIds);
 			$gridFields = FrameworkFieldData::model()->findAll($fieldDataCriteria);
 			if(empty($gridFields)) {
