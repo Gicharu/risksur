@@ -241,32 +241,35 @@ if (!Yii::app()->user->isGuest) {
 		</div>
 	<div id="designName">
 	<?php
-	$activeDesignAction = 'Select';
-	$activeSurSystem = '';
-	$surSystemOptions = [
-		'class' => 'chozen',
-		'empty' => 'Select one...',
-		'data-placeholder' => 'Select one',
-		'id' => 'systemSelector',
-		'onchange' => "if(\$(this).val() !== '') {window.location='" .
-			Yii::app()->createUrl('context/view') . "/id/' + $(this).val()}"
-	];
-	if (!empty(Yii::app()->session['surDesign'])) {
-		$activeSurSystem = Yii::app()->session['surDesign']['id'];
-		//$activeDesignAction = 'Change';
-		unset($surSystemOptions['empty'], $surSystemOptions['data-placeholder']);
-	}
-	$surSystemCriteria = new CDbCriteria();
-	$surSystemCriteria->select = 'frameworkId, name';
-	$surSystemCriteria->condition = 'userId=:user';
-	$surSystemCriteria->params = [
-		':user' => Yii::app()->user->id
-	];
+	if(!Yii::app()->user->isGuest) {
+
+		$activeDesignAction = 'Select';
+		$activeSurSystem = '';
+		$surSystemOptions = [
+			'class' => 'chozen',
+			'empty' => 'Select one...',
+			'data-placeholder' => 'Select one',
+			'id' => 'systemSelector',
+			'onchange' => "if(\$(this).val() !== '') {window.location='" .
+				Yii::app()->createUrl('context/view') . "/id/' + $(this).val()}"
+		];
+		if (!empty(Yii::app()->session['surDesign'])) {
+			$activeSurSystem = Yii::app()->session['surDesign']['id'];
+			//$activeDesignAction = 'Change';
+			unset($surSystemOptions['empty'], $surSystemOptions['data-placeholder']);
+		}
+		$surSystemCriteria = new CDbCriteria();
+		$surSystemCriteria->select = 'frameworkId, name';
+		$surSystemCriteria->condition = 'userId=:user';
+		$surSystemCriteria->params = [
+			':user' => Yii::app()->user->id
+		];
 		//echo "Selected surveillance system: $activeSurSystem <a href='" . Yii::app()->createUrl("context/list") . "'>$activeDesignAction</a>";
 		echo CHtml::label('Current surveillance system: ', 'systemSelector');
 		echo CHtml::dropDownList('systemSelector', $activeSurSystem,
 			CHtml::listData(FrameworkContext::model()->findAll($surSystemCriteria
 			), 'frameworkId', 'name'), $surSystemOptions);
+	}
 	?>
 	</div>
 	<div id="evalName">
