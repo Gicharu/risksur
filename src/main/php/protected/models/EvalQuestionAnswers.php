@@ -40,6 +40,7 @@ class EvalQuestionAnswers extends CActiveRecord {
 		// class name for the relations automatically generated below.
 		return array(
 			'evalQuestion' => array(self::BELONGS_TO, 'EvaluationQuestion', 'evalQuestionId'),
+			'nextQuestion' => array(self::BELONGS_TO, 'EvaluationQuestion', 'nextQuestion'),
 		);
 	}
 

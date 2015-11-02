@@ -40,12 +40,26 @@
 						"sButtonText": "<?php echo Yii::t('translation', 'Save')?>",
 						"aButtons": [{
 							"sExtends": "pdf",
-							oSelectorOpts: {
-								page: 'current'
-							},
+							"sNewLine": "auto",
+							"sPdfOrientation": 'landscape',
+//							oSelectorOpts: {
+//								page: 'current'
+//							},
 							"sButtonText": "PDF",
 							"fnClick": function (nButton, oConfig, flash) {
 								flash.setFileName("Evaluation_Summary_" + getTitle() + ".pdf");
+//								var a = TableTools.fnGetMasters();
+//								var s = '';
+//								var ttOpts = '';
+//								ttOpts += "title:" + this.fnGetTitle(oConfig) + "\n";
+//								for ( var i=0, iLen=a.length ; i<iLen ; i++ ) {
+//
+//									s += a[i].fnGetTableData( oConfig );
+//									ttOpts += "message:" + oConfig.sPdfMessage + "\n" +
+//									"colWidth:" + a[i].fnCalcColRatios(oConfig) + "\n" +
+//									"orientation:" + oConfig.sPdfOrientation + "\n" +
+//									"size:" + oConfig.sPdfSize + "\n";
+//								}
 								this.fnSetText(flash,
 									"title:" + this.fnGetTitle(oConfig) + "\n" +
 									"message:" + oConfig.sPdfMessage + "\n" +

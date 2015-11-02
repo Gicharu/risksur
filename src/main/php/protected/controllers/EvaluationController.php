@@ -424,7 +424,7 @@ class EvaluationController extends RiskController {
 		Yii::log("actionEvaQuestionWizard called", "trace", self::LOG_CAT);
 		$this->setPageTitle('Evaluation question wizard');
 		$this->layout = '//layouts/column3';
-		$model = new EvaluationQuestion();
+		$model = new EvaluationQuestion('wizard');
 		$elements = ContextController::getDefaultElements();
 		$questionId = '';
 		$menu = [];
@@ -436,18 +436,19 @@ class EvaluationController extends RiskController {
 
 		} else {
 			//print_r($_POST); die;
-			$questionId = $_POST['EvaluationQuestion']['question'];
+			$answerId = $_POST['EvaluationQuestion']['answer'];
+			$rsAnswers = EvalQuestionAnswers::model()->with('evalQuestion')->findByPk($answerId);
+			$questionId = $rsAnswers->nextQuestion;
 			$questions = $model->with('evalQuestionAnswers')->findByPk($questionId);
 			//var_dump($questions); die();
 			if($questions->flag !== 'final') {
-				$rsMenu = EvalQuestionAnswers::model()
-					->with('evalQuestion')
-					->find('t.evalQuestionId=:id OR nextQuestion=:next', [':id' => $questions->parentQuestion, ':next' => $questions->evalQuestionId]);
+
 				//print_r($rsMenu); die;
-				$menu = CHtml::tag('li', [], "Q: " . addslashes($rsMenu->evalQuestion->question) . "<br /> A: "  . $rsMenu->optionName);
+				$menu = CHtml::tag('li', [], "Q: " . addslashes($rsAnswers->evalQuestion->question) .
+					"<br /> A: "  . $rsAnswers->optionName);
 				Yii::app()->session['leftMenu'] .= $menu;
-				if(isset($rsMenu->flashQuestion)) {
-					Yii::app()->user->setFlash('notice', $rsMenu->flashQuestion);
+				if(isset($rsAnswers->flashQuestion)) {
+					Yii::app()->user->setFlash('notice', $rsAnswers->flashQuestion);
 
 				}
 
@@ -471,7 +472,7 @@ class EvaluationController extends RiskController {
 		}
 		$elements['elements'] = [
 			'<h4>' . $questions->question . '</h4>',
-			'question' => [
+			'answer' => [
 				'type'         => 'radiolist',
 				'style'        => 'width:1em;',
 				'labelOptions' => ['style' => 'display:inline'],
@@ -618,15 +619,39 @@ class EvaluationController extends RiskController {
 			});
 			$components = rtrim($components, ',');
 		}
-		$rsSurvObj = FrameworkFields::model()->with('options', 'data')->find("inputName='survObj' AND data.frameworkId="
-			. $model['frameworks']['frameworkId'] . " AND data.value=options.optionId");
-		//print_r($rsSurvObj); die;
+		$rsSurveillance = FrameworkFields::model()->with('options', 'data')->findAll("inputName IN ('hazardName', 'survObj', 'geographicalArea', 'stateOfDisease', 'legalReq') AND data.frameworkId="
+			. $model['frameworks']['frameworkId']);
+		//print_r($rsSurveillance); die;
 
 		$evaDetails[] = ['Evaluation name', $model['evaluationName']];
 		$evaDetails[] = ['Surveillance system name', $model['frameworks']['name']];
+		$inputNameMap = [
+			'survObj' => 'Surveillance objective',
+			'hazardName' => 'Hazard name',
+			'stateOfDisease' => 'Hazard situation',
+			'geographicalArea' => 'Geographical area',
+			'legalReq' => 'Legal requirements'
+		];
+		foreach ($rsSurveillance as $survKey => $survData) {
+			$key = $survKey + 2;
+			$evaDetails[$key] = [$inputNameMap[$survData->inputName], $survData->data[0]->value];
+			if(isset($survData->options[0])) {
+				$selectedOption = $survData->data[0]->value;
+				if(DForm::isJson($selectedOption)) {
+					$selectedOption = json_decode($survData->data[0]->value)[0];
+				}
+				foreach ($survData->options as $option) {
+					if($option->optionId == $selectedOption) {
+						$evaDetails[$key] = [$inputNameMap[$survData->inputName], $option->label];
+						break;
+					}
+				}
+
+			}
+		}
+
 		$evaDetails[] = ['Surveillance components to evaluate', $components]; //$evaDetailsArray;
-		$evaDetails[] = ['Surveillance objective', isset($rsSurvObj['options'][0]['label']) ?
-			$rsSurvObj['options'][0]['label'] : ''];
+
 		$evaDetails[] = ['Evaluation question', $model['question']['question']];
 		$evaDetails[] = ['Evaluation criteria', $model['evaCriteria']];
 		$evaDetails[] = ['Evaluation method', $model['evaMethods']];
@@ -775,6 +800,19 @@ class EvaluationController extends RiskController {
 	public function actionSelectEvaAttributes() {
 		$this->setPageTitle('Select Evaluation Attributes');
 		$evaDetails = $this->getEvaDetails();
+		//print_r($evaDetails); die;
+		// Check if the evaluation is component based and check if components are selected
+		$componentsCriteria = new CDbCriteria();
+		$componentsCriteria->condition = 't.evalId=:evaId AND evaElements.inputName=:name';
+		$componentsCriteria->with = ['evaluationHead', 'evaElements', 'options'];
+		$componentsCriteria->params = [':evaId' => $this->evaContextId, ':name' => 'evaType'];
+		$rsComponents = EvaluationDetails::model()->find($componentsCriteria);
+		//print_r($rsComponents); die;
+		if($rsComponents->options->label == 'Component' && empty($rsComponents->evaluationHead->components)) {
+			Yii::app()->user->setFlash('notice', 'Please select the surveillance components to evaluate first');
+			$this->redirect('selectComponents');
+
+		}
 		$this->docName = 'evaAttributes';
 		if (isset($_POST['pageId'])) {
 			SystemController::savePage('selectEvaAttributes');
@@ -1269,13 +1307,14 @@ class EvaluationController extends RiskController {
 		$surveillanceRs = FrameworkFields::model()->with('data', 'options')->findAll($surveillanceCriteria);
 		$surveillanceFields = [
 			'hazardName'       => 'Hazard Name',
-			'survobj'          => 'Surveillance objective',
+			'survObj'          => 'Surveillance objective',
 			'geographicalArea' => 'Geographical area',
 			'stateOfDisease'   => 'Hazard situation',
 			'legalReq'         => 'Legal Requirements',
 		];
 //		$evaDetails[] = ['Evaluation Name', $model['evaluationName']];
-		//print_r($surveillanceRs); die;
+//		print_r($surveillanceRs); die;
+//		var_dump(DForm::isJson('68')); die;
 		$surveillanceSummary = [];
 		$surveillanceSummary[] = ['Surveillance system name', Yii::app()->session['surDesign']['name']];
 		foreach ($surveillanceRs as $surveillanceFieldKey => $surveillanceField) {
@@ -1288,7 +1327,12 @@ class EvaluationController extends RiskController {
 				if (isset($surveillanceField->options[0]) && isset($surveillanceField->data[0])) {
 					//die('pop');
 					foreach ($surveillanceField->options as $option) {
-						if (($dataValue = json_decode($surveillanceField->data[0]['value'])[0]) == $option->optionId) {
+						$dataValue = $surveillanceField->data[0]['value'];
+						if(DForm::isJson($surveillanceField->data[0]['value'])) {
+							$dataValue = json_decode($surveillanceField->data[0]['value'])[0];
+						}
+						//echo $dataValue;
+						if ($dataValue == $option->optionId) {
 							$surveillanceSummary[$surveillanceFieldKey] =
 								[$surveillanceKey, $option->label];
 							break;
@@ -1299,6 +1343,7 @@ class EvaluationController extends RiskController {
 
 			}
 		}
+		//die;
 		$surveillanceComponents = CHtml::link('add surveillance components', ['design/addMultipleComponents']);
 		// Get surveillance components
 		$rsComponents = ComponentHead::model()->findAll('frameworkId=:framework', [':framework' => $this->frameworkId]);
