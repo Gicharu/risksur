@@ -80,6 +80,7 @@ class EvaAttributesAssessmentMethods extends CActiveRecord {
 		$this->description = UtilModel::urlToLink($this->description);
 		$this->dataRequired = UtilModel::urlToLink($this->dataRequired);
 		$this->expertiseRequired = UtilModel::urlToLink($this->expertiseRequired);
+		$this->reference = UtilModel::urlToLink($this->reference);
 		parent::afterFind();
 
 	}

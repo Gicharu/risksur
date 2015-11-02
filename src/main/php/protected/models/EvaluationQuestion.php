@@ -10,6 +10,8 @@
  * @property EvalQuestionOptions[] $evalQuestionOptions
  */
 class EvaluationQuestion extends CActiveRecord {
+
+	public $answer;
 	/**
 	 * @return string the associated database table name
 	 */
@@ -23,12 +25,13 @@ class EvaluationQuestion extends CActiveRecord {
 	public function rules() {
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
-		return array(
-			array('question, questionNumber', 'required'),
-			array('parentQuestion', 'length', 'max' => 11),
+		return [
+			['question, questionNumber', 'required'],
+			['parentQuestion', 'length', 'max' => 11],
+			['answer', 'required', 'on' => 'wizard']
 			// The following rule is used by search().
 			//array('evalQuestionId, question, parentQuestion', 'safe', 'on'=>'search'),
-		);
+		];
 	}
 
 	/**
@@ -100,7 +103,7 @@ class EvaluationQuestion extends CActiveRecord {
 		$items = array();
 		foreach($model as $item) {
 			if(empty($item->url)) {
-				$items[$item->nextQuestion] = $item->optionName;
+				$items[$item->id] = $item->optionName;
 			}
 		}
 		//print_r($items); die;

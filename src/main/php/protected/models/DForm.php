@@ -82,7 +82,7 @@ class DForm extends CFormModel {
 	 * @return bool
 	 */
 	public static function isJson($string) {
-		if(!empty($string)) {
+		if(!empty($string) && !is_numeric($string)) {
 			json_decode($string);
 			return (json_last_error() == JSON_ERROR_NONE);
 		}

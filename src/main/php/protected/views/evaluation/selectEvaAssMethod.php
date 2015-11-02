@@ -52,14 +52,14 @@
 
 
 					},
-					{"mData": "name"},
+					{"mData": "name", "sWidth": '5%'},
 					{
 						"mData": null, "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
 						var description = '<ul><li><b> Description: </b>' + oData.description +
 							'</li><li><b> Data required: </b>' + oData.dataRequired +
 							'</li><li><b> Expertise required: </b>' + oData.expertiseRequired + '</li></ul>';
 						$(nTd).html(description)
-					}
+					}, "sWidth": '50%'
 					},
 					{
 						"mData": null, "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
@@ -88,12 +88,15 @@
 						}
 					}
 					},
-					{"mData": "reference"}
+					{"mData": "reference", "sWidth": '5%'}
 				],
 //			"aaSorting": [[0,'desc']],
 				"bJQueryUI": true,
 				"sPaginationType": "buttons_input",
-				"bRetrieve": true
+				"bRetrieve": true,
+				"fnInitComplete": function() {
+					this.fnAdjustColumnSizing(true);
+				}
 
 			});
 		}
@@ -102,14 +105,21 @@
 			if (element != '') {
 				var evaMethodsTable = initTable();
 				evaMethodsTable.fnReloadAjax('<?= $this->createUrl("selectEvaAssMethod"); ?>/id/' + element, customAssData);
-				$('.row').toggle();
+//				evaMethodsTable.fnAdjustColumnSizing();
+				//$('.row').toggle();
 			}
 			//$('.row').toggle();
 		}
 		function customAssData(data) {
+			console.log(data);
 			//console.log(data.customMethod.isEmptyObject());
 			if(data.customMethod !== null && typeof data.customMethod.customAssessmentMethod != 'undefined') {
 				$('#EvaAssessmentMethods_customAssessmentMethod').val(data.customMethod.customAssessmentMethod);
+			}
+			if(data.aaData.length == 0) {
+				$('.row').hide();
+			} else {
+				$('.row').show();
 			}
 		}
 		//var evaMethodsTable;

@@ -403,7 +403,7 @@ class ContextController extends RiskController {
 				if(isset($form['context']->model)) {
 					$surveillanceModel = $form['context']->model;
 					$surveillanceModel->save();
-					Yii::app()->session['surDesign']['id'] = $surveillanceModel->frameworkId;
+					Yii::app()->session['surDesign'] = ['id' => $surveillanceModel->frameworkId];
 				}
 				//var_dump($this->surveillanceId . '   ------>tsergtretgretgerd'); die;
 				if(isset($dForm)) {
@@ -611,7 +611,7 @@ class ContextController extends RiskController {
 //		}
 		//die('hapa');
 		unset(Yii::app()->session['surveillanceObjective']);
-		unset(Yii::app()->session['surDesign']);
+//		unset(Yii::app()->session['surDesign']);
 		unset(Yii::app()->session['evaContext']);
 		$event->sender->reset();
 //		Yii::app()->end();
@@ -629,6 +629,10 @@ class ContextController extends RiskController {
 		$this->process($step);
 	}
 
+	/**
+	 * @param null $systemId
+	 * @param null $ajax
+	 */
 	public function actionReport($systemId = null, $ajax = null) {
 		$surveillanceReport = [];
 

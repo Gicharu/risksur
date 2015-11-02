@@ -11,6 +11,9 @@
  * @var $evaAttributes array
  * @var $this EvaluationController
  */
+
+$this->renderPartial('_detailsTable', ['evaDetails' => $evaDetails, 'tools' => true]);
+
 ?>
 <script type="text/javascript">
 	var dataAvailabilityMap = <?= json_encode([
@@ -238,7 +241,6 @@ $this->renderPartial('//system/_page', [
 	'editAccess' => $page['editAccess'],
 	'editMode' => $page['editMode']
 ]);
-$this->renderPartial('_detailsTable', ['evaDetails' => $evaDetails, 'tools' => true]);
 ?>
 <span class="widgetTitle">
 	Evaluation Attributes

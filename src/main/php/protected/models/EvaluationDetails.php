@@ -60,6 +60,7 @@ class EvaluationDetails extends CActiveRecord {
 	public function relations() {
 		return [
 			'evaluationHead' => [ self::BELONGS_TO, 'EvaluationHeader', 'evalId' ],
+			'evaElements' => [ self::BELONGS_TO, 'EvaluationElements', 'evalElementsId' ],
 			'options' => [ self::BELONGS_TO, 'Options', 'value' ]
 		];
 	}
