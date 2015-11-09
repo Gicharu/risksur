@@ -4,3 +4,8 @@ php:
   - 5.5
   - 5.6
   - nightly
+  
+env:
+  - DB=mysql
+  
+script: phpunit --configuration src/test/resources/php.ini --bootstrap src/main/php/protected/tests/bootstrap.php --debug --verbose src/main/php/protected/tests/unit
