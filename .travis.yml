@@ -7,5 +7,9 @@ php:
   
 env:
   - DB=mysql
-  
-script: phpunit --configuration src/test/resources/php.ini --bootstrap src/main/php/protected/tests/bootstrap.php --debug --verbose src/main/php/protected/tests/unit
+services:
+  - mysql  
+before_script: 
+- phpenv config-add src/test/resources/php.ini
+- mysql -e 'create database risksur;'
+script: phpunit --configuration src/main/php/protected/tests/phpunit.xml --bootstrap src/main/php/protected/tests/bootstrap.php --debug --verbose src/main/php/protected/tests/unit
