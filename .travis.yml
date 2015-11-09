@@ -1,0 +1,15 @@
+language: php
+php:
+  - 5.4
+  - 5.5
+  - 5.6
+  - nightly
+  
+env:
+  - DB=mysql
+services:
+  - mysql  
+before_script: 
+- phpenv config-add src/test/resources/php.ini
+- mysql -e 'create database risksur;'
+script: phpunit --configuration src/main/php/protected/tests/phpunit.xml --bootstrap src/main/php/protected/tests/bootstrap.php --debug --verbose src/main/php/protected/tests/unit
